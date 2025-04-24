@@ -27,6 +27,6 @@ app.get("/", (req, res) => {
 // 라우터 모듈 등록
 app.use("/sales", salesRouter);
 app.use("/mat", matRouter);
-app.use("/work", workRouter);
+app.use("/", workRouter);
 app.use("/fac", facRouter);
 app.use("/qual", qualRouter);
