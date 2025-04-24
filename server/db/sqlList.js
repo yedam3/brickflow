@@ -6,7 +6,7 @@ const qual = require('./sqls/qual.js');
 const agTest = require('./sqls/agTest.js')
 module.exports = {
     ...work,
-    // ...sales,
+    ...sales,
     // ...work,
     // ...mat,
     // ...fac,
