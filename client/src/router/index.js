@@ -38,6 +38,16 @@ const router = createRouter({
                     name: 'Report',
                     component: () => import('@/views/pages/work/Report.vue')
                 },
+                {
+                    path: '/sales/home',
+                    name: 'saleshome',
+                    component: () => import('@/views/pages/sales/saleshome.vue')
+                },
+                {
+                    path: '/sales/saleorder',
+                    name: 'saleorder',
+                    component: () => import('@/views/pages/sales/saleorder.vue')
+                },
             ]
         },
         // {

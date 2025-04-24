@@ -20,7 +20,7 @@ const model = ref([
                     {
                         label: '주문관리',
                         icon: 'pi pi-fw pi-sign-in',
-                        to: '/'
+                        to: '/sales/saleorder'
                     },
                     {
                         label: '출/입고 관리',
