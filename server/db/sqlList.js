@@ -3,7 +3,7 @@ const work = require('./sqls/work.js');
 const mat = require('./sqls/mat.js');
 const fac = require('./sqls/fac.js');
 const qual = require('./sqls/qual.js');
-
+const agTest = require('./sqls/agTest.js')
 module.exports = {
     ...work,
     ...sales,
@@ -11,4 +11,5 @@ module.exports = {
     // ...mat,
     // ...fac,
     // ...qual,
+    ...agTest
 }

@@ -19,6 +19,7 @@ const workRouter = require("./routers/work_router.js");
 const matRouter = require("./routers/mat_router.js");
 const facRouter = require("./routers/fac_router.js");
 const qualRouter = require("./routers/qual_router.js");
+const agTest = require("./routers/agTest_router.js");
 
 // 기본 라우팅
 app.get("/", (req, res) => {
@@ -30,3 +31,4 @@ app.use("/mat", matRouter);
 app.use("/", workRouter);
 app.use("/fac", facRouter);
 app.use("/qual", qualRouter);
+app.use("/", agTest);

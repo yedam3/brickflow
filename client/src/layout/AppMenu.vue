@@ -14,8 +14,8 @@ const model = ref([
         to: '/pages',
         items: [
         {
-                label: '영업관리',
-                icon: 'pi pi-fw pi-tag',
+                label: '공통관리',
+                icon: 'pi pi-fw pi-user layout-menuitem-icon pi-spin',
                 items: [
                     {
                         label: '주문관리',
@@ -23,13 +23,39 @@ const model = ref([
                         to: '/sales/saleorder'
                     },
                     {
-                        label: '출/입고 관리',
+                        label: '출고 관리',
                         icon: 'pi pi-fw pi-times-circle',
                         to: '/'
                     },
                     {
-                        label: '매출 관리',
-                        icon: 'pi pi-fw pi-lock',
+                        label: '완제품 입고관리',
+                        icon: 'pi pi-fw pi-times-circle',
+                        to: '/'
+                    },
+                    {
+                        label: '반품관리',
+                        icon: 'pi pi-fw pi-sign-in',
+                        to: '/'
+                    },
+                ]
+        },
+        {
+                label: '영업관리',
+                icon: 'pi pi-spin pi-fw pi-tag',
+                items: [
+                    {
+                        label: '주문관리',
+                        icon: 'pi pi-fw pi-sign-in',
+                        to: '/'
+                    },
+                    {
+                        label: '출고 관리',
+                        icon: 'pi pi-fw pi-times-circle',
+                        to: '/'
+                    },
+                    {
+                        label: '완제품 입고관리',
+                        icon: 'pi pi-fw pi-times-circle',
                         to: '/'
                     },
                     {
@@ -41,7 +67,7 @@ const model = ref([
             },
             {
                 label: '생산관리',
-                icon: 'pi pi-fw pi-tag',
+                icon: 'pi pi-spin pi-cog',
                 items: [
                     {
                         label: '생산 계획 관리',
@@ -72,12 +98,12 @@ const model = ref([
             },
             {
                 label: '자재관리',
-                icon: 'pi pi-fw pi-tag',
+                icon: 'pi pi-fw pi-spin pi-box',
                 items: [
                     {
-                        label: 'Login',
+                        label: '자재발주관리',
                         icon: 'pi pi-fw pi-sign-in',
-                        to: '/'
+                        to: '/mat/order'
                     },
                     {
                         label: 'Error',
@@ -85,15 +111,15 @@ const model = ref([
                         to: '/'
                     },
                     {
-                        label: 'Access Denied',
+                        label: 'AG테스트',
                         icon: 'pi pi-fw pi-lock',
-                        to: '/'
+                        to: '/mat/practice'
                     }
                 ]
             },
             {
                 label: '설비관리',
-                icon: 'pi pi-fw pi-tag',
+                icon: 'pi pi-spin pi-wrench',
                 items: [
                     {
                         label: '설비 정보 등록',
@@ -129,7 +155,7 @@ const model = ref([
             },
             {
                 label: '품질관리',
-                icon: 'pi pi-fw pi-tag',
+                icon: 'pi pi-spin pi-file-edit',
                 items: [
                     {
                         label: '자재 검수',
