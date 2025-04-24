@@ -1,4 +1,4 @@
-// env 파일을 읽어들이는 코드 => 가능한 가장 첫번쨰 줄에 작성
+// env 파일을 읽어들이는 코드 => 가능한 가장 첫번쨰 줄에 작성 
 require("dotenv").config({ path: "./db/configs/dbConfig.env" });
 const express = require("express");
 const app = express();
