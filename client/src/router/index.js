@@ -1,6 +1,11 @@
 import AppLayout from '@/layout/AppLayout.vue';
 import { createRouter, createWebHistory } from 'vue-router';
-
+import workRoutes from './routes/work.js';
+import matRoutes from './routes/mat.js';
+import qualityRoutes from './routes/quality.js';
+import sellerRoutes from './routes/seller.js';
+import facRoutes from './routes/fac.js';
+import adminRouter from './routes/admin.js';
 const router = createRouter({
     history: createWebHistory(),
     routes: [
@@ -8,36 +13,8 @@ const router = createRouter({
             path: '/',
             component: AppLayout,
             children: [
-                {
-                    path: '/',
-                    name: 'dashboard',
-                    component: () => import('@/views/DashBoard.vue')
-                },
-                {
-                    path: '/work/schedule',
-                    name: 'Schedule',
-                    component: () => import('@/views/pages/work/Schedule.vue')
-                },
-                {
-                    path: '/work/dispatch',
-                    name: 'Dispatch',
-                    component: () => import('@/views/pages/work/Dispatch.vue')
-                },
-                {
-                    path: '/work/order',
-                    name: 'Order',
-                    component: () => import('@/views/pages/work/Order.vue')
-                },
-                {
-                    path: '/work/process',
-                    name: 'Process',
-                    component: () => import('@/views/pages/work/Process.vue')
-                },
-                {
-                    path: '/work/report',
-                    name: 'Report',
-                    component: () => import('@/views/pages/work/Report.vue')
-                },
+                ...workRoutes,
+                ...matRoutes
             ]
         },
         // {
