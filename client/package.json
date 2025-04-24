@@ -1,0 +1,40 @@
+{
+  "name": "client",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build"
+  },
+  "dependencies": {
+    "@coreui/coreui": "^5.2.0",
+    "@coreui/vue": "^5.4.1",
+    "@primeuix/themes": "^1.0.0",
+    "ag-grid-community": "^32.2.0",
+    "ag-grid-vue3": "^32.2.0",
+    "axios": "^1.8.4",
+    "chart.js": "3.3.2",
+    "core-js": "^3.8.3",
+    "primeicons": "^7.0.0",
+    "primevue": "^4.3.1",
+    "tailwindcss-primeui": "^0.5.0",
+    "vue": "^3.2.13",
+    "vue-router": "^4.0.3"
+  },
+  "devDependencies": {
+    "@primevue/auto-import-resolver": "^4.3.1",
+    "@vue/cli-plugin-babel": "~5.0.0",
+    "@vue/cli-plugin-router": "~5.0.0",
+    "@vue/cli-service": "~5.0.0",
+    "sass": "^1.87.0",
+    "sass-loader": "^16.0.5",
+    "tailwindcss": "^3.4.6",
+    "unplugin-vue-components": "^0.27.3"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead",
+    "not ie 11"
+  ]
+}
