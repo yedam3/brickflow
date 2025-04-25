@@ -15,7 +15,7 @@ const model = ref([
         items: [
         {
                 label: '공통관리',
-                icon: 'pi pi-fw pi-user layout-menuitem-icon pi-spin',
+                icon: 'pi pi-fw pi-user  pi-spin',
                 items: [
                     {
                         label: '주문관리',
@@ -46,22 +46,22 @@ const model = ref([
                     {
                         label: '주문관리',
                         icon: 'pi pi-fw pi-sign-in',
-                        to: '/'
+                        to: '/seller/order'
                     },
                     {
                         label: '출고 관리',
                         icon: 'pi pi-fw pi-times-circle',
-                        to: '/'
+                        to: '/seller/deliverymanage'
                     },
                     {
                         label: '완제품 입고관리',
                         icon: 'pi pi-fw pi-times-circle',
-                        to: '/'
+                        to: '/seller/finishstore'
                     },
                     {
                         label: '반품관리',
                         icon: 'pi pi-fw pi-sign-in',
-                        to: '/'
+                        to: '/seller/return'
                     },
                 ]
             },
