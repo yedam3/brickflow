@@ -18,11 +18,6 @@ const model = ref([
                 icon: 'pi pi-fw pi-user  pi-spin',
                 items: [
                     {
-                        label: '주문관리',
-                        icon: 'pi pi-fw pi-sign-in',
-                        to: '/sales/saleorder'
-                    },
-                    {
                         label: '출고 관리',
                         icon: 'pi pi-fw pi-times-circle',
                         to: '/'
@@ -36,6 +31,26 @@ const model = ref([
                         label: '반품관리',
                         icon: 'pi pi-fw pi-sign-in',
                         to: '/'
+                    },
+                    {
+                        label: '공정 흐름도 관리',
+                        icon: 'pi pi-fw pi-sign-in',
+                        to: '/admin/proessflow'
+                    },
+                    {
+                        label: '사원 관리',
+                        icon: 'pi pi-fw pi-sign-in',
+                        to: '/admin/employees'
+                    },
+                    {
+                        label: '업체 관리',
+                        icon: 'pi pi-fw pi-sign-in',
+                        to: '/admin/company'
+                    },
+                    {
+                        label: 'Bom관리',
+                        icon: 'pi pi-fw pi-sign-in',
+                        to: '/admin/bom'
                     },
                 ]
         },
@@ -175,23 +190,9 @@ const model = ref([
                     {
                         label: '제품 검수',
                         icon: 'pi pi-fw pi-times-circle',
-                        to: '/'
+                        to: '/admin/prodcheck'
                     },
-                    {
-                        label: 'BOM 관리',
-                        icon: 'pi pi-fw pi-lock',
-                        to: '/'
-                    },
-                    {
-                        label: '공정 흐름도 관리',
-                        icon: 'pi pi-fw pi-sign-in',
-                        to: '/'
-                    },
-                    {
-                        label: '사원 관리',
-                        icon: 'pi pi-fw pi-sign-in',
-                        to: '/'
-                    },
+
                 ]
             },
         ]
