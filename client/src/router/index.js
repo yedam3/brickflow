@@ -14,7 +14,8 @@ const router = createRouter({
             component: AppLayout,
             children: [
                 ...workRoutes,
-                ...matRoutes
+                ...matRoutes,
+                ...qualityRoutes
             ]
         },
         // {
