@@ -60,9 +60,9 @@
 }
 
 </script>
-<style scoped>
+<style>
   .ag-theme-alpine .ag-header {
-  background-color: #FF9900; /* Tailwind의 blue-500 */
+  background-color: #FF9900; 
   color: white;
   }
 </style>
