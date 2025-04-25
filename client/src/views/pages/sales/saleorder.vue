@@ -69,7 +69,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
  :root .ag-theme-alpine .ag-header{
   background-color: #e0a72a;
  }
