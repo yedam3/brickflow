@@ -70,16 +70,5 @@ function isOutsideClicked(event) {
     <Toast />
 </template>
 <style>
-  :root .layout-topbar{
-    background-color: antiquewhite;
-  }
-  :root .layout-sidebar{
-    background-color: antiquewhite;
-  }
-  :root[class='app-dark'] .layout-topbar {
-    background-color: black;
-}
-:root[class='app-dark'] .layout-sidebar {
-    background-color: black;
-}
+
 </style>
