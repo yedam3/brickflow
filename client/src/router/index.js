@@ -3,7 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import workRoutes from './routes/work.js';
 import matRoutes from './routes/mat.js';
 import qualityRoutes from './routes/quality.js';
-import sellerRoutes from './routes/se ller.js';
+import sellerRoutes from './routes/seller.js';
 import facRoutes from './routes/fac.js';
 import adminRouter from './routes/admin.js';
 const router = createRouter({
