@@ -124,32 +124,42 @@ const model = ref([
                     {
                         label: '설비 정보 등록',
                         icon: 'pi pi-fw pi-sign-in',
-                        to: '/'
+                        to: '/facs/enroll'
                     },
                     {
                         label: '설비 상태 확인',
                         icon: 'pi pi-fw pi-times-circle',
-                        to: '/'
+                        to: '/facs/status'
                     },
                     {
                         label: '비가동 설비 관리',
                         icon: 'pi pi-fw pi-lock',
-                        to: '/'
+                        to: '/facs/noplay'
                     },
                     {
                         label: '설비 수리 관리',
                         icon: 'pi pi-fw pi-sign-in',
-                        to: '/'
+                        to: '/facs/repaire'
                     },
                     {
                         label: '설비 통계 관리',
                         icon: 'pi pi-fw pi-sign-in',
-                        to: '/'
+                        to: '/facs/statistic'
                     },
                     {
                         label: '설비 점검 관리',
                         icon: 'pi pi-fw pi-sign-in',
-                        to: '/'
+                        to: '/facs/inspection'
+                    },
+                    {
+                        label: '설비 수리 내역',
+                        icon: 'pi pi-fw pi-clipboard',
+                        to: '/facs/repirList'
+                    },
+                    {
+                        label: '설비 점검 내역',
+                        icon: 'pi pi-fw pi-clipboard',
+                        to: '/facs/inspectList'
                     },
                 ]
             },
