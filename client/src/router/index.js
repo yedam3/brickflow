@@ -15,7 +15,9 @@ const router = createRouter({
             children: [
                 ...workRoutes,
                 ...matRoutes,
-                ...qualityRoutes
+                ...qualityRoutes,
+                ...facRoutes,
+                ...sellerRoutes,
             ]
         },
         // {
