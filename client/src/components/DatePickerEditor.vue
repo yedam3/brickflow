@@ -28,7 +28,7 @@ export default {
     }
   },
   mounted() {
-    // ag-Grid는 props 말고 this.params로 다양한 정보를 전달함
+    // ag-Grid는 props 말고 this.params로 정보를 전달함
     this.internalValue = this.params.value;
   }
 };

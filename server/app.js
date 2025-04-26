@@ -16,7 +16,7 @@ app.listen(3000, () => {
 // 라우팅 등록 영역
 const salesRouter = require("./routers/sales_router.js");
 const workRouter = require("./routers/work_router.js");
-const matRouter = require("./routers/mat_router.js");
+const matRouter = require("./routers/matRouter/mat_router.js");
 const facRouter = require("./routers/fac_router.js");
 const qualRouter = require("./routers/qual_router.js");
 const agTest = require("./routers/agTest_router.js");
