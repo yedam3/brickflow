@@ -1,7 +1,7 @@
 export default[
     {
         path: '/mat/order',
-        name: 'Schedule',
+        name: 'matOrder',
         component: () => import('@/views/pages/mat/MatOrder.vue')
     },
     {
