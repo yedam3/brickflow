@@ -8,17 +8,19 @@
       style="min-width: 1000px"
     >
       <CModalHeader>
-        <slot name="header">자재 목록</slot>
+        <slot name="header">업체 목록</slot>
       </CModalHeader>
   
       <CModalBody>
         <div class="ag-theme-alpine" style="height: 400px; width: 100%">
-          <!-- 자재명 검색창 -->
+          <!-- 검색창 -->
           <div class="d-flex justify-content-end me-5">
             <div class="input-group mb-3 w-50">
               <!-- 검색 조건 선택 -->
               <select v-model="searchType" class="form-select" aria-label="Default select example">
-                <option value="mat_code" selected>자재코드</option>
+                <option value="m.mat_order_code" selected>발주코드</option>
+                <option value="m.mat_order_name">발주명</option>
+                <option value="company_name">업체명</option>
                 <option value="mat_name">자재명</option>
               </select>
               <!-- 검색어 입력 -->
@@ -55,7 +57,7 @@
   import axios from "axios";
   
   export default {
-    name: "MatModal",
+    name: "MatOrderModal",
     components: {
       AgGridVue,
     },
@@ -68,22 +70,45 @@
     data() {
       return {
         rowData: [],
-        searchType: "mat_code",  // 검색 조건 
+        searchType: "m.mat_order_code",  // 검색 조건 
         searchText: "",   // 검색어
         columnDefs: [
-          { field: "mat_code", headerName: "자재코드", flex: 1 },
-          { field: "mat_name", headerName: "자재명", flex: 1 },
-          { field: "unit", headerName: "단위", flex: 1 },
-          { field: "by_unit_number", headerName: "단위별 갯수", flex: 1,
-            valueFormatter: (params) => {
-              return params.value != null ? `${params.value}개` : '';
-            }
-          },
-          { field: "size", headerName: "크기", flex: 1 },
-          { field: "safe_inventory", headerName: "안전재고", flex: 1,
-            valueFormatter: (params) => {
-              return params.value != null ? `${params.value}개` : '';
-            }
+          { field: "mat_order_code", headerName: "발주코드", flex: 1 },
+          { field: "mat_order_name", headerName: "발주명", flex: 1 },
+          { field: "company_name", headerName: "업체명", flex: 1 },
+          { field: "request_date", headerName: "발주일자", flex: 1,
+                valueFormatter: params => {
+                    // 날짜 형식을 YYYY-MM-DD로 변환
+                    if (params.value) {
+                        const date = new Date(params.value);
+                        return date.toISOString().split('T')[0]; // YYYY-MM-DD 형식으로 변환
+                    }
+                    return params.value;
+                } 
+            },
+          { field: "delivery_date", headerName: "입고예정일자", flex: 1,
+                valueFormatter: params => {
+                    // 날짜 형식을 YYYY-MM-DD로 변환
+                    if (params.value) {
+                        const date = new Date(params.value);
+                        return date.toISOString().split('T')[0]; // YYYY-MM-DD 형식으로 변환
+                    }
+                    return params.value;
+                }
+            },
+          { field: "mat_name", headerName: "자재명", flex: 2 },
+          { field: "total_quantity", headerName: "발주총갯수", flex: 1 },
+          { field: "status_name", headerName: "발주상태", flex: 1 ,
+          cellStyle: params => {
+                  if (params.value == '검수대기') {
+                      return { color: '#0284C7', textAlign:'center',fontWeight: 'bold'}; // 파란색
+                  } else if (params.value == '검수완료') {
+                      return { color: '#22C55E', textAlign:'center',fontWeight: 'bold'}; // 초록색
+                  } else if (params.value == '반품처리') {
+                      return { color: '#E02D2D', textAlign:'center',fontWeight: 'bold'}; // 빨간색
+                  }
+              return null; // 기본 스타일
+          }
           },
         ],
         gridOptions: {
@@ -111,7 +136,7 @@
         this.$emit("close");
       },
       matList() {
-        axios.get('/api/mat/matList')  
+        axios.get('/api/mat/orderList')  
           .then(res => {
             this.rowData = res.data;
           })
@@ -120,7 +145,7 @@
           });
       },
       searchMaterials() {
-        axios.get('/api/mat/matList', {
+        axios.get('/api/mat/orderList', {
           params: {
             type: this.searchType,
             keyword: this.searchText,
@@ -134,7 +159,11 @@
         });
       },
       clicked(event){
-        this.$emit('selectMat', event.data);
+        if(event.data.status_name=='검수완료'||event.data.status_name=='반품처리'){
+            alert('이미 검수가 진행된 항목에선 수정 및 삭제가 불가합니다.')
+            return;
+        }
+        this.$emit('selectOrder', event.data);
         this.close();
       }
     }
@@ -155,5 +184,5 @@
     ::v-deep(.header-center .ag-header-cell-label) {
       justify-content: center;
     }
-  </style>
+</style>
   

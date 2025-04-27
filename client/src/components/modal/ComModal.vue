@@ -8,18 +8,18 @@
       style="min-width: 1000px"
     >
       <CModalHeader>
-        <slot name="header">자재 목록</slot>
+        <slot name="header">업체 목록</slot>
       </CModalHeader>
   
       <CModalBody>
         <div class="ag-theme-alpine" style="height: 400px; width: 100%">
-          <!-- 자재명 검색창 -->
+          <!-- 업체명 검색창 -->
           <div class="d-flex justify-content-end me-5">
             <div class="input-group mb-3 w-50">
               <!-- 검색 조건 선택 -->
               <select v-model="searchType" class="form-select" aria-label="Default select example">
-                <option value="mat_code" selected>자재코드</option>
-                <option value="mat_name">자재명</option>
+                <option value="company_code" selected>업체코드</option>
+                <option value="company_name">업체명</option>
               </select>
               <!-- 검색어 입력 -->
               <input type="text" v-model="searchText" placeholder="검색어 입력" 
@@ -55,7 +55,7 @@
   import axios from "axios";
   
   export default {
-    name: "MatModal",
+    name: "ComModal",
     components: {
       AgGridVue,
     },
@@ -68,23 +68,13 @@
     data() {
       return {
         rowData: [],
-        searchType: "mat_code",  // 검색 조건 
+        searchType: "company_name",  // 검색 조건 
         searchText: "",   // 검색어
         columnDefs: [
-          { field: "mat_code", headerName: "자재코드", flex: 1 },
-          { field: "mat_name", headerName: "자재명", flex: 1 },
-          { field: "unit", headerName: "단위", flex: 1 },
-          { field: "by_unit_number", headerName: "단위별 갯수", flex: 1,
-            valueFormatter: (params) => {
-              return params.value != null ? `${params.value}개` : '';
-            }
-          },
-          { field: "size", headerName: "크기", flex: 1 },
-          { field: "safe_inventory", headerName: "안전재고", flex: 1,
-            valueFormatter: (params) => {
-              return params.value != null ? `${params.value}개` : '';
-            }
-          },
+          { field: "company_code", headerName: "업체코드", flex: 1 },
+          { field: "company_name", headerName: "업체명", flex: 1 },
+          { field: "tel", headerName: "전화번호", flex: 1 },
+          { field: "address", headerName: "주소", flex: 1 },
         ],
         gridOptions: {
           domLayout: "autoHeight",
@@ -111,7 +101,7 @@
         this.$emit("close");
       },
       matList() {
-        axios.get('/api/mat/matList')  
+        axios.get('/api/mat/comList')  
           .then(res => {
             this.rowData = res.data;
           })
@@ -120,7 +110,7 @@
           });
       },
       searchMaterials() {
-        axios.get('/api/mat/matList', {
+        axios.get('/api/mat/comList', {
           params: {
             type: this.searchType,
             keyword: this.searchText,
@@ -134,7 +124,7 @@
         });
       },
       clicked(event){
-        this.$emit('selectMat', event.data);
+        this.$emit('selectCom', event.data);
         this.close();
       }
     }
@@ -142,7 +132,7 @@
   </script>
   
   <style scoped>
-    .btn-primary {
+     .btn-primary {
       background-color: rgb(230, 171, 98);
       border-color: rgb(230, 171, 98);
     }

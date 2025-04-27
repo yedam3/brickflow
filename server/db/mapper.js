@@ -1,3 +1,4 @@
+//mapper.js
 // MariaDB에 접속할 모듈
 const mariadb = require("mariadb/callback");
 // DB에서 실행할 SQL문을 별도 파일로 작성

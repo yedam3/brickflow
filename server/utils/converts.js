@@ -31,6 +31,18 @@ const convertObjToQuery = (target, selected = []) => {
         };
     }
 };
+const convertLikeToQuery = (target, selected = []) => {
+    let fields = Object.keys(target);
+    let queryWhere = "AND ";
+    for (let i = 0; i < fields.length; i++) {
+        let columnName = fields[i];
+        let columnValue = target[columnName];
+        queryWhere += `${columnName} LIKE '%${columnValue}%' ${selected[i] ?? ""} `;
+    }
+    return {
+        serchKeyword: queryWhere,
+    };
+};
 const queryFormat = function (query, values) {
     // query : SQL 문
     // values : 대체값
@@ -54,5 +66,6 @@ const queryFormat = function (query, values) {
 module.exports = {
     convertObjToAry,
     convertObjToQuery,
+    convertLikeToQuery,
     queryFormat,
 };
