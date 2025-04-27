@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const salesService = require("../services/sales_service.js");
+const salesService = require("../../services/sales_service.js");
 
 router.get("/", async (req, res) => {
     res.send("");
