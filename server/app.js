@@ -14,13 +14,14 @@ app.listen(3000, () => {
     console.log("http://localhost:3000");
 });
 // 라우팅 등록 영역
-const salesRouter = require("./routers/sales_router.js");
-const workRouter = require("./routers/work_router.js");
+const salesRouter = require("./routers/salesrouter/sales_router.js");
+const workRouter = require("./routers/workRouter/work_router.js");
 const matRouter = require("./routers/matRouter/mat_router.js");
 const matCheckRouter = require("./routers/matRouter/mat_check_router.js");
-const facRouter = require("./routers/fac_router.js");
-const qualRouter = require("./routers/qual_router.js");
+const qualRouter = require("./routers/qualRouter/qual_router.js");
+const facRouter = require("./routers/facRouter/fac_router.js");
 const agTest = require("./routers/agTest_router.js");
+const adminRouter = require("./routers/adminRouter/admin_router.js");
 
 // 기본 라우팅
 app.get("/", (req, res) => {
@@ -29,7 +30,7 @@ app.get("/", (req, res) => {
 // 라우터 모듈 등록
 app.use("/sales", salesRouter);
 app.use("/mat", matRouter);
-app.use("/", workRouter);
+app.use("/work", workRouter);
 app.use("/fac", facRouter);
 app.use("/qual", qualRouter);
 app.use("/", agTest);
@@ -38,3 +39,4 @@ app.use("/", agTest);
 
 
 app.use("/mat", matCheckRouter);
+app.use("/admin", adminRouter);
