@@ -181,7 +181,6 @@ export default {
     },
     //자재 모달창 값 전달
     matSelected(mat) {
-      console.log(mat);
       for (let rowInclude of this.secondRowData) {
         if (rowInclude.mat_code == mat.mat_code) {
           Swal.fire({
