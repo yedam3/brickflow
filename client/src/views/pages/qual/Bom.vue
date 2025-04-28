@@ -17,7 +17,7 @@
               </button>
             </div>
           </div>
-    <div class="prod-grid">
+    <div class="prod-grid" >
      
       <ag-grid-vue style="width: 700px; height: 500px;"
         class="ag-theme-alpine"
