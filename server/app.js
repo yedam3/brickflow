@@ -17,7 +17,7 @@ app.listen(3000, () => {
 const salesRouter = require("./routers/salesrouter/sales_router.js");
 const workRouter = require("./routers/work_router.js");
 const matRouter = require("./routers/matRouter/mat_router.js");
-const facRouter = require("./routers/fac_router.js");
+const facRouter = require("./routers/facRouter/fac_router.js");
 const qualRouter = require("./routers/qual_router.js");
 const agTest = require("./routers/agTest_router.js");
 
