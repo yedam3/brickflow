@@ -168,6 +168,7 @@ export default {
                         return null; // 기본 스타일
                     }
                 },
+                
             ],
             gridOptions: {
                 domLayout: "autoHeight",
@@ -183,6 +184,7 @@ export default {
                     sortable: false,
                     cellStyle: { textAlign: "center" },
                 },
+              
             },
             info:{
                 mat_order_detailCode : '',
@@ -227,6 +229,7 @@ export default {
         },
     },
     methods: {
+     
         close() {
             this.$emit("close");
         },
