@@ -168,6 +168,7 @@ export default {
                         return null; // 기본 스타일
                     }
                 },
+                
             ],
             gridOptions: {
                 domLayout: "autoHeight",
@@ -183,6 +184,7 @@ export default {
                     sortable: false,
                     cellStyle: { textAlign: "center" },
                 },
+              
             },
             info:{
                 mat_order_detailCode : '',
@@ -227,6 +229,17 @@ export default {
         },
     },
     methods: {
+        // ag-Grid 옵션에 rowClicked 이벤트 추가
+        onRowClicked(event) {
+            // 모든 row를 돌면서 selected를 false로
+            this.gridOptions.api.forEachNode((node) => {
+                node.data.selected = false;
+            });
+            // 클릭한 row만 selected를 true로
+            event.data.selected = true;
+            // 화면 다시 그리기
+            this.gridOptions.api.refreshCells({ force: true });
+        },
         close() {
             this.$emit("close");
         },
