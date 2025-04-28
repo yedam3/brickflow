@@ -55,11 +55,13 @@
   <script>
   import { AgGridVue } from "ag-grid-vue3";
   import axios from "axios";
+  import Swal from 'sweetalert2';
   
   export default {
     name: "MatOrderModal",
     components: {
       AgGridVue,
+      Swal
     },
     props: {
       visible: {
@@ -160,8 +162,13 @@
       },
       clicked(event){
         if(event.data.status_name=='검수완료'||event.data.status_name=='반품처리'){
-            alert('이미 검수가 진행된 항목에선 수정 및 삭제가 불가합니다.')
-            return;
+          Swal.fire({
+            title: '선택불가',
+            text: '이미 검수가 진행된 항목에 대해선 선택이 불가합니다.',
+            icon: 'error',
+            confirmButtonText: '확인'
+          });
+          return;
         }
         this.$emit('selectOrder', event.data);
         this.close();

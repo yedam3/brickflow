@@ -17,6 +17,7 @@ app.listen(3000, () => {
 const salesRouter = require("./routers/salesrouter/sales_router.js");
 const workRouter = require("./routers/workRouter/work_router.js");
 const matRouter = require("./routers/matRouter/mat_router.js");
+const matCheckRouter = require("./routers/matRouter/mat_check_router.js");
 const qualRouter = require("./routers/qualRouter/qual_router.js");
 const facRouter = require("./routers/facRouter/fac_router.js");
 const agTest = require("./routers/agTest_router.js");
@@ -33,4 +34,9 @@ app.use("/work", workRouter);
 app.use("/fac", facRouter);
 app.use("/qual", qualRouter);
 app.use("/", agTest);
+
+
+
+
+app.use("/mat", matCheckRouter);
 app.use("/admin", adminRouter);
