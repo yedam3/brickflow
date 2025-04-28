@@ -1,12 +1,17 @@
 export default[
     {
+        path: '/mat/practice',
+        name: 'MatPractice',
+        component: () => import('@/views/pages/mat/AgPractice.vue')
+    },
+    {
         path: '/mat/order',
         name: 'matOrder',
         component: () => import('@/views/pages/mat/MatOrder.vue')
     },
     {
-        path: '/mat/practice',
-        name: 'MatPractice',
-        component: () => import('@/views/pages/mat/AgPractice.vue')
+        path: '/mat/check',
+        name: 'MatCheck',
+        component: () => import('@/views/pages/mat/MatCheck.vue')
     },
 ]

@@ -121,9 +121,9 @@ const model = ref([
                         to: '/mat/order'
                     },
                     {
-                        label: 'Error',
+                        label: '자재검수관리',
                         icon: 'pi pi-fw pi-times-circle',
-                        to: '/'
+                        to: '/mat/check'
                     },
                     {
                         label: 'AG테스트',

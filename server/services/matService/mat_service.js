@@ -1,4 +1,3 @@
-const { result } = require("lodash");
 const mariaDB = require("../../db/mapper.js");
 const { convertObjToQuery } = require("../../utils/converts.js");
 const { convertLikeToQuery } = require("../../utils/converts.js");
