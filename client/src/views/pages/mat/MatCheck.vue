@@ -3,7 +3,7 @@
         <div class="font-semibold text-xl mb-4">자재검수관리</div>
         <div class="text-end mt-3 mb-3">
             <Button label="조회" severity="success" class="me-3" @click="matOrderList" />
-            <Button label="등록" severity="info" class="me-3" />
+            <Button label="등록" severity="info" class="me-3" @click="checkAdd"/>
             <Button label="수정" severity="help" class="me-3" />
             <Button label="삭제" severity="danger" class="me-5" />
         </div>
@@ -33,71 +33,88 @@
                 <AgGridVue style="width: 100%; height: 100%" class="ag-theme-alpine" :columnDefs="columnDefs"
                     :rowData="rowData" :gridOptions="gridOptions" @rowClicked="clicked" />
             </div>
-            <div class="card border-0 col" style="height: 600px; background-color: #F5F5F5;">
+            <div class="card border-0 col" style="height: 650px; background-color: #F5F5F5;">
                 <h5>검수등록</h5>
+                <div class="row">
+                    <div class="input-group mb-5 col">
+                        <span class="input-group-text" id="basic-addon1">발주코드</span>
+                        <input type="text" class="form-control" placeholder="발주코드" aria-label="Username"
+                            aria-describedby="basic-addon1" v-model="info.mat_order_code" readonly>
+                    </div>
+                    <div class="input-group mb-5 col">
+                        <span class="input-group-text" id="basic-addon1">발주상세코드</span>
+                        <input type="text" class="form-control" placeholder="발주상세코드" aria-label="Username"
+                            aria-describedby="basic-addon1" v-model="info.mat_order_detailCode" readonly>
+                    </div>
+                </div>
                 <div class="row">
                     <div class="input-group mb-5 col">
                         <span class="input-group-text" id="basic-addon1">자재코드</span>
                         <input type="text" class="form-control" placeholder="자재코드" aria-label="Username"
-                            aria-describedby="basic-addon1" readonly>
+                            aria-describedby="basic-addon1" v-model="info.mat_code" readonly>
                     </div>
                     <div class="input-group mb-5 col">
                         <span class="input-group-text" id="basic-addon1">자재명</span>
                         <input type="text" class="form-control" placeholder="자재명" aria-label="Username"
-                            aria-describedby="basic-addon1" readonly>
+                            aria-describedby="basic-addon1" v-model="info.mat_name" readonly>
                     </div>
                 </div>
                 <div class="row">
                     <div class="input-group mb-5 col">
                         <span class="input-group-text" id="basic-addon1">기검수량</span>
                         <input type="text" class="form-control" placeholder="기검수량" aria-label="Username"
-                            aria-describedby="basic-addon1" readonly>
+                            aria-describedby="basic-addon1" :value="formatAleady" readonly>
                     </div>
                     <div class="input-group mb-5 col">
                         <span class="input-group-text" id="basic-addon1">미검수량</span>
                         <input type="text" class="form-control" placeholder="미검수량" aria-label="Username"
-                            aria-describedby="basic-addon1" readonly>
+                            aria-describedby="basic-addon1" :value="formatNot" readonly>
                     </div>
                 </div>
                 <div class="row">
                     <div class="input-group mb-5 col">
                         <span class="input-group-text" id="basic-addon1">발주량</span>
                         <input type="text" class="form-control" placeholder="발주량" aria-label="Username"
-                            aria-describedby="basic-addon1" readonly>
+                            aria-describedby="basic-addon1" :value="formatRequest" readonly>
                     </div>
                     <div class="input-group mb-5 col">
                         <span class="input-group-text" id="basic-addon1">검수량</span>
                         <input type="text" class="form-control" placeholder="검수량" aria-label="Username"
-                            aria-describedby="basic-addon1">
+                            aria-describedby="basic-addon1" v-model="info.check_quantity" >
                     </div>
                 </div>
                 <div class="row">
                     <div class="input-group col">
                         <span class="input-group-text" id="basic-addon1">비고</span>
-                        <textarea class="form-control" placeholder="비고" style="height: 100px; resize: none;"></textarea>
+                        <textarea class="form-control"  v-model="info.note" placeholder="비고" style="height: 100px; resize: none;"></textarea>
+                    </div>
+                    <div class="input-group mb-5 col">
+                        <span class="input-group-text" id="basic-addon1">등록자</span>
+                        <input type="text" class="form-control" placeholder="등록자" aria-label="Username"
+                            aria-describedby="basic-addon1" v-model="info.emp_code" readonly>
                     </div>
                 </div>
                 <h5>검사항목</h5>
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="" name="quantity">
+                    <input class="form-check-input" type="checkbox" value="수량불일치" v-model="info.error_check_ary" name="quantity">
                     <label class="form-check-label" for="flexCheckDefault" name="quantity">
                         수량불일치
                     </label>
                 </div>
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="">
+                    <input class="form-check-input" type="checkbox" value="규격불일치"v-model="info.error_check_ary">
                     <label class="form-check-label" for="flexCheckChecked">
                         규격불일치
                     </label>
                 </div>
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="">
+                    <input class="form-check-input" type="checkbox"  value="색상불일치" v-model="info.error_check_ary">
                     <label class="form-check-label" for="flexCheckDefault">
                         색상
                     </label>
                 </div>
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="">
+                    <input class="form-check-input" type="checkbox" value="외관불일치" v-model="info.error_check_ary">
                     <label class="form-check-label" for="flexCheckChecked">
                         외관
                     </label>
@@ -133,9 +150,9 @@ export default {
             columnDefs: [
                 { field: "mat_order_code", headerName: "발주코드", flex: 1 },
                 { field: "mat_order_name", headerName: "발주명", flex: 1 },
-                { field: "mat_order_detailCode", headerName: "발주디테일", flex: 1 },
+                { field: "mat_order_detailCode", headerName: "발주디테일", flex: 2 },
                 { field: "company_name", headerName: "업체명", flex: 1 },
-                { field: "mat_name", headerName: "자재명", flex: 2 },
+                { field: "mat_name", headerName: "자재명", flex: 2},
                 {
                     field: "status", headerName: "발주상태", flex: 1,
                     cellStyle: params => {
@@ -167,10 +184,47 @@ export default {
                     cellStyle: { textAlign: "center" },
                 },
             },
+            info:{
+                mat_order_detailCode : '',
+                mat_code : '',
+                already_check_quantity: '', //기검수량
+                not_check_quantity : '',  //미검수량
+                mat_code : '',
+                mat_name : '',
+                request_quantity : '',
+                check_quantity : 0,
+                note : '',
+                mat_order_code : '',
+                emp_code : '',
+                error_check_ary : [] //불합격 사유 배열 담을 곳 
+            }
         };
     },
     mounted() {
         this.matList();
+    },
+    computed:{
+        formatRequest(){
+            if(this.info.request_quantity==''){
+                return this.info.request_quantity
+            }else{
+            return this.info.request_quantity +'개'
+           }
+        },
+        formatAleady(){
+            if(this.info.already_check_quantity==''){
+                return this.info.already_check_quantity
+            }else{
+            return this.info.already_check_quantity +'개'
+           }
+        },
+        formatNot(){
+            if(this.info.not_check_quantity==''){
+                return this.info.not_check_quantity
+            }else{
+            return this.info.not_check_quantity +'개'
+           }
+        },
     },
     methods: {
         close() {
@@ -201,6 +255,86 @@ export default {
                     console.error(error);
                 });
         },
+        async clicked(event) {
+            let detail = event.data.mat_order_detailCode;
+            await axios.get('/api/mat/checkList/' + detail)
+                          .then(res => {
+                                res.data.check_quantity=0;
+                                res.data.error_check_ary=[];
+                                this.info = res.data
+                          }).catch(error => {
+                                console.error(error);
+                         });
+        },
+
+        //값체크
+        checkValue(){
+            //값이 다들어있는지 체크
+            if(this.info.already_check_quantity==''||this.info.check_quantity==''||this.info.check_quantity==0 ){
+                Swal.fire({
+                    title: '실패',
+                    text: '해당하는 값을 입력해주십시오.',
+                    icon: 'error',
+                    confirmButtonText: '확인'
+                })
+                return 1;
+            }
+            if(this.info.not_check_quantity < Number(this.info.check_quantity)){
+                Swal.fire({
+                    title: '실패',
+                    text: '미검수량보다 더많은 검수량을 기입하였습니다.',
+                    icon: 'error',
+                    confirmButtonText: '확인'
+                })
+                return 2;
+            }
+        },
+        //등록
+        async checkAdd(){
+          //값체크
+          let validation = this.checkValue();
+          if(validation==1){
+            return;
+          }else if (validation==2){
+            return;
+          }
+          //검수통과인 항목 등록
+            let result = await axios.post('/api/mat/successAdd',this.info)
+            .catch(err => console.log(err))
+            if(result.data.affectedRows>0){
+                Swal.fire({
+                    title: '성공',
+                    text: '등록에 성공 하였습니다.',
+                    icon: 'success',
+                    confirmButtonText: '확인'
+                })
+                //등록 후 초기화 작업
+             this.info =    {
+                mat_order_detailCode : '',
+                mat_code : '',
+                already_check_quantity: '', 
+                not_check_quantity : '',  
+                mat_code : '',
+                mat_name : '',
+                request_quantity : '',
+                check_quantity : 0,
+                note : '',
+                mat_order_code : '',
+                emp_code : '',
+                error_check_ary : [] 
+            }
+            //그리드 다시 렌더링
+            this.matList();
+            //에러시
+            }else{
+                Swal.fire({
+                    title: '실패',
+                    text: '등록에 실패 하였습니다.',
+                    icon: 'error',
+                    confirmButtonText: '확인'
+                })
+            }
+        }
     }
 };
 </script>
