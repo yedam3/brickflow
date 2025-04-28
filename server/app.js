@@ -14,7 +14,7 @@ app.listen(3000, () => {
     console.log("http://localhost:3000");
 });
 // 라우팅 등록 영역
-const salesRouter = require("./routers/sales_router.js");
+const salesRouter = require("./routers/salesrouter/sales_router.js");
 const workRouter = require("./routers/work_router.js");
 const matRouter = require("./routers/matRouter/mat_router.js");
 const facRouter = require("./routers/fac_router.js");
