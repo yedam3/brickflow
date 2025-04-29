@@ -84,16 +84,49 @@ const errCheckAdd =`
   FROM mat_check
 `
 const errorReason = `
-  INSERT INTO mat_error_reason(mat_reason_code,mat_error_name,check_code)
+  INSERT INTO mat_error_reason(mat_reason_code,mat_error_name,check_code,mat_check_error,mat_error_code)
   SELECT CONCAT('mrc-',IFNULL(MAX(CAST(SUBSTR(mat_reason_code,5) AS SIGNED)),100)+1),
    ?,
    (SELECT CONCAT('mck-',IFNULL(MAX(CAST(SUBSTR(check_code,5) AS SIGNED)),100)) 
-   FROM mat_check )
+   FROM mat_check ),
+   ?,
+   ?
   FROM mat_error_reason`;
+
+  const statusCheck = `
+    SELECT 
+		CASE
+          WHEN sum(IFNULL(request_quantity,0)) =  (SELECT sum(IFNULL(mat_check_error,0))
+												   FROM matOrderDetail d LEFT JOIN mat_check c
+												   ON(d.mat_order_detailCode = c.mat_order_detailCode)
+                                                   WHERE mat_order_code = ?
+                                                   ) THEN 'MS3'
+          WHEN sum(IFNULL(request_quantity,0)) = (SELECT sum(IFNULL(check_quantity,0))
+                                                     FROM matOrderDetail d LEFT JOIN mat_check c
+												   ON(d.mat_order_detailCode = c.mat_order_detailCode)
+                                                   WHERE mat_order_code = ?
+                                                   )  THEN 'MS2'
+        WHEN sum(IFNULL(request_quantity,0)) > (SELECT sum(IFNULL(check_quantity,0))
+                                                     FROM matOrderDetail d LEFT JOIN mat_check c
+												   ON(d.mat_order_detailCode = c.mat_order_detailCode)
+                                                   WHERE mat_order_code = ?
+                                                   )  THEN 'MS4'
+END status
+FROM matOrderDetail 
+WHERE mat_order_code = ?
+  `
+const statusUpdate  = `
+  UPDATE matOrders
+  SET status = ?
+  WHERE mat_order_code =? 
+`
+
 module.exports = {
   matOrderCheckList,
   matCheckRender,
   successCheckAdd,
   errCheckAdd,
-  errorReason
+  errorReason,
+  statusCheck,
+  statusUpdate
 }

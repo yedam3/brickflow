@@ -23,26 +23,50 @@ const checkRender = async(matDetailCode) => {
       return result[0];
 }
 //통과인 자재 등록
- const successCheckAdd = async (matCheck) => {
+ const successCheckAdd = async (check,error) => {
   let result = null
-  if(matCheck.error_check_ary.length < 1){
-  result = await mariaDB.query('successCheckAdd',[matCheck.mat_code,
-                                                      matCheck.check_quantity,
-                                                      matCheck.check_history,
-                                                      matCheck.check_quantity,
-                                                      matCheck.mat_order_detailCode])
-                              .catch((err)=> console.log(err));
-  }else{
-    result = await mariaDB.query('errCheckAdd', [matCheck.mat_code,
-                                                     matCheck.check_quantity,
-                                                     matCheck.check_history,
-                                                     matCheck.check_quantity,
-                                                     matCheck.mat_order_detailCode])
-      .catch((err) => console.log(err))
-      for(let error_check of matCheck.error_check_ary){
-        result = await mariaDB.query('errorReason',error_check)
-      }
+  let errExist= false;
+  for(let errCheck of error){
+    if(errCheck.check == true){
+      errExist = true;
+    }
   }
+  console.log('에러'+errExist)
+  if(!errExist){
+  result = await mariaDB.query('successCheckAdd',[check.mat_code,
+                                                      check.check_quantity,
+                                                      check.check_history,
+                                                      check.check_quantity,
+                                                      check.mat_order_detailCode])
+                              .catch((err)=> console.log(err));
+  } else {
+    result = await mariaDB.query('errCheckAdd', [check.mat_code,
+        check.check_quantity,
+        check.check_history,
+        check.check_quantity,
+        check.mat_order_detailCode
+      ])
+      .catch((err) => console.log(err))
+      //비사유 코드 추가
+  
+    for (let value of error) {
+      if(value.check == true){
+      result = await mariaDB.query('errorReason', [value.mat_error_name,
+                                                   value.mat_check_error,
+                                                   value.mat_error_code
+      ])
+    }
+   }
+  }
+  //상태값 확인
+  let statusCheck = await mariaDB.query('statusCheck',[check.mat_order_code,
+                                                   check.mat_order_code,
+                                                   check.mat_order_code,
+                                                   check.mat_order_code])
+                            .catch((err)=> console.log(err));
+  //상태값변경
+  result = await mariaDB.query('statusUpdate',[statusCheck[0].status,check.mat_order_code])
+                                     .catch((err)=> console.log(err));
   return result;
  }
 module.exports={
