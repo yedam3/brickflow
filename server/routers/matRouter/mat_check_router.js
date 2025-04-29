@@ -25,5 +25,28 @@ router.post('/successAdd',async(req,res)=>{
                                .catch((err)=> console.log(err));
     res.send(result);
 })
+//검수 결과 항목 보기
+router.get("/checkResultList", async (req, res) => {
+    //쿼리 스트링 형식으로 받기
+        const { type, keyword } = req.query;
+        let matOrderList = await matCheckService.checkReusltList({type,keyword})
+                                          .catch((err)=> console.log(err));
+        res.send(matOrderList);
+});
+
+//검수불량수량확인
+router.get("/errorList/:mcd",async(req,res)=>{
+    let matDeatailCode  = req.params.mcd;
+    let list = await matCheckService.matErrorQuantity(matDeatailCode)
+                                    .catch((err)=> console.log(err));
+    res.send(list);
+})
+//검수수정
+router.put('/checkUpdate',async(req,res)=>{
+    const {check,error} = req.body;
+     let result = await matCheckService.checkUpdate(check,error)
+                                        .catch((err) =>console.log(err));
+    res.send(result)                            
+})
 
 module.exports = router;
