@@ -27,7 +27,7 @@
         :rowData="rowData"
         :gridOptions="gridOptions"
         :defaultColDef="defaultColDef"
-        @rowClicked="clicked">
+        @cellClicked="bomCellClicked">
     </ag-grid-vue>
    </div>
    <div class="bom-grid">
@@ -69,9 +69,9 @@
           paginationPageSizeSelector: [5, 10, 20, 50],
           overlayNoRowsTemplate: '표시할 값이 없습니다.',
           defaultColDef: {
-            suppressMovable: true, //
-            resizable: false,
-            sortable: false,
+            suppressMovable: true, //컬럼 드래그로 순서바꾸기 못하게
+            resizable: false, //컬럼 너비 마우스로 조절 못하게
+            sortable: false, //정렬 기능 비활성화
           onGridReady: function (event) {
           event.api.sizeColumnsToFit();
         },  
@@ -115,7 +115,8 @@
       } catch (err) {
         console.error('데이터 조회 실패:', err);
       }
-    }
+    },
+    
   }
 }
 
@@ -129,13 +130,14 @@
 </style>
 <style scoped>
 
-
 .prod-grid {
   display: inline-block;
   margin-right: 30px;
+  
 }
 .bom-grid {
   display: inline-block;
+  
 }
 
 </style>
