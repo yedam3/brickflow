@@ -37,7 +37,9 @@ const convertLikeToQuery = (target, selected = []) => {
     for (let i = 0; i < fields.length; i++) {
         let columnName = fields[i];
         let columnValue = target[columnName];
-        queryWhere += `${columnName} LIKE '%${columnValue}%' ${selected[i] ?? ""} `;
+        queryWhere += `${columnName} LIKE '%${columnValue}%' ${
+            selected[i] ?? ""
+        } `;
     }
     return {
         serchKeyword: queryWhere,
@@ -63,9 +65,15 @@ const queryFormat = function (query, values) {
     return rewriteQuery;
 };
 
+// 날짜 변환
+const dateFormat = (date) => {
+    return new Date(date);
+};
+
 module.exports = {
     convertObjToAry,
     convertObjToQuery,
     convertLikeToQuery,
     queryFormat,
+    dateFormat,
 };
