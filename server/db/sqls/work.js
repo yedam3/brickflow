@@ -112,6 +112,20 @@ FROM plan_detail pd
 WHERE pd.plan_code = ?;
 `;
 
+// 생산 번호 체크
+const existsByPlan_code = `
+SELECT COUNT(*) AS check
+FROM plan
+WHERE plan_code = ?
+`;
+
+// 주문 상태 확인
+const findOrder_statusByOrders_code = `
+SELECT COUNT(*) AS check
+FROM orders
+WHERE orders_code = ? AND orders_code = 'OS4'
+`;
+
 // 생산 계획 등록
 const insertPlan = `
 INSERT INTO plan (plan_code, orders_code, plan_name, employee_code, start_date, end_date, finish_status, note)
@@ -127,6 +141,7 @@ SELECT
 FROM plan_detail
 `;
 
+// 주문 "생산중"으로 상태 변경
 const updateOrdersByOrders_code = `
 UPDATE orders
 	SET
@@ -174,6 +189,8 @@ module.exports = {
     findByOrders_code,
     findAllPlan,
     findPlanDetailByPlan_code,
+    existsByPlan_code,
+    findOrder_statusByOrders_code,
     insertPlan,
     insertPlanDetail,
     updatePlanByPlan_code,

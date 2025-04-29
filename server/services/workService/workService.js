@@ -54,6 +54,18 @@ const insertPlan = async (planData, planDetailData) => {
     insertPlanDetail(data.plan_code, planDetailData, data.orders_code);
 };
 
+// 생산 번호 체크
+const existsByPlan_code = async (plan_code) => {
+    let result = (await mariaDB.query("existsByPlan_code", plan_code).catch((err) => console.error(err)))[0];
+    return result;
+};
+
+// 주문 상태 확인
+const findOrder_statusByOrders_code = async (orders_code) => {
+    let result = (await mariaDB.query("findOrder_statusByOrders_code", orders_code).catch((err => console.error(err))))[0];
+    return result;
+}
+
 // 생산 계획 상세 등록
 const insertPlanDetail = async (plan_code, planDetailData, orders_code) => {
     const fields = ["plan_code", "currentPlanQty", "prod_code"];
@@ -144,7 +156,7 @@ const updatePlanDetailByPlan_code = async (planDetailData) => {
 
 // 생산 계획 삭제
 const deletePlanByPlan_code = async (plan_code) => {
-     //let result = await mariaDB.query("deletePlanByPlan_code", plan_code).catch((err) => console.error(err));
+    //let result = await mariaDB.query("deletePlanByPlan_code", plan_code).catch((err) => console.error(err));
     let conn ;
     let result;
     try{
@@ -172,6 +184,8 @@ module.exports = {
     findByOrders_code,
     findAllPlan,
     findPlanDetailByPlan_code,
+    existsByPlan_code,
+    findOrder_statusByOrders_code,
     insertPlan,
     insertPlanDetail,
     updatePlanByPlan_code,
