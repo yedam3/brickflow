@@ -13,5 +13,39 @@
       <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option3">
       <label class="form-check-label" for="inlineRadio2">비가동</label>
     </div>
-  </div> 
+  </div>
+  <div class="col" style="margin-right: 50px;">
+            <div class="ag-wrapper d-flex justify-content-center">
+                <ag-grid-vue class="ag-theme-alpine custom-grid-theme" style="width: 1000px; height: 400px;"
+                    :columnDefs="columnDefs" :rowData="rowData" :gridOptions="gridOptions"
+                    @cellClicked="comCellClicked">
+                </ag-grid-vue>
+            </div>
+        </div> 
 </template>
+
+<script>
+  import { AgGridVue } from "ag-grid-vue3";
+  import DatePickerEditor from "../../../components/DatePickerEditor.vue";
+  import axios from "axios";
+  import Swal from "sweetalert2";
+  export default {
+    components: {
+        AgGridVue,
+        datePicker: DatePickerEditor,
+        Swal
+  },
+  data() {
+    return{
+      columnDefs:[
+        { field:"fac_code", headerName: "설비코드", flex: 2 },
+        { field:"model_name", headerName: "설비이름", flex: 2 },
+        { field:"fac_location", headerName: "설비위치", flex: 2 },
+        { field:"fac_pattern", headerName: "설비유형", flex: 2 },
+        { field:"employee_code", headerName: "담당자", flex: 2 },
+        { field:"fac_status", headerName: "설비상태", flex: 2 },
+      ]
+    }
+  },
+}
+</script>

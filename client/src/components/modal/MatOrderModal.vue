@@ -108,6 +108,8 @@
                       return { color: '#22C55E', textAlign:'center',fontWeight: 'bold'}; // 초록색
                   } else if (params.value == '반품처리') {
                       return { color: '#E02D2D', textAlign:'center',fontWeight: 'bold'}; // 빨간색
+                  } else if (params.value == '검수중') {
+                      return { color: '#FF7F00', textAlign:'center',fontWeight: 'bold'}; // 빨간색
                   }
               return null; // 기본 스타일
           }
@@ -161,7 +163,7 @@
         });
       },
       clicked(event){
-        if(event.data.status_name=='검수완료'||event.data.status_name=='반품처리'){
+        if(event.data.status_name=='검수완료'||event.data.status_name=='반품처리'||event.data.status_name=='검수중'){
           Swal.fire({
             title: '선택불가',
             text: '이미 검수가 진행된 항목에 대해선 선택이 불가합니다.',
