@@ -95,30 +95,15 @@
                     </div>
                 </div>
                 <h5>검사항목</h5>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="수량불일치" v-model="info.error_check_ary" name="quantity">
+               <div class="row">
+                <div class="form-check col-6" v-for="errInfo in error_check_ary">
+                    <input class="form-check-input" type="checkbox" v-model="errInfo.check" name="quantity" onclick="return false;" >
                     <label class="form-check-label" for="flexCheckDefault" name="quantity">
-                        수량불일치
+                        {{ errInfo.mat_error_name }}
                     </label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="규격불일치"v-model="info.error_check_ary">
-                    <label class="form-check-label" for="flexCheckChecked">
-                        규격불일치
-                    </label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox"  value="색상불일치" v-model="info.error_check_ary">
-                    <label class="form-check-label" for="flexCheckDefault">
-                        색상
-                    </label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="외관불일치" v-model="info.error_check_ary">
-                    <label class="form-check-label" for="flexCheckChecked">
-                        외관
-                    </label>
-                </div>
+                    <input type="number" class="form-control w-50 mt-2" v-model="errInfo.mat_check_error">
+                </div>            
+            </div>
             </div>
 
         </div>
@@ -198,14 +183,22 @@ export default {
                 note : '',
                 mat_order_code : '',
                 emp_code : '',
-                error_check_ary : [] //불합격 사유 배열 담을 곳 
-            }
+               
+            },
+            error_check_ary : [
+                    { mat_error_code : 'E01', mat_error_name : '수량불일치', check : false, mat_check_error : 0 },
+                    { mat_error_code : 'E02', mat_error_name : '규격', check : false, mat_check_error : 0 },
+                    { mat_error_code : 'E03', mat_error_name : '색상', check : false, mat_check_error : 0 },
+                    { mat_error_code : 'E04', mat_error_name : '외관', check : false, mat_check_error : 0 },
+            ],
+           
         };
     },
     mounted() {
         this.matList();
     },
     computed:{
+        //박스갯수 체크
         formatRequest(){
             if(this.info.request_quantity==''){
                 return this.info.request_quantity
@@ -229,7 +222,9 @@ export default {
         },
     },
     methods: {
-     
+        change(event){
+            console.log(event.isTrusted)
+        },
         close() {
             this.$emit("close");
         },
@@ -263,8 +258,7 @@ export default {
             await axios.get('/api/mat/checkList/' + detail)
                           .then(res => {
                                 res.data.check_quantity=0;
-                                res.data.error_check_ary=[];
-                                this.info = res.data
+                                this.info = res.data;
                           }).catch(error => {
                                 console.error(error);
                          });
@@ -302,7 +296,9 @@ export default {
             return;
           }
           //검수통과인 항목 등록
-            let result = await axios.post('/api/mat/successAdd',this.info)
+            let result = await axios.post('/api/mat/successAdd',
+                    {check :this.info , error: this.error_check_ary}
+                )
             .catch(err => console.log(err))
             if(result.data.affectedRows>0){
                 Swal.fire({
@@ -324,7 +320,9 @@ export default {
                 note : '',
                 mat_order_code : '',
                 emp_code : '',
-                error_check_ary : [] 
+            }
+            for(let errorCheck of this.error_check_ary){
+                errorCheck.mat_check_error = 0;
             }
             //그리드 다시 렌더링
             this.matList();
@@ -337,6 +335,26 @@ export default {
                     confirmButtonText: '확인'
                 })
             }
+        }
+    },
+    watch : {
+        error_check_ary : {
+            handler(errAry) {
+                let errTotal = errAry.reduce((errSum, errInfo, idx) => { 
+                     //1) 체크여부
+                     errInfo.check = (errInfo.mat_check_error > 0);
+
+                    //2) 총 불량량의 합계
+                    return errSum += errInfo.mat_check_error; }, 0);
+                
+                if(errTotal > this.info.check_quantity ){
+                   alert('불량량의 합이 검수량을 넘어섰습니다.');
+                   for(let check of this.error_check_ary){
+                          check.mat_check_error = 0;
+                   }
+                }
+            },
+            deep: true
         }
     }
 };

@@ -20,8 +20,8 @@ router.get("/checkList/:mcd",async(req,res)=>{
 })
 //합격인 자제 검수 등록
 router.post('/successAdd',async(req,res)=>{
-    const checkInfo = req.body;
-    let result = await matCheckService.successCheckAdd(checkInfo)
+    const {check,error} = req.body;
+    let result = await matCheckService.successCheckAdd(check,error)
                                .catch((err)=> console.log(err));
     res.send(result);
 })
