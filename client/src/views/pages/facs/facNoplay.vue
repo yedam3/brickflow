@@ -1,6 +1,6 @@
 <template>
-    <div class="row">
-        <div class="col">
+    <div >
+        <div >
             <div class="p-4 row" style="width: 400px; height: auto; background-color: white;">
                 <div class="col">
                     <h6 style="color: gray;">비가동 설비조회</h6>
@@ -13,15 +13,15 @@
                         </select></h7>
                 </div>
                 <div class="col d-flex justify-content-end p-4" >
-                    <Button label="조회" severity="success" class=""></Button>
+                    <Button label="조회" severity="success" class="" @click="unFacList"></Button>
                 </div>
             </div>
 
         </div>
-        <div class="col" style="margin-right: 50px;">
+        <div>
             <div class="ag-wrapper d-flex justify-content-center">
-                <ag-grid-vue class="ag-theme-alpine custom-grid-theme" style="width: 1000px; height: 400px;"
-                    :columnDefs="columnDefs" :rowData="rowData" :gridOptions="gridOptions"
+                <ag-grid-vue class="ag-theme-alpine custom-grid-theme" style="width: 100%; height: 400px;"
+                    :columnDefs="columnDefs" :rowData="rowData2" :gridOptions="gridOptions"
                     @cellClicked="comCellClicked">
                 </ag-grid-vue>
             </div>
@@ -31,20 +31,20 @@
     <div class="ag-theme-alpine" style="width: 800px; height: 250px; background-color: white;">
         <div class="d-flex flex-wrap gap-4">
             <div class="p-4">
-                <h6>비가동코드 <input type="text" value="" class="form-control" style="border: 1px solid black; width: 100px;"></h6>
-                <h6>비가동사유코드 <select value="" class="form-select form-control" style="height: 34px; border: 1px solid black ; font-size: 12px; color: gray; width: 100px;" >
+                <h6>비가동코드 <input type="text" v-model="rowData.unplay_code" class="form-control" style="border: 1px solid black; width: 100px;"></h6>
+                <h6>비가동사유코드 <select v-model="rowData.unplay_reason_code" class="form-select form-control" style="height: 34px; border: 1px solid black ; font-size: 12px; color: gray; width: 100px;" >
                       <option value="">선택</option>
                       <option value="">1</option>
                     </select></h6>
-                <h6>설비코드 <input type="text" value="" class="form-control" style="border: 1px solid black; width: 100px;"></h6>
+                <h6>설비코드 <input type="text" v-model="rowData.fac_code" class="form-control" style="border: 1px solid black; width: 100px;"></h6>
             </div>
             <div class="p-4 ">
-                <h6>시작일시<input type="date" value="" class="form-control" style="border: 1px solid black; width: 150px;"></h6>
-                <h6>종료일시 <input type="date" value="" class="form-control" style="border: 1px solid black; width: 150px;"></h6>
+                <h6>시작일시<input type="date" v-model="rowData.unplay_start_date" class="form-control" style="border: 1px solid black; width: 150px;"></h6>
+                <h6>종료일시 <input type="date" v-model="rowData.unplay_end_date" class="form-control" style="border: 1px solid black; width: 150px;"></h6>
             </div>
             <div class="p-4">
-                <h6>비고<input type="text" value="" class="form-control" style="border: 1px solid black; width: 100px;"></h6>
-                <h6>담당자<input type="number" value="" class="form-control" style="border: 1px solid black; width: 100px;"></h6>
+                <h6>비고<input type="text" v-model="rowData.note" class="form-control" style="border: 1px solid black; width: 100px;"></h6>
+                <h6>담당자<input type="number" v-model="rowData.employee_code" class="form-control" style="border: 1px solid black; width: 100px;"></h6>
                 <div class="d-flex justify-content-end p-4">
                     <Button label="등록" severity="info" class="me-3" @click="addUnFac" />
                     <Button label="수정" severity="help" class="me-3" @click="modifyUnplay" />
@@ -68,7 +68,18 @@ export default {
     },
     data() {
         return {
-            rowData: [
+            rowData: 
+                {
+                    unplay_code: "",
+                    unplay_reason_code: "",
+                    employee_code: "",
+                    unplay_start_date: "",
+                    unplay_end_date: "",
+                    note: "",
+                    fac_code: "",
+                }
+            ,
+            rowData2:[
                 {
                     unplay_code: "",
                     unplay_reason_code: "",
@@ -80,26 +91,46 @@ export default {
                 }
             ],
             columnDefs: [
-                { field: "note", headerName: "설비코드", flex: 3, },
+                { field: "fac_code", headerName: "설비코드", flex: 3, },
                 { field: "unplay_code", headerName: "비가동설비코드", flex: 3, },
                 { field: "unplay_reason_code", headerName: "비가동사유코드", flex: 3, },
                 { field: "employee_code", headerName: "당담자", flex: 3, },
                 { field: "unplay_start_date", headerName: "비가동시작일시", flex: 3, },
                 { field: "unplay_end_date", headerName: "비가동종료일시", flex: 3, },
                 { field: "note", headerName: "비고", flex: 3,},
-            ]
+            ],
+            gridOptions: {
+                domLayout: "autoHeight",
+                singleClickEdit: true,
+                suppressRowClickSelection: true,
+                pagination: true,
+                paginationPageSize: 5,
+                paginationPageSizeSelector: false,
+                overlayNoRowsTemplate: '표시할 값이 없습니다.',
+                defaultColDef: {
+                    suppressMovable: true,
+                    resizable: false,
+                    sortable: false,
+                    cellStyle: { textAlign: "center" },
+                },
+            },
         }
+    },
+    mounted() {
+        this.autoUnCode();
+        this.unFacList();
     },
     methods: {
         //
         async autoUnCode(){
             const result = await axios.get("/api/fac/autoUnCode");
-            this.rowData[0].unplay_code = result.data[0].unplay_code;
+            this.rowData.unplay_code = result.data[0].unplay_code;
         },
         async addUnFac() {
+            console.log(this.rowData.unplay_code);
             const res = await axios.get('/api/fac/unFacCheck', {
                 params: {
-                    unplayCode: this.rowData[0].unplay_code
+                    unplayCode: this.rowData.unplay_code
                 }
             })
                 .catch((err) => console.log(err));
@@ -112,17 +143,20 @@ export default {
                 });
                 return;
             }
+            console.log(this.rowData);
             //등록
             axios.post('/api/fac/addUnFac', {
-                unplayFac: this.rowData[0]
+                unplayFac: this.rowData,
             })
-                .then(res => {
+            .then(res => {
                     if (res.data.affectedRows > 0) {
                         Swal.fire({
                             title: '등록성공',
                             text: '정상적으로 등록이 완료되었습니다.',
                             icon: 'success',
                             confirmButtonText: '확인'
+                        }).then(() =>{
+                            this.unFacList();
                         });
                     } else {
                         Swal.fire({
@@ -143,22 +177,14 @@ export default {
                     });
                     return;
                 });
-            this.rowData = [{
-                unplay_code: "",
-                unplay_reson_code: "",
-                employee_code: "",
-                unplay_start_date: "",
-                unplay_end_date: "",
-                note: "",
-                fac_code: "",
-            }];
+           
             this.autoUnCode();
         },
         //수정
         async modifyUnplay() {
-            const res = await axios.get('/api/mat/unFacCheck', {
+            const res = await axios.get('/api/fac/unFacCheck', {
                 params: {
-                    unplayCode: this.rowData[0].unplay_code
+                    unplayCode: this.rowData2[0].unplay_code
                 }
             })
                 .catch((err) => console.log(err));
@@ -172,8 +198,8 @@ export default {
                 return;
             }
             //설비수정
-            await axios.put('/api/mat/modifyUnplay', {
-                unplayFac: this.rowData[0],
+            await axios.put('/api/fac/modifyUnplay', {
+                unplayFac: this.rowData2[0]
             })
                 .then(res => {
                     if (res.data.affectedRows > 0) {
@@ -204,22 +230,13 @@ export default {
                     });
                     return
                 });
-            this.rowData = [{
-                unplay_code: "",
-                unplay_reson_code: "",
-                employee_code: "",
-                unplay_start_date: "",
-                unplay_end_date: "",
-                note: "",
-                fac_code: "",
-            }];
             this.autoUnCode();
         },
         //삭제
         async deleteUnplay() {
-            await axios.delete('/api/delUnplay/' + this.rowData[0].unplay_code)
+            await axios.delete('/api/fac/delUnplay' + this.rowData2.unplay_code)
                 .then((res) => {
-                    if (res.data.affectedRows < 1) {
+                    if (res.data[0].affectedRows < 1) {
                         Swal.fire({
                             title: '삭제 실패',
                             text: '삭제 실패 하였습니다.',
@@ -236,16 +253,15 @@ export default {
                     }
                 })
                 .catch((err) => console.log(err));
-            this.rowData = [{
-                unplay_code: "",
-                unplay_reson_code: "",
-                employee_code: "",
-                unplay_start_date: "",
-                unplay_end_date: "",
-                note: "",
-                fac_code: "",
-            }];
             this.autoUnCode();
+        },
+        //조회
+        async unFacList() {
+            await axios.get('/api/fac/unFacList')
+                        .then(res => {
+                            console.log(res.data)
+                            this.rowData2 = res.data;
+                        })
         },
     }
 }

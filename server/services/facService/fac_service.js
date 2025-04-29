@@ -16,25 +16,18 @@ const findAll = async (facCode)=>{
 
 //비가동설비조회
 const unplayAll = async (unplayCode) => {
-
-  let list = await mariaDB.query("unplaryList", unplayCode);
+  let list = await mariaDB.query("unplayList", unplayCode);
   return list;
 }
 
 //비가동설비 등록
-const addUnFac = async (unplayFac)=>{
-  let result = await mariaDB.query("addNoFac",[unplayFac.unplay_code, 
-                                               unplayFac.unplay_reson_code, 
-                                               unplayFac.employee_code, 
-                                               unplayFac.unplay_start_date, 
-                                               unplayFac.unplay_end_date,
-                                               unplayFac.note,
-                                               unplayFac.fac_code,
-                                              ])
-                     .catch((err)=>console.log(err));
-  if(result.affectedRows<1){
-    return result;
-  }           
+const addUnFac = async (unplayFac)=> {
+  let insertColumns = ['unplay_code', 'unplay_reason_code','employee_code','unplay_start_date','unplay_end_date','note','fac_code'];
+  let data = convertObjToAry(unplayFac, insertColumns);
+  console.log("asd", data);
+  let resInfo = await mariaDB.query("addNoFac", data).catch(err => console.log(err));
+
+  return resInfo;
 }
 //비가동 설비 수정
 const modifyUnplay = async (unplayInfo)=> {
@@ -48,6 +41,7 @@ const modifyUnplay = async (unplayInfo)=> {
 
 //값 중복확인
 const unFacCheck = async (unplayCode) => {
+  console.log(unplayCode);
   let list = await mariaDB.query('facCheck', unplayCode)
   return list;
 }
@@ -61,6 +55,11 @@ const deleteUnplay = async(unplayCode) =>{
   return result;
 }
 
+const reason = async() =>{
+  let list = await mariaDB.query("reasonFac");
+  return list
+}
+
 module.exports = {
   autoUnCode,
   findAll,
@@ -69,4 +68,5 @@ module.exports = {
   modifyUnplay,
   unFacCheck,
   deleteUnplay,
+  reason,
 }
