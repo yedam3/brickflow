@@ -12,7 +12,7 @@ module.exports = {
     // ...work,
     ...mat,
     // ...fac,
-    // ...qual,
+    ...qual,
     ...agTest,
     ...matCheck,
 }
