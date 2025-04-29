@@ -1,6 +1,7 @@
 //mapper.js
 // MariaDB에 접속할 모듈
-const mariadb = require("mariadb/callback");
+//const mariadb = require("mariadb/callback");
+const mariadb = require("mariadb");
 // DB에서 실행할 SQL문을 별도 파일로 작성
 const sqlList = require("./sqlList.js");
 // 공통적으로 사용되는 기능을 별도 파일로 관리, 필요한 함수를 가져옴
@@ -38,7 +39,7 @@ const connectionPool = mariadb.createPool({
 // MariaDB에 SQL문을 보내고 결과를 받아올 함수 설정
 // -> 실제로 동작하는 mariadb의 query 함수를 또 하나의 함수로 감싸는 방식으로
 //    반복적인 작업을 효율적으로 처리하도록 함.
-const query = (alias, values) => {
+let query = (alias, values) => {
     // alias : 각 테이블 별로 실행할 SQL문을 가지고 있는 변수
     // values : SQL문 안에 선언된 '?'들을 대체할 값의 집합
     return new Promise((resolve, reject) => {
@@ -61,6 +62,24 @@ const query = (alias, values) => {
     });
 };
 
+query = async (alias, values) => {
+    let result = null;
+
+    try{
+        let executeSql = queryFormat(sqlList[alias], values);  
+        result = await  connectionPool.query(executeSql, values);
+    }catch(err){
+        console.log(err);
+    }
+    return result;
+};
+
+const getConnection = async () =>  await connectionPool.getConnection() ;
+
+const selectedQuery = (alias, values) =>  queryFormat(sqlList[alias], values) ;
+
 module.exports = {
     query,
+    getConnection,
+    selectedQuery,
 };

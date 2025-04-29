@@ -6,13 +6,13 @@
 
         <CModalBody>
             <div class="ag-theme-alpine" style="height: 400px; width: 100%">
-                <!-- 주문 검색창 -->
+                <!-- 생산계획 검색 -->
                 <div class="d-flex justify-content-center me-5">
                     <div class="input-group mb-3 w-50">
                         <select class="form-select" aria-label="Default select example">
-                            <option value="1" selected>제품명</option>
+                            <option value="1" selected>계획명</option>
                             <option value="2">주문명</option>
-                            <option value="2">주문번호</option>
+                            <option value="2">제품명</option>
                         </select>
                         <input type="text" v-model="searchText" placeholder="검색어 입력" @keydown.enter="searchOrders"
                             class="form-control w-50" style="width: 30%" />
@@ -39,7 +39,7 @@ import { AgGridVue } from "ag-grid-vue3";
 import axios from "axios";
 
 export default {
-    name: "OrderModal",
+    name: "PlanModal",
     components: {
         AgGridVue,
     },
@@ -56,12 +56,13 @@ export default {
             searchText: "",
 
             columnDefs: [
-                { field: "orders_code", headerName: "주문번호", flex: 1 },
+                { field: "plan_code", headerName: "계획코드", flex: 1 },
                 { field: "order_name", headerName: "주문명", flex: 1 },
-                { field: "orders_date", headerName: "주문일자", flex: 1 },
-                { field: "del_date", headerName: "납기일자", flex: 1 },
+                { field: "plan_name", headerName: "계획명", flex: 2 },
+                { field: "start_date", headerName: "시작일", flex: 1 },
+                { field: "end_date", headerName: "종료일", flex: 1 },
                 { field: "prod_name", headerName: "제품명", flex: 2 },
-                { field: "finish_status", headerName: "상태값", flex: 1 },
+                { field: "finish_status", headerName: "상태", flex: 1 },
             ],
             gridOptions: {
                 domLayout: "autoHeight",
@@ -83,18 +84,17 @@ export default {
     },
     mounted() {
         // 주문 목록
-        this.orderList();
+        this.planList();
     },
     methods: {
-
         // 모달창 닫기 이벤트
         close() {
             this.$emit("close");
         },
 
         // 주문 목록 조회 API
-        orderList() {
-            axios.get('/api/work/orderList')
+        planList() {
+            axios.get('/api/work/planList')
                 .then(res => {
                     this.rowData = res.data
                 })
@@ -103,7 +103,7 @@ export default {
 
         // 그리드 행 클릭 메소드
         onRowClicked(event) {
-            this.$emit('selectOrder', event.data);
+            this.$emit('selectPlan', event.data);
             this.close();
         },
     },

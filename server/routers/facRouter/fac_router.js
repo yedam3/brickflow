@@ -26,8 +26,9 @@ router.get("/unFacList", async (req, res)=> {
 //비가동 등록
 router.post("/addUnFac", async (req,res)=>{
     const {unplayFac} = req.body;
-    let result = await facService.addUnFac(unplayFac);
-    res.send(result)
+    console.log("asdfasdf", unplayFac);
+    let result = await facService.addUnFac(unplayFac).catch(err => console.log(err));
+    res.send(result);
 })
 
 //비가동설비 수정
@@ -50,6 +51,7 @@ router.delete('/delUnplay/:ucd', async(req,res)=>{
     let result = await facService.deleteUnplay(unplayCode)
     res.send(result);
 })
+
 
 
 module.exports = router;

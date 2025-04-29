@@ -2,9 +2,9 @@
     <div class="card border-0" style="height: 800px">
         <div class="font-semibold text-xl mb-4">자재검수관리</div>
         <div class="text-end mt-3 mb-3">
-            <Button label="조회" severity="success" class="me-3" @click="matOrderList" />
-            <Button label="등록" severity="info" class="me-3" />
-            <Button label="수정" severity="help" class="me-3" />
+            <Button label="조회" severity="success" class="me-3" @click="checkResultList" />
+            <Button label="등록" severity="info" class="me-3" @click="checkAdd"/>
+            <Button label="수정" severity="help" class="me-3" @click="checkUpdate"/>
             <Button label="삭제" severity="danger" class="me-5" />
         </div>
         <div class="row">
@@ -33,91 +33,101 @@
                 <AgGridVue style="width: 100%; height: 100%" class="ag-theme-alpine" :columnDefs="columnDefs"
                     :rowData="rowData" :gridOptions="gridOptions" @rowClicked="clicked" />
             </div>
-            <div class="card border-0 col" style="height: 600px; background-color: #F5F5F5;">
+            <div class="card border-0 col" style="height: 650px; background-color: #F5F5F5;">
                 <h5>검수등록</h5>
+                <div class="row">
+                    <div class="input-group mb-5 col">
+                        <span class="input-group-text" id="basic-addon1">발주코드</span>
+                        <input type="text" class="form-control" placeholder="발주코드" aria-label="Username"
+                            aria-describedby="basic-addon1" v-model="info.mat_order_code" readonly>
+                    </div>
+                    <div class="input-group mb-5 col">
+                        <span class="input-group-text" id="basic-addon1">발주상세코드</span>
+                        <input type="text" class="form-control" placeholder="발주상세코드" aria-label="Username"
+                            aria-describedby="basic-addon1" v-model="info.mat_order_detailCode" readonly>
+                    </div>
+                </div>
                 <div class="row">
                     <div class="input-group mb-5 col">
                         <span class="input-group-text" id="basic-addon1">자재코드</span>
                         <input type="text" class="form-control" placeholder="자재코드" aria-label="Username"
-                            aria-describedby="basic-addon1" readonly>
+                            aria-describedby="basic-addon1" v-model="info.mat_code" readonly>
                     </div>
                     <div class="input-group mb-5 col">
                         <span class="input-group-text" id="basic-addon1">자재명</span>
                         <input type="text" class="form-control" placeholder="자재명" aria-label="Username"
-                            aria-describedby="basic-addon1" readonly>
+                            aria-describedby="basic-addon1" v-model="info.mat_name" readonly>
                     </div>
                 </div>
                 <div class="row">
                     <div class="input-group mb-5 col">
                         <span class="input-group-text" id="basic-addon1">기검수량</span>
                         <input type="text" class="form-control" placeholder="기검수량" aria-label="Username"
-                            aria-describedby="basic-addon1" readonly>
+                            aria-describedby="basic-addon1" :value="formatAleady" readonly>
                     </div>
                     <div class="input-group mb-5 col">
                         <span class="input-group-text" id="basic-addon1">미검수량</span>
                         <input type="text" class="form-control" placeholder="미검수량" aria-label="Username"
-                            aria-describedby="basic-addon1" readonly>
+                            aria-describedby="basic-addon1" :value="formatNot" readonly>
                     </div>
                 </div>
                 <div class="row">
                     <div class="input-group mb-5 col">
                         <span class="input-group-text" id="basic-addon1">발주량</span>
                         <input type="text" class="form-control" placeholder="발주량" aria-label="Username"
-                            aria-describedby="basic-addon1" readonly>
+                            aria-describedby="basic-addon1" :value="formatRequest" readonly>
                     </div>
                     <div class="input-group mb-5 col">
                         <span class="input-group-text" id="basic-addon1">검수량</span>
-                        <input type="text" class="form-control" placeholder="검수량" aria-label="Username"
-                            aria-describedby="basic-addon1">
+                        <input type="number" class="form-control" placeholder="검수량" aria-label="Username"
+                            aria-describedby="basic-addon1" v-model="info.check_quantity">
                     </div>
                 </div>
                 <div class="row">
                     <div class="input-group col">
-                        <span class="input-group-text" id="basic-addon1">비고</span>
-                        <textarea class="form-control" placeholder="비고" style="height: 100px; resize: none;"></textarea>
+                        <span class="input-group-text" id="basic-addon1">검수내역</span>
+                        <textarea class="form-control"  v-model="info.check_history" placeholder="비고" style="height: 100px; resize: none;"></textarea>
+                    </div>
+                    <div class="input-group mb-5 col">
+                        <span class="input-group-text" id="basic-addon1">등록자</span>
+                        <input type="text" class="form-control" placeholder="등록자" aria-label="Username"
+                            aria-describedby="basic-addon1" v-model="info.emp_code" readonly>
                     </div>
                 </div>
                 <h5>검사항목</h5>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="" name="quantity">
+               <div class="row">
+                <div class="form-check col-6" v-for="errInfo in error_check_ary">
+                    <input class="form-check-input" type="checkbox" v-model="errInfo.check" name="quantity" onclick="return false;" >
                     <label class="form-check-label" for="flexCheckDefault" name="quantity">
-                        수량불일치
+                        {{ errInfo.mat_error_name }}
                     </label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="">
-                    <label class="form-check-label" for="flexCheckChecked">
-                        규격불일치
-                    </label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="">
-                    <label class="form-check-label" for="flexCheckDefault">
-                        색상
-                    </label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="">
-                    <label class="form-check-label" for="flexCheckChecked">
-                        외관
-                    </label>
-                </div>
+                    <input type="number" class="form-control w-50 mt-2" v-model="errInfo.mat_check_error">
+                </div>            
+            </div>
             </div>
 
         </div>
     </div>
+    <MatResult
+        :visible="showModal"
+        rowSelection="multiple"
+        @close="showModal = false"
+        @checkResult="checkResult"
+   ></MatResult>
 </template>
 
 <script>
 import Swal from 'sweetalert2';
 import axios from "axios";
 import { AgGridVue } from "ag-grid-vue3";
-
+import MatResult from '@/components/modal/MatResult.vue';
+import quality from '@/router/routes/quality';
 export default {
     name: "MatOrderModal",
     components: {
         AgGridVue,
-        Swal
+        Swal,
+        MatResult
     },
     props: {
         visible: {
@@ -133,9 +143,9 @@ export default {
             columnDefs: [
                 { field: "mat_order_code", headerName: "발주코드", flex: 1 },
                 { field: "mat_order_name", headerName: "발주명", flex: 1 },
-                { field: "mat_order_detailCode", headerName: "발주디테일", flex: 1 },
+                { field: "mat_order_detailCode", headerName: "발주디테일", flex: 2 },
                 { field: "company_name", headerName: "업체명", flex: 1 },
-                { field: "mat_name", headerName: "자재명", flex: 2 },
+                { field: "mat_name", headerName: "자재명", flex: 2},
                 {
                     field: "status", headerName: "발주상태", flex: 1,
                     cellStyle: params => {
@@ -151,6 +161,7 @@ export default {
                         return null; // 기본 스타일
                     }
                 },
+                
             ],
             gridOptions: {
                 domLayout: "autoHeight",
@@ -166,27 +177,75 @@ export default {
                     sortable: false,
                     cellStyle: { textAlign: "center" },
                 },
+              
             },
+            info:{
+                mat_order_detailCode : '',
+                mat_code : '',
+                already_check_quantity: '', //기검수량
+                not_check_quantity : '',  //미검수량
+                mat_name : '',
+                request_quantity : '',
+                check_quantity : 0,
+                check_history : '',
+                mat_order_code : '',
+                emp_code : '',
+                check_code : '',
+               
+            },
+            error_check_ary : [
+                    { mat_error_code : 'E01', mat_error_name : '수량불일치', check : false, mat_check_error : 0 },
+                    { mat_error_code : 'E02', mat_error_name : '규격', check : false, mat_check_error : 0 },
+                    { mat_error_code : 'E03', mat_error_name : '색상', check : false, mat_check_error : 0 },
+                    { mat_error_code : 'E04', mat_error_name : '외관', check : false, mat_check_error : 0 },
+            ],
+            showModal : false
+           
         };
     },
     mounted() {
         this.matList();
     },
+    computed:{
+        //박스갯수 체크
+        formatRequest(){
+            if(this.info.request_quantity==''){
+                return this.info.request_quantity
+            }else{
+            return this.info.request_quantity +'개'
+           }
+        },
+        formatAleady(){
+            if(this.info.already_check_quantity==''){
+                return this.info.already_check_quantity
+            }else{
+            return this.info.already_check_quantity +'개'
+           }
+        },
+        formatNot(){
+            if(this.info.not_check_quantity==''){
+                return this.info.not_check_quantity
+            }else{
+            return this.info.not_check_quantity +'개'
+           }
+        },
+    },
     methods: {
+        
         close() {
             this.$emit("close");
         },
         async matList() {
-          
+          //검수대기 항목 조회
             await axios.get('/api/mat/checkList')
                 .then(res => {
-                    console.log(res.data)
                     this.rowData = res.data;
                 })
                 .catch(error => {
                     console.error(error);
                 });
         },
+        //검색 조회
         async searchMaterials() {
             await axios.get('/api/mat/checkList', {
                 params: {
@@ -201,7 +260,198 @@ export default {
                     console.error(error);
                 });
         },
-    }
+        //클릭했을때 검수량 렌더링
+        async clicked(event) {
+            let detail = event.data.mat_order_detailCode;
+            await axios.get('/api/mat/checkList/' + detail)
+                          .then(res => {
+                                res.data.check_quantity=0;
+                                this.info = res.data;
+                          }).catch(error => {
+                                console.error(error);
+                         });
+            //갯수 초기화
+            for (let errorCheck of this.error_check_ary) {
+                errorCheck.mat_check_error = 0;
+            }
+        },
+        //값체크
+        checkValue(){
+            //값이 다들어있는지 체크
+            if(this.info.mat_code==''||this.info.check_quantity==''||this.info.check_quantity==0 ){
+                Swal.fire({
+                    title: '실패',
+                    text: '해당하는 값을 입력해주십시오.',
+                    icon: 'error',
+                    confirmButtonText: '확인'
+                })
+                return 1;
+            }
+            if(this.info.not_check_quantity < Number(this.info.check_quantity)){
+                Swal.fire({
+                    title: '실패',
+                    text: '미검수량보다 더많은 검수량을 기입하였습니다.',
+                    icon: 'error',
+                    confirmButtonText: '확인'
+                })
+                return 2;
+            }
+        },
+        //등록
+        async checkAdd(){
+          //값체크
+          let validation = this.checkValue();
+          if(validation==1){
+            return;
+          }else if (validation==2){
+            return;
+          }
+          //검수통과인 항목 등록
+            let result = await axios.post('/api/mat/successAdd',
+                    {check :this.info , error: this.error_check_ary}
+                )
+            .catch(err => console.log(err))
+            if(result.data.affectedRows>0){
+                Swal.fire({
+                    title: '성공',
+                    text: '등록에 성공 하였습니다.',
+                    icon: 'success',
+                    confirmButtonText: '확인'
+                })
+                //등록 후 초기화 작업
+             this.info =    {
+                mat_order_detailCode : '',
+                mat_code : '',
+                already_check_quantity: '', 
+                not_check_quantity : '',  
+                mat_name : '',
+                request_quantity : '',
+                check_quantity : 0,
+                check_history : '',
+                mat_order_code : '',
+                check_code : '',
+                emp_code : '',
+            }
+            for(let errorCheck of this.error_check_ary){
+                errorCheck.mat_check_error = 0;
+            }
+            //그리드 다시 렌더링
+            this.matList();
+            //에러시
+            }else{
+                Swal.fire({
+                    title: '실패',
+                    text: '등록에 실패 하였습니다.',
+                    icon: 'error',
+                    confirmButtonText: '확인'
+                })
+            }
+        },
+        //검수결과 조회 모달
+        checkResultList(){
+            this.showModal =true;
+        },
+        //렌더링해서 다시조회
+        async checkResult(check){
+            let detail = check.mat_order_detailCode;
+            await axios.get('/api/mat/checkList/' + detail)
+                          .then(res => {
+                                this.info = res.data;
+                                console.log(this.info)
+                                //기검수량 이미한만큼은 제외하고 다시 렌더링
+                                this.info.already_check_quantity=this.info.already_check_quantity-check.check_quantity;
+                                //미검수량은 이미 검수한량 플러스하고 다시 렌더링
+                                this.info.not_check_quantity=Number(this.info.not_check_quantity)+Number(check.check_quantity);
+                                //검수량 렌더링
+                                this.info.check_quantity = check.check_quantity;
+                                //체크코드 가져오기
+                                this.info.check_code = check.check_code
+                          }).catch(error => {
+                                console.error(error);
+                         });
+            //갯수 초기화
+            for (let errorCheck of this.error_check_ary) {
+                errorCheck.mat_check_error = 0;
+            }
+            //갯수 다시 렌더링
+          let check_code = check.check_code;
+          await axios.get('/api/mat/errorList/' + check_code)
+                          .then(res => {
+                            this.error_check_ary.forEach(errorInfo => {
+                                let matched = res.data.find(info => info.mat_error_code==errorInfo.mat_error_code);
+                                 if(matched){
+                                errorInfo.mat_check_error = matched.mat_check_error
+                                }
+                            })
+                                
+                          }).catch(error => {
+                                console.error(error);
+                         });
+        },
+     //수정
+        async checkUpdate() {
+            let validation = this.checkValue();
+            if (validation == 1) {
+                return;
+            } else if (validation == 2) {
+                return;
+            }
+            await axios.put('/api/mat/checkUpdate', {
+                check: this.info, error: this.error_check_ary
+            })
+                .then(res => {
+                    if (res.data.affectedRows > 0) {
+                        Swal.fire({
+                            title: '수정 완료',
+                            text: '수정이 완료되었습니다.',
+                            icon: 'success',
+                            confirmButtonText: '확인'
+                        });
+                    } else {
+                        Swal.fire({
+                            title: '수정 실패',
+                            text: '수정을 실패하였습니다.',
+                            icon: 'error',
+                            confirmButtonText: '확인'
+                        });
+                        return;
+                    }
+                })
+        }
+    },
+    watch : {
+        error_check_ary : {
+            handler(errAry) {
+                let errTotal = errAry.reduce((errSum, errInfo, idx) => { 
+                     //1) 체크여부
+                     errInfo.check = (errInfo.mat_check_error > 0);
+
+                    //2) 총 불량량의 합계
+                    return errSum += errInfo.mat_check_error; }, 0);
+                
+                if(errTotal > this.info.check_quantity ){
+                   alert('불량량의 합이 검수량을 넘어섰습니다.');
+                   for(let check of this.error_check_ary){
+                          check.mat_check_error = 0;
+                   }
+                }
+            },
+            deep: true
+        },
+        'info.check_quantity': function (newVal) {
+            // check_quantity가 바뀔 때도 불량 총합과 비교
+            let errTotal = this.error_check_ary.reduce((sum, item) => {
+                return sum + item.mat_check_error;
+            }, 0);
+
+            if (errTotal > newVal) {
+                // info.check_quantity 값을 수정하려면 this를 통해 접근해야 합니다.
+                this.info.check_quantity = errTotal;  // 여기에서 check_quantity 수정
+                alert('불량량의 합이 검수량을 넘어섰습니다.');
+            }
+        }
+    },
+    
 };
 </script>
 

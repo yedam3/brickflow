@@ -55,7 +55,6 @@
   import axios from "axios";
   
   export default {
-    name: "MatModal",
     components: {
       AgGridVue,
     },

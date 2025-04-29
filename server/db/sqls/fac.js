@@ -1,5 +1,5 @@
 // fac.js
-const autoUnCode = `SELECT CONCAT('nup-',IFNULL(MAX(CAST(SUBSTR(unplay_code,5) AS SIGNED)),100)+1) AS unplay_code
+const autoUnCode = `SELECT CONCAT('UNP-',IFNULL(MAX(CAST(SUBSTR(unplay_code,5) AS SIGNED)),100)+1) AS unplay_code
 FROM fac_none_play`;
 
 //설비 조회
@@ -15,14 +15,14 @@ const selectFacList =
         f.fac_status
 FROM fac f`;
 
-const unplaryList =
+const unplayList =
 `SELECT unplay_code,
-        unplay_reson_code,
+        unplay_reason_code,
         employee_code,
         unplay_start_date,
         unplay_end_date,
         note,
-        fac_code,
+        fac_code
 FROM fac_none_play`
 
 // 값 체크
@@ -36,7 +36,7 @@ const facCheck =
 //비가동
 const addNoFac =
 `INSERT INTO fac_none_play(unplay_code, 
-                           unplay_reson_code, 
+                           unplay_reason_code, 
                            employee_code, 
                            unplay_start_date, 
                            unplay_end_date,
@@ -57,12 +57,18 @@ const delUnplay =
 `DELETE FROM fac_none_play
 WHERE unplay_code = ?`
 
+const reasonFac =
+`SELECT s.sub_code_name
+ FROM main_codes m join sub_codes s on(m.main_code = s.main_code)
+ WHERE s.main_code = "NR"`
+
 module.exports = {
   autoUnCode,
   selectFacList, 
   addNoFac,
-  unplaryList,
+  unplayList,
   updateUnplay,
   facCheck,
   delUnplay,
+  reasonFac,
 };
