@@ -18,6 +18,7 @@ const router = createRouter({
                 ...qualityRoutes,
                 ...facRoutes,
                 ...sellerRoutes,
+                ...adminRouter,
             ]
         },
         // {
