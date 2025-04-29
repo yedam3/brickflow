@@ -7,6 +7,13 @@ const findPlanDetailByPlan_code = async () => {
     return planDetailList;
 }
 
+// 생산지시 등록
+const insertInstr = async () => {
+
+}
+
+// 
+
 export default {
     findPlanDetailByPlan_code,
 }
