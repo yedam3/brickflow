@@ -58,7 +58,6 @@
   import Swal from 'sweetalert2';
   
   export default {
-    name: "MatOrderModal",
     components: {
       AgGridVue,
       Swal
@@ -174,6 +173,13 @@
         }
         this.$emit('selectOrder', event.data);
         this.close();
+      }
+    },
+    watch: {
+      visible(newVal) {
+        if (newVal) {
+          this.matList();  // visible이 true로 바뀌면 쿼리 실행
+        }
       }
     }
   };

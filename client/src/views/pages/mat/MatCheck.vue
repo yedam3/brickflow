@@ -2,9 +2,9 @@
     <div class="card border-0" style="height: 800px">
         <div class="font-semibold text-xl mb-4">자재검수관리</div>
         <div class="text-end mt-3 mb-3">
-            <Button label="조회" severity="success" class="me-3" @click="matOrderList" />
+            <Button label="조회" severity="success" class="me-3" @click="checkResultList" />
             <Button label="등록" severity="info" class="me-3" @click="checkAdd"/>
-            <Button label="수정" severity="help" class="me-3" />
+            <Button label="수정" severity="help" class="me-3" @click="checkUpdate"/>
             <Button label="삭제" severity="danger" class="me-5" />
         </div>
         <div class="row">
@@ -79,14 +79,14 @@
                     </div>
                     <div class="input-group mb-5 col">
                         <span class="input-group-text" id="basic-addon1">검수량</span>
-                        <input type="text" class="form-control" placeholder="검수량" aria-label="Username"
-                            aria-describedby="basic-addon1" v-model="info.check_quantity" >
+                        <input type="number" class="form-control" placeholder="검수량" aria-label="Username"
+                            aria-describedby="basic-addon1" v-model="info.check_quantity">
                     </div>
                 </div>
                 <div class="row">
                     <div class="input-group col">
-                        <span class="input-group-text" id="basic-addon1">비고</span>
-                        <textarea class="form-control"  v-model="info.note" placeholder="비고" style="height: 100px; resize: none;"></textarea>
+                        <span class="input-group-text" id="basic-addon1">검수내역</span>
+                        <textarea class="form-control"  v-model="info.check_history" placeholder="비고" style="height: 100px; resize: none;"></textarea>
                     </div>
                     <div class="input-group mb-5 col">
                         <span class="input-group-text" id="basic-addon1">등록자</span>
@@ -108,18 +108,26 @@
 
         </div>
     </div>
+    <MatResult
+        :visible="showModal"
+        rowSelection="multiple"
+        @close="showModal = false"
+        @checkResult="checkResult"
+   ></MatResult>
 </template>
 
 <script>
 import Swal from 'sweetalert2';
 import axios from "axios";
 import { AgGridVue } from "ag-grid-vue3";
-
+import MatResult from '@/components/modal/MatResult.vue';
+import quality from '@/router/routes/quality';
 export default {
     name: "MatOrderModal",
     components: {
         AgGridVue,
-        Swal
+        Swal,
+        MatResult
     },
     props: {
         visible: {
@@ -176,13 +184,13 @@ export default {
                 mat_code : '',
                 already_check_quantity: '', //기검수량
                 not_check_quantity : '',  //미검수량
-                mat_code : '',
                 mat_name : '',
                 request_quantity : '',
                 check_quantity : 0,
-                note : '',
+                check_history : '',
                 mat_order_code : '',
                 emp_code : '',
+                check_code : '',
                
             },
             error_check_ary : [
@@ -191,6 +199,7 @@ export default {
                     { mat_error_code : 'E03', mat_error_name : '색상', check : false, mat_check_error : 0 },
                     { mat_error_code : 'E04', mat_error_name : '외관', check : false, mat_check_error : 0 },
             ],
+            showModal : false
            
         };
     },
@@ -222,23 +231,21 @@ export default {
         },
     },
     methods: {
-        change(event){
-            console.log(event.isTrusted)
-        },
+        
         close() {
             this.$emit("close");
         },
         async matList() {
-          
+          //검수대기 항목 조회
             await axios.get('/api/mat/checkList')
                 .then(res => {
-                    console.log(res.data)
                     this.rowData = res.data;
                 })
                 .catch(error => {
                     console.error(error);
                 });
         },
+        //검색 조회
         async searchMaterials() {
             await axios.get('/api/mat/checkList', {
                 params: {
@@ -253,6 +260,7 @@ export default {
                     console.error(error);
                 });
         },
+        //클릭했을때 검수량 렌더링
         async clicked(event) {
             let detail = event.data.mat_order_detailCode;
             await axios.get('/api/mat/checkList/' + detail)
@@ -262,12 +270,15 @@ export default {
                           }).catch(error => {
                                 console.error(error);
                          });
+            //갯수 초기화
+            for (let errorCheck of this.error_check_ary) {
+                errorCheck.mat_check_error = 0;
+            }
         },
-
         //값체크
         checkValue(){
             //값이 다들어있는지 체크
-            if(this.info.already_check_quantity==''||this.info.check_quantity==''||this.info.check_quantity==0 ){
+            if(this.info.mat_code==''||this.info.check_quantity==''||this.info.check_quantity==0 ){
                 Swal.fire({
                     title: '실패',
                     text: '해당하는 값을 입력해주십시오.',
@@ -313,12 +324,12 @@ export default {
                 mat_code : '',
                 already_check_quantity: '', 
                 not_check_quantity : '',  
-                mat_code : '',
                 mat_name : '',
                 request_quantity : '',
                 check_quantity : 0,
-                note : '',
+                check_history : '',
                 mat_order_code : '',
+                check_code : '',
                 emp_code : '',
             }
             for(let errorCheck of this.error_check_ary){
@@ -335,6 +346,77 @@ export default {
                     confirmButtonText: '확인'
                 })
             }
+        },
+        //검수결과 조회 모달
+        checkResultList(){
+            this.showModal =true;
+        },
+        //렌더링해서 다시조회
+        async checkResult(check){
+            let detail = check.mat_order_detailCode;
+            await axios.get('/api/mat/checkList/' + detail)
+                          .then(res => {
+                                this.info = res.data;
+                                console.log(this.info)
+                                //기검수량 이미한만큼은 제외하고 다시 렌더링
+                                this.info.already_check_quantity=this.info.already_check_quantity-check.check_quantity;
+                                //미검수량은 이미 검수한량 플러스하고 다시 렌더링
+                                this.info.not_check_quantity=Number(this.info.not_check_quantity)+Number(check.check_quantity);
+                                //검수량 렌더링
+                                this.info.check_quantity = check.check_quantity;
+                                //체크코드 가져오기
+                                this.info.check_code = check.check_code
+                          }).catch(error => {
+                                console.error(error);
+                         });
+            //갯수 초기화
+            for (let errorCheck of this.error_check_ary) {
+                errorCheck.mat_check_error = 0;
+            }
+            //갯수 다시 렌더링
+          let check_code = check.check_code;
+          await axios.get('/api/mat/errorList/' + check_code)
+                          .then(res => {
+                            this.error_check_ary.forEach(errorInfo => {
+                                let matched = res.data.find(info => info.mat_error_code==errorInfo.mat_error_code);
+                                 if(matched){
+                                errorInfo.mat_check_error = matched.mat_check_error
+                                }
+                            })
+                                
+                          }).catch(error => {
+                                console.error(error);
+                         });
+        },
+     //수정
+        async checkUpdate() {
+            let validation = this.checkValue();
+            if (validation == 1) {
+                return;
+            } else if (validation == 2) {
+                return;
+            }
+            await axios.put('/api/mat/checkUpdate', {
+                check: this.info, error: this.error_check_ary
+            })
+                .then(res => {
+                    if (res.data.affectedRows > 0) {
+                        Swal.fire({
+                            title: '수정 완료',
+                            text: '수정이 완료되었습니다.',
+                            icon: 'success',
+                            confirmButtonText: '확인'
+                        });
+                    } else {
+                        Swal.fire({
+                            title: '수정 실패',
+                            text: '수정을 실패하였습니다.',
+                            icon: 'error',
+                            confirmButtonText: '확인'
+                        });
+                        return;
+                    }
+                })
         }
     },
     watch : {
@@ -355,8 +437,21 @@ export default {
                 }
             },
             deep: true
+        },
+        'info.check_quantity': function (newVal) {
+            // check_quantity가 바뀔 때도 불량 총합과 비교
+            let errTotal = this.error_check_ary.reduce((sum, item) => {
+                return sum + item.mat_check_error;
+            }, 0);
+
+            if (errTotal > newVal) {
+                // info.check_quantity 값을 수정하려면 this를 통해 접근해야 합니다.
+                this.info.check_quantity = errTotal;  // 여기에서 check_quantity 수정
+                alert('불량량의 합이 검수량을 넘어섰습니다.');
+            }
         }
-    }
+    },
+    
 };
 </script>
 
