@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const facService = require("../../services/facService/fac_service.js");
-const { route } = require("../work_router.js");
+
 
 //자동증가
 router.get("/autoUnCode", async (req, res) => {
