@@ -9,10 +9,10 @@ const matCheck = require('./sqls/matCheck.js');
 module.exports = {
     ...work,
     ...sales,
-    // ...work,
+    ...work,
     ...mat,
-    ...qual,
     ...fac,
+    ...qual,
     ...agTest,
     ...matCheck,
 }

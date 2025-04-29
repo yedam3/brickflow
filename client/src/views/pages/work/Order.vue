@@ -3,22 +3,22 @@
         <div class="font-semibold text-xl mb-4">생산 지시 관리</div>
 
         <div class="text-end mt-3 mb-3">
-            <Button label="계획목록" severity="success" class="me-3" @click="orderList" />
+            <Button label="계획목록" severity="success" class="me-3" @click="planList" />
             <Button label="지시목록" severity="info" class="me-3" />
             <Button label="등록" severity="help" class="me-3" />
             <Button label="수정" severity="danger" class="me-3" />
-            <Button label="삭제" severity="danger" class="me-5" />
+            <Button label="삭제" severity="danger" class="" />
         </div>
         <div class="mb-3">
-            <Card style="overflow: hidden; background-color: gray;">
+            <Card style="overflow: hidden; background-color: #f8f9fa;">
                 <template #content>
-                    <div class="mb-3 row">
+                    <div class="mb-5 row">
                         <div class="col-4">
                             <InputGroup>
                                 <InputGroupAddon>
                                     생산 지시 코드
                                 </InputGroupAddon>
-                                <InputText v-model="formData.plan_code" placeholder="" />
+                                <InputText v-model="formData.plan_code" size="large" placeholder="" />
                             </InputGroup>
                         </div>
                         <div class="col-4">
@@ -26,17 +26,17 @@
                                 <InputGroupAddon>
                                     생산 지시명
                                 </InputGroupAddon>
-                                <InputText v-model="formData.employee_code" placeholder="(입력)" />
+                                <InputText v-model="formData.employee_code" size="large" placeholder="(입력)" />
                             </InputGroup>
                         </div>
                     </div>
-                    <div class="mb-3 row">
+                    <div class="mb-5 row">
                         <div class="col-4">
                             <InputGroup>
                                 <InputGroupAddon>
                                     담당자
                                 </InputGroupAddon>
-                                <InputText v-model="formData.plan_name" placeholder="" />
+                                <InputText v-model="formData.plan_name" size="large" placeholder="" />
                             </InputGroup>
                         </div>
                         <div class="col-4">
@@ -44,7 +44,7 @@
                                 <InputGroupAddon>
                                     계획 코드
                                 </InputGroupAddon>
-                                <InputText v-model="formData.orders_code" placeholder="" />
+                                <InputText v-model="formData.orders_code" size="large" placeholder="" />
                             </InputGroup>
                         </div>
                         <div class="col-4">
@@ -52,17 +52,17 @@
                                 <InputGroupAddon>
                                     계획명
                                 </InputGroupAddon>
-                                <InputText v-model="formData.order_name" placeholder="" />
+                                <InputText v-model="formData.order_name" size="large" placeholder="" />
                             </InputGroup>
                         </div>
                     </div>
-                    <div class="mb-2 row">
+                    <div class="mb-5 row">
                         <div class="col-4">
                             <InputGroup>
                                 <InputGroupAddon>
                                     시작일자
                                 </InputGroupAddon>
-                                <InputText v-model="formData.start_date" placeholder="" />
+                                <InputText v-model="formData.start_date" size="large" placeholder="" />
                             </InputGroup>
                         </div>
                         <div class="col-4">
@@ -70,11 +70,11 @@
                                 <InputGroupAddon>
                                     종료일자
                                 </InputGroupAddon>
-                                <InputText v-model="formData.end_date" placeholder="" />
+                                <InputText v-model="formData.end_date" size="large" placeholder="" />
                             </InputGroup>
                         </div>
                     </div>
-                    <Button label="초기화" severity="danger" class="me-5" @click="clearForm" />
+                    <Button label="초기화" severity="danger" class="me-5" size="large" @click="clearForm" />
                 </template>
             </Card>
         </div>
@@ -82,7 +82,7 @@
         <div class="row">
             <div class="col">
                 <div class="d-flex justify-content-between mb-3">
-                    <h4 class="text-start m-0">자재발주량</h4>
+                    <h4 class="text-start m-0">생산 제품 목록</h4>
                     <Button label="행추가" severity="success" @click="addRow" />
                 </div>
                 <div class="ag-wrapper" style="border: none;">
@@ -102,17 +102,20 @@
         </div>
     </div>
 
-    <!--주문 목록 조회 모달창-->
-    <OrderModal :visible="showOrderModal" @close="showOrderModal = false" @select-item="orderSelected"></OrderModal>
+    <!--생산 계획 목록 조회 모달창-->
+    <PlanModal :visible="showPlanModal" @close="showPlanModal = false" @selectPlan="planSelected"></PlanModal>
 </template>
 
 <script>
 import { AgGridVue } from "ag-grid-vue3";
 import axios from "axios";
 
+import PlanModal from "@/components/modal/PlanModal.vue";
+
 export default {
     components: {
         AgGridVue,
+        PlanModal,
     },
     data() {
         return {
@@ -168,12 +171,31 @@ export default {
                     sortable: false, //정렬 금지
                 },
             },
-            showOrderModal: false,
+            showPlanModal: false,
+
         };
     },
     mounted() {
     },
     methods: {
+        // 생산 계획 모달창
+        planList() {
+            this.showPlanModal = true;
+        },
+
+        // 생산 계획 모달창 값 전달, 생산 계획 상세값 조회
+        async planSelected(plan) {
+            await axios.get('/api/work/planDetailList', {
+                params: {
+                    plan_code: plan.plan_code
+                }
+            }).then(res => {
+                const data = res.data;
+                console.log(data);
+                // this.rowData = [...data];
+            }).catch((err) => console.error(err));
+        },
+
         //행추가
         addRow() {
             this.secondRowData.push({
