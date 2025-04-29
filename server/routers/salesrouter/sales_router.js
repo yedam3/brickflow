@@ -13,7 +13,7 @@ router.get("/comList", async (req, res) => {
 });
 
 
-//발주등록
+//등록
 router.post('/salesOrderAdd',async(req,res)=>{
     const { salesOrder, salesOrderDetail } = req.body;
     let result = await salesService.salesOrderAdd(salesOrder, salesOrderDetail);

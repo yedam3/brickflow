@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const facService = require("../../services/facService/fac_service.js");
 
+
 //자동증가
 router.get("/autoUnCode", async (req, res) => {
     let autoUnCode = await facService.autoUnCode().catch((err)=> console.log(err));
