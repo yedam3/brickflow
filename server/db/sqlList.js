@@ -11,7 +11,7 @@ module.exports = {
     ...sales,
     // ...work,
     ...mat,
-    // ...fac,
+    ...fac,
     // ...qual,
     ...agTest,
     ...matCheck,
