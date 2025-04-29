@@ -18,7 +18,7 @@
                                 <InputGroupAddon>
                                     생산 지시 코드
                                 </InputGroupAddon>
-                                <InputText v-model="formData.plan_code" size="large" placeholder="" />
+                                <InputText v-model="formData.product_order_code" size="large" placeholder="" />
                             </InputGroup>
                         </div>
                         <div class="col-4">
@@ -26,7 +26,7 @@
                                 <InputGroupAddon>
                                     생산 지시명
                                 </InputGroupAddon>
-                                <InputText v-model="formData.employee_code" size="large" placeholder="(입력)" />
+                                <InputText v-model="formData.product_order_name" size="large" placeholder="(입력)" />
                             </InputGroup>
                         </div>
                     </div>
@@ -36,7 +36,7 @@
                                 <InputGroupAddon>
                                     담당자
                                 </InputGroupAddon>
-                                <InputText v-model="formData.plan_name" size="large" placeholder="" />
+                                <InputText v-model="formData.emp_name" size="large" placeholder="" />
                             </InputGroup>
                         </div>
                         <div class="col-4">
@@ -44,7 +44,7 @@
                                 <InputGroupAddon>
                                     계획 코드
                                 </InputGroupAddon>
-                                <InputText v-model="formData.orders_code" size="large" placeholder="" />
+                                <InputText v-model="formData.plan_code" size="large" placeholder="" />
                             </InputGroup>
                         </div>
                         <div class="col-4">
@@ -52,7 +52,7 @@
                                 <InputGroupAddon>
                                     계획명
                                 </InputGroupAddon>
-                                <InputText v-model="formData.order_name" size="large" placeholder="" />
+                                <InputText v-model="formData.plan_name" size="large" placeholder="" />
                             </InputGroup>
                         </div>
                     </div>
@@ -121,31 +121,31 @@ export default {
         return {
             // FormData
             formData: {
-                product_order_code: "", // 생산지시_코드
-                employee_code: "", // 담당자
-                product_order_name: "", // 생산지시명
-                plan_code: "", // 계획코드
-                plan_name: "", // 계획명
-                start_date: "", // 시작일자
-                end_date: "", // 종료일자
+                product_order_code: "",     // 생산지시_코드
+                emp_name: "",               // 담당자명
+                product_order_name: "",     // 생산지시명
+                plan_code: "",              // 계획코드
+                plan_name: "",              // 계획명
+                start_date: "",             // 시작일자
+                end_date: "",               // 종료일자
             },
 
             rowData: [
                 {
-                    orders_code: "", // 제품코드
-                    prod_name: "", // 제품명
-                    order_quantity: "", // 지시수량
-                    priority: "", // 우선순위
-                    quantity: "", // 주문량
+                    orders_code: "",        // 제품코드
+                    prod_name: "",          // 제품명
+                    order_quantity: "",     // 지시수량
+                    priority: "",           // 우선순위
+                    quantity: "",           // 주문량
                 }
             ],
 
             secondRowData: [
                 {
-                    mat_code: "", // 자재코드
-                    mat_name: "", // 자재명
+                    mat_code: "",           // 자재코드
+                    mat_name: "",           // 자재명
                     product_order_name: "", // 요구량
-                    prod_name: "", // 투입량
+                    prod_name: "",          // 투입량
                 }
             ],
             prodListDefs: [
@@ -178,6 +178,19 @@ export default {
     mounted() {
     },
     methods: {
+        // FormData 초기화
+        clearForm() {
+            this.formData = {
+                product_order_code: "",     // 생산지시_코드
+                emp_name: "",               // 담당자명
+                product_order_name: "",     // 생산지시명
+                plan_code: "",              // 계획코드
+                plan_name: "",              // 계획명
+                start_date: "",             // 시작일자
+                end_date: "",               // 종료일자
+            }
+        },
+        
         // 생산 계획 모달창
         planList() {
             this.showPlanModal = true;
@@ -185,7 +198,10 @@ export default {
 
         // 생산 계획 모달창 값 전달, 생산 계획 상세값 조회
         async planSelected(plan) {
-            await axios.get('/api/work/planDetailList', {
+            this.formData.plan_code = plan.plan_code;
+            this.formData.plan_name = plan.plan_name;
+
+            await axios.get(`/api/work/planDetailList`, {
                 params: {
                     plan_code: plan.plan_code
                 }

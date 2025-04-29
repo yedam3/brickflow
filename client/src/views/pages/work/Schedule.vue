@@ -178,7 +178,6 @@ export default {
             try {
                 const result = await axios.get("/api/work/autoCode");
                 this.formData.plan_code = result.data[0].plan_code;
-                console.log(this.formData.plan_code);
             } catch (err) {
                 console.error(err);
             }
@@ -208,6 +207,54 @@ export default {
             this.showPlanModal = true;
         },
 
+        // input 유효성 검사
+        // plan_code: "",      // 생산계획_코드
+        //         orders_code: "",    // 주문_코드
+        //         plan_name: "",      // 생산계획명
+        //         employee_code: "",  // 담당자
+        //         start_date: "",     // 시작_일자
+        //         end_date: "",       // 종료_일자
+        //         finish_status: "",  // 처리_상태
+        //         note: "",           // 비고
+        inputCheck() {
+            if (this.formData.plan_code == '' ||
+                this.formData.orders_code == '' ||
+                this.formData.plan_name == '' ||
+                this.formData.employee_code == '' ||
+                this.formData.start_date == '' ||
+                this.formData.end_date == ''
+                // || this.formData.finish_status == '' ||
+                // this.formData.note == ''
+            ) {
+                Swal.fire({
+                    title: '실패',
+                    text: '값을 입력해주세요.',
+                    icon: 'error',
+                    confirmButtonText: '확인',
+                });
+                return 1;
+            } else if (this.formData.start_date > this.formData.end_date) {
+                Swal.fire({
+                    title: '실패',
+                    text: '종료일자가 시작일자보다 빠릅니다.',
+                    icon: 'error',
+                    confirmButtonText: '확인',
+                });
+                return 1;
+            }
+            for(let data of this.rowData) {
+                if(data.currentPlanQty == '') {
+                    Swal.fire({
+                        title: '실패',
+                        text: '현기획량을 입력하세요.',
+                        icon: 'error',
+                        confirmButtonText: '확인'
+                    });
+                    return 1;
+                }
+            }
+        },
+
         // 행추가
         addRow() {
             this.rowData.push({
@@ -222,7 +269,7 @@ export default {
                 unplannedQty: "",       // 미계획량
                 currentPlanQty: "",     // 현계획량
             });
-            // 새 배열로 설정하여 AG Grid가 반영하게 만듬
+            // 새 배열로 설정하여 AG Grid가 반영하게 만듦
             this.rowData = [...this.rowData];
         },
 
@@ -261,6 +308,29 @@ export default {
 
         // 생산 계획 등록
         async addPlan() {
+            if (this.inputCheck() > 0) {
+                return;
+            }
+            const plan_codeRes = await axios.get(`/api/work/plan_codeCheck/${this.formData.plan_code}`).catch((err) => console.error(err));
+            if (plan_codeRes.data.check > 0) {
+                Swal.fire({
+                    title: '등록 실패',
+                    text: '이미 등록이 진행된 계획코드입니다.',
+                    icon: 'error',
+                    confirmButtonText: '확인'
+                });
+                return;
+            }
+            const order_statusRes = await axios.get(`/api/work/order_statusCheck/${this.formData.orders_code}`).catch((err) => console.error(err));
+            if(order_statusRes.data.check > 0) {
+                Swal.fire({
+                    title: '등록 실패',
+                    text: '이미 출고가 완료된 건입니다.',
+                    icon: 'error',
+                    confirmButtonText: '확인'
+                });
+                return;
+            }
             await axios.post("/api/work/plan", {
                 planData: this.formData,
                 planDetailData: this.rowData,
