@@ -77,16 +77,20 @@
         },  
       }
      },
+
      rowData2: [
      {
-        
+      mat_code: "",
+      prod_name: "",
+      mat_name: "",
+      quantity: "",
      }
      ],
      columnDefs2: [
-        { field: 'mat_code', headerName: '자재코드',flex:4,editable:true},
-        { field: 'prod_name', headerName: '제품명' ,flex:1},
-        { field: 'mat_name', headerName: '자재명 ' ,flex:1},
-        { field: 'quantity', headerName: '수량 ' ,flex:1},
+        { field: 'mat_code', headerName: '자재코드',flex:3,editable:true},
+        { field: 'prod_name', headerName: '제품명' ,flex:4},
+        { field: 'mat_name', headerName: '자재명 ' ,flex:2},
+        { field: 'quantity', headerName: '수량 ' ,flex:2},
       ],
       gridOptions2:{
         pagination: true,
@@ -94,9 +98,9 @@
          paginationPageSizeSelector: [5, 10, 20, 50],
          overlayNoRowsTemplate: '표시할 값이 없습니다.',
          defaultColDef2: {
-         sortable: false, //정렬가능
-         filter: false, //필터가능
-         resizable: false, //마우스드래그
+           suppressMovable: true, //컬럼 드래그로 순서바꾸기 못하게
+           resizable: false, //컬럼 너비 마우스로 조절 못하게
+           sortable: false, //정렬 기능 비활성화
          onGridReady: function (event) {
          event.api.sizeColumnsToFit();
         },
@@ -116,9 +120,20 @@
         console.error('데이터 조회 실패:', err);
       }
     },
-    
+    bomCellClicked(event){
+      let bom = event.data.prod_code;
+      axios.get('/api/admin/bom/' + bom)
+                 .then(res => {
+                  console.log(res);
+                       this.rowData2 = res.data;
+                 }).catch(error => {
+                  console.error(error);
+                 });
+                 console.log(event);
+        },
+    }
   }
-}
+
 
 </script>
 <style>
