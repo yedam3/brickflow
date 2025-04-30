@@ -23,6 +23,10 @@ const facRouter = require("./routers/facRouter/fac_router.js");
 const agTest = require("./routers/agTest_router.js");
 const adminRouter = require("./routers/adminRouter/admin_router.js");
 
+
+const matRedayRouter = require("./routers/matRouter/mat_stroe_router.js");
+
+
 // 기본 라우팅
 app.get("/", (req, res) => {
     res.send("Welcome!!");
@@ -40,3 +44,5 @@ app.use("/", agTest);
 
 app.use("/mat", matCheckRouter);
 app.use("/admin", adminRouter);
+
+app.use('/mat',matRedayRouter);

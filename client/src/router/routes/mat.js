@@ -14,4 +14,9 @@ export default[
         name: 'MatCheck',
         component: () => import('@/views/pages/mat/MatCheck.vue')
     },
+    {
+        path: '/mat/store',
+        name: 'MatStore',
+        component: () => import('@/views/pages/mat/MatStore.vue')
+    },
 ]

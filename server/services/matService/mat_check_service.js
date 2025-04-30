@@ -165,11 +165,38 @@ const checkUpdate = async (check,error) => {
   return result;
   
 } 
+
+//검수 등록 및 수정 체크
+const addUpdateCheck = async(checkCode) =>{
+  let list = await mariaDB.query('updateInsertCheck',checkCode);
+  return list;
+}
+const updateFinished = async(checkCode) =>{
+  let list = await mariaDB.query('updateFinished',checkCode);
+  return list;
+}
+//삭제
+const deleteChekc = async(checkCode,matOrderCode) => {
+  let result = await mariaDB.query('deleteCheck',checkCode);
+  result = await mariaDB.query('errorDelete',checkCode);
+console.log('맷'+matOrderCode)
+  //상태값 확인
+  let statusCheck = await mariaDB.query('statusCheck', [matOrderCode, matOrderCode, matOrderCode, matOrderCode])
+    .catch((err) => console.log(err));
+  console.log('값'+statusCheck[0])
+  //상태값변경
+  result = await mariaDB.query('statusUpdate', [statusCheck[0].status, matOrderCode])
+    .catch((err) => console.log(err));
+  return result;
+}
 module.exports={
   checkOrderList,
   checkRender,
   successCheckAdd,
   checkReusltList,
   matErrorQuantity,
-  checkUpdate
+  checkUpdate,
+  addUpdateCheck,
+  updateFinished,
+  deleteChekc
 }

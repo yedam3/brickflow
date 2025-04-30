@@ -5,7 +5,7 @@
             <Button label="조회" severity="success" class="me-3" @click="checkResultList" />
             <Button label="등록" severity="info" class="me-3" @click="checkAdd"/>
             <Button label="수정" severity="help" class="me-3" @click="checkUpdate"/>
-            <Button label="삭제" severity="danger" class="me-5" />
+            <Button label="삭제" severity="danger" class="me-5" @click="checkDelete"/>
         </div>
         <div class="row">
 
@@ -121,7 +121,6 @@ import Swal from 'sweetalert2';
 import axios from "axios";
 import { AgGridVue } from "ag-grid-vue3";
 import MatResult from '@/components/modal/MatResult.vue';
-import quality from '@/router/routes/quality';
 export default {
     name: "MatOrderModal",
     components: {
@@ -297,6 +296,12 @@ export default {
                 return 2;
             }
         },
+        //등록인지 수정인지 체크
+        async checkCount(param){
+          let result = await axios.get('/api/mat/testCheck/'+param)
+                                  .catch((err)=>console.log(err))
+         return result.data[0].checkCount;
+        },
         //등록
         async checkAdd(){
           //값체크
@@ -305,6 +310,17 @@ export default {
             return;
           }else if (validation==2){
             return;
+          }
+          //체크코드가 이미 있는지 값체크
+          let count = await this.checkCount(this.info.check_code);
+          if(count>0){
+            Swal.fire({
+                    title: '등록 실패',
+                    text: '이미 등록이 진행된 건입닌다.',
+                    icon: 'error',
+                    confirmButtonText: '확인'
+                })
+                return;
           }
           //검수통과인 항목 등록
             let result = await axios.post('/api/mat/successAdd',
@@ -396,6 +412,18 @@ export default {
             } else if (validation == 2) {
                 return;
             }
+            //등록건인지 수정건인지 채크
+            let count = await this.checkCount(this.info.check_code);
+          if(count==0){
+            Swal.fire({
+                    title: '수정 실패',
+                    text: '등록이 진행되지 않은 건입니다.',
+                    icon: 'error',
+                    confirmButtonText: '확인'
+                })
+                return;
+          }
+          //수정실행
             await axios.put('/api/mat/checkUpdate', {
                 check: this.info, error: this.error_check_ary
             })
@@ -417,6 +445,62 @@ export default {
                         return;
                     }
                 })
+        },
+
+        //삭제
+        async checkDelete(){
+              //등록건인지 수정건인지 채크
+              let count = await this.checkCount(this.info.check_code);
+          if(count==0){
+            Swal.fire({
+                    title: '삭제 실패',
+                    text: '등록이 진행되지 않은 건입니다.',
+                    icon: 'error',
+                    confirmButtonText: '확인'
+                })
+                return;
+          }
+          console.log(this.info.mat_order_code)
+          //삭제실행
+          await axios.delete('/api/mat/checkDelete/'+this.info.check_code,{
+              params : {
+                matOrderCode : this.info.mat_order_code
+            }
+          })
+                     .then(res => {
+                         if (res.data.affectedRows > 0) {
+                             Swal.fire({
+                                 title: '삭제 성공',
+                                 text: '삭제가 정상적으로 삭제되었습니다.',
+                                 icon: 'success',
+                                 confirmButtonText: '확인'
+                             })
+                        }else{
+                            Swal.fire({
+                                 title: '삭제 실패',
+                                 text: '삭제가 진행되지않았습니다.',
+                                 icon: 'error',
+                                 confirmButtonText: '확인'
+                             })  
+                        }
+                     })
+        //값 다시 초기화
+        this.info =    {
+                mat_order_detailCode : '',
+                mat_code : '',
+                already_check_quantity: '', 
+                not_check_quantity : '',  
+                mat_name : '',
+                request_quantity : '',
+                check_quantity : 0,
+                check_history : '',
+                mat_order_code : '',
+                check_code : '',
+                emp_code : '',
+            }
+            for(let errorCheck of this.error_check_ary){
+                errorCheck.mat_check_error = 0;
+            }
         }
     },
     watch : {
