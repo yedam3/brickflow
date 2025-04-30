@@ -41,7 +41,7 @@ const findPlanDetailByPlan_code = async (plan_code) => {
 
 // 생산 계획 등록
 const insertPlan = async (planData, planDetailData) => {
-    const { finish_status, note, ...data } = planData;
+    const { finish_status, order_name, ...data } = planData;
     data.start_date = dateFormat(new Date(data.start_date));
     data.end_date = dateFormat(new Date(data.end_date));
     let result = await mariaDB
@@ -50,8 +50,7 @@ const insertPlan = async (planData, planDetailData) => {
     if (result.affectedRows < 1) {
         return result;
     }
-
-    insertPlanDetail(data.plan_code, planDetailData, data.orders_code);
+    return insertPlanDetail(data.plan_code, planDetailData, data.orders_code);
 };
 
 // 생산 번호 체크
@@ -65,7 +64,7 @@ const findOrder_statusByOrders_code = async (orders_code) => {
     let result = (await mariaDB.query("findOrder_statusByOrders_code", orders_code).catch((err => console.error(err))))[0];
     return result;
 }
-
+// ----------------------------------------
 // 생산 계획 상세 등록
 const insertPlanDetail = async (plan_code, planDetailData, orders_code) => {
     const fields = ["plan_code", "currentPlanQty", "prod_code"];
@@ -105,15 +104,15 @@ const updateOrdersByOrders_code = async (orders_code) => {
     let result = await mariaDB.query("updateOrdersByOrders_code", orders_code).catch((err) => console.error(err));
     return result;
 }
-
+// ----------------------------------------
 // 생산 계획 수정
 const updatePlanByPlan_code = async (planData, planDetailData) => {
-    const { finish_status, note, ...data} = planData;
+    const { finish_status, ...data} = planData;
 
     data.start_date = dateFormat(new Date(data.start_date));
     data.end_date = dateFormat(new Date(data.end_date));
 
-    const fields = ["plan_name", "start_date", "end_date", "order_name", "plan_code"];
+    const fields = ["plan_name", "start_date", "end_date", "note", "plan_code"];
     const newData = fields.reduce((obj, key) => {
         if(data[key] !== undefined) {
             obj[key] = data[key];

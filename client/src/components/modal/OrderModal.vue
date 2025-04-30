@@ -61,7 +61,31 @@ export default {
                 { field: "orders_date", headerName: "주문일자", flex: 1 },
                 { field: "del_date", headerName: "납기일자", flex: 1 },
                 { field: "prod_name", headerName: "제품명", flex: 2 },
-                { field: "finish_status", headerName: "상태값", flex: 1 },
+                {
+                    field: "finish_status", headerName: "상태", flex: 1,
+                    valueFormatter: params => {
+                        if(params.value === 'OS1') {
+                            return '접수';
+                        } else if(params.value == 'OS2') {
+                            return '생산중';
+                        } else if(params.value == 'OS3') {
+                            return '출고대기';
+                        } else if(params.value == 'OS4') {
+                            return '출고완료';
+                        }
+                    },
+                    cellStyle: params => {
+                        if(params.value === 'OS1') {
+                            return { textAlign: 'center', fontWeight: 'bold', color: '#6c757d' };
+                        } else if(params.value == 'OS2') {
+                            return { textAlign: 'center', fontWeight: 'bold', color: '#007bff' };
+                        } else if(params.value == 'OS3') {
+                            return { textAlign: 'center', fontWeight: 'bold', color: '#fd7e14' };
+                        } else if(params.value == 'OS4') {
+                            return { textAlign: 'center', fontWeight: 'bold', color: '#28a745' };
+                        }
+                    }
+                },
             ],
             gridOptions: {
                 domLayout: "autoHeight",
@@ -70,7 +94,7 @@ export default {
                 suppressCellFocus: true,                // 셀 포커스 OFF
                 pagination: true,                       // 페이징 ON
                 paginationPageSize: 5,                  // 한 페이지 보여질 행 수
-                paginationPageSizeSelector: false,      //paseSize 선택란 삭제
+                paginationPageSizeSelector: false,      // paseSize 선택란 삭제
                 defaultColDef: {                        // 열(컬럼) 기본 설정
                     suppressMovable: true,              // 컬럼을 드래그하여 이동하지 못하게
                     resizable: false,                   // 컬럼 크기 조절 못하게
@@ -94,7 +118,7 @@ export default {
 
         // 주문 목록 조회 API
         orderList() {
-            axios.get('/api/work/orderList')
+            axios.get('/api/work/plan/orderList')
                 .then(res => {
                     this.rowData = res.data
                 })

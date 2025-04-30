@@ -1,7 +1,7 @@
 <template>
     <CModal :visible="visible" @close="close" backdrop="static" alignment="center" size="xl" style="min-width: 1000px">
         <CModalHeader>
-            <slot name="header">주문 목록</slot>
+            <slot name="header">생산계획 목록</slot>
         </CModalHeader>
 
         <CModalBody>
@@ -62,7 +62,27 @@ export default {
                 { field: "start_date", headerName: "시작일", flex: 1 },
                 { field: "end_date", headerName: "종료일", flex: 1 },
                 { field: "prod_name", headerName: "제품명", flex: 2 },
-                { field: "finish_status", headerName: "상태", flex: 1 },
+                {
+                    field: "finish_status", headerName: "상태값", flex: 1,
+                    valueFormatter: params => {
+                        if(params.value === 'OC1') {
+                            return '계획등록';
+                        } else if(params.value === 'OC2') {
+                            return '지시중';
+                        } else if(params.value === 'OC3') {
+                            return '지시완료';
+                        }
+                    },
+                    cellStyle: params => {
+                        if(params.value === 'OS1') {
+                            return { textAlign: 'center', fontWeight: 'bold', color: '#6c757d' };
+                        } else if(params.value == 'OS2') {
+                            return { textAlign: 'center', fontWeight: 'bold', color: '#fd7e14' };
+                        } else if(params.value == 'OS3') {
+                            return { textAlign: 'center', fontWeight: 'bold', color: '#28a745' };
+                        }
+                    }
+                },
             ],
             gridOptions: {
                 domLayout: "autoHeight",
@@ -94,7 +114,7 @@ export default {
 
         // 주문 목록 조회 API
         planList() {
-            axios.get('/api/work/planList')
+            axios.get('/api/work/plan/planList')
                 .then(res => {
                     this.rowData = res.data
                 })
