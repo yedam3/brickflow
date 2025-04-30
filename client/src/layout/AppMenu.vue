@@ -126,6 +126,11 @@ const model = ref([
                         to: '/mat/check'
                     },
                     {
+                        label: '자재입고관리',
+                        icon: 'pi pi-fw pi-lock',
+                        to: '/mat/store'
+                    },
+                    {
                         label: 'AG테스트',
                         icon: 'pi pi-fw pi-lock',
                         to: '/mat/practice'

@@ -9,9 +9,18 @@ const autoUnCode = async() => {
 }
 
 
-const findAll = async (facCode)=>{
-  let list = await mariaDB.query("selectFacList", facCode);
-  return list;
+const facList = async ({type, keyword})=>{
+  let searchCondition ={};
+  let convertedCondition = '';
+
+  if (type && keyword) {
+    searchCondition[type] = keyword;
+    const converted = convertObjToAry(searchCondition, []);
+    convertedCondition = converted.searchKeyword;
+  }
+
+  const result = await mariaDB.query('selectFacList', { searchCondition: convertedCondition}).catch((err) => console.log(err));
+  return result;
 }
 
 //비가동설비조회
@@ -60,13 +69,20 @@ const reason = async() =>{
   return list
 }
 
+//설비 모달
+const facModal = async (facCode) => {
+  let list = await mariaDB.query('facModal', facCode)
+  return list;
+}
+
 module.exports = {
   autoUnCode,
-  findAll,
+  facList,
   unplayAll,
   addUnFac,
   modifyUnplay,
   unFacCheck,
   deleteUnplay,
   reason,
+  facModal,
 }

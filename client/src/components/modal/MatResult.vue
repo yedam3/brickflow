@@ -142,7 +142,17 @@
                         console.error(error);
                     });
             },
-            clicked(event) {
+            async clicked(event) {
+               let result = await axios.get('/api/mat/finExist/'+event.data.check_code)
+               if(result.data[0].checkCount>0){
+                Swal.fire({
+                    title: '실패',
+                    text: '이미 완제품 입고가 진행된 자재입니다..',
+                    icon: 'error',
+                    confirmButtonText: '확인'
+                })
+                return;
+               }
                //만약 완제품입고가 완료된 항목에 대해선 validation 추가해야함
                 this.$emit('checkResult', event.data);
                 this.close();

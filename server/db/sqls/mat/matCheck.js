@@ -165,6 +165,24 @@ const updateClear = `
   SET check_status = ?
   WHERE check_code = ?
 `
+const updateInsertCheck =`
+SELECT count(*) AS checkCount
+FROM mat_check
+WHERE check_code = ?
+`
+
+const updateFinished =`
+ SELECT count(*) AS checkCount
+ FROM mat_check m JOIN mat_store s
+				   ON(m.check_code = s.check_code)
+  WHERE m.check_code = ? 
+`
+
+const deleteCheck = `
+  DELETE FROM mat_check
+  WHERE check_code = ?
+`
+
 
 module.exports = {
   matOrderCheckList,
@@ -178,5 +196,8 @@ module.exports = {
   errQuantity,
   checkUpdate,
   errorDelete,
-  updateClear
+  updateClear,
+  updateInsertCheck,
+  updateFinished,
+  deleteCheck,
 }
