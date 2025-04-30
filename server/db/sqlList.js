@@ -6,6 +6,14 @@ const fac = require('./sqls/fac/fac.js');
 const qual = require('./sqls/qual/qual.js');
 const agTest = require('./sqls/agTest.js')
 const matCheck = require('./sqls/mat/matCheck.js');
+const matStore = require('./sqls/mat/matStore.js');
+
+
+
+
+
+
+
 module.exports = {
     ...work,
     ...sales,
@@ -15,4 +23,5 @@ module.exports = {
     ...qual,
     ...agTest,
     ...matCheck,
+    ...matStore,
 }

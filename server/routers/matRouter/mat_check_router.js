@@ -48,5 +48,26 @@ router.put('/checkUpdate',async(req,res)=>{
                                         .catch((err) =>console.log(err));
     res.send(result)                            
 })
+//값중복확인
+router.get('/testCheck/:checkCode',async(req,res)=>{
+    let check = req.params.checkCode;
+    let list = await matCheckService.addUpdateCheck(check);
+    res.send(list);
+})
+//값중복확인
+router.get('/finExist/:checkCode',async(req,res)=>{
+    let check = req.params.checkCode;
+    let list = await matCheckService.updateFinished(check);
+    res.send(list);
+})
+
+//값 삭제
+router.delete('/checkDelete/:check',async(req,res)=>{
+    let checkCode = req.params.check;
+    let {matOrderCode} = req.query;
+    console.log('라우터'+matOrderCode)
+    let result = await matCheckService.deleteChekc(checkCode,matOrderCode)
+    res.send(result);
+})
 
 module.exports = router;
