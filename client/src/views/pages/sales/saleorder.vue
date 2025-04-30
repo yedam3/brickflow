@@ -154,6 +154,13 @@ export default {
       // 새 배열로 설정하여 AG Grid가 반영하게 만듬
       this.rowData = [...this.rowData];
     },
+
+    // 주문 모달창
+    orderList() {
+      this.showOrderModal = true;
+    },
+
+    
     //현재날짜 가져오기
     getToday() {
       const today = new Date();
@@ -186,8 +193,7 @@ export default {
     //주문등록
     async addOrder() {
       const res = await axios.post('/api/sales/orderCheck', {
-       
-          orderCode: this.rowData[0].sales_order_code
+          orderCode: this.rowData[0].order_code
        
       })
         .catch((err) => console.log(err));

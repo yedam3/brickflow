@@ -26,14 +26,14 @@ const comList = async ({ type, keyword }) => {
 //등록
 const salesOrderAdd = async (salesOrder, salesOrderDetail) => {
   let result = await mariaDB.query('addsalesOrder',[salesOrder.sales_order_name,
-    salesOrder.orders_code,
-    salesOrder.order_name,
-    salesOrder.orders_date,
-    salesOrder.del_date,
-    salesOrder.employee_code,
-    salesOrder.note,
-    salesOrder.finish_status,
-    salesOrder.company_code,
+                                                    salesOrder.orders_code,
+                                                    salesOrder.order_name,
+                                                    salesOrder.orders_date,
+                                                    salesOrder.del_date,
+                                                    salesOrder.employee_code,
+                                                    salesOrder.note,
+                                                    salesOrder.finish_status,
+                                                    salesOrder.company_code,
   ])
   .catch((err)=>console.log(err));
      if(result.affectedRows<1){
