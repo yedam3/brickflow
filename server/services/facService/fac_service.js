@@ -1,5 +1,5 @@
 const mariaDB = require("../../db/mapper.js");
-const { updateUnplay } = require("../../db/sqls/fac.js");
+const { updateUnplay } = require("../../db/sqls/fac/fac.js");
 const { convertObjToAry } = require("../../utils/converts.js");
 
 // 자동 matcode 증가
