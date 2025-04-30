@@ -4,17 +4,28 @@ FROM fac_none_play`;
 
 //설비 조회
 const selectFacList =
-`SELECT f.fac_code,
-        f.model_name,
-        f.fac_location,
-        f.employee_code,
-        f.fac_pattern,
-        f.install_date,
-        f.inspection_cycle,
-        f.image,
-        f.fac_status
-FROM fac f`;
+`SELECT fac_code,
+        model_name,
+        fac_location,
+        employee_code,
+        fac_pattern,
+        install_date,
+        inspection_cycle,
+        image,
+        fac_status
+FROM fac`;
 
+//설비 모달창
+const facModal =
+`SELECT fac_code,
+        model_name,
+        fac_location,
+        employee_code,
+        fac_status
+FROM fac
+WHERE fac_code = ?`
+
+//비가동 설비 리스트
 const unplayList =
 `SELECT unplay_code,
         unplay_reason_code,
@@ -71,4 +82,5 @@ module.exports = {
   facCheck,
   delUnplay,
   reasonFac,
+  facModal,
 };

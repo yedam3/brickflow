@@ -22,7 +22,7 @@
             <div class="ag-wrapper d-flex justify-content-center">
                 <ag-grid-vue class="ag-theme-alpine custom-grid-theme" style="width: 100%; height: 400px;"
                     :columnDefs="columnDefs" :rowData="rowData2" :gridOptions="gridOptions"
-                    @cellClicked="comCellClicked">
+                    @cellClicked="comCellClicked"  @rowClicked="clicked">
                 </ag-grid-vue>
             </div>
         </div>
@@ -36,15 +36,15 @@
                       <option value="">선택</option>
                       <option value="">1</option>
                     </select></h6>
-                <h6>설비코드 <input type="text" v-model="rowData.fac_code" class="form-control" style="border: 1px solid black; width: 100px;"></h6>
+                <h6>설비코드 <input type="text" v-model="rowData.fac_code" class="form-control" style="border: 1px solid black; width: 100px;" @click="facModalList" readonly ></h6>
             </div>
             <div class="p-4 ">
-                <h6>시작일시<input type="date" v-model="rowData.unplay_start_date" class="form-control" style="border: 1px solid black; width: 150px;"></h6>
-                <h6>종료일시 <input type="date" v-model="rowData.unplay_end_date" class="form-control" style="border: 1px solid black; width: 150px;"></h6>
+                <h6>시작일시<input type="text" v-model="rowData.unplay_start_date" class="form-control" style="border: 1px solid black; width: 150px;"></h6>
+                <h6>종료일시 <input type="text" v-model="rowData.unplay_end_date" class="form-control" style="border: 1px solid black; width: 150px;"></h6>
+                <h6>담당자<input type="number" v-model="rowData.employee_code" class="form-control" style="border: 1px solid black; width: 100px;"></h6>
             </div>
             <div class="p-4">
-                <h6>비고<input type="text" v-model="rowData.note" class="form-control" style="border: 1px solid black; width: 100px;"></h6>
-                <h6>담당자<input type="number" v-model="rowData.employee_code" class="form-control" style="border: 1px solid black; width: 100px;"></h6>
+                <h6>비고<textarea v-model="rowData.note" class="form-control" style="border: 1px solid black; width: 200px; height: 115px;"></textarea></h6>
                 <div class="d-flex justify-content-end p-4">
                     <Button label="등록" severity="info" class="me-3" @click="addUnFac" />
                     <Button label="수정" severity="help" class="me-3" @click="modifyUnplay" />
@@ -53,6 +53,13 @@
             </div>
         </div>
     </div>
+    <!--설비모달창-->
+    <FacListModal
+        :visible="showFacModal"
+        rowSelection="multiple"
+        @close="showFacModal = false"
+        @selectFac="facSelected">
+    </FacListModal>
 </template>
 <script>
 
@@ -60,10 +67,12 @@ import { AgGridVue } from "ag-grid-vue3";
 import DatePickerEditor from "../../../components/DatePickerEditor.vue";
 import axios from "axios";
 import Swal from "sweetalert2";
+import FacListModal from "@/components/modal/FacListModal.vue";
 export default {
     components: {
         AgGridVue,
         datePicker: DatePickerEditor,
+        FacListModal,
         Swal
     },
     data() {
@@ -76,7 +85,7 @@ export default {
                     unplay_start_date: "",
                     unplay_end_date: "",
                     note: "",
-                    fac_code: "",
+                    fac_code: '',
                 }
             ,
             rowData2:[
@@ -87,7 +96,7 @@ export default {
                     unplay_start_date: "",
                     unplay_end_date: "",
                     note: "",
-                    fac_code: "",
+                    fac_code: '',
                 }
             ],
             columnDefs: [
@@ -99,6 +108,7 @@ export default {
                 { field: "unplay_end_date", headerName: "비가동종료일시", flex: 3, },
                 { field: "note", headerName: "비고", flex: 3,},
             ],
+
             gridOptions: {
                 domLayout: "autoHeight",
                 singleClickEdit: true,
@@ -114,6 +124,8 @@ export default {
                     cellStyle: { textAlign: "center" },
                 },
             },
+            showFacModal: false,
+            selectedRowIndexes: [],
         }
     },
     mounted() {
@@ -158,6 +170,15 @@ export default {
                         }).then(() =>{
                             this.unFacList();
                         });
+                        this.rowData =      {
+                            unplay_code: "",
+                            unplay_reason_code: "",
+                            employee_code: "",
+                            unplay_start_date: "",
+                            unplay_end_date: "",
+                            note: "",
+                            fac_code: '',
+                }
                     } else {
                         Swal.fire({
                             title: '등록 실패',
@@ -184,7 +205,7 @@ export default {
         async modifyUnplay() {
             const res = await axios.get('/api/fac/unFacCheck', {
                 params: {
-                    unplayCode: this.rowData2[0].unplay_code
+                    unplayCode: this.rowData2.unplay_code
                 }
             })
                 .catch((err) => console.log(err));
@@ -234,9 +255,9 @@ export default {
         },
         //삭제
         async deleteUnplay() {
-            await axios.delete('/api/fac/delUnplay' + this.rowData2.unplay_code)
+            await axios.delete('/api/fac/delUnplay' + this.rowData)
                 .then((res) => {
-                    if (res.data[0].affectedRows < 1) {
+                    if (res.data.affectedRows < 1) {
                         Swal.fire({
                             title: '삭제 실패',
                             text: '삭제 실패 하였습니다.',
@@ -255,14 +276,27 @@ export default {
                 .catch((err) => console.log(err));
             this.autoUnCode();
         },
+        //
+        clicked(event) {
+            console.log(event.data);
+            this.rowData = event.data;
+        },
         //조회
         async unFacList() {
             await axios.get('/api/fac/unFacList')
-                        .then(res => {
-                            console.log(res.data)
-                            this.rowData2 = res.data;
-                        })
+                .then(res => {
+                    console.log(res.data)
+                    this.rowData2 = res.data;
+                })
         },
+        //설비 모달창 띄우기
+        facModalList(){
+          this.showFacModal = true;
+        },
+        //설비 모달 리스트
+        async facSelected(data) {
+            this.rowData.fac_code =data.fac_code
+        }
     }
 }
 </script>

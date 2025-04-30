@@ -52,6 +52,20 @@ router.delete('/delUnplay/:ucd', async(req,res)=>{
     res.send(result);
 })
 
+//설비 모달리스트
+router.get('/facModal', async (req, res) => {
+    const {facCode}= req.query;
+    let list = await facService.facModal(facCode).catch((err) => console.log(err));
+    res.send(list);
+})
+
+//설비 리스트
+router.get ('/facList', async (req, res)=>{
+    const { type, keyword }= req.query;
+    let list = await facService.facList({ type, keyword }).catch((err)=> console.log(err));
+    res.send(list);
+})
+
 
 
 module.exports = router;
