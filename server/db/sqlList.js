@@ -1,11 +1,11 @@
 //sqlList.js
-const sales = require('./sqls/sales.js');
-const work = require('./sqls/work.js');
-const mat = require('./sqls/mat.js');
-const fac = require('./sqls/fac.js');
-const qual = require('./sqls/qual.js');
+const sales = require('./sqls/sales/sales.js');
+const work = require('./sqls/work/work.js');
+const mat = require('./sqls/mat/mat.js');
+const fac = require('./sqls/fac/fac.js');
+const qual = require('./sqls/qual/qual.js');
 const agTest = require('./sqls/agTest.js')
-const matCheck = require('./sqls/matCheck.js');
+const matCheck = require('./sqls/mat/matCheck.js');
 module.exports = {
     ...work,
     ...sales,
