@@ -47,12 +47,12 @@ SELECT
         JOIN plan_detail pd ON p.plan_code = pd.plan_code
         WHERE p.orders_code = od.orders_code AND pd.prod_code = od.prod_code
     ), 0) AS prePlannedQty,
-    od.quantity - COALESCE((
+    GREATEST(od.quantity - COALESCE((
         SELECT SUM(pd.plan_quantity)
         FROM plan p
         JOIN plan_detail pd ON p.plan_code = pd.plan_code
         WHERE p.orders_code = od.orders_code AND pd.prod_code = od.prod_code
-    ), 0) AS unplannedQty,
+    ), 0), 0) AS unplannedQty,
     '' AS currentPlanQty
     
 FROM order_detail od
@@ -71,7 +71,7 @@ SELECT p.plan_code, getOrderName(p.orders_code) AS order_name, p.plan_name, p.em
             ELSE ''
         END
     ) AS prod_name,
-    p.finish_status, od.orders_code
+    p.finish_status, od.orders_code, p.note
 FROM plan p
 	JOIN plan_detail pd ON p.plan_code = pd.plan_code
 	JOIN ( SELECT DISTINCT orders_code, prod_code 
@@ -82,7 +82,7 @@ GROUP BY p.plan_code, order_name, p.plan_name, p.start_date, p.end_date, p.finis
 
 // 생산 계획 상세 조회
 const findPlanDetailByPlan_code = `
-SELECT pd.plan_detail_code, o.orders_code, o.orders_date, o.del_date, getProdName(od.prod_code) AS prod_name, od.quantity,
+SELECT pd.plan_detail_code, o.orders_code, o.orders_date, o.del_date, od.prod_code, getProdName(od.prod_code) AS prod_name, od.quantity,
 		od.quantity - COALESCE((
         SELECT SUM(dmd.delivery_quantity)
         FROM delivery_manage dm
@@ -97,14 +97,15 @@ SELECT pd.plan_detail_code, o.orders_code, o.orders_date, o.del_date, getProdNam
         WHERE p.orders_code = od.orders_code AND pd.prod_code = od.prod_code
     ), 0) AS prePlannedQty,
     
-    od.quantity - COALESCE((
+    GREATEST(od.quantity - COALESCE((
         SELECT SUM(pd.plan_quantity)
         FROM plan p
         JOIN plan_detail pd ON p.plan_code = pd.plan_code
         WHERE p.orders_code = od.orders_code AND pd.prod_code = od.prod_code
-    ), 0) AS unplannedQty,
+    ), 0), 0) AS unplannedQty,
 
-    pd.plan_quantity AS currentPlanQty
+    pd.plan_quantity AS currentPlanQty,
+    p.note
 FROM plan_detail pd
 	JOIN plan p ON pd.plan_code = p.plan_code
     JOIN orders o ON p.orders_code = o.orders_code
@@ -119,7 +120,7 @@ FROM plan
 WHERE plan_code = ?
 `;
 
-// 주문 상태 확인
+// 주문 상태 확인 (출고완료)
 const findOrder_statusByOrders_code = `
 SELECT COUNT(*) AS check
 FROM orders

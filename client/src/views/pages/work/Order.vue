@@ -62,7 +62,8 @@
                                 <InputGroupAddon>
                                     시작일자
                                 </InputGroupAddon>
-                                <InputText v-model="formData.start_date" size="large" placeholder="" />
+                                <DatePicker v-model="formData.start_date" size="large" dateFormat="yy/mm/dd"
+                                    placeholder="(입력)" showIcon iconDisplay="input" />
                             </InputGroup>
                         </div>
                         <div class="col-4">
@@ -70,7 +71,8 @@
                                 <InputGroupAddon>
                                     종료일자
                                 </InputGroupAddon>
-                                <InputText v-model="formData.end_date" size="large" placeholder="" />
+                                <DatePicker v-model="formData.end_date" size="large" dateFormat="yy/mm/dd"
+                                    placeholder="(입력)" showIcon iconDisplay="input" />
                             </InputGroup>
                         </div>
                     </div>
@@ -131,13 +133,13 @@ export default {
             },
 
             rowData: [
-                {
-                    orders_code: "",        // 제품코드
-                    prod_name: "",          // 제품명
-                    order_quantity: "",     // 지시수량
-                    priority: "",           // 우선순위
-                    quantity: "",           // 주문량
-                }
+                // {
+                //     orders_code: "",        // 제품코드
+                //     prod_name: "",          // 제품명
+                //     order_quantity: "",     // 지시수량
+                //     priority: "",           // 우선순위
+                //     quantity: "",           // 주문량
+                // }
             ],
 
             secondRowData: [
@@ -149,17 +151,17 @@ export default {
                 }
             ],
             prodListDefs: [
-                { field: "orders_code", headerName: "제품코드", flex: 2, cellStyle: { textAlign: "center" } },
-                { field: "prod_name", headerName: "제품명", flex: 2, cellStyle: { textAlign: "center" } },
-                { field: "order_quantity", headerName: "지시수량", flex: 2, editable: true, cellStyle: { textAlign: "center" }, cellEditor: "datePicker" },
-                { field: "priority", headerName: "우선순위", flex: 3, editable: true, cellStyle: { textAlign: "center" }, cellEditor: "datePicker" },
-                { field: "quantity", headerName: "주문량", flex: 3, cellStyle: { textAlign: "center" } },
+                { field: "prod_code", headerName: "제품코드", flex: 1.5, cellStyle: { textAlign: "center" } },
+                { field: "prod_name", headerName: "제품명", flex: 3, cellStyle: { textAlign: "center" } },
+                { field: "order_quantity", headerName: "지시수량", flex: 1.5, cellStyle: { textAlign: "center" } },
+                { field: "priority", headerName: "우선순위", flex: 1.5, cellStyle: { textAlign: "center" } },
+                { field: "quantity", headerName: "주문량", flex: 2, cellStyle: { textAlign: "center" } },
             ],
             matHoldListDefs: [
                 { field: "mat_code", headerName: "자재코드", flex: 2, cellStyle: { textAlign: "center" } },
                 { field: "mat_name", headerName: "자재명", flex: 2, cellStyle: { textAlign: "center" } },
-                { field: "", headerName: "요구량", flex: 2, editable: true, cellStyle: { textAlign: "center" }, cellEditor: "datePicker" },
-                { field: "prod_name", headerName: "투입량", flex: 3, editable: true, cellStyle: { textAlign: "center" }, cellEditor: "datePicker" },
+                { field: "", headerName: "요구량", flex: 2, cellStyle: { textAlign: "center" } },
+                { field: "prod_name", headerName: "투입량", flex: 3, cellStyle: { textAlign: "center" } },
             ],
             gridOptions: {
                 domLayout: "autoHeight", //행을 보고 자동으로 hight부여
@@ -196,20 +198,43 @@ export default {
             this.showPlanModal = true;
         },
 
+        // 사이트 접속시 plan_code 자동증가
+        async autoPlan_code() {
+            try {
+                const result = await axios.get("/api/work/order/orderAutoCode");
+                this.formData.plan_code = result.data[0].plan_code;
+            } catch (err) {
+                console.error(err);
+            }
+        },
+
         // 생산 계획 모달창 값 전달, 생산 계획 상세값 조회
         async planSelected(plan) {
             this.formData.plan_code = plan.plan_code;
             this.formData.plan_name = plan.plan_name;
-
-            await axios.get(`/api/work/planDetailList`, {
-                params: {
-                    plan_code: plan.plan_code
-                }
+            await axios.get(`/api/work/plan/planDetailList/${plan.plan_code}`, {
             }).then(res => {
                 const data = res.data;
                 console.log(data);
-                // this.rowData = [...data];
+                let cnt = 1;
+                for(let obj of data) {
+                    this.rowData.push({
+                        prod_code: obj.prod_code,
+                        prod_name: obj.prod_name,
+                        order_quantity: obj.currentPlanQty,
+                        priority: cnt,
+                        quantity: obj.quantity,
+                    });
+                    cnt++;
+                }
             }).catch((err) => console.error(err));
+
+            await axios.get(`/api/work/order/matHoldQty/`, {
+            }).then(res => {
+
+            }).catch((err) => {
+                console.error(err);
+            })
         },
 
         //행추가

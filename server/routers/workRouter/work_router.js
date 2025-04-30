@@ -3,7 +3,7 @@ const router = express.Router();
 const workService = require("../../services/workService/workService.js");
 
 // plan_code 증가 값
-router.get("/autoCode", async (req, res) => {
+router.get("/planAutoCode", async (req, res) => {
     let plan_code = await workService.getPlan_code().catch((err) => console.log(err));
     res.send(plan_code);
 })
@@ -28,7 +28,7 @@ router.get("/planList", async (req, res) => {
 });
 
 // 생산 계획 상세 목록 조회
-router.get("/planDetailList", async (req, res) => {
+router.get("/planDetailList/:plan_code", async (req, res) => {
     let plan_code = req.params.plan_code;
     let planDetailList = await workService.findPlanDetailByPlan_code(plan_code).catch((err) => console.error(err));
     res.send(planDetailList);
