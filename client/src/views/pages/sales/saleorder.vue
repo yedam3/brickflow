@@ -13,7 +13,7 @@
     <!--메인 그리드-->
     <ag-grid-vue class="ag-theme-alpine" style="width: 100%; 
     height: 150px;" :columnDefs="columnDefs" :rowData="rowData" :gridOptions="gridOptions"
-      :defaultColDef="defaultColDef" @cellClicked="comCellClicked">
+      :defaultColDef="defaultColDef" @cellClicked="comCellClicked" >
     </ag-grid-vue>
   </div>
 
@@ -34,7 +34,8 @@
     </ag-grid-vue>
   </div>
 
-
+  <!-- 주문 목록 조회 모달창 -->
+  <OrderModal :visible="showOrderModal" @close="showOrderModal = false" @selectOrder="orderSelected"></OrderModal>
   <!-- 업체 모달창-->
   <ProdComModal :visible="showComModal" rowSelection="multiple" @close="showComModal = false" @selectCom="comSelected">
   </ProdComModal>
@@ -45,7 +46,8 @@ import { AgGridVue } from 'ag-grid-vue3';
 import DatePickerEditor from "../../../components/DatePickerEditor.vue";
 import axios from 'axios';
 import ProdComModal from "@/components/modal/ProdComModal.vue";
-import Swal from 'sweetalert2';
+import Swal from 'sweetalert2'; 
+import OrderModal from '@/components/modal/OrderModal.vue';
 
 export default {
   components: {
@@ -53,11 +55,13 @@ export default {
     datePicker: DatePickerEditor,
     ProdComModal,
     Swal,
+    OrderModal
   },
   data() {
     return {
+
       rowData: [{
-        orders_no: '',
+        orders_code: '',
         order_name: '',
         orders_date: this.getToday(),
         sdel_date: '',
@@ -68,17 +72,17 @@ export default {
       ],
       //메인그리드
       columnDefs: [
-        { field: 'orders_no', headerName: '주문번호', flex: 3, },
+        { field: 'orders_code', headerName: '주문번호', flex: 3, },
         { field: 'order_name', headerName: '주문명', flex: 2, editable: true },
         { field: 'orders_date', headerName: '주문일자', flex: 3, editable: true },
         { field: 'del_date', headerName: '납기일자', flex: 3, editable: true },
-        { field: 'employee_code', headerName: '등록자', flex: 2 },
+        { field: 'employee_code', headerName: '등록자', flex: 2, editable: true },
         { field: 'company_name', headerName: '업체명', flex: 2 },
         { field: 'note', headerName: '비고', flex: 2, editable: true },
       ],
       //상세그리드
       secondRowData: [{
-        orders_no: '',
+        orders_code: '',
         prod_code: '',
         prod_name: '',
         quantity: '',
@@ -89,7 +93,7 @@ export default {
       columnDefss: [
         //체크박스 
         { headerCheckboxSelection: true, checkboxSelection: true, width: 50 },
-        { field: 'orders_no', headerName: '주문번호', flex: 2, },
+        { field: 'orders_code', headerName: '주문번호', flex: 2, },
         { field: 'prod_code', headerName: '제품코드', flex: 2, editable: true },
         { field: 'prod_name', headerName: '제품명', flex: 2, editable: true },
         {
@@ -112,15 +116,15 @@ export default {
           cellStyle: { textAlign: "center" },
           headerClass: "header-center",
           // gridOptions: {
-      //   pagination: true,
-      //   paginationPageSize: 5,
-      //   paginationPageSizeSelector: [5, 10, 20, 50],
-      //   overlayNoRowsTemplate: '표시할 값이 없습니다.',
-       
-      // }
+          //   pagination: true,
+          //   paginationPageSize: 5,
+          //   paginationPageSizeSelector: [5, 10, 20, 50],
+          //   overlayNoRowsTemplate: '표시할 값이 없습니다.',
+
+          // }
         },
       },
-
+      showOrderModal: false,
       showComModal: false,
       //메인그리드 행 인덱스 ary
       selectedRowIndexes: [],
@@ -160,7 +164,7 @@ export default {
       this.showOrderModal = true;
     },
 
-    
+
     //현재날짜 가져오기
     getToday() {
       const today = new Date();
@@ -172,7 +176,7 @@ export default {
     //행추가
     addRow() {
       this.secondRowData.push({
-        orders_no: "",
+        orders_code: "",
         prod_code: "",
         prod_name: "",
         quantity: 0,
@@ -190,11 +194,73 @@ export default {
       // secondRowData에서 선택된 행을 제외한 나머지만 남긴다
       this.secondRowData = this.secondRowData.filter(row => !selectedData.includes(row));
     },
+
+    // 주문 모달창 값 전달
+    //메인 그리드로 주문코드 전달
+    async orderSelected(order) {
+      console.log(order)
+      await axios.get('/api/work/orderList', {
+        params: {
+          orders_code: order.orders_code
+        }
+      }).then(res => {
+        console.log(res)
+        const rowData = res.data;
+        this.rowData[0].orders_code = res.orders_code;
+        this.rowData = [...rowData];
+      })
+        .catch((err) => console.error(err));
+        
+      //상세 그리드로 전달
+      await axios.get('/api/sales/detail', {
+        params: {
+          orders_code: order.orders_code
+        }
+      })
+        .then(res => {
+          this.secondRowData = res.data;
+      })
+    },
+
+    fullCheck() {
+      //메인그리드 값 다들어 갔는지 체크
+      if (this.rowData[0].company_code == '' || this.rowData[0].company_name == '',
+        this.rowData[0].delivery_date == '' || this.rowData[0].request_date == '',
+        this.rowData[0].order_name == '') {
+        Swal.fire({
+          title: '실패',
+          text: '해당하는 값을 입력해주십시오.',
+          icon: 'error',
+          confirmButtonText: '확인'
+        });
+        return 1;
+      } else if (this.rowData[0].delivery_date < this.rowData[0].request_date) {
+        Swal.fire({
+          title: '실패',
+          text: '납기일자가 주문일자보다 빠릅니다.',
+          icon: 'error',
+          confirmButtonText: '확인'
+        });
+        return 2;
+      }
+      //상세그리드 값 다들어 갔는지 체크
+      for (let rowInclude of this.secondRowData) {
+        if (rowInclude.orders_code == ''|| rowInclude.order_name, rowInclude.prod_code == 0 ) {
+          Swal.fire({
+            title: '실패',
+            text: '값을 다입력하십시오',
+            icon: 'error',
+            confirmButtonText: '확인'
+          });
+          return 1;
+        }
+      }
+    },
     //주문등록
     async addOrder() {
       const res = await axios.post('/api/sales/orderCheck', {
-          orderCode: this.rowData[0].order_code
-       
+        orderCode: this.rowData[0].orders_code
+
       })
         .catch((err) => console.log(err));
       if (res.data[0].checkCount > 0) {
@@ -244,29 +310,131 @@ export default {
           return;
         });
       this.rowData = [{
-        orders_no: '',
-        order_name: '',
+        orders_code: "",
+        order_name: "",
         orders_date: this.getToday(),
-        sdel_date: '',
-        employee_code: '',
-        company_name: '',
-        note: '',
+        sdel_date: "",
+        employee_code: "",
+        company_name: "",
+        note: "",
       }];
       this.columnDefss = [{
-        orders_no: '',
-        prod_code: '',
-        prod_name: '',
-        quantity: '',
-        totalorderprice: '',
-        note: '',
+        orders_code: "",
+        prod_code: "",
+        prod_name: "",
+        quantity: "",
+        totalorderprice: "",
+        note: "",
       }];
+    },
+
+  //수정
+  async modifyOrder() {
+      const res = await axios.get('/api/sales/orderCheck', {
+        params: {
+          orderCode: this.rowData[0].orders_code
+        }
+      })
+        .catch((err) => console.log(err));
+      if (res.data[0].checkCount < 1) {
+        Swal.fire({
+          title: '수정 실패',
+          text: '아직 등록되지 않은 건입니다.',
+          icon: 'error',
+          confirmButtonText: '확인'
+        });
+        return;
+      }
+      //값 다 들어가있는지 체크
+      if (this.fullCheck() == 1) {
+        return;
+      } else if (this.fullCheck() == 2) {
+        return;
+      }
+      //수정시작
+      await axios.put('/api/sales/modify', {
+        salesOrder: this.rowData[0],
+        salesOrderDetail: this.secondRowData
+      })
+        .then(res => {
+          if (res.data.affectedRows > 0) {
+            Swal.fire({
+              title: '수정 완료',
+              text: '수정이 완료되었습니다.',
+              icon: 'success',
+              confirmButtonText: '확인'
+            });
+
+          } else {
+            Swal.fire({
+              title: '수정 실패',
+              text: '수정을 실패하였습니다.',
+              icon: 'error',
+              confirmButtonText: '확인'
+            });
+            return;
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          Swal.fire({
+            title: '수정 실패',
+            text: '알수 없는 에러.',
+            icon: 'error',
+            confirmButtonText: '확인'
+          });
+          return
+        });
+      this.rowData = [{
+        orders_code: "",
+        order_name: "",
+        orders_date: this.getToday(),
+        sdel_date: "",
+        employee_code: "",
+        company_name: "",
+        note: "",
+      }];
+      this.autosalesCode();
+    },
+
+//삭제
+    async orderDelete() {
+      await axios.delete('/api/sales/salesOrderDelete' + this.rowData[0].orders_code)
+        .then((res) => {
+          if (res.data.affectedRows < 1) {
+            Swal.fire({
+              title: '삭제 실패',
+              text: '삭제 실패 하였습니다.',
+              icon: 'error',
+              confirmButtonText: '확인'
+            });
+          } else {
+            Swal.fire({
+              title: '삭제 완료',
+              text: '정상적으로 삭제가 완료되었습니다.',
+              icon: 'success',
+              confirmButtonText: '확인'
+            });
+          }
+        })
+        .catch((err) => console.log(err));
+        this.rowData = [{
+          orders_code: "",
+          order_name: "",
+          orders_date: this.getToday(),
+          sdel_date: "",
+          employee_code: "",
+          company_name: "",
+          note: "",
+        }];
+      this.autosalesCode();
     }
-  }
-  };
+  },
+};
 </script>
 
 <style>
- :root .ag-theme-alpine .ag-header{
+:root .ag-theme-alpine .ag-header {
   background-color: #e0a72a;
- }
+}
 </style>
