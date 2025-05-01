@@ -4,7 +4,7 @@
 
         <div class="text-end mt-3 mb-3">
             <Button label="계획목록" severity="success" class="me-3" @click="planList" />
-            <Button label="지시목록" severity="info" class="me-3" />
+            <Button label="지시목록" severity="info" class="me-3" @click="planOrderList" />
             <Button label="등록" severity="help" class="me-3" />
             <Button label="수정" severity="danger" class="me-3" />
             <Button label="삭제" severity="danger" class="" />
@@ -97,7 +97,7 @@
                 <h4 class="text-start">자재 홀드량</h4>
                 <div class="ag-wrapper" style="border: none;">
                     <ag-grid-vue class="ag-theme-alpine custom-grid-theme" :columnDefs="matHoldListDefs"
-                        :rowData="rowData" :gridOptions="gridOptions">
+                        :rowData="secondRowData" :gridOptions="gridOptions">
                     </ag-grid-vue>
                 </div>
             </div>
@@ -106,6 +106,9 @@
 
     <!--생산 계획 목록 조회 모달창-->
     <PlanModal :visible="showPlanModal" @close="showPlanModal = false" @selectPlan="planSelected"></PlanModal>
+
+    <!-- 생산 지시 조회 모달창 -->
+    <PlanOrderModal :visible="showPlanOrderModal" @close="showPlanOrderModal = false" @selectPlanOrder="planOrderSelected"></PlanOrderModal>
 </template>
 
 <script>
@@ -113,11 +116,13 @@ import { AgGridVue } from "ag-grid-vue3";
 import axios from "axios";
 
 import PlanModal from "@/components/modal/PlanModal.vue";
+import PlanOrderModal from "@/components/modal/PlanOrderModal.vue"
 
 export default {
     components: {
         AgGridVue,
         PlanModal,
+        PlanOrderModal,
     },
     data() {
         return {
@@ -143,25 +148,27 @@ export default {
             ],
 
             secondRowData: [
-                {
-                    mat_code: "",           // 자재코드
-                    mat_name: "",           // 자재명
-                    product_order_name: "", // 요구량
-                    prod_name: "",          // 투입량
-                }
+                // {
+                //     prod_code: "",                  // 제품코드
+                //     mat_code: "",                   // 자재코드
+                //     mat_name: "",                   // 자재명
+                //     req_material_quantity: "",      // 요구량
+                //     material_input_qunatity: "",    // 투입량
+                // }
             ],
             prodListDefs: [
                 { field: "prod_code", headerName: "제품코드", flex: 1.5, cellStyle: { textAlign: "center" } },
                 { field: "prod_name", headerName: "제품명", flex: 3, cellStyle: { textAlign: "center" } },
                 { field: "order_quantity", headerName: "지시수량", flex: 1.5, cellStyle: { textAlign: "center" } },
                 { field: "priority", headerName: "우선순위", flex: 1.5, cellStyle: { textAlign: "center" } },
-                { field: "quantity", headerName: "주문량", flex: 2, cellStyle: { textAlign: "center" } },
+                { field: "quantity", headerName: "주문량", flex: 1, cellStyle: { textAlign: "center" } },
             ],
             matHoldListDefs: [
+                { field: "prod_code", headerName: "제품코드", flex: 2, cellStyle: { textAlign: "center" } },
                 { field: "mat_code", headerName: "자재코드", flex: 2, cellStyle: { textAlign: "center" } },
-                { field: "mat_name", headerName: "자재명", flex: 2, cellStyle: { textAlign: "center" } },
-                { field: "", headerName: "요구량", flex: 2, cellStyle: { textAlign: "center" } },
-                { field: "prod_name", headerName: "투입량", flex: 3, cellStyle: { textAlign: "center" } },
+                { field: "mat_name", headerName: "자재명", flex: 3, cellStyle: { textAlign: "center" } },
+                { field: "req_material_quantity", headerName: "요구량", flex: 1, cellStyle: { textAlign: "center" } },
+                { field: "material_input_qunatity", headerName: "투입량", flex: 1, cellStyle: { textAlign: "center" } },
             ],
             gridOptions: {
                 domLayout: "autoHeight", //행을 보고 자동으로 hight부여
@@ -174,10 +181,11 @@ export default {
                 },
             },
             showPlanModal: false,
-
+            showPlanOrderModal: false,
         };
     },
     mounted() {
+        this.autoOrder_Code();
     },
     methods: {
         // FormData 초기화
@@ -198,11 +206,16 @@ export default {
             this.showPlanModal = true;
         },
 
+        // 생산 지시 모달창
+        planOrderList() {
+            this.showPlanOrderModal = true;
+        },
+
         // 사이트 접속시 plan_code 자동증가
-        async autoPlan_code() {
+        async autoOrder_Code() {
             try {
                 const result = await axios.get("/api/work/order/orderAutoCode");
-                this.formData.plan_code = result.data[0].plan_code;
+                this.formData.product_order_code = result.data[0].product_order_code;
             } catch (err) {
                 console.error(err);
             }
@@ -212,10 +225,12 @@ export default {
         async planSelected(plan) {
             this.formData.plan_code = plan.plan_code;
             this.formData.plan_name = plan.plan_name;
+            this.formData.start_date = plan.start_date;
+            this.formData.end_date = plan.end_date;
             await axios.get(`/api/work/plan/planDetailList/${plan.plan_code}`, {
             }).then(res => {
+                this.rowData = [];
                 const data = res.data;
-                console.log(data);
                 let cnt = 1;
                 for(let obj of data) {
                     this.rowData.push({
@@ -229,12 +244,44 @@ export default {
                 }
             }).catch((err) => console.error(err));
 
-            await axios.get(`/api/work/order/matHoldQty/`, {
+            await axios.get(`/api/work/order/matReqQty/${plan.plan_code}`, {
             }).then(res => {
-
+                this.secondRowData = [];
+                const data = res.data;
+                let cnt = 1;
+                for(let obj of data) {
+                    this.secondRowData.push({
+                        prod_code: obj.prod_code,
+                        mat_code: obj.mat_code,
+                        mat_name: obj.mat_name,
+                        req_material_quantity: obj.req_material_quantity,
+                        material_input_qunatity: obj.material_input_qunatity,
+                    });
+                    cnt++;
+                }
             }).catch((err) => {
                 console.error(err);
-            })
+            });
+        },
+
+        // 생산 지시 모달창 값 전달
+        async planOrderSelected(planOrder) {
+            await axios.get(`/api/work/order/detailList/${planOrder.product_order_code}`, {
+            }).then(res => {
+                this.rowData = [];
+                const data = res.data;
+                let cnt = 1;
+                for(let obj of data) {
+                    this.rowData.push({
+                        prod_code: obj.prod_code,
+                        prod_name: obj.prod_name,
+                        order_quantity: obj.currentPlanQty,
+                        priority: cnt,
+                        quantity: obj.quantity,
+                    });
+                    cnt++;
+                }
+            }).catch((err) => console.error(err));
         },
 
         //행추가
