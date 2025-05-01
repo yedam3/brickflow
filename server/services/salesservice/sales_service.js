@@ -1,14 +1,21 @@
-const { inRange } = require("lodash");
+const {
+  inRange
+} = require("lodash");
 const mariaDB = require("../../db/mapper.js");
-const { convertObjToAry } = require("../../utils/converts.js");
+const {
+  convertObjToAry
+} = require("../../utils/converts.js");
 
 const findAll = async () => {
   let list = await mariaDB.query("testList").catch(err => console.log(err));
-  return result;
+  return list;
 };
 
 //업체리스트 조회
-const comList = async ({ type, keyword }) => {
+const comList = async ({
+  type,
+  keyword
+}) => {
   let searchCondition = {};
   let convertedCondition = ''; // 기본값
 
@@ -19,7 +26,9 @@ const comList = async ({ type, keyword }) => {
     convertedCondition = converted.serchKeyword;
   }
 
-  const result = await mariaDB.query('prodComList', { searchcondition: convertedCondition })
+  const result = await mariaDB.query('prodComList', {
+      searchcondition: convertedCondition
+    })
     .catch((err) => console.log(err));
   return result;
 };
@@ -27,35 +36,30 @@ const comList = async ({ type, keyword }) => {
 //등록
 const salesOrderAdd = async (salesOrder, salesOrderDetail) => {
   salesOrder.orders_code = (await mariaDB.query('salesAutoOrder'))[0].code;
+
   console.log(salesOrder.orders_code);
   let result = await mariaDB.query('salesOrderAdd', [
-                                                    salesOrder.orders_code,
-                                                    salesOrder.order_name,
-                                                    salesOrder.orders_date,
-                                                    salesOrder.del_date,
-                                                    salesOrder.employee_code,
-                                                    salesOrder.note,
-                                                    salesOrder.finish_status,
-                                                    salesOrder.company_code,
-                                                    ])
-                            .catch((err)=>console.log(err));
-     if(result.affectedRows < 1 ) {
-        return result;
-     }
+      salesOrder.orders_code,
+      salesOrder.order_name,
+      salesOrder.orders_date,
+      salesOrder.del_date,
+      salesOrder.employee_code,
+      salesOrder.note,
+      salesOrder.finish_status,
+      salesOrder.company_code,
+    ])
+    .catch((err) => console.log(err));
+  if (result.affectedRows < 1) {
+    return result;
+  }
   for (let detail of salesOrderDetail) {
-        detail.orders_detail_code = (await mariaDB.query('salesAutoOrderDetail'))[0].code;
-       result = await mariaDB.query('salesOrderDetailAdd', [
-         detail.orders_detail_code
-                                                          , salesOrder.orders_code
-                                                          , detail.quantity
-                                                          , detail.price
-                                                          , detail.note
-                                                          , detail.prod_code
-                                                          , detail.finish_status
-                                                  ])
-                            .catch((err)=>console.log(err));
-     }
-     return result;
+    detail.orders_detail_code = (await mariaDB.query('salesAutoOrderDetail'))[0].code;
+    result = await mariaDB.query('salesOrderDetailAdd', [
+        detail.orders_detail_code, salesOrder.orders_code, detail.quantity, detail.price, detail.note, detail.prod_code, detail.finish_status
+      ])
+      .catch((err) => console.log(err));
+  }
+  return result;
 }
 
 //메인 그리드 디스플레이
@@ -64,53 +68,78 @@ const findOrderAll = async (orderCode) => {
   return list;
 }
 
-// 상세그리드 단건조회
+// 메인조회
+const findMainOrders = async (orders_code) => {
+  let list = await mariaDB.query("orderinfochoice", orders_code)
+  return list[0];
+}
+
+// 상세그리드 조회
 const findorders = async (orders_code) => {
   let list = await mariaDB.query("selectorders", orders_code)
     .catch(err => console.log(err));
-  
+
   //let info = list[0];
   //return info;
   return list;
 }
 
 //수정
-const modifyoders = async (order_name, orders_code) => {
-  let orderUpdate = [orders_code, order_name]
-  let result = await mariaDB.query('orderUpdate', orderUpdate)
-    .catch((err) => console.log(err))
-  if (result.affectedRows < 1) {
-    return result;
-  } else {
-    result = {
-      isUpdated: false,
-    };
+const modifyoders = async (orders, ordersDetail) => {
+  
+  let upInfo = {
+    order_name: orders.order_name,
+    orders_date: orders.orders_date,
+    del_date: orders.del_date,
+    note: orders.note,
+    company_code: orders.company_code,
+  }
+  let result = await mariaDB.query('ordersUpdate', [upInfo, orders.orders_code])
+    .catch((err) => console.log(err)); 
+        if (result.affectedRows < 1) {
+            return result;
+        }
+  for (let detail of ordersDetail) {                // [ 객체 ,            주문번호값       ]
+    let upDetailInfo = {
+      quantity: detail.quantity,
+      price: detail.price,
+      note: detail.note,
+      prod_code: detail.prod_code,
+    }
+
+    result = await mariaDB.query('ordersUpdateDetail', [upDetailInfo, detail.orders_detail_code])
+      .catch((err) => console.log(err));
   }
   return result;
 };
 
-//삭제
-const removeorder = async (orders_code) => {
-  let result = await mariaDB.query("orderDelete", orders_code)
-    .catch(err => console.log(err));
-  
-  return result;
-};
+      //삭제
+      const removeorder = async (orders_code) => {
+        let result = await mariaDB.query("orderDelete", [orders_code])
+          .catch(err => console.log(err));
 
-  
-//값중복확인
-const orderCheck = async (orderCode) => {
-  let list = await mariaDB.query('addCheck',orderCode)
-  return list;
-}
+        result = await mariaDB.query("orderDeleteDetail", [orders_code])
+          .catch(err => console.log(err));
 
-module.exports = {
-  findAll,
-  findOrderAll,
-  comList,
-  salesOrderAdd,
-  orderCheck,
-  findorders,
-  modifyoders, 
-  removeorder,
-}
+        return result;
+      };
+
+
+
+      //값중복확인
+      const orderCheck = async (orderCode) => {
+        let list = await mariaDB.query('addCheck', orderCode)
+        return list;
+      }
+
+      module.exports = {
+        findAll,
+        findOrderAll,
+        comList,
+        salesOrderAdd,
+        orderCheck,
+        findorders,
+        modifyoders,
+        removeorder,
+        findMainOrders
+      }

@@ -2,41 +2,48 @@
 
   <div class="card border-0 h-100">
     <div class="font-semibold text-xl mb-4">주문 관리</div>
-    <div class="text-end mt-3 mb-3 ">
-      <button class="btn btn-info me-2">조회</button>
-      <button class="btn btn-primary me-2">등록</button>
-      <button class="btn btn-success me-2">수정</button>
-      <button class="btn btn-danger me-2">삭제</button>
+    <div class="text-end mt-3 mb-3">
+      <Button label="조회" severity="success" class="me-3" @click="orderList" />
+      <Button label="등록" severity="info" class="me-3" @click="addOrder" />
+      <Button label="수정" severity="help" class="me-3" @click="modifyOrder" />
+      <Button label="삭제" severity="danger" class="me-5" @click="orderDelete" />
     </div>
-    
-    <ag-grid-vue 
-    class="ag-theme-alpine" 
-    style="width: 100%; 
-    height: 150px;" 
-    :columnDefs="columnDefs" 
-    :rowData="rowData" 
-    :gridOptions="gridOptions" 
-    :defaultColDef="defaultColDef">
-  </ag-grid-vue>
-</div>
+
+
+    <ag-grid-vue class="ag-theme-alpine" style="width: 100%; 
+    height: 150px;" :columnDefs="columnDefs" :rowData="rowData" :gridOptions="gridOptions"
+      :defaultColDef="defaultColDef">
+    </ag-grid-vue>
+  </div>
+  <div>
+
 
     <div class="card border-0 h-100">
-    <div class="font-semibold text-xl mb-4">주문 요구 수량</div>
-    <div class="text-start mt-5 mb-2 ms-5">
-      <Button label="행추가" severity="success" class="me-3" />
-      <Button label="행삭제" severity="danger" class="me-5" />
+      <div class="font-semibold text-xl mb-4">주문 요구 수량</div>
+      <div class=" mt-3 mb-3 ">
+        <Button label="행추가" severity="success" class="me-3" @click="addRow" />
+        <Button label="행삭제" severity="danger" class="me-5" @click="deleteRow" />
+      </div>
+
+      <div class="orders-grid">
+        <ag-grid-vue class="ag-theme-alpine" style="width: 40%; 
+          height: 100px;" 
+          :columnDefs="seColumnDefs" 
+          :rowData="rowData" 
+          :gridOptions="gridOptions"
+          :defaultColDef="defaultColDef">
+        </ag-grid-vue>
+      </div>
+
     </div>
-    
-    <ag-grid-vue 
-    class="ag-theme-alpine" 
-    style="width: 40%; 
-    height: 100px;" 
-    :columnDefs="seColumnDefs" 
-    :rowData="rowData" 
-    :gridOptions="gridOptions" 
-    :defaultColDef="defaultColDef">
-  </ag-grid-vue>
-</div>
+    <!-- <div>
+      <div class="delivery-grid">
+        <ag-grid-vue style="width: 40%; height: 100px;" class="ag-theme-alpine" :columnDefs="columnDefs2"
+          :rowData="rowData2" :gridOptions="gridOptions2" :defaultColDef="defaultColDef2">
+        </ag-grid-vue>
+      </div> -->
+
+  </div>
 </template>
 
 <script>
@@ -95,4 +102,12 @@ export default {
  :root .ag-theme-alpine .ag-header{
   background-color: #e0a72a;
  }
+ .orders-grid {
+  display: inline-block;
+  margin-right: 30px;
+ }
+
+.delivery-grid {
+  display: inline-block;
+}
 </style>
