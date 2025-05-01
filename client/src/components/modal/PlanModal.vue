@@ -49,6 +49,13 @@ export default {
             required: true,
         },
     },
+    watch: {
+        visible(newVal) {
+            if (newVal) {
+                this.planList();
+            }
+        }
+    },
     data() {
         return {
             rowData: [],

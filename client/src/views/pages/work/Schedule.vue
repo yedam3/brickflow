@@ -46,7 +46,7 @@
                                 <InputGroupAddon>
                                     주문번호
                                 </InputGroupAddon>
-                                <InputText v-model="formData.orders_code" size="large" placeholder="" />
+                                <InputText v-model="formData.orders_code" size="large" placeholder="" readonly />
                             </InputGroup>
                         </div>
                         <div class="col-4">
@@ -54,7 +54,7 @@
                                 <InputGroupAddon>
                                     주문명
                                 </InputGroupAddon>
-                                <InputText v-model="formData.order_name" size="large" placeholder="" />
+                                <InputText v-model="formData.order_name" size="large" placeholder="" readonly />
                             </InputGroup>
                         </div>
                     </div>
@@ -73,7 +73,7 @@
                                 <InputGroupAddon>
                                     종료일자
                                 </InputGroupAddon>
-                                <DatePicker v-model="formData.end_date" size="large" dateFormat="yy/MM/dd"
+                                <DatePicker v-model="formData.end_date" size="large" dateFormat="yy/mm/dd"
                                     placeholder="(입력)" showIcon iconDisplay="input" />
                             </InputGroup>
                         </div>
@@ -124,6 +124,12 @@ export default {
         datePicker: DatePickerEditor,
         OrderModal,
         PlanModal,
+    },
+    props: {
+        visible: {
+            type: Boolean,
+            required: true,
+        },
     },
     data() {
         return {
@@ -192,19 +198,19 @@ export default {
         this.autoPlan_code();
     },
     computed: {
-
         columnDefs() {
             return [
                 { headerCheckboxSelection: true, checkboxSelection: true, width: 50 },
                 { field: "orders_code", headerName: "주문번호", flex: 2, editable: params => this.ag_grid_cols.orders_code, cellStyle: { textAlign: "center" } },
                 { field: "orders_date", headerName: "주문일자", flex: 2, editable: params => this.ag_grid_cols.orders_date, cellEditor: 'agDateCellEditor', cellStyle: { textAlign: "center" } },
                 { field: "del_date", headerName: "납기일자", flex: 2, editable: params => this.ag_grid_cols.del_date, cellEditor: 'agDateCellEditor', cellStyle: { textAlign: "center" } },
+                { field: "prod_code", headerName: "제품코드", flex: 3, editable: params => this.ag_grid_cols.prod_name, cellStyle: { textAlign: "center" } },
                 { field: "prod_name", headerName: "제품명", flex: 3, editable: params => this.ag_grid_cols.prod_name, cellStyle: { textAlign: "center" } },
                 { field: "quantity", headerName: "주문량", flex: 3, editable: params => this.ag_grid_cols.quantity, cellStyle: { textAlign: "center" } },
-                { field: "unshippedQty", headerName: "미출고량", flex: 3, editable: params => this.ag_grid_cols.unshippedQty, cellStyle: { textAlign: "center" } },
-                { field: "prePlannedQty", headerName: "기계획량", flex: 3, editable: params => this.ag_grid_cols.prePlannedQty, cellStyle: { textAlign: "center" } },
-                { field: "unplannedQty", headerName: "미계획량", flex: 3, editable: params => this.ag_grid_cols.unplannedQty, cellStyle: { textAlign: "center" } },
-                { field: "currentPlanQty", headerName: "현계획량", flex: 3, editable: params => this.ag_grid_cols.currentPlanQty, cellStyle: { textAlign: "center" } },
+                { field: "unshippedQty", headerName: "미출고량", flex: 2, editable: params => this.ag_grid_cols.unshippedQty, cellStyle: { textAlign: "center" } },
+                { field: "prePlannedQty", headerName: "기계획량", flex: 2, editable: params => this.ag_grid_cols.prePlannedQty, cellStyle: { textAlign: "center" } },
+                { field: "unplannedQty", headerName: "미계획량", flex: 2, editable: params => this.ag_grid_cols.unplannedQty, cellStyle: { textAlign: "center" } },
+                { field: "currentPlanQty", headerName: "현계획량", flex: 2, editable: params => this.ag_grid_cols.currentPlanQty, cellStyle: { textAlign: "center" } },
             ]
         }
     },
@@ -222,14 +228,14 @@ export default {
         // FormData 초기화
         clearForm() {
             this.formData = {
-                plan_code: this.formData.plan_code,      // 생산계획_코드
-                orders_code: "",    // 주문_코드
-                plan_name: "",      // 생산계획명
-                employee_code: "",  // 담당자
-                start_date: "",     // 시작_일자
-                end_date: "",       // 종료_일자
-                finish_status: "",  // 처리_상태
-                note: "",           // 비고
+                plan_code: this.formData.plan_code, // 생산계획_코드
+                orders_code: "",                    // 주문_코드
+                plan_name: "",                      // 생산계획명
+                employee_code: "",                  // 담당자
+                start_date: "",                     // 시작_일자
+                end_date: "",                       // 종료_일자
+                finish_status: "",                  // 처리_상태
+                note: "",                           // 비고
             }
             this.rowData = [];
             this.ag_grid_cols.prod_name = true;
@@ -299,7 +305,7 @@ export default {
             if (this.formData.orders_code != '') {
                 Swal.fire({
                     title: '실패',
-                    text: '주문번호 존재 시 행추가는 할 수 없습니다.',
+                    text: '주문번호 존재 시 행추가를 할 수 없습니다.',
                     icon: 'error',
                     confirmButtonText: '확인'
                 });
@@ -320,12 +326,21 @@ export default {
             // 새 배열로 설정하여 AG Grid가 반영하게 만듦
             this.rowData = [...this.rowData];
         },
+
         //행삭제
         deleteRow() {
+            if (this.formData.orders_code != '') {
+                Swal.fire({
+                    title: '실패',
+                    text: '주문번호 존재 시 행삭제를를 할 수 없습니다.',
+                    icon: 'error',
+                    confirmButtonText: '확인'
+                });
+                return;
+            }
             const selectedNodes = this.$refs.mainGrid.api.getSelectedNodes();
             const selectedData = selectedNodes.map(node => node.data);
 
-            // rowData 선택된 행을 제외한 나머지만 남긴다
             this.rowData = this.rowData.filter(row => !selectedData.includes(row));
         },
 
@@ -340,6 +355,9 @@ export default {
                 this.formData.orders_code = order.orders_code;
                 this.formData.order_name = order.order_name;
                 this.rowData = [...data];
+                
+                
+                console.log(this.rowData);
 
                 this.ag_grid_cols.prod_name = false;
                 this.ag_grid_cols.quantity = false;
@@ -418,26 +436,34 @@ export default {
 
         // 생산 계획 수정
         async updatePlan() {
-            // if (this.planOrderStatusCheck()) {
-            //     Swal.fire({
-            //         title: '실패',
-            //         text: '이미 생산이 진행되고 있는 계획코드입니다.',
-            //         icon: 'error',
-            //         confirmButtonText: '확인'
-            //     });
-            //     return;
-            // }
+            if (!this.planOrderStatusCheck(this.formData.plan_code)) {
+                Swal.fire({
+                    title: '실패',
+                    text: '이미 생산이 진행되고 있는 계획코드입니다.',
+                    icon: 'error',
+                    confirmButtonText: '확인'
+                });
+                return;
+            }
             await axios.put("/api/work/plan/plan", {
                 planData: this.formData,
                 planDetailData: this.rowData,
             }).then(res => {
-                console.log(res);
-                Swal.fire({
-                    title: '성공',
-                    text: '생산 계획이 정상적으로 수정되었습니다.',
-                    icon: 'success',
-                    confirmButtonText: '확인'
-                });
+                if(res.data.affectedRows > 0) {
+                    Swal.fire({
+                        title: '성공',
+                        text: '생산 계획이 정상적으로 수정되었습니다.',
+                        icon: 'success',
+                        confirmButtonText: '확인'
+                    });
+                } else {
+                    Swal.fire({
+                        title: '정보',
+                        text: '수정정하려는 값이 존재 하지 않습니다.',
+                        icon: 'info',
+                        confirmButtonText: '확인'
+                    });
+                }
                 this.clearForm();
             }).catch(err => {
                 console.error(err)
@@ -452,23 +478,36 @@ export default {
 
         // 생산 계획 삭제
         async deletePlan() {
-            // if (this.planOrderStatusCheck) {
-            //     Swal.fire({
-            //         title: '실패',
-            //         text: '이미 생산이 진행되고 있는 계획코드입니다.',
-            //         icon: 'error',
-            //         confirmButtonText: '확인'
-            //     });
-            //     return;
-            // }
-            await axios.delete(`/api/work/plan/plan/${this.formData.plan_code}`).then(res => {
-                console.log(res);
+            if (!this.planOrderStatusCheck(this.formData.plan_code)) {
                 Swal.fire({
-                    title: '성공',
-                    text: '생산 계획이 정상적으로 삭제되었습니다.',
-                    icon: 'success',
+                    title: '실패',
+                    text: '이미 생산이 진행되고 있는 계획코드입니다.',
+                    icon: 'error',
                     confirmButtonText: '확인'
                 });
+                return;
+            }
+            await axios.delete(`/api/work/plan/plan`, {
+                data: {
+                    plan_code: this.formData.plan_code,
+                    orders_code: this.formData.orders_code
+                }
+            }).then(res => {
+                if(res.data.affectedRows > 0) {
+                    Swal.fire({
+                        title: '성공',
+                        text: '생산 계획이 정상적으로 삭제되었습니다.',
+                        icon: 'success',
+                        confirmButtonText: '확인'
+                    });
+                } else {
+                    Swal.fire({
+                        title: '정보',
+                        text: '삭제하려는 값이 존재 하지 않습니다.',
+                        icon: 'info',
+                        confirmButtonText: '확인'
+                    });
+                }
                 this.clearForm();
             }).catch(err => {
                 console.error(err)
@@ -483,15 +522,15 @@ export default {
 
         // 생산계획 상태 확인
         async planOrderStatusCheck(plan_code) {
-            // let res = await axios.get(`/work/order/findStatusByPlan_code/${plan_code}`, {
-            // }).catch((err) => {
-            //     console.error(err);
-            // })
+            let res = await axios.get(`/work/order/findStatusByPlan_code`, {
+            }).catch((err) => {
+                console.error(err);
+            })
 
-            // if(res.data.finish_status === 'WS1') {
-            //     return true;
-            // }
-            return false;
+            if(res.data.finish_status === 'WS1') {
+                return false;
+            }
+            return true;
         },
     },
 };
