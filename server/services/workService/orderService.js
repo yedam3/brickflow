@@ -25,6 +25,23 @@ const findAllPlanOrder = async () => {
     return result;
 }
 
+// 생산 지시 상세 조회
+const findAllPlanOrderDetail = async (product_order_code) => {
+    let result = await mariaDB.query("findAllPlanOrderDetail", product_order_code).catch((err) => {
+        console.error(err);
+    });
+    return result;
+}
+
+// 생산 상품 자재 재고 조회
+const findAllProdMatQtyByMat_code = async (mat_code) => {
+    let result = await mariaDB.query("findAllProdMatQtyByMat_code", mat_code).catch((err) => {
+        console.error(err);
+    });
+    return result;
+}
+
+
 // 생산지시 상태 확인
 const findStatusByPlan_code = async (plan_code) => {
     let result = await mariaDB.query("findStatusByPlan_code", plan_code).catch((err) => {
@@ -77,6 +94,8 @@ const insertInstr = async () => {
 module.exports = {
     getOrder_code,
     findAllPlanOrder,
+    findAllPlanOrderDetail,
+    findAllProdMatQtyByMat_code,
 
     findStatusByPlan_code,
     findPlanDetailByPlan_code,

@@ -82,7 +82,7 @@ const model = ref([
             },
             {
                 label: '생산관리',
-                icon: 'pi pi-spin pi-cog',
+                icon: 'pi pi-fw pi-spin pi-cog',
                 items: [
                     {
                         label: '생산 계획 관리',
