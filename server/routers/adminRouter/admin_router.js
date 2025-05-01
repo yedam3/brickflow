@@ -19,7 +19,7 @@ router.get('/bom', async (req, res) => {
 //3.BOM 등록
 router.post('/bominsert', async(req, res)=>{
     let bomInfo = req.body;
-    let result = await adminService.bomInsert(bomInfo);
+    let result = await adminService.insertBom(bomInfo);
     res.send(result);
     });
 
