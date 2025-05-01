@@ -197,6 +197,12 @@ const model = ref([
                         icon: 'pi pi-fw pi-times-circle',
                         to: '/admin/prodcheck'
                     },
+                    //신현욱
+                    {
+                        label: '공정 검사',
+                        icon: 'pi pi-fw pi-times-circle',
+                        to: '/qual/procTest'
+                    },
 
                 ]
             },

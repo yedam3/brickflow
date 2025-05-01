@@ -3,9 +3,9 @@
         <div class="font-semibold text-xl mb-4">자재검수관리</div>
         <div class="text-end mt-3 mb-3">
             <Button label="조회" severity="success" class="me-3" @click="checkResultList" />
-            <Button label="등록" severity="info" class="me-3" @click="checkAdd"/>
-            <Button label="수정" severity="help" class="me-3" @click="checkUpdate"/>
-            <Button label="삭제" severity="danger" class="me-5" @click="checkDelete"/>
+            <Button label="등록" severity="info" class="me-3" @click="checkAdd" />
+            <Button label="수정" severity="help" class="me-3" @click="checkUpdate" />
+            <Button label="삭제" severity="danger" class="me-5" @click="checkDelete" />
         </div>
         <div class="row">
 
@@ -86,7 +86,8 @@
                 <div class="row">
                     <div class="input-group col">
                         <span class="input-group-text" id="basic-addon1">검수내역</span>
-                        <textarea class="form-control"  v-model="info.check_history" placeholder="비고" style="height: 100px; resize: none;"></textarea>
+                        <textarea class="form-control" v-model="info.check_history" placeholder="비고"
+                            style="height: 100px; resize: none;"></textarea>
                     </div>
                     <div class="input-group mb-5 col">
                         <span class="input-group-text" id="basic-addon1">등록자</span>
@@ -94,26 +95,25 @@
                             aria-describedby="basic-addon1" v-model="info.emp_code" readonly>
                     </div>
                 </div>
-                <h5>검사항목</h5>
-               <div class="row">
-                <div class="form-check col-6" v-for="errInfo in error_check_ary">
-                    <input class="form-check-input" type="checkbox" v-model="errInfo.check" name="quantity" onclick="return false;" >
-                    <label class="form-check-label" for="flexCheckDefault" name="quantity">
-                        {{ errInfo.mat_error_name }}
-                    </label>
-                    <input type="number" class="form-control w-50 mt-2" v-model="errInfo.mat_check_error">
-                </div>            
-            </div>
+                <div v-if="info.check_quantity > 0 " >
+                    <h5>검사항목</h5>
+                    <div class="row">
+                        <div class="form-check col-6" v-for="errInfo in error_check_ary">
+                            <input class="form-check-input" type="checkbox" v-model="errInfo.check" name="quantity"
+                                onclick="return false;">
+                            <label class="form-check-label" for="flexCheckDefault" name="quantity">
+                                {{ errInfo.mat_error_name }}
+                            </label>
+                            <input type="number" class="form-control w-50 mt-2" v-model="errInfo.mat_check_error">
+                        </div>
+                    </div>
+                </div>
             </div>
 
         </div>
     </div>
-    <MatResult
-        :visible="showModal"
-        rowSelection="multiple"
-        @close="showModal = false"
-        @checkResult="checkResult"
-   ></MatResult>
+    <MatResult :visible="showModal" rowSelection="multiple" @close="showModal = false" @checkResult="checkResult">
+    </MatResult>
 </template>
 
 <script>
@@ -149,13 +149,13 @@ export default {
                     field: "status", headerName: "발주상태", flex: 1,
                     cellStyle: params => {
                         if (params.value == '검수대기') {
-                            return { color: '#0284C7', textAlign: 'center', fontWeight: 'bold' }; // 파란색
+                            return { color: '#0284C7', textAlign: 'center', fontWeight: 'bold' }; 
                         } else if (params.value == '검수완료') {
-                            return { color: '#22C55E', textAlign: 'center', fontWeight: 'bold' }; // 초록색
+                            return { color: '#22C55E', textAlign: 'center', fontWeight: 'bold' }; 
                         } else if (params.value == '반품처리') {
-                            return { color: '#E02D2D', textAlign: 'center', fontWeight: 'bold' }; // 빨간색
+                            return { color: '#E02D2D', textAlign: 'center', fontWeight: 'bold' }; 
                         } else if (params.value == '검수중') {
-                            return { color: '#A855F7', textAlign: 'center', fontWeight: 'bold' }; // 빨간색
+                            return { color: '#A855F7', textAlign: 'center', fontWeight: 'bold' }; 
                         }
                         return null; // 기본 스타일
                     }
@@ -435,6 +435,25 @@ export default {
                             icon: 'success',
                             confirmButtonText: '확인'
                         });
+                        //등록 후 초기화 작업
+                        this.info = {
+                            mat_order_detailCode: '',
+                            mat_code: '',
+                            already_check_quantity: '',
+                            not_check_quantity: '',
+                            mat_name: '',
+                            request_quantity: '',
+                            check_quantity: 0,
+                            check_history: '',
+                            mat_order_code: '',
+                            check_code: '',
+                            emp_code: '',
+                        }
+                        for (let errorCheck of this.error_check_ary) {
+                            errorCheck.mat_check_error = 0;
+                        }
+                        //그리드 다시 렌더링
+                        this.matList();
                     } else {
                         Swal.fire({
                             title: '수정 실패',
@@ -475,6 +494,25 @@ export default {
                                  icon: 'success',
                                  confirmButtonText: '확인'
                              })
+                             //등록 후 초기화 작업
+                             this.info = {
+                                 mat_order_detailCode: '',
+                                 mat_code: '',
+                                 already_check_quantity: '',
+                                 not_check_quantity: '',
+                                 mat_name: '',
+                                 request_quantity: '',
+                                 check_quantity: 0,
+                                 check_history: '',
+                                 mat_order_code: '',
+                                 check_code: '',
+                                 emp_code: '',
+                             }
+                             for (let errorCheck of this.error_check_ary) {
+                                 errorCheck.mat_check_error = 0;
+                             }
+                             //그리드 다시 렌더링
+                             this.matList();
                         }else{
                             Swal.fire({
                                  title: '삭제 실패',

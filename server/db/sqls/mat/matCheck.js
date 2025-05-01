@@ -175,7 +175,7 @@ const updateFinished =`
  SELECT count(*) AS checkCount
  FROM mat_check m JOIN mat_store s
 				   ON(m.check_code = s.check_code)
-  WHERE m.check_code = ? 
+  WHERE s.check_code = ? 
 `
 
 const deleteCheck = `
