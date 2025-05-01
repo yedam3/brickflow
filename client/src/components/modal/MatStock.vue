@@ -5,22 +5,10 @@
         </CModalHeader>
 
         <CModalBody>
+            <div class="row">
+                <Button label="행추가" severity="success" size="large" @click="" />
+            </div>
             <div class="ag-theme-alpine" style="height: 400px; width: 100%">
-                <!-- 생산 지시 검색창 -->
-                <div class="d-flex justify-content-center me-5">
-                    <div class="input-group mb-3 w-50">
-                        <select class="form-select" aria-label="Default select example">
-                            <option value="1" selected>제품명</option>
-                            <option value="2">주문명</option>
-                            <option value="2">주문번호</option>
-                        </select>
-                        <input type="text" v-model="searchText" placeholder="검색어 입력" @keydown.enter="searchOrders"
-                            class="form-control w-50" style="width: 30%" />
-                        <button @click="searchMaterials" class="btn btn-primary">
-                            <i class="pi pi-search"></i>
-                        </button>
-                    </div>
-                </div>
                 <AgGridVue style="width: 100%; height: 100%" class="ag-theme-alpine" :columnDefs="columnDefs"
                     :rowData="rowData" :gridOptions="gridOptions" @rowClicked="onRowClicked" />
             </div>
@@ -52,7 +40,7 @@ export default {
     watch: {
         visible(newVal) {
             if (newVal) {
-                this.orderList();
+                this.matStockList();
             }
         }
     },
@@ -63,36 +51,12 @@ export default {
             searchText: "",
 
             columnDefs: [
-                { field: "orders_code", headerName: "주문번호", flex: 1 },
-                { field: "order_name", headerName: "주문명", flex: 1 },
-                { field: "orders_date", headerName: "주문일자", flex: 1 },
-                { field: "del_date", headerName: "납기일자", flex: 1 },
-                { field: "prod_name", headerName: "제품명", flex: 2 },
-                {
-                    field: "finish_status", headerName: "상태", flex: 1,
-                    valueFormatter: params => {
-                        if(params.value === 'OS1') {
-                            return '접수';
-                        } else if(params.value == 'OS2') {
-                            return '생산중';
-                        } else if(params.value == 'OS3') {
-                            return '출고대기';
-                        } else if(params.value == 'OS4') {
-                            return '출고완료';
-                        }
-                    },
-                    cellStyle: params => {
-                        if(params.value === 'OS1') {
-                            return { textAlign: 'center', fontWeight: 'bold', color: '#6c757d' };
-                        } else if(params.value == 'OS2') {
-                            return { textAlign: 'center', fontWeight: 'bold', color: '#007bff' };
-                        } else if(params.value == 'OS3') {
-                            return { textAlign: 'center', fontWeight: 'bold', color: '#fd7e14' };
-                        } else if(params.value == 'OS4') {
-                            return { textAlign: 'center', fontWeight: 'bold', color: '#28a745' };
-                        }
-                    }
-                },
+                { field: "lot", headerName: "LOT번호", flex: 1 },
+                { field: "mat_code", headerName: "자재코드", flex: 1 },
+                { field: "mat_name", headerName: "자재명", flex: 1 },
+                { field: "store_date", headerName: "입고일자", flex: 1 },
+                { field: "prod_name", headerName: "자재출고 가능 수량", flex: 2 },
+                { field: "prod_name", headerName: "자재출고 수량", flex: 2 },
             ],
             gridOptions: {
                 domLayout: "autoHeight",
@@ -113,8 +77,8 @@ export default {
         };
     },
     mounted() {
-        // 생산 지시 목록
-        this.orderList();
+        // 제품별 자재 재고 목록
+        this.matStockList();
     },
     methods: {
 
@@ -123,13 +87,13 @@ export default {
             this.$emit("close");
         },
 
-        // 생산 지시 목록 조회 API
-        orderList() {
+        // 제품별 자재 재고 목록 조회 API
+        matStockList() {
             axios.get('/api/work/plan/orderList')
                 .then(res => {
                     this.rowData = res.data
                 })
-                .catch(error => { console.error(error) })
+                .catch(error => { console.error(error) });
         },
 
         // 그리드 행 클릭 메소드
