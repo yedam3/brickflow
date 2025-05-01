@@ -25,6 +25,8 @@ const adminRouter = require("./routers/adminRouter/admin_router.js");
 
 const matRedayRouter = require("./routers/matRouter/mat_stroe_router.js");
 
+const proceRouter = require('./routers/proceRouter/proce_Router.js');
+const prodTestRouter = require('./routers/prodTestRouter/prodTest_router.js');
 // 기본 라우팅
 app.get("/", (req, res) => {
     res.send("Welcome!!");
@@ -41,3 +43,5 @@ app.use("/mat", matCheckRouter);
 app.use("/admin", adminRouter);
 
 app.use('/mat',matRedayRouter);
+app.use('/proce',proceRouter);
+app.use('/test',prodTestRouter);

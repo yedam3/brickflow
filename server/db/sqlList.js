@@ -9,6 +9,14 @@ const agTest = require('./sqls/agTest.js')
 const matCheck = require('./sqls/mat/matCheck.js');
 const matStore = require('./sqls/mat/matStore.js');
 
+const procedure = require('./sqls/prodTest/procedure.js')
+const prodTest = require('./sqls/prodTest/prodTest.js')
+
+
+
+
+
+
 module.exports = {
     ...work,
     ...sales,
@@ -20,4 +28,6 @@ module.exports = {
     ...agTest,
     ...matCheck,
     ...matStore,
+    ...procedure,
+    ...prodTest
 }

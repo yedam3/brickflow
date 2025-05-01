@@ -144,6 +144,7 @@
             },
             async clicked(event) {
                let result = await axios.get('/api/mat/finExist/'+event.data.check_code)
+               console.log(result)
                if(result.data[0].checkCount>0){
                 Swal.fire({
                     title: '실패',
