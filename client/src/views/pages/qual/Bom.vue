@@ -27,8 +27,8 @@
     </div>
 
     <div class="text-end mt-3 mb-3">
-      <Button label="+" severity="success" class="me-3" @click="addRow"/>
-      <Button label="-" severity="danger" class="me-3" @click="deleteRow"/>  
+      <Button label="행추가" severity="success" class="me-3" @click="addRow"/>
+      <Button label="행삭제" severity="danger" class="me-3" @click="deleteRow"/>  
     </div>
   <div class="par-grid">
     <div class="prod-grid">
@@ -123,10 +123,10 @@
     };
   },
   mounted() {
-    this.fetchData();
+    this.BomData();
   },
   methods: {
-    async fetchData() {
+    async BomData() {
       try {
         const response = await axios.get('/api/admin/bom');
         this.rowData = response.data;
@@ -164,11 +164,11 @@
       // rowData2에서 선택된 행을 제외한 나머지만 남긴다
       this.rowData2 = this.rowData2.filter(row => !selectedData.includes(row));
     },
-     // 등록
-     async addBom(){
-      const res = await axios.get('/api/admin/bominsert', {
-        bominsert: this.rowData2,
-        })
+   
+    async addBom(){
+      const res = axios.post('/api/mat/bominsert', {
+        insertbom: this.rowData2,
+      })
         .then(res => {
           if (res.data.affectedRows > 0) {
             Swal.fire({
@@ -196,11 +196,19 @@
           });
           return;
         });
-        }
-        
-  
-  }
-  }
+        this.rowData2 = [{
+                          mat_code: "",
+                          prod_name: "",
+                          mat_name: "",
+                          quantity: "",
+                        }];
+        this.BomData();
+    },
+
+
+
+  },
+  };
   
 
 </script>
