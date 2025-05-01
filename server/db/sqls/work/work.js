@@ -8,8 +8,8 @@ FROM plan
 const findAllOrders = `
 SELECT o.orders_code, 
        o.order_name, 
-       o.orders_date, 
-       o.del_date, 
+       DATE_FORMAT(o.orders_date, '%Y-%m-%d') AS orders_date,
+       DATE_FORMAT(o.del_date, '%Y-%m-%d') AS del_date,
        o.note, 
        o.finish_status, 
        CONCAT(
@@ -27,8 +27,8 @@ GROUP BY o.orders_code, o.order_name, o.orders_date, o.del_date, o.note, o.finis
 // 주문 상세 조회
 const findByOrders_code = `
 SELECT 
-    o.orders_date,
-    o.del_date,
+    DATE_FORMAT(o.orders_date, '%Y-%m-%d') AS orders_date,
+    DATE_FORMAT(o.del_date, '%Y-%m-%d') AS del_date,
     od.orders_code,
     '' AS start_date,
     '' AS end_date,
@@ -63,7 +63,9 @@ ORDER BY od.orders_detail_code
 
 // 생산 계획 조회
 const findAllPlan = `
-SELECT p.plan_code, getOrderName(p.orders_code) AS order_name, p.plan_name, p.employee_code, p.start_date, p.end_date,
+SELECT p.plan_code, getOrderName(p.orders_code) AS order_name, p.plan_name, p.employee_code,
+        DATE_FORMAT(p.start_date, '%Y-%m-%d') AS start_date,
+        DATE_FORMAT(p.end_date, '%Y-%m-%d') AS end_date,
 		CONCAT(
         getProdName(od.prod_code),
         CASE 
@@ -82,7 +84,10 @@ GROUP BY p.plan_code, order_name, p.plan_name, p.start_date, p.end_date, p.finis
 
 // 생산 계획 상세 조회
 const findPlanDetailByPlan_code = `
-SELECT pd.plan_detail_code, o.orders_code, o.orders_date, o.del_date, od.prod_code, getProdName(od.prod_code) AS prod_name, od.quantity,
+SELECT pd.plan_detail_code, o.orders_code, od.prod_code,
+    DATE_FORMAT(o.orders_date, '%Y-%m-%d') AS orders_date,
+    DATE_FORMAT(o.del_date, '%Y-%m-%d') AS del_date,
+    getProdName(od.prod_code) AS prod_name, od.quantity,
 		od.quantity - COALESCE((
         SELECT SUM(dmd.delivery_quantity)
         FROM delivery_manage dm
@@ -142,14 +147,6 @@ SELECT
 FROM plan_detail
 `;
 
-// 주문 "생산중"으로 상태 변경
-const updateOrdersByOrders_code = `
-UPDATE orders
-	SET
-		finish_status = 'OS2'
-WHERE orders_code = ?
-`;
-
 // 생산 계획 수정
 const updatePlanByPlan_code = `
 UPDATE plan 
@@ -184,6 +181,14 @@ FROM plan_detail
 WHERE plan_code = ?
 `;
 
+// 주문 "생산중"으로 상태 변경
+const updateOrdersByOrders_code = `
+UPDATE orders
+	SET
+		finish_status = ?
+WHERE orders_code = ?
+`;
+
 module.exports = {
     getPlan_code,
     findAllOrders,
@@ -196,7 +201,7 @@ module.exports = {
     insertPlanDetail,
     updatePlanByPlan_code,
     updatePlanDetailByPlan_code,
-    updateOrdersByOrders_code,
     deletePlanByPlan_code,
     deletePlanDetailByPlan_code,
+    updateOrdersByOrders_code,
 };

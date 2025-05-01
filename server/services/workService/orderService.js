@@ -6,8 +6,24 @@ const getOrder_code = async () => {
     let result = await mariaDB
         .query("getOrder_code")
         .catch((err) => console.error(err));
-    return result[0];
+    return result;
 };
+
+// 자재 요구량 조회
+const findMatReqByPlan_code = async (plan_code) => {
+    let result = await mariaDB.query("findMatReqByPlan_code", plan_code).catch((err) => {
+        console.err(err);
+    });
+    return result;
+};
+
+// 생산 지시 목록 조회
+const findAllPlanOrder = async () => {
+    let result = await mariaDB.query("findAllPlanOrder").catch((err) => {
+        console.error(err);
+    })
+    return result;
+}
 
 // 생산지시 상태 확인
 const findStatusByPlan_code = async (plan_code) => {
@@ -60,5 +76,10 @@ const insertInstr = async () => {
 
 module.exports = {
     getOrder_code,
+    findAllPlanOrder,
+
     findStatusByPlan_code,
+    findPlanDetailByPlan_code,
+    findMatReqByPlan_code,
+    insertInstr,
 };

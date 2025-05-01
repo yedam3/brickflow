@@ -1,18 +1,18 @@
 <template>
     <CModal :visible="visible" @close="close" backdrop="static" alignment="center" size="xl" style="min-width: 1000px">
         <CModalHeader>
-            <slot name="header">주문 목록</slot>
+            <slot name="header">생산지시 목록</slot>
         </CModalHeader>
 
         <CModalBody>
             <div class="ag-theme-alpine" style="height: 400px; width: 100%">
-                <!-- 주문 검색창 -->
+                <!-- 생산계획 검색 -->
                 <div class="d-flex justify-content-center me-5">
                     <div class="input-group mb-3 w-50">
                         <select class="form-select" aria-label="Default select example">
-                            <option value="1" selected>제품명</option>
+                            <option value="1" selected>지시명</option>
                             <option value="2">주문명</option>
-                            <option value="2">주문번호</option>
+                            <option value="2">제품명</option>
                         </select>
                         <input type="text" v-model="searchText" placeholder="검색어 입력" @keydown.enter="searchOrders"
                             class="form-control w-50" style="width: 30%" />
@@ -39,7 +39,7 @@ import { AgGridVue } from "ag-grid-vue3";
 import axios from "axios";
 
 export default {
-    name: "OrderModal",
+    name: "PlanOrderModal",
     components: {
         AgGridVue,
     },
@@ -52,43 +52,41 @@ export default {
     watch: {
         visible(newVal) {
             if (newVal) {
-                this.orderList();
+                this.planOrderList();
             }
         }
     },
     data() {
         return {
-            rowData: [],
+            rowData: [
+
+            ],
             searchType: "",
             searchText: "",
 
             columnDefs: [
-                { field: "orders_code", headerName: "주문번호", flex: 1 },
-                { field: "order_name", headerName: "주문명", flex: 1 },
-                { field: "orders_date", headerName: "주문일자", flex: 1 },
-                { field: "del_date", headerName: "납기일자", flex: 1 },
-                { field: "prod_name", headerName: "제품명", flex: 2 },
+                { field: "product_order_code", headerName: "생산지시코드", flex: 1 },
+                { field: "product_order_name", headerName: "생산지시명", flex: 2 },
+                { field: "start_date", headerName: "시작일", flex: 1 },
+                { field: "end_date", headerName: "종료일", flex: 1 },
+                { field: "prod_name", headerName: "제품명", flex: 3 },
                 {
                     field: "finish_status", headerName: "상태", flex: 1,
                     valueFormatter: params => {
-                        if(params.value === 'OS1') {
-                            return '접수';
-                        } else if(params.value == 'OS2') {
+                        if(params.value === 'WS1') {
+                            return '지시등록';
+                        } else if(params.value === 'WS2') {
                             return '생산중';
-                        } else if(params.value == 'OS3') {
-                            return '출고대기';
-                        } else if(params.value == 'OS4') {
-                            return '출고완료';
+                        } else if(params.value === 'SW3') {
+                            return '생산완료';
                         }
                     },
                     cellStyle: params => {
                         if(params.value === 'OS1') {
                             return { textAlign: 'center', fontWeight: 'bold', color: '#6c757d' };
                         } else if(params.value == 'OS2') {
-                            return { textAlign: 'center', fontWeight: 'bold', color: '#007bff' };
-                        } else if(params.value == 'OS3') {
                             return { textAlign: 'center', fontWeight: 'bold', color: '#fd7e14' };
-                        } else if(params.value == 'OS4') {
+                        } else if(params.value == 'OS3') {
                             return { textAlign: 'center', fontWeight: 'bold', color: '#28a745' };
                         }
                     }
@@ -101,7 +99,7 @@ export default {
                 suppressCellFocus: true,                // 셀 포커스 OFF
                 pagination: true,                       // 페이징 ON
                 paginationPageSize: 5,                  // 한 페이지 보여질 행 수
-                paginationPageSizeSelector: false,      // paseSize 선택란 삭제
+                paginationPageSizeSelector: false,      //paseSize 선택란 삭제
                 defaultColDef: {                        // 열(컬럼) 기본 설정
                     suppressMovable: true,              // 컬럼을 드래그하여 이동하지 못하게
                     resizable: false,                   // 컬럼 크기 조절 못하게
@@ -113,19 +111,18 @@ export default {
         };
     },
     mounted() {
-        // 주문 목록
-        this.orderList();
+        // 계획 지시 목록
+        this.planOrderList();
     },
     methods: {
-
         // 모달창 닫기 이벤트
         close() {
             this.$emit("close");
         },
 
-        // 주문 목록 조회 API
-        orderList() {
-            axios.get('/api/work/plan/orderList')
+        // 계획지시 목록 조회 API
+        planOrderList() {
+            axios.get('/api/work/order/list')
                 .then(res => {
                     this.rowData = res.data
                 })
@@ -134,7 +131,7 @@ export default {
 
         // 그리드 행 클릭 메소드
         onRowClicked(event) {
-            this.$emit('selectOrder', event.data);
+            this.$emit('selectPlanOrder', event.data);
             this.close();
         },
     },
