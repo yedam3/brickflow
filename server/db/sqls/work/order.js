@@ -47,6 +47,22 @@ GROUP BY po.product_order_code, po.product_order_name, po.finish_status, sc.sub_
 ORDER BY po.product_order_code
 `;
 
+// 생산 지시 상세 조회
+const findAllPlanOrderDetail = `
+
+`;
+
+// 생산 상품 자재 재고 조회
+const findAllProdMatQtyByMat_code = `
+SELECT ms.mat_LOT, m.mat_code, m.mat_name, ms.store_date AS 'store_date',
+    (COALESCE(s.inbound_quantity, 0) - COALESCE(s.dispatch_quantity, 0)) AS 'available_qty'
+FROM mat_store ms
+	JOIN mat m ON ms.mat_code = m.mat_code
+	LEFT JOIN store s ON ms.mat_LOT = s.LOT AND ms.mat_code = s.item_code
+WHERE ms.mat_code = ?
+ORDER BY ms.store_date ASC
+`;
+
 // 생산지시 상태 확인
 const findStatusByPlan_code = `
 SELECT finish_status
@@ -71,6 +87,8 @@ const insertInstr = `
 module.exports = {
     getOrder_code,
     findMatReqByPlan_code,
+    findAllPlanOrderDetail,
+    findAllProdMatQtyByMat_code,
 
     findAllPlanOrder,
     findStatusByPlan_code,

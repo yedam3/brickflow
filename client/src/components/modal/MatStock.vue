@@ -51,11 +51,11 @@ export default {
             searchText: "",
 
             columnDefs: [
-                { field: "lot", headerName: "LOT번호", flex: 1 },
+                { field: "mat_LOT", headerName: "LOT번호", flex: 1 },
                 { field: "mat_code", headerName: "자재코드", flex: 1 },
                 { field: "mat_name", headerName: "자재명", flex: 1 },
                 { field: "store_date", headerName: "입고일자", flex: 1 },
-                { field: "prod_name", headerName: "자재출고 가능 수량", flex: 2 },
+                { field: "available_qty", headerName: "자재출고 가능 수량", flex: 2 },
                 { field: "prod_name", headerName: "자재출고 수량", flex: 2 },
             ],
             gridOptions: {
@@ -89,7 +89,7 @@ export default {
 
         // 제품별 자재 재고 목록 조회 API
         matStockList() {
-            axios.get('/api/work/plan/orderList')
+            axios.get('/api/work/order/findStatusByPlan_code')
                 .then(res => {
                     this.rowData = res.data
                 })
@@ -98,7 +98,7 @@ export default {
 
         // 그리드 행 클릭 메소드
         onRowClicked(event) {
-            this.$emit('selectOrder', event.data);
+            this.$emit('selectMat', event.data);
             this.close();
         },
     },

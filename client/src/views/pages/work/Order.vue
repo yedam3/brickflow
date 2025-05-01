@@ -109,6 +109,9 @@
 
     <!-- 생산 지시 조회 모달창 -->
     <PlanOrderModal :visible="showPlanOrderModal" @close="showPlanOrderModal = false" @selectPlanOrder="planOrderSelected"></PlanOrderModal>
+
+    <!-- 자재 재고 조회 모달창 -->
+     <MatStock :visible="showMatStockModal" @close="showMatStockModal = false" @selectMat="matSelected"></MatStock>
 </template>
 
 <script>
@@ -117,12 +120,14 @@ import axios from "axios";
 
 import PlanModal from "@/components/modal/PlanModal.vue";
 import PlanOrderModal from "@/components/modal/PlanOrderModal.vue"
+import MatStock from "@/components/modal/MatStock.vue";
 
 export default {
     components: {
         AgGridVue,
         PlanModal,
         PlanOrderModal,
+        MatStock,
     },
     data() {
         return {
@@ -282,6 +287,11 @@ export default {
                     cnt++;
                 }
             }).catch((err) => console.error(err));
+        },
+
+        // 자재 재고 모달창 값 전달달
+        async matSelected(mat) {
+
         },
 
         //행추가
