@@ -19,18 +19,24 @@ const bomList = `SELECT bom_code,
                         pass_or_not,
                         emp_code,
                         getMatName(mat_code) as mat_name,
-                        getProdName(prod_code) as prod_names
+                        getProdName(prod_code) as prod_name
                         FROM BOM
                  WHERE prod_code = ?`;
 
-// BOM 등록
-const bomInsert = 
-`INSERT INTO BOM (bom_code, mat_code, prod_code, quantity)
-VALUES(?, ?, ?, ?)`;
+// BOM 저장
+// 일단 다 삭제
+const bomDelete = `DELETE FROM BOM
+                 WHERE prod_code = ?`
+
+// 삭제 후 다시 등록
+const bomSave = `INSERT INTO BOM (bom_code, mat_code, prod_code, quantity)
+                    VALUES(?, ?, ?, ?)`
 
 module.exports = {
     autoBomCode,
     prodList,
     bomList,
-    bomInsert,
+    bomDelete,
+    bomSave,
+    
 };

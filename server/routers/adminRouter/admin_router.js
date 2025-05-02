@@ -16,10 +16,18 @@ router.get('/bom', async (req, res) => {
     res.send(bomInfo);
 });
 
-//3.BOM 등록
-router.post('/bominsert', async(req, res)=>{
-    const { insertBom } = req.body;
-    let result = await adminService.insertBom(insertBom);
+//3.BOM 저장 - 일단 다 삭제
+router.delete('/bom/:bno', async (req, res) => {
+    let bomNo = req.params.prno;
+    let bomInfo = await adminService.findBom(bomNo);
+    res.send(bomInfo);
+});
+
+
+//3.BOM 저장 - 삭제 후 등록
+router.post('/bomsave', async(req, res)=>{
+    let {insertbom} = req.body;
+    let result = await adminService.saveBom(insertbom);
     res.send(result);
     });
 
