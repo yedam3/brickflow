@@ -8,7 +8,6 @@ FROM product_order
 const findMatReqByPlan_code = `
 SELECT pd.prod_code, b.mat_code, m.mat_name,
     SUM(pd.plan_quantity * b.quantity) AS req_material_quantity,
-    MAX(s.store_quantity) AS material_input_qunatity,
     CASE 
         WHEN MAX(s.store_quantity) IS NULL THEN '재고 정보 없음'
         WHEN SUM(pd.plan_quantity * b.quantity) > MAX(s.store_quantity) THEN '재고 부족'
@@ -47,20 +46,46 @@ GROUP BY po.product_order_code, po.product_order_name, po.finish_status, sc.sub_
 ORDER BY po.product_order_code
 `;
 
-// 생산 지시 상세 조회
-const findAllPlanOrderDetail = `
+// 생산 지시 조회
+const findAllPlanOrderByProduct_order_code = `
+SELECT po.product_order_code, po.product_order_name, e.emp_name, po.plan_code, p.plan_name, po.start_date, po.end_date, po.note
+FROM product_order po
+	JOIN plan p ON po.plan_code = p.plan_code
+    JOIN employees e ON e.emp_code = po.employee_code
+WHERE product_order_code = ?
+`;
 
+// 생산 지시 상세 조회
+const findAllWorkDetailByProduct_order_code = `
+SELECT wd.prod_code, getProdName(wd.prod_code) AS 'prod_name', od.quantity, wd.order_quantity, wd.priority, wd.product_order_code
+FROM work_detail wd
+    LEFT JOIN product_order po ON po.product_order_code = wd.product_order_code
+    LEFT JOIN plan p ON p.plan_code = po.plan_code
+    LEFT JOIN order_detail od ON od.orders_code = p.orders_code AND od.prod_code = wd.prod_code
+WHERE wd.product_order_code = ?
 `;
 
 // 생산 상품 자재 재고 조회
 const findAllProdMatQtyByMat_code = `
-SELECT ms.mat_LOT, m.mat_code, m.mat_name, ms.store_date AS 'store_date',
+SELECT s.lot AS 'mat_LOT', m.mat_code, m.mat_name, ms.store_date AS 'store_date',
     (COALESCE(s.inbound_quantity, 0) - COALESCE(s.dispatch_quantity, 0)) AS 'available_qty'
-FROM mat_store ms
+FROM store s
+	LEFT JOIN mat_store ms ON ms.mat_LOT = s.LOT AND ms.mat_code = s.item_code
 	JOIN mat m ON ms.mat_code = m.mat_code
-	LEFT JOIN store s ON ms.mat_LOT = s.LOT AND ms.mat_code = s.item_code
 WHERE ms.mat_code = ?
 ORDER BY ms.store_date ASC
+`;
+
+// 생산 상품 자재 홀드 조회
+const findAllMatHoldByProdcut_order_detail_code = `
+SELECT wd.prod_code, b.mat_code, m.mat_name, b.quantity AS required_per_unit,
+    (b.quantity * wd.order_quantity) AS total_input_qty
+FROM work_detail wd
+	JOIN BOM b ON b.prod_code = wd.prod_code
+	JOIN mat m ON m.mat_code = b.mat_code
+WHERE wd.product_order_code = ?
+ORDER BY wd.prod_code, b.mat_code
+
 `;
 
 // 생산지시 상태 확인
@@ -87,8 +112,11 @@ const insertInstr = `
 module.exports = {
     getOrder_code,
     findMatReqByPlan_code,
-    findAllPlanOrderDetail,
+    findAllPlanOrderByProduct_order_code,
+    findAllWorkDetailByProduct_order_code,
     findAllProdMatQtyByMat_code,
+
+    findAllMatHoldByProdcut_order_detail_code,
 
     findAllPlanOrder,
     findStatusByPlan_code,
