@@ -34,7 +34,11 @@ FROM check_standard
 WHERE process_code =?
 `
 
+const testAdd = `
+ CALL addTest(?, ?, ?, ?, ?, ?, ?, @good);
+`
  module.exports = {
     testReadyList,
-    testMenuList
+    testMenuList,
+    testAdd
  }

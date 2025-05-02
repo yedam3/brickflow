@@ -21,6 +21,12 @@ const testMenuList = async (procCode) => {
   const result = await mariaDB.query('testMenuList',procCode)
   return result;
 }
+//등록
+const testAdd = async (testInfo) => {
+  for(let test of testInfo){
+    const result = await mariaDB.query('testAdd',)
+ }
+}
 module.exports = {
     testReadyList,
     testMenuList

@@ -5,7 +5,7 @@
       <h4 class="text-start">공정검사대기항목</h4>
       <div class="text-end mt-3 mb-3">
         <Button label="조회" severity="success" class="me-3" />
-        <Button label="등록" severity="info" class="me-3" />
+        <Button label="등록" severity="info" class="me-3" @click="addTest"/>
         <Button label="수정" severity="help" class="me-3" />
         <Button label="삭제" severity="danger" class="me-5" />
       </div>
@@ -19,6 +19,7 @@
           :gridOptions="gridOptions"
           rowSelection="single"
           @cellClicked="onRowClicked"
+          @cellValueChanged ="inputRender"
          
         />
       </div>
@@ -36,7 +37,6 @@
           :rowData="secondRowData"
           :gridOptions="gridOptions2"
           rowSelection="multiple"
-          @cellClicked="matCellClicked"
           @cellValueChanged="testChange"
         />
       </div>
@@ -44,9 +44,9 @@
   </template>
   
   <script>
-  import { AgGridVue } from "ag-grid-vue3";
+import { AgGridVue } from "ag-grid-vue3";
 import axios from "axios";
-  import Swal from "sweetalert2";
+import Swal from "sweetalert2";
   
   export default {
     components: {
@@ -56,7 +56,7 @@ import axios from "axios";
     data() {
       return {
         rowData: [],
-        row2DataIndex : null,
+        rowDataIndex : null,
         columnDefs: [
           { field: "product_order_name", headerName: "생산지시명", flex: 1 },
           { field: "prod_code", headerName: "제품코드", flex: 1 },
@@ -74,22 +74,27 @@ import axios from "axios";
         valueFormatter: (params) => {
               return params.value != null ? `${params.value}개` : '';
             }},
+            { field: "input_quantity", headerName: "현검사량", flex: 1 , editable: true,
+        valueFormatter: (params) => {
+              return params.value != null ? `${params.value}개` : '';
+            }},
 
         ],
         secondRowData: [],
         secondColumnDefs: [
           { field: "test_name", headerName: "검사명", flex: 1 },
           { field: "test_item", headerName: "검사항목", flex: 1, editable: true },
+          { field: "input_quantity", headerName: "검사량", flex: 1},
           { field: "pass_standard", headerName: "합격기준", flex: 1 },
           { field: "test_value", headerName: "검사수치", flex: 1, editable: true },
-          { field: "pass_or_not", headerName: "합격여부", flex: 1 ,
+          { field: "pass_or_not", headerName: "합격여부", flex: 1 , 
           cellStyle: params => {
                         if (params.value == 'YN1') {
                             return { color: '#0284C7', textAlign: 'center', fontWeight: 'bold' }; 
                         } else if (params.value == 'YN2') {
                             return { color: '#E02D2D', textAlign: 'center', fontWeight: 'bold' }; 
                         } 
-                        return null; // 기본 스타일
+                        return null; 
                     },
             valueFormatter: (params) => {
               let result = '';
@@ -134,25 +139,47 @@ import axios from "axios";
       this.testReady();
     },
     watch : {
-      
+    //  'rowDataIndex' : function(newVal){
+    //   console.log(newVal)
+    //   for(let data in this.rowData){
+    //      if(data != newVal){
+    //       this.rowData[data].input_quantity ='0';
+    //      }
+    //   }
+    //  }
     },
     methods: {
+      //인풋값 그리드2에 전달
+      inputRender(){
+        console.log(this.rowData[this.rowDataIndex])
+        //값체크
+        if(Number(this.rowData[this.rowDataIndex].not_test) < Number(this.rowData[this.rowDataIndex].input_quantity)){
+          this.rowData[this.rowDataIndex].input_quantity=0;
+          this.rowData = [...this.rowData]
+          alert('미검사량 보다 더많은값을 기입할 수 없습니다.')
+          return;
+        }
+
+        for(let inputQuantity of this.secondRowData ){
+          inputQuantity.input_quantity = this.rowData[this.rowDataIndex].input_quantity;
+        }
+      },
       async onRowClicked(event) {
+        //클릭 인덱스 값 담기
+        this.rowDataIndex =event.rowIndex;
         // 클릭시 검사항목들 보여줌
         axios.get('/api/test/testMenu/'+event.data.process_code)
+              //검사량 초기화
               .then(res => {
-                console.log(res.data)
                 for(let addValue of res.data){
                   addValue.pass_or_not='';
                   addValue.emp_code='';
                   addValue.test_value='';
+                  addValue.process_code = this.rowData[0].process_code;
                 }
                  this.secondRowData = res.data;
               })
               .catch((err) => console.log(err));
-      },
-      matCellClicked(params) {
-        this.row2DataIndex=params.rowIndex;
       },
       //겁사항목 출력
       async testReady(){
@@ -171,6 +198,29 @@ import axios from "axios";
 
         // ag-grid에 변경 반영
         this.$refs.secondGrid.api.refreshCells({ rowNodes: [event.node], force: true });
+      },
+      async addTest(){
+        //값체크
+        if(this.secondRowData.length ==0){
+          Swal.fire({
+                    title: '실패',
+                    text: '해당하는 값을 입력해주십시오.',
+                    icon: 'error',
+                    confirmButtonText: '확인'
+                })
+          return;
+        }
+        for(let value of this.secondRowData){
+          if(!value.test_item||!value.pass_standard||!value.test_value){
+            Swal.fire({
+                    title: '실패',
+                    text: '해당하는 값을 입력해주십시오.',
+                    icon: 'error',
+                    confirmButtonText: '확인'
+                })
+            return;
+          }
+        }
       }
     }
   };
