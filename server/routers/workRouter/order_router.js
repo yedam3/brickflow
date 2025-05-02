@@ -22,10 +22,19 @@ router.get("/list", async (req, res) => {
     res.send(list);
 });
 
-// 생산 지시 상세 조회
-router.get("/detailList/:product_order_code", async (req, res) => {
+// 생산 지시 조회
+router.get("/productOrder/:product_order_code", async (req, res) => {
     let product_order_code = req.params.product_order_code;
-    let detailList = await orderService.findAllPlanOrderDetail(product_order_code).catch((err) => {
+    let result = await orderService.findAllPlanOrderByProduct_order_code(product_order_code).catch((err) => {
+        console.error(err);
+    })
+    res.send(result);
+});
+
+// 생산 지시 상세 조회
+router.get("/productOrderDetail/:product_order_code", async (req, res) => {
+    let product_order_code = req.params.product_order_code;
+    let detailList = await orderService.findAllWorkDetailByProduct_order_code(product_order_code).catch((err) => {
         console.error(err);
     })
     res.send(detailList);
@@ -38,6 +47,15 @@ router.get("/matQty/:mat_code", async (req, res) => {
         console.error(err);
     })
     res.send(matList);
+});
+
+// 생산 상품 자재 홀드 조회
+router.get("/loadMatQty/:product_order_code", async (req, res) => {
+    let product_order_code = req.params.product_order_code;
+    let matQtyList = await orderService.findAllMatHoldByProdcut_order_detail_code(product_order_code).catch((err) => {
+        console.error(err);
+    });
+    res.send(matQtyList);
 });
 
 // 생산 지시 상태 확인

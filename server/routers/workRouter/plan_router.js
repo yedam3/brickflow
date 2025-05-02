@@ -64,10 +64,17 @@ router.put("/plan", async (req, res) => {
 
 // 생산 계획 삭제
 router.delete("/plan", async (req, res) => {
-    console.log(req.body);
     let { plan_code, orders_code } = req.body;
     let result = await planService.deletePlanByPlan_code(plan_code, orders_code).catch((err) => console.error(err));
     res.send(result);
 });
+
+// 제품 검색
+router.get("/prodList", async (req, res) => {
+    let prodList = await planService.findAllProd().catch((err) => {
+        console.error(err);
+    })
+    res.send(prodList);
+})
 
 module.exports = router;

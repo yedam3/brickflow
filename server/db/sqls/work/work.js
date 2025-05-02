@@ -189,6 +189,12 @@ UPDATE orders
 WHERE orders_code = ?
 `;
 
+// 제품 검색
+const findAllProd = `
+SELECT prod_code, prod_name, unit, by_unit_number
+FROM prod
+`;
+
 module.exports = {
     getPlan_code,
     findAllOrders,
@@ -204,4 +210,5 @@ module.exports = {
     deletePlanByPlan_code,
     deletePlanDetailByPlan_code,
     updateOrdersByOrders_code,
+    findAllProd,
 };

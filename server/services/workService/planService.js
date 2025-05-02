@@ -234,6 +234,14 @@ const updateOrdersByOrders_code = async (orders_code, status_type) => {
     return result;
 }
 
+const findAllProd = async () => {
+    let prodList = await mariaDB.query("findAllProd").catch((err) => {
+        console.error(err);
+    })
+
+    return prodList;
+}
+
 module.exports = {
     getPlan_code,
     findAllOrders,
@@ -247,4 +255,5 @@ module.exports = {
     updatePlanByPlan_code,
     updatePlanDetailByPlan_code,
     deletePlanByPlan_code,
+    findAllProd,
 };

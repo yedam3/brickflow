@@ -97,7 +97,7 @@
         <!-- 메인그리드 -->
         <div class="ag-wrapper d-flex justify-content-center" style="border: none;">
             <ag-grid-vue ref="mainGrid" class="ag-theme-alpine custom-grid-theme" style="width: 100%; border: none;"
-                :columnDefs="columnDefs" :rowData="rowData" :gridOptions="gridOptions">
+                :columnDefs="columnDefs" :rowData="rowData" :gridOptions="gridOptions"  @cellClicked="prodCellClicked">
             </ag-grid-vue>
         </div>
     </div>
@@ -107,6 +107,9 @@
 
     <!-- 생산 계획 조회 모달창 -->
     <PlanModal :visible="showPlanModal" @close="showPlanModal = false" @selectPlan="planSelected"></PlanModal>
+
+    <!-- 제품 조회 모달창 -->
+    <ProdModal :visible="showProdModal" @close="showProdModal = false" @selectProd="prodSelected"></ProdModal>
 </template>
 
 <script>
@@ -117,6 +120,7 @@ import Swal from 'sweetalert2';
 
 import OrderModal from "@/components/modal/OrderModal.vue";
 import PlanModal from "@/components/modal/PlanModal.vue";
+import ProdModal from "@/components/modal/ProdModal.vue";
 
 export default {
     components: {
@@ -124,6 +128,7 @@ export default {
         datePicker: DatePickerEditor,
         OrderModal,
         PlanModal,
+        ProdModal,
     },
     props: {
         visible: {
@@ -149,10 +154,11 @@ export default {
 
             rowData: [
                 {
-                    plan_detail_code: "",   // 생산계획_상세_코드
+                    // plan_detail_code: "",   // 생산계획_상세_코드
                     orders_code: "",        // 주문번호
                     orders_date: "",        // 시작_일자
                     del_date: "",           // 종료_일자
+                    prod_code: "",
                     prod_name: "",          // 제품명
                     quantity: "",           // 수량(주문상세)
                     unshippedQty: "",       // 미출고량
@@ -167,8 +173,8 @@ export default {
                 orders_code: false,         // 주문번호
                 orders_date: false,         // 시작_일자
                 del_date: false,            // 종료_일자
-                prod_name: true,            // 제품명
-                quantity: true,             // 수량(주문상세)
+                prod_name: false,            // 제품명
+                quantity: false,             // 수량(주문상세)
                 unshippedQty: false,        // 미출고량
                 prePlannedQty: false,       // 기계획량
                 unplannedQty: false,        // 미계획량
@@ -187,6 +193,8 @@ export default {
             },
             showOrderModal: false,
             showPlanModal: false,
+            showProdModal: false,
+
             //상세그리드 행 인덱스
             selectedSecondIndex: null,
         };
@@ -215,6 +223,21 @@ export default {
         }
     },
     methods: {
+        // 주문 모달창
+        orderList() {
+            this.showOrderModal = true;
+        },
+
+        // 생산 계획 모달창
+        planList() {
+            this.showPlanModal = true;
+        },
+
+        // 제품 조회 모달창
+        prodList() {
+            this.showProdModal = true;
+        },
+
         // 사이트 접속시 plan_code 자동증가
         async autoPlan_code() {
             try {
@@ -238,19 +261,9 @@ export default {
                 note: "",                           // 비고
             }
             this.rowData = [];
-            this.ag_grid_cols.prod_name = true;
-            this.ag_grid_cols.quantity = true;
+            this.ag_grid_cols.prod_name = false;
+            this.ag_grid_cols.quantity = false;
             this.editMode = false;
-        },
-
-        // 주문 모달창
-        orderList() {
-            this.showOrderModal = true;
-        },
-
-        // 생산 계획 모달창
-        planList() {
-            this.showPlanModal = true;
         },
 
         // input 유효성 검사
@@ -532,6 +545,21 @@ export default {
             }
             return true;
         },
+
+        // 제품 명 제품 코드 선택 시 모달창 열기
+        prodCellClicked(params) {
+            if((params.colDef.field == "prod_code" || params.colDef.field == "prod_name")) {
+                this.selectedSecondIndex = params.rowIndex;
+                this.showProdModal = true;
+            }
+        },
+
+        // 제품 모달창 값 전달
+        prodSelected(prod) {
+            this.rowData[this.selectedSecondIndex].prod_code = prod.prod_code;
+            this.rowData[this.selectedSecondIndex].prod_name = prod.prod_name;
+            this.rowData = [...this.rowData];
+        }
     },
 };
 </script>
