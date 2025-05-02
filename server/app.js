@@ -15,6 +15,8 @@ app.listen(3000, () => {
 });
 // 라우팅 등록 영역
 const salesRouter = require("./routers/salesrouter/sales_router.js");
+const deliveryRouter = require("./routers/salesrouter/delivery_router.js");
+
 const workRouters = require("./routers/workRouter/work_routers.js");
 const matRouter = require("./routers/matRouter/mat_router.js");
 const matCheckRouter = require("./routers/matRouter/mat_check_router.js");
@@ -33,6 +35,8 @@ app.get("/", (req, res) => {
 });
 // 라우터 모듈 등록
 app.use("/sales", salesRouter);
+app.use("/sales", deliveryRouter);
+
 app.use("/mat", matRouter);
 app.use("/work", workRouters);
 app.use("/fac", facRouter);

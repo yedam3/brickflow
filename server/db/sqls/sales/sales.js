@@ -54,7 +54,7 @@ const salesAutoOrder =
 //등록
 const salesOrderAdd =
   `INSERT INTO orders(orders_code, order_name, orders_date, del_date, employee_code, note, finish_status, company_code)
-VALUES( ? , ? , ? , ? , ? , ? , ? , ? )`;
+VALUES( ? , ? , ? , ? , ? , ? , 'OS1' , ? )`;
 
 // orders_detail_code  자동부여
 const salesAutoOrderDetail =

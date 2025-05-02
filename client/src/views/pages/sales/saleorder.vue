@@ -89,7 +89,8 @@ export default {
         prod_code: '',
         prod_name: '',
         quantity: '',
-        totalorderprice: '',
+        price: '',
+        totalprice: '',
         note: '',
       }
       ],
@@ -99,13 +100,9 @@ export default {
         { field: 'orders_code', headerName: '주문번호', flex: 2, },
         { field: 'prod_code', headerName: '제품코드', flex: 2, editable: true },
         { field: 'prod_name', headerName: '제품명', flex: 2, editable: true },
-        {field: 'quantity', headerName: '수량', flex: 2, editable: true,
-          valueFormatter: (params) => {
-            return params.value != null ? `${params.value}` : '';
-          }
-        },
-        { field: 'prodprice', headerName: '단가', flex: 2, editable: true },
-        { field: 'totalorderprice', headerName: '총주문 금액', flex: 3 },
+        {field: 'quantity', headerName: '수량', flex: 2, editable: true, valueFormatter: (params) => {return params.value != null ? `${params.value}` : '';}},
+        { field: 'price', headerName: '단가', flex: 2, editable: true },
+        { field: 'totalprice', headerName: '총주문 금액', valueGetter: 'Number(data.quantity) * Number(data.price)', flex: 3 },
         { field: 'note', headerName: '비고', flex: 3 },
       ],
       gridOptions: {
@@ -117,14 +114,7 @@ export default {
           resizable: false, // 열 크기 조정 가능
           sortable: false, //정렬 금지
           cellStyle: { textAlign: "center" },
-          headerClass: "header-center",
-          // gridOptions: {
-          //   pagination: true,
-          //   paginationPageSize: 5,
-          //   paginationPageSizeSelector: [5, 10, 20, 50],
-          //   overlayNoRowsTemplate: '표시할 값이 없습니다.',
-
-          // }
+          headerClass: "header-center",          
         },
       },
       showOrderModal: false,
@@ -183,7 +173,7 @@ export default {
         prod_code: "",
         prod_name: "",
         quantity: 0,
-        totalorderprice: "",
+        price: 0,
         note: "",
       })
       // 새 배열로 설정하여 AG Grid가 반영하게 만듬
@@ -219,24 +209,34 @@ export default {
     //주문 목록 조회
     async orderSelected(order) {
       console.log(order)
+      if (order.finish_status == 'OS2' || order.finish_status == 'OS3' || order.finish_status == 'OS4' ) {
+        Swal.fire({
+          title: '선택불가',
+          text: ' 선택이 불가한 항목입니다.',
+          icon: 'error',
+          confirmButtonText: '확인'
+        });
+        //alert("안됨")
+        return;
+      }
       // await axios.get(`/api/sales/orders/:orders_code`, {
-      await axios.get(`/api/sales/orders/${order.orders_code}`)
+      await axios.get(`/api/sales/orders/${order.orders_code}`) // 선택된 주문의 상세 정보를 서버에 요청
       .then(res => {
         console.log(res.data);
-        const serverRowData = res.data;
+        const serverRowData = res.data; // 응답받은 주문 데이터를 변수에 저장.
         //this.rowData[0].orders_code = res.orders_code;
-        this.rowData = [serverRowData];
+        this.rowData = [serverRowData]; //  rouwData를 새 배열로 재할당(AG grid 등에 전달된 데이터)
       })
         .catch((err) => console.log(err));
       
       //상세 그리드로 전달
       await axios.get('/api/sales/detail', {
         params: {
-          orders_code: order.orders_code
+          orders_code: order.orders_code // 선택한 주문 코드를 파라미터로 전달
         }
       })
         .then(res => {
-          this.secondRowData = res.data;
+          this.secondRowData = res.data; // 응답받은 데이터를 상세 그리드 데이터로 설정
       })
     },
 
@@ -337,14 +337,8 @@ export default {
         company_name: "",
         note: "",
       }];
-      this.columnDefss = [{
-        orders_code: "",
-        prod_code: "",
-        prod_name: "",
-        quantity: "",
-        totalorderprice: "",
-        note: "",
-      }];
+      this.secondRowData = [];
+      
     },
 
   //수정

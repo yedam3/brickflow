@@ -1,10 +1,6 @@
-const {
-  inRange
-} = require("lodash");
+const {inRange} = require("lodash");
 const mariaDB = require("../../db/mapper.js");
-const {
-  convertObjToAry
-} = require("../../utils/converts.js");
+const {convertObjToAry} = require("../../utils/converts.js");
 
 const findAll = async () => {
   let list = await mariaDB.query("testList").catch(err => console.log(err));
@@ -35,7 +31,7 @@ const comList = async ({
 
 //등록
 const salesOrderAdd = async (salesOrder, salesOrderDetail) => {
-  salesOrder.orders_code = (await mariaDB.query('salesAutoOrder'))[0].code;
+  salesOrder.orders_code = (await mariaDB.query('salesAutoOrder'))[0].code; // 자동생성 코드
 
   console.log(salesOrder.orders_code);
   let result = await mariaDB.query('salesOrderAdd', [

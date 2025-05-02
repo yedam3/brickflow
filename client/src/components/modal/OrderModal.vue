@@ -134,6 +134,7 @@ export default {
 
         // 그리드 행 클릭 메소드
         onRowClicked(event) {
+            console.log(event.data)
             this.$emit('selectOrder', event.data);
             this.close();
         },
