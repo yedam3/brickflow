@@ -37,6 +37,7 @@ const connectionPool = mariadb.createPool({
     // mariaDB의 날짜(DATE, DATETIME, TIME)관련 타입을 어떻게 처리할 것인지
     // true일 경우엔 문자열로, false인 경우엔 Date 객체로 취급해서 불필요한 시간이 같이 출력됨.
     dateStrings : true,
+    multipleStatements : true
 });
 
 // MariaDB에 SQL문을 보내고 결과를 받아올 함수 설정

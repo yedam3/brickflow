@@ -38,6 +38,7 @@
           :gridOptions="gridOptions2"
           rowSelection="multiple"
           @cellValueChanged="testChange"
+          @cellClicked="testValueclicked"
         />
       </div>
     </div>
@@ -57,6 +58,7 @@ import Swal from "sweetalert2";
       return {
         rowData: [],
         rowDataIndex : null,
+        grid2Index: null,
         columnDefs: [
           { field: "product_order_name", headerName: "생산지시명", flex: 1 },
           { field: "prod_code", headerName: "제품코드", flex: 1 },
@@ -77,7 +79,13 @@ import Swal from "sweetalert2";
             { field: "input_quantity", headerName: "현검사량", flex: 1 , editable: true,
         valueFormatter: (params) => {
               return params.value != null ? `${params.value}개` : '';
-            }},
+              }, valueParser: params => {
+                // 숫자로 변환, 숫자가 아니면 null
+                const value = parseInt(params.newValue);
+                return isNaN(value) ? null : value;
+              },
+},
+
 
         ],
         secondRowData: [],
@@ -86,14 +94,22 @@ import Swal from "sweetalert2";
           { field: "test_item", headerName: "검사항목", flex: 1, editable: true },
           { field: "input_quantity", headerName: "검사량", flex: 1},
           { field: "pass_standard", headerName: "합격기준", flex: 1 },
-          { field: "test_value", headerName: "검사수치", flex: 1, editable: true },
+          { field: "test_value", headerName: "검사수치", flex: 1, editable: true,
+            valueParser: params => {
+              // 숫자로 변환, 숫자가 아니면 null
+              const value = parseInt(params.newValue);
+              return isNaN(value) ? null : value;
+            },
+          },
           { field: "pass_or_not", headerName: "합격여부", flex: 1 , 
           cellStyle: params => {
                         if (params.value == 'YN1') {
                             return { color: '#0284C7', textAlign: 'center', fontWeight: 'bold' }; 
                         } else if (params.value == 'YN2') {
                             return { color: '#E02D2D', textAlign: 'center', fontWeight: 'bold' }; 
-                        } 
+                        } else if (params.value == 'YN3'){
+                          return { color: '#6C757D', textAlign: 'center', fontWeight: 'bold' }; 
+                        }
                         return null; 
                     },
             valueFormatter: (params) => {
@@ -102,6 +118,8 @@ import Swal from "sweetalert2";
                 result ='적합'
               }else if(params.value=='YN2'){
                 result = '부적합'
+              }else if(params.value=='YN3'){
+                result = '검사항목제외'
               }
               return result;
             }
@@ -151,7 +169,6 @@ import Swal from "sweetalert2";
     methods: {
       //인풋값 그리드2에 전달
       inputRender(){
-        console.log(this.rowData[this.rowDataIndex])
         //값체크
         if(Number(this.rowData[this.rowDataIndex].not_test) < Number(this.rowData[this.rowDataIndex].input_quantity)){
           this.rowData[this.rowDataIndex].input_quantity=0;
@@ -159,10 +176,8 @@ import Swal from "sweetalert2";
           alert('미검사량 보다 더많은값을 기입할 수 없습니다.')
           return;
         }
-
-        for(let inputQuantity of this.secondRowData ){
-          inputQuantity.input_quantity = this.rowData[this.rowDataIndex].input_quantity;
-        }
+          this.secondRowData[0].input_quantity = this.rowData[this.rowDataIndex].input_quantity;
+        
       },
       async onRowClicked(event) {
         //클릭 인덱스 값 담기
@@ -175,7 +190,11 @@ import Swal from "sweetalert2";
                   addValue.pass_or_not='';
                   addValue.emp_code='';
                   addValue.test_value='';
-                  addValue.process_code = this.rowData[0].process_code;
+                  addValue.input_quantity = '';
+                  addValue.work_lot = this.rowData[this.rowDataIndex].work_lot;
+                  addValue.product_order_detail_code = this.rowData[this.rowDataIndex].product_order_detail_code;
+                  addValue.process_code = this.rowData[this.rowDataIndex].process_code;
+                  addValue.prod_code = this.rowData[this.rowDataIndex].prod_code;
                 }
                  this.secondRowData = res.data;
               })
@@ -189,29 +208,80 @@ import Swal from "sweetalert2";
                    })
                    .catch((err) => console.log(err))
       },
-      testChange(event){
+      testChange(event) {
+        // 값체크
+        if (event.data.input_quantity == 0 || event.data.input_quantity == '') {
+          Swal.fire({
+            title: '실패',
+            text: '전 항목을 통과하지 못하였거나 기입을 안하여 해당 항목 기입이 불가능합니다.',
+            icon: 'error',
+            confirmButtonText: '확인'
+          });
+          event.data.test_value = '';
+          return;
+        }
+
         const row = event.data;
         const test = Number(row.test_value);
         const standard = Number(row.pass_standard);
 
-        row.pass_or_not = test > standard ? 'YN1' : 'YN2';
+        //검사판단
+        row.pass_or_not = test >= standard ? 'YN1' : 'YN2';
 
-        // ag-grid에 변경 반영
-        this.$refs.secondGrid.api.refreshCells({ rowNodes: [event.node], force: true });
+        // 다음 항목에서 합격일떄만 검사량 전달 
+        if (row.pass_or_not == 'YN1') {
+          const targetRow = this.secondRowData[this.grid2Index + 1];
+          if (targetRow) {
+            this.secondRowData[this.grid2Index + 1].input_quantity = row.input_quantity;
+          }
+        }
+
+        //검사 결과 전체 다시보고 이후 다시 정리
+        let foundFail = false;
+        for (let i = 0; i < this.secondRowData.length; i++) {
+          const current = this.secondRowData[i];
+
+          if (!foundFail) {
+            // 불합격을 처음 발견하면 무조건 Yn2로 설정
+            if (current.pass_or_not === 'YN2') {
+              foundFail = true;
+            }
+          } else {
+            // 불합격 이후 항목들은 무조건 YN3로 바꾸기
+            current.pass_or_not = 'YN3';
+          }
+        }
+
+        //  불합격에서 합격으로 바꾼 경우 이후 항목들 초기화
+        if (!this.secondRowData.some(row => row.pass_or_not === 'YN2')) {
+          for (let i = 0; i < this.secondRowData.length; i++) {
+            if (this.secondRowData[i].pass_or_not === 'YN3') {
+              this.secondRowData[i].pass_or_not = '';
+            }
+          }
+        }
+
+        // 반응성 갱신
+        this.secondRowData = [...this.secondRowData];
+      },
+
+      //그리드2 클릭시 인덱스 값 가져오기
+      testValueclicked(event){
+       this.grid2Index = event.rowIndex;
       },
       async addTest(){
         //값체크
         if(this.secondRowData.length ==0){
           Swal.fire({
                     title: '실패',
-                    text: '해당하는 값을 입력해주십시오.',
+                    text: '해당하는 공정을 선택해주세요.',
                     icon: 'error',
                     confirmButtonText: '확인'
                 })
           return;
         }
         for(let value of this.secondRowData){
-          if(!value.test_item||!value.pass_standard||!value.test_value){
+          if(!value.test_item||!value.pass_standard|!value.pass_or_not){
             Swal.fire({
                     title: '실패',
                     text: '해당하는 값을 입력해주십시오.',
@@ -221,6 +291,21 @@ import Swal from "sweetalert2";
             return;
           }
         }
+        await axios.post('/api/test/addTest',this.secondRowData)
+                      .then(res => {
+                        console.log(res.data);
+                        if(res.data[res.data.length-1][0].result =='success'){
+                          Swal.fire({
+                            title: '성공',
+                            text: '등록에 성공하였습니다',
+                            icon: 'success',
+                            confirmButtonText: '확인'
+                          })
+                          this.testReady();
+                          this.secondRowData = [];
+                        }
+                      })
+                      .catch((err) =>  console.log(err));
       }
     }
   };

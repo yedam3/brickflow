@@ -201,7 +201,7 @@ export default {
     comSelected(com) {
       this.rowData[0].company_code = com.company_code;
       this.rowData[0].company_name = com.company_name;
-      // 새 배열로 설정하여 AG Grid가 반영하게 만듬
+      //새 배열로 설정하여 AG Grid가 반영하게 만듬
       this.rowData = [...this.rowData];
     },
     //행추가
@@ -211,7 +211,7 @@ export default {
                                mat_name: "",
                                mat_order_code: this.rowData[0].mat_order_code,
                                request_quantity: 0,})
-  // 새 배열로 설정하여 AG Grid가 반영하게 만듬
+  //새 배열로 설정하여 AG Grid가 반영하게 만듬
      this.secondRowData = [...this.secondRowData];  
    },
    //행삭제
@@ -226,9 +226,9 @@ export default {
     getToday() {
     const today = new Date();
     const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0'); // 월은 0부터 시작하니까 +1
+    const month = String(today.getMonth() + 1).padStart(2, '0'); //월은 0부터 시작하니까 +1
     const day = String(today.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;  // "2025-04-27" 형식
+    return `${year}-${month}-${day}`;  //"2025-04-27" 형식
   },
     //값이 다있는지 체크
     fullCheck(){
