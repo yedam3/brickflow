@@ -1,6 +1,7 @@
 //검사대기 리스트
 const testReadyList = `
 SELECT o.product_order_name,
+       d.product_order_detail_code,
        p.work_lot,
 	   p.prod_code,
        getProdName(p.prod_code) AS prod_name,
@@ -19,10 +20,12 @@ FROM work_process p JOIN work_detail d
 					 JOIN process m
                        ON(p.process_code = m.process_code)
 WHERE m.process_type = 'PT2'
+AND p.order_quantity > 0
 GROUP BY  o.product_order_name,
        p.work_lot,
 	   p.prod_code
 HAVING 1=1 
+AND not_test > 0
 :searchcondition
  `
 const testMenuList = `
@@ -33,12 +36,23 @@ const testMenuList = `
 FROM check_standard
 WHERE process_code =?
 `
-
 const testAdd = `
- CALL addTest(?, ?, ?, ?, ?, ?, ?, @good);
+    INSERT INTO prod_check_finish(test_proc_code,
+                              work_lot,
+                              pass_or_not,
+                              test_item,
+                              test_name,
+                              test_value)
+ SELECT CONCAT('tpc-',IFNULL(MAX(CAST(SUBSTR(test_proc_code,5) AS SIGNED)),100)+1),?,?,?,?,?
+ FROM prod_check_finish;
+`
+const workProcessUpdate = `
+ CALL addTest(?, ?, ?, ?,@result);
+ SELECT @result as result;
 `
  module.exports = {
     testReadyList,
     testMenuList,
-    testAdd
+    testAdd,
+    workProcessUpdate
  }
