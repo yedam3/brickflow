@@ -8,7 +8,7 @@ const autoUnCode = async() => {
   return list;
 }
 
-
+//설비모달창
 const facList = async ({type, keyword})=>{
   let searchCondition ={};
   let convertedCondition = '';
@@ -26,6 +26,12 @@ const facList = async ({type, keyword})=>{
 //비가동설비조회
 const unplayAll = async (unplayCode) => {
   let list = await mariaDB.query("unplayList", unplayCode);
+  return list;
+}
+
+//설비상태확인
+const statuFac = async (facCode) => {
+  let list = await mariaDB.query('statusList', facCode)
   return list;
 }
 
@@ -85,4 +91,5 @@ module.exports = {
   deleteUnplay,
   reason,
   facModal,
+  statuFac,
 }
