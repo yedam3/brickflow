@@ -66,7 +66,13 @@ router.get ('/facList', async (req, res)=>{
     res.send(list);
 })
 
-//테스ㅡㅌㅊ
+router.get('/facStatus', async (req, res)=>{
+    const { facCode} = req.query;
+    let list = await facService.statuFac(facCode).catch((err) => console.log(err));
+    res.send(list);
+})
+
+
 
 
 module.exports = router;
