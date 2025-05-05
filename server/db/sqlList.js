@@ -12,6 +12,8 @@ const matStore = require('./sqls/mat/matStore.js');
 const procedure = require('./sqls/prodTest/procedure.js')
 const prodTest = require('./sqls/prodTest/prodTest.js')
 
+const label = require('./sqls/mat/label.js');
+const mainPage = require('./sqls/mainPage/mainPage.js');
 
 
 
@@ -29,5 +31,7 @@ module.exports = {
     ...matCheck,
     ...matStore,
     ...procedure,
-    ...prodTest
+    ...prodTest,
+    ...label,
+    ...mainPage
 }
