@@ -66,6 +66,7 @@ router.get ('/facList', async (req, res)=>{
     res.send(list);
 })
 
+//테스ㅡㅌㅊ
 
 
 module.exports = router;
