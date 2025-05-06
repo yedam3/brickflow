@@ -2,13 +2,12 @@
   <!-- 주문관리-->
   <div class="card border-0 h-100">
     <div class="font-semibold text-xl mb-4">주문 관리</div>
-
     <div class="text-end mt-3 mb-3">
       <Button label="조회" severity="success" class="me-3" @click="orderList" />
       <Button label="등록" severity="info" class="me-3" @click="addOrder" />
       <Button label="수정" severity="help" class="me-3" @click="modifyOrder" />
       <Button label="삭제" severity="danger" class="me-5" @click="orderDelete" />
-    </div>
+    
 
     <!--메인 그리드-->
     <ag-grid-vue class="ag-theme-alpine" style="width: 100%; 
@@ -16,7 +15,7 @@
       :defaultColDef="defaultColDef" @cellClicked="comCellClicked">
     </ag-grid-vue>
   </div>
-
+</div>
   <!-- 주문 상세 그리드-->
   <div class="card border-0 h-100">
     <div class="font-semibold text-xl mb-4">
@@ -29,16 +28,18 @@
 
     <ag-grid-vue ref="secondGrid" class="ag-theme-alpine" style="width: 100%; 
     height: 150px;" :columnDefs="columnDefss" :rowData="secondRowData" :gridOptions="gridOptions"
-      :defaultColDef="defaultColDef">
+      :defaultColDef="defaultColDef" @cellClicked="prodCellClicked">
     </ag-grid-vue>
   </div>
 
   <!-- 주문 목록 조회 모달창 -->
-  <OrderModal ref="orderModal" :visible="showOrderModal" @close="showOrderModal = false" @selectOrder="orderSelected">
-  </OrderModal>
+  <OrderModal ref="orderModal" :visible="showOrderModal" @close="showOrderModal = false" @selectOrder="orderSelected"></OrderModal>
+  
   <!-- 업체 모달창-->
-  <ProdComModal :visible="showComModal" rowSelection="multiple" @close="showComModal = false" @selectCom="comSelected">
-  </ProdComModal>
+  <ProdComModal :visible="showComModal" rowSelection="multiple" @close="showComModal = false" @selectCom="comSelected"></ProdComModal>
+  
+  <!-- 제품 조회 모달창 -->
+  <ProdModal :visible="showProdModal" @close="showProdModal = false" @selectProd="prodSelected"></ProdModal>
   
 </template>
 
@@ -49,7 +50,7 @@ import axios from 'axios';
 import ProdComModal from "@/components/modal/ProdComModal.vue";
 import Swal from 'sweetalert2'; 
 import OrderModal from '@/components/modal/OrderModal.vue';
-
+import ProdModal from "@/components/modal/ProdModal.vue";
 
 export default {
   components: {
@@ -58,7 +59,8 @@ export default {
     datePickerEditor: DatePickerEditor,
     ProdComModal,
     Swal,
-    OrderModal
+    OrderModal,
+    ProdModal,
   },
   data() {
     return {
@@ -99,7 +101,7 @@ export default {
         { headerCheckboxSelection: true, checkboxSelection: true, width: 50 },
         { field: 'orders_code', headerName: '주문번호', flex: 2, },
         { field: 'prod_code', headerName: '제품코드', flex: 2, editable: true },
-        { field: 'prod_name', headerName: '제품명', flex: 2, editable: true },
+        { field: 'prod_name', headerName: '제품명', flex: 2, editable: false },
         {field: 'quantity', headerName: '수량', flex: 2, editable: true, valueFormatter: (params) => {return params.value != null ? `${params.value}` : '';}},
         { field: 'price', headerName: '단가', flex: 2, editable: true },
         { field: 'totalprice', headerName: '총주문 금액', valueGetter: 'Number(data.quantity) * Number(data.price)', flex: 3 },
@@ -119,10 +121,12 @@ export default {
       },
       showOrderModal: false,
       showComModal: false,
+      showProdModal: false,
       //메인그리드 행 인덱스 ary
       selectedRowIndexes: [],
       //상세그리드 행 인덱스
-      selectedSecondIndex: null,
+      selectedSecondIndex: [],
+      
     };
   },
 
@@ -156,6 +160,24 @@ export default {
     orderList() {
       this.showOrderModal = true;
     },
+    // 제품 조회 모달창
+    prodList() {
+            this.showProdModal = true;
+        },
+        // 제품 명 제품 코드 선택 시 모달창 열기
+        prodCellClicked(params) {
+            if((params.colDef.field == "prod_code" || params.colDef.field == "prod_name")) {
+                this.selectedSecondIndex = params.rowIndex;
+                this.showProdModal = true;
+            }
+        },
+
+        // 제품 모달창 값 전달
+        prodSelected(prod) {
+            this.secondRowData[this.selectedSecondIndex].prod_code = prod.prod_code;
+            this.secondRowData[this.selectedSecondIndex].prod_name = prod.prod_name;
+            this.secondRowData = [...this.secondRowData];
+        },
 
 
     //현재날짜 가져오기
