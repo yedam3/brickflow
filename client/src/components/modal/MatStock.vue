@@ -41,9 +41,12 @@ export default {
         },
         mat_code: {
             type: String,
-            required: true,
+            required: false,
         },
-            
+        mat_list: {
+            type: Array,
+            required: false,
+        }
     },
     
     watch: {
@@ -56,13 +59,15 @@ export default {
             if (newVal) {
                 this.matStockList();
             }
-        }
+        },
     },
     data() {
         return {
             rowData: [],
 
             mat_data: [],
+
+            mat_hold_data: [],
 
             columnDefs: [
                 { field: "mat_LOT", headerName: "LOT번호", flex: 1 },
@@ -95,7 +100,6 @@ export default {
         this.matStockList();
     },
     methods: {
-
         // 모달창 닫기 이벤트
         close() {
             this.$emit("close");
@@ -106,6 +110,8 @@ export default {
             const result = await axios.get(`/api/work/order/matQty/${this.mat_code}`).catch(error => { console.error(error) });
             let matList = result.data;
             this.rowData = [...matList];
+
+            this.setMatHoldData(); 
         },
 
         // 자재 확보 버튼
@@ -126,7 +132,23 @@ export default {
 
         // 그리드 행 클릭 메소드
         onRowClicked() {
+
         },
+
+        // 자재 홀드량 반영
+        setMatHoldData() {
+            if (this.mat_list && this.mat_list.length > 0) {
+                this.rowData = this.rowData.map(row => {
+                    const match = this.mat_list.find(item => {
+                        return(item.mat_LOT.toLowerCase() == row.mat_LOT.toLowerCase() && item.mat_code.toLowerCase() == row.mat_code.toLowerCase())
+                    });
+                    if (match) {
+                        return { ...row, mat_hold_qty: match.hold_quantity };
+                    }
+                    return row;
+                });
+            }
+        }
     },
 };
 </script>
