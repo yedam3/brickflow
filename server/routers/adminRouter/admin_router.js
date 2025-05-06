@@ -31,4 +31,39 @@ router.post('/bomsave', async(req, res)=>{
     res.send(result);
     });
 
+
+// 공정흐름도 관리
+//1.제품 조회
+router.get('/processflow', async (req, res) => {
+    let fProdList = await adminService.findProd();
+    res.send(fProdList);
+});
+
+
+//2. 공정 조회
+router.get('/processflow/:prodno', async (req, res) => {
+    let procNo = req.params.prodno;
+    let procInfo = await adminService.findProc(procNo);
+    res.send(procInfo);
+});
+
+//3. 공정 저장 - 일단 다 삭제
+router.delete('/processflow/:procno', async (req, res) => {
+    let procNo = req.params.procno;
+    let procInfo = await adminService.findProc(procNo);
+    res.send(procInfo);
+});
+//3. 공정 저장 - 삭제 후 등록
+router.post('/procsave', async(req, res) => {
+    let {insertproc} = req.body;
+    let result = await adminService.saveProc(insertproc);
+    res.send(result);
+});
+
+
+//제품검수관리
+router.get('/prodcheck', async (req, res) => {
+    let pcprodList = await adminService.prodcList();
+    res.send(pcprodList);
+});
 module.exports = router;

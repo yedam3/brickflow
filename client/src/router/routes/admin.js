@@ -5,7 +5,7 @@ export default[
       component: () => import('@/views/pages/qual/Bom.vue')
   },
   {
-    path: '/admin/proessflow',
+    path: '/admin/processflow',
     name: 'processflow',
     component: () => import('@/views/pages/qual/ProcessFlow.vue')
   },
