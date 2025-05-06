@@ -23,4 +23,9 @@ router.get('/pieChart',async(reqm,res)=> {
                                     .catch((err) => console.log(err));
     res.send(list);
 })
+router.get('/popChart',async(reqm,res)=> {
+    let list= await matCheckService.popChart()
+                                    .catch((err) => console.log(err));
+    res.send(list);
+})
 module.exports = router;
