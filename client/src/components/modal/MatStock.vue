@@ -114,6 +114,7 @@ export default {
             for(let row of this.rowData) {
                 if(row.mat_hold_qty != '' && row.mat_hold_qty > 0) {
                     this.mat_data.push({
+                        mat_code: row.mat_code,
                         mat_LOT: row.mat_LOT,
                         mat_hold_qty: row.mat_hold_qty
                     })
