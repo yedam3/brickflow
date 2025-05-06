@@ -66,8 +66,22 @@ const queryFormat = function (query, values) {
 };
 
 // 날짜 변환
-const dateFormat = (date) => {
-    return new Date(date);
+const dateFormat = (isoString) => {
+    const date = new Date(isoString);
+
+    // UTC 기준에서 9시간 더해 한국 시간으로 변환
+    date.setHours(date.getHours() + 9);
+
+    const pad = n => n.toString().padStart(2, '0');
+
+    const year = date.getFullYear();
+    const month = pad(date.getMonth() + 1);
+    const day = pad(date.getDate());
+    const hours = pad(date.getHours());
+    const minutes = pad(date.getMinutes());
+    const seconds = pad(date.getSeconds());
+
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 };
 
 module.exports = {

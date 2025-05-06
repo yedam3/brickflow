@@ -77,24 +77,79 @@ const findPlanDetailByPlan_code = async () => {
 };
 
 // 생산지시 등록
-const insertInstr = async () => {
+const insertProduct_order = async (orderData, orderDetailDataList, matHoldDataList) => {
     let conn;
     let result;
+
+    const orderDetail_fields = ["product_order_detail_code", "prod_code", "order_quantity", "priority", "process_flow_code", "product_order_code"];
+    const matHold_fields = ["mat_hold_code", "product_order_detail_code", "mat_LOT", "hold_quantity", "mat_code"];
+    
     try {
         conn = await mariaDB.getConnection();
         await conn.beginTransaction();
-        let selectedQuery = mariaDB.selectedQuery(
-            "deletePlanByPlan_code",
-            plan_code
-        );
-        result = await conn.query(selectedQuery, plan_code);
 
-        // 생산 계획 상세 삭제
-        selectedQuery = mariaDB.selectedQuery(
-            "deletePlanDetailByPlan_code",
-            plan_code
-        );
-        result = await conn.query(selectedQuery, plan_code);
+        // 생산 지시 등록
+        orderData.start_date = dateFormat(orderData.start_date);
+        orderData.end_date = dateFormat(orderData.end_date);
+        let selectedQuery = mariaDB.selectedQuery("insertProduct_order", Object.values(orderData));
+        result = await conn.query(selectedQuery, Object.values(orderData));
+
+        // 공정 흐름도 
+
+        // 생산 지시 상세 등록
+        for (let orderDetailData of orderDetailDataList) {
+
+            // 생산 지시 코드 조회
+            selectedQuery = mariaDB.selectedQuery("findProduct_order_detail_code");
+            result = await conn.query(selectedQuery);
+
+            orderDetailData.product_order_detail_code = result[0].product_order_detail_code;
+
+            orderDetailData.product_order_code = orderData.product_order_code;
+            orderDetailData.process_flow_code = "공정 흐름도 임시데이터";
+
+            selectedQuery = mariaDB.selectedQuery("insertProduct_order_detail", convertObjToAry(orderDetailData, orderDetail_fields));
+            result = await conn.query(selectedQuery, convertObjToAry(orderDetailData, orderDetail_fields));
+        }
+
+        // 생산 자재 홀드량 등록
+        for (let matHoldData of matHoldDataList) {
+            let workDetailData = [orderData.product_order_code, matHoldData.prod_code];
+
+            // 생산 지시 상세 조회 (product_order_code, prod_code)
+            selectedQuery = mariaDB.selectedQuery("findWork_detailByProduct_order_codeAndProd_code", workDetailData);
+            result = await conn.query(selectedQuery, workDetailData);
+
+            let newMatData = {
+                mat_hold_code: "",
+                product_order_detail_code: result[0].product_order_detail_code,
+                mat_LOT: "",
+                hold_quantity: "",
+                mat_code: "",
+            }
+
+            for(let matData of matHoldData.mat_LOTs) {
+                // 자재 홀드 코드 조회
+                selectedQuery = mariaDB.selectedQuery("findMat_hold_code");
+                result = await conn.query(selectedQuery);
+
+                newMatData.mat_hold_code = result[0].mat_hold_code;
+                newMatData.mat_LOT = matData.mat_LOT;
+                newMatData.hold_quantity = parseInt(matHoldData.material_input_qunatity);
+                newMatData.mat_code = matData.mat_code;
+
+
+                // 자재 홀드량 등록
+                selectedQuery = mariaDB.selectedQuery("insertMat_hold", Object.values(newMatData));
+                result = await conn.query(selectedQuery, Object.values(newMatData));
+            }
+        }
+
+        // 생산 계획 상태 변경
+        let planData = ["OC2", orderData.plan_code];
+        selectedQuery = mariaDB.selectedQuery("updatePlanStatusByPlan_code", planData);
+        result = await conn.query(selectedQuery, planData);
+
         await conn.commit();
     } catch (err) {
         if (conn) await conn.rollback();
@@ -105,19 +160,17 @@ const insertInstr = async () => {
     return result;
 };
 
-//
-
 module.exports = {
     getOrder_code,
     findAllPlanOrder,
     findAllPlanOrderByProduct_order_code,
     findAllWorkDetailByProduct_order_code,
     findAllProdMatQtyByMat_code,
+    insertProduct_order,
 
     findAllMatHoldByProdcut_order_detail_code,
     
     findStatusByPlan_code,
     findPlanDetailByPlan_code,
     findMatReqByPlan_code,
-    insertInstr,
 };
