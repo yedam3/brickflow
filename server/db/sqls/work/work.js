@@ -120,14 +120,14 @@ WHERE pd.plan_code = ?;
 
 // 생산 번호 체크
 const existsByPlan_code = `
-SELECT COUNT(*) AS check
+SELECT COUNT(*) AS 'check'
 FROM plan
 WHERE plan_code = ?
 `;
 
 // 주문 상태 확인 (출고완료)
 const findOrder_statusByOrders_code = `
-SELECT COUNT(*) AS check
+SELECT COUNT(*) AS 'check'
 FROM orders
 WHERE orders_code = ? AND orders_code = 'OS4'
 `;

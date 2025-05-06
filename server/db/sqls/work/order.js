@@ -101,12 +101,64 @@ SELECT p.plan_code, p.plan_name, p.start_date, p.end_date,
        p.employee_code, e.emp_name, p.note
 FROM plan p
     LEFT JOIN employees e ON p.employee_code = e.emp_code
-WHERE p.plan_code = ?;
+WHERE p.plan_code = ?
 `;
 
-// 생산지시 등록
-const insertInstr = `
+// 상품 공정 흐름도 조회
+const findProcess_flowByProd_code = `
 
+`;
+
+// 생산 지시 등록
+const insertProduct_order = `
+INSERT INTO product_order(product_order_code, plan_code, product_order_name, employee_code, start_date, end_date, finish_status, note)
+VALUES(?, ?, ?, ?, ?, ?, 'WS1', ?)
+`;
+
+// 생산 지시 코드 자동증가
+const findProduct_order_detail_code = `
+SELECT CONCAT('WD-',IFNULL(MAX(CAST(SUBSTR(product_order_detail_code, 4) AS SIGNED)),100)+1) AS product_order_detail_code
+FROM work_detail
+`;
+
+// 생산 지시 상세 등록
+const insertProduct_order_detail = `
+INSERT INTO work_detail VALUES(?, ?, ?, ?, ?, ?)
+`;
+
+// 생산 계획 상태 변경
+const updatePlanStatusByPlan_code = `
+UPDATE plan
+SET
+    finish_status = ?
+WHERE plan_code = ?
+`;
+
+// 생산 지시 상세 조회 (product_order_code, prod_code)
+const findWork_detailByProduct_order_codeAndProd_code = `
+SELECT product_order_detail_code, prod_code, order_quantity, priority, process_flow_code, product_order_code
+FROM work_detail
+WHERE product_order_code = ? AND prod_code = ?
+`;
+
+// 생산 지시 상세 조회 (LIMIT)
+const findWork_detailByLimit = `
+SELECT *
+FROM work_detail
+ORDER BY product_order_detail_code DESC
+LIMIT ?
+`;
+
+// 자재 홀드 코드 조회
+const findMat_hold_code = `
+SELECT CONCAT('MH-',IFNULL(MAX(CAST(SUBSTR(mat_hold_code, 4) AS SIGNED)),100)+1) AS mat_hold_code
+FROM mat_hold;
+`;
+
+// 자재 홀드량 등록
+const insertMat_hold = `
+INSERT INTO mat_hold(mat_hold_code, product_order_detail_code, mat_LOT, hold_quantity, finish_status, mat_code)
+VALUES (?, ?, ?, ?, 'OF1', ?);
 `;
 
 module.exports = {
@@ -114,11 +166,18 @@ module.exports = {
     findMatReqByPlan_code,
     findAllPlanOrderByProduct_order_code,
     findAllWorkDetailByProduct_order_code,
-    findAllProdMatQtyByMat_code,
+    findAllProdMatQtyByMat_code,                        // 생산 상품 자재 재고 조회
+    insertProduct_order,                                // 생산 지시 등록
+    findProduct_order_detail_code,                      // 생산 지시 코드 조회
+    insertProduct_order_detail,                         // 생산 지시 상세 등록
+    updatePlanStatusByPlan_code,                        // 생산 계획 상태 변경
+    findWork_detailByProduct_order_codeAndProd_code,    // 생산 지시 상세 조회 (product_order_code, prod_code)
+    findWork_detailByLimit,                             // 생산 지시 상세 조회 (LIMIT)
+    findMat_hold_code,                                  // 자재 홀드 코드 조회
+    insertMat_hold,                                     // 생산 자재 홀드량 등록
 
     findAllMatHoldByProdcut_order_detail_code,
 
     findAllPlanOrder,
     findStatusByPlan_code,
-    insertInstr,
 };

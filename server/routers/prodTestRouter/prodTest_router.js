@@ -15,5 +15,12 @@ router.get('/testMenu/:proc',async(req,res) => {
   let list = await prodTestService.testMenuList(proc) 
                                   .catch((err) =>  console.log(err));
   res.send(list);
+});
+//등록
+router.post('/addTest',async(req,res)=>{
+  let testInfo = req.body;
+  let result = await prodTestService.testAdd(testInfo)
+                                    .catch((err) => console.log(err));
+  res.send(result);
 })
 module.exports = router;

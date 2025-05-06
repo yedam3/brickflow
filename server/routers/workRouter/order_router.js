@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const orderService = require("../../services/workService/orderService.js");
+const { insertInstr } = require("../../db/sqlList.js");
 
 
 // 생산 지시 코드 자동 증가
@@ -62,6 +63,13 @@ router.get("/loadMatQty/:product_order_code", async (req, res) => {
 router.get("/findStatusByPlan_code/:plan_code", async (req, res) => {
     let plan_code = req.params.plan_code;
     let result = await orderService.findStatusByPlan_code(plan_code).catch((err) => console.error(err));
+    res.send(result);
+});
+
+// 생산 지시 등록
+router.post("/insert", async (req, res) => {
+    let { orderData, orderDetailDataList, matHoldDataList } = req.body;
+    let result = await orderService.insertProduct_order(orderData, orderDetailDataList, matHoldDataList).catch((err) => console.error(err));
     res.send(result);
 });
 

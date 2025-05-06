@@ -40,17 +40,62 @@ const findPlanDetailByPlan_code = async (plan_code) => {
 }
 
 // 생산 계획 등록
+// const insertPlan = async (planData, planDetailData) => {
+//     const { finish_status, order_name, ...data } = planData;
+//     data.start_date = dateFormat(new Date(data.start_date));
+//     data.end_date = dateFormat(new Date(data.end_date));
+//     let result = await mariaDB
+//         .query("insertPlan", Object.values(data))
+//         .catch((err) => console.error(err));
+//     if (result.affectedRows < 1) {
+//         return result;
+//     }
+//     return insertPlanDetail(data.plan_code, planDetailData, data.orders_code);
+// };
+
+// 생산 계획 등록
 const insertPlan = async (planData, planDetailData) => {
-    const { finish_status, order_name, ...data } = planData;
-    data.start_date = dateFormat(new Date(data.start_date));
-    data.end_date = dateFormat(new Date(data.end_date));
-    let result = await mariaDB
-        .query("insertPlan", Object.values(data))
-        .catch((err) => console.error(err));
-    if (result.affectedRows < 1) {
-        return result;
-    }
-    return insertPlanDetail(data.plan_code, planDetailData, data.orders_code);
+    // 생산 계획
+    const { finish_status, order_name, ...newPlanData } = planData;
+    newPlanData.start_date = dateFormat(new Date(newPlanData.start_date));
+    newPlanData.end_date = dateFormat(new Date(newPlanData.end_date));
+
+    // 생산 계획 상세
+    const planDetailFields = ["plan_code", "currentPlanQty", "prod_code"];
+    let result;
+    try{
+        conn =  await mariaDB.getConnection();
+        await conn.beginTransaction();
+
+        // 생산 계획 등록
+        let selectedQuery = mariaDB.selectedQuery("insertPlan", Object.values(newPlanData));
+        result = await conn.query(selectedQuery, Object.values(newPlanData));
+        
+        // 생산 계획 상세 등록
+        for (let data of planDetailData) {
+            data.plan_code = newPlanData.plan_code;
+            const newPlanDetailData = planDetailFields.reduce((obj, key) => {
+                if (data[key] !== undefined)
+                    obj[key] = data[key];
+                return obj;
+            }, {});
+            selectedQuery = mariaDB.selectedQuery("insertPlanDetail", Object.values(newPlanDetailData));
+            result = await conn.query(selectedQuery, Object.values(newPlanDetailData));
+        }
+
+        // 주문 상태 변경 (생산중)
+        let data = ['OS2', newPlanData.orders_code];
+        selectedQuery = mariaDB.selectedQuery("updateOrdersByOrders_code", data);
+        result = await conn.query(selectedQuery, data);
+        
+        await conn.commit();    
+    }catch(err){
+        if (conn) await conn.rollback();
+        console.log(err);
+    } finally{
+        if (conn) conn.release();
+    }  
+    return result;
 };
 
 // 생산 번호 체크
@@ -101,53 +146,53 @@ const insertPlanDetail = async (plan_code, planDetailData, orders_code) => {
 
 // ----------------------------------------
 // 생산 계획 수정
-const __updatePlanByPlan_code = async (planData, planDetailData) => {
-    const { finish_status, ...data} = planData;
+// const __updatePlanByPlan_code = async (planData, planDetailData) => {
+//     const { finish_status, ...data} = planData;
 
-    data.start_date = dateFormat(new Date(data.start_date));
-    data.end_date = dateFormat(new Date(data.end_date));
+//     data.start_date = dateFormat(new Date(data.start_date));
+//     data.end_date = dateFormat(new Date(data.end_date));
 
-    const fields = ["plan_name", "start_date", "end_date", "note", "plan_code"];
-    const newData = fields.reduce((obj, key) => {
-        if(data[key] !== undefined) {
-            obj[key] = data[key];
-        }
-        return obj;
-    }, {});
+//     const fields = ["plan_name", "start_date", "end_date", "note", "plan_code"];
+//     const newData = fields.reduce((obj, key) => {
+//         if(data[key] !== undefined) {
+//             obj[key] = data[key];
+//         }
+//         return obj;
+//     }, {});
 
-    let result = await mariaDB.query("updatePlanByPlan_code", Object.values(newData)).catch((err) => console.error(err));
+//     let result = await mariaDB.query("updatePlanByPlan_code", Object.values(newData)).catch((err) => console.error(err));
 
-    if(result.affectedRows < 1) {
-        return result;
-    };
-    updatePlanDetailByPlan_code(planDetailData);
-};
+//     if(result.affectedRows < 1) {
+//         return result;
+//     };
+//     updatePlanDetailByPlan_code(planDetailData);
+// };
+
+// const updatePlanDetailByPlan_code = async (planDetailData) => {
+//     const fields = ["currentPlanQty", "plan_detail_code"];
+
+//     let results = [];
+//     for(let data of planDetailData) {
+//         const newData = fields.reduce((obj, key) => {
+//             if (data[key] !== undefined)
+//                 obj[key] = data[key];
+//             return obj;
+//         }, {});
+//         try {
+//             const result = await mariaDB.query(
+//                 "updatePlanDetailByPlan_code",
+//                 Object.values(newData)
+//             );
+//             results.push(result);
+//         } catch (err) {
+//             console.error(err);
+//         }
+//     }
+
+//     return results;
+// };
 
 // 생산 계획 상세 수정
-const updatePlanDetailByPlan_code = async (planDetailData) => {
-    const fields = ["currentPlanQty", "plan_detail_code"];
-
-    let results = [];
-    for(let data of planDetailData) {
-        const newData = fields.reduce((obj, key) => {
-            if (data[key] !== undefined)
-                obj[key] = data[key];
-            return obj;
-        }, {});
-        try {
-            const result = await mariaDB.query(
-                "updatePlanDetailByPlan_code",
-                Object.values(newData)
-            );
-            results.push(result);
-        } catch (err) {
-            console.error(err);
-        }
-    }
-
-    return results;
-};
-
 const updatePlanByPlan_code = async (planData, planDetailData) => {
     const plan_fields = ["plan_name", "start_date", "end_date", "note", "plan_code"];
     const newPlan = plan_fields.reduce((obj, key) => {
@@ -253,7 +298,6 @@ module.exports = {
     insertPlan,
     insertPlanDetail,
     updatePlanByPlan_code,
-    updatePlanDetailByPlan_code,
     deletePlanByPlan_code,
     findAllProd,
 };

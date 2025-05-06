@@ -15,6 +15,16 @@ const selectFacList =
         fac_status
 FROM fac`;
 
+//설비상태페이지 리스트
+const statusList =
+`SELECT fac_code,
+        model_name,
+        fac_location,
+        employee_code,
+        fac_pattern,
+        fac_status
+FROM fac`;
+
 //설비 모달창
 const facModal =
 `SELECT fac_code,
@@ -83,4 +93,5 @@ module.exports = {
   delUnplay,
   reasonFac,
   facModal,
+  statusList,
 };

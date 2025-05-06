@@ -5,7 +5,7 @@
         <div class="text-end mt-3 mb-3">
             <Button label="계획목록" severity="success" class="me-3" @click="planList" />
             <Button label="지시목록" severity="info" class="me-3" @click="planOrderList" />
-            <Button label="등록" severity="help" class="me-3" />
+            <Button label="등록" severity="help" class="me-3" @click="addPlanOrder" />
             <Button label="수정" severity="danger" class="me-3" />
             <Button label="삭제" severity="danger" class="" />
         </div>
@@ -75,6 +75,14 @@
                                     placeholder="(입력)" showIcon iconDisplay="input" />
                             </InputGroup>
                         </div>
+                        <div class="col-4">
+                            <InputGroup>
+                                <InputGroupAddon>
+                                    비고
+                                </InputGroupAddon>
+                                <InputText v-model="formData.note" size="large" placeholder="" />
+                            </InputGroup>
+                        </div>
                     </div>
                     <Button label="초기화" severity="danger" class="me-5" size="large" @click="clearForm" />
                 </template>
@@ -121,6 +129,8 @@
 import { AgGridVue } from "ag-grid-vue3";
 import axios from "axios";
 
+import Swal from 'sweetalert2';
+
 import PlanModal from "@/components/modal/PlanModal.vue";
 import PlanOrderModal from "@/components/modal/PlanOrderModal.vue"
 import MatStock from "@/components/modal/MatStock.vue";
@@ -152,6 +162,7 @@ export default {
                 plan_name: "",              // 계획명
                 start_date: "",             // 시작일자
                 end_date: "",               // 종료일자
+                note: "",                   // 비고
             },
 
             rowData: [
@@ -270,7 +281,6 @@ export default {
             }).then(res => {
                 this.secondRowData = [];
                 const data = res.data;
-                console.log(data);
                 let cnt = 1;
                 for (let obj of data) {
                     this.secondRowData.push({
@@ -316,13 +326,13 @@ export default {
 
             result = await axios.get(`/api/work/order/loadMatQty/${planOrder.product_order_code}`).catch((err) => console.err(err));
             const mat_qty_list = result.data;
-            for(let matQty of mat_qty_list) {
+            for (let matQty of mat_qty_list) {
                 this.secondRowData.push({
-                    prod_code: matQty.prod_code,                            // 제품코드
-                    mat_code: matQty.mat_code,                              // 자재코드
-                    mat_name: matQty.mat_name,                              // 자재명
-                    req_material_quantity: matQty.req_material_quantity,    // 요구량
-                    material_input_qunatity: matQty.material_input_qunatity,        // 투입량
+                    prod_code: matQty.prod_code,                                // 제품코드
+                    mat_code: matQty.mat_code,                                  // 자재코드
+                    mat_name: matQty.mat_name,                                  // 자재명
+                    req_material_quantity: matQty.req_material_quantity,        // 요구량
+                    material_input_qunatity: matQty.material_input_qunatity,    // 투입량
                 });
             }
         },
@@ -336,15 +346,19 @@ export default {
 
         // 자재 재고 모달창 값 전달
         async matData(mats) {
+            console.log(mats);
             let totalQty = 0;
             for (let mat of mats) {
                 totalQty += parseInt(mat.mat_hold_qty);
+                this.secondRowData[this.selectedSecondIndex].mat_LOTs = [];
+                this.secondRowData[this.selectedSecondIndex].mat_LOTs.push({
+                    mat_code: mat.mat_code,
+                    mat_LOT: mat.mat_LOT,
+                    mat_hold_qty: mat.mat_hold_qty,
+                });
             }
-            console.log(totalQty);
             this.secondRowData[this.selectedSecondIndex].material_input_qunatity = totalQty;
             this.secondRowData = [...this.secondRowData];
-
-            console.log(this.secondRowData);
         },
 
         //행추가
@@ -359,6 +373,40 @@ export default {
             // 새 배열로 설정하여 AG Grid가 반영하게 만듬
             this.secondRowData = [...this.secondRowData];
         },
+
+        // 생산 지시 등록
+        async addPlanOrder() {
+            let orderData = {
+                product_order_code: this.formData.product_order_code,
+                plan_code: this.formData.plan_code,
+                product_order_name: this.formData.product_order_name,
+                employee_code: this.formData.emp_name,
+                start_date: this.formData.start_date,
+                end_date: this.formData.end_date,
+                note: this.formData.note,
+            }
+
+            let result = await axios.post(`/api/work/order/insert`, {
+                orderData: orderData,
+                orderDetailDataList: this.rowData,
+                matHoldDataList: this.secondRowData,
+            }).catch((err) => console.err(err));
+            if (result.data.affectedRows > 0) {
+                Swal.fire({
+                    title: '성공',
+                    text: '생산 지시가 정상적으로 등록되었습니다.',
+                    icon: 'success',
+                    confirmButtonText: '확인'
+                });
+            } else {
+                Swal.fire({
+                    title: '실패',
+                    text: '생산 지시 등록 중 오류가 발생되었습니다.',
+                    icon: 'error',
+                    confirmButtonText: '확인'
+                });
+            }
+        }
     },
 };
 </script>

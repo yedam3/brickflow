@@ -12,14 +12,25 @@ const router = createRouter({
         {
             path: '/',
             component: AppLayout,
+            
             children: [
+                {
+                    path: '/',
+                    name: 'main',
+                    component: () => import('@/views/pages/MainView.vue')
+                },
                 ...workRoutes,
                 ...matRoutes,
                 ...qualityRoutes,
                 ...facRoutes,
                 ...sellerRoutes,
                 ...adminRouter,
+                
             ]
+        },
+        {       path: '/auth/login',
+                name: 'login',
+                component: () => import('@/views/pages/auth/Login.vue')
         },
         // {
         //     path: '/landing',
