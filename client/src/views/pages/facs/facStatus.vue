@@ -13,9 +13,12 @@
       <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option3">
       <label class="form-check-label" for="inlineRadio2">비가동</label>
     </div>
+    <div class="col d-flex justify-content-end p-4" >
+                    <Button label="조회" severity="success" class="" @click="facStatus"></Button>
+                </div>
   </div>
   <br>
-  <div class="col" style="margin-right: 50px;">
+  <div class="col" style="margin-right: 50px; ">
             <div class="ag-wrapper d-flex justify-content-center">
                 <ag-grid-vue class="ag-theme-alpine custom-grid-theme" style="width: 100%; height:  500px;"
                     :columnDefs="columnDefs" :rowData="rowData" :gridOptions="gridOptions"
@@ -29,45 +32,59 @@
   import { AgGridVue } from "ag-grid-vue3";
   import DatePickerEditor from "../../../components/DatePickerEditor.vue";
   import axios from "axios";
-  import Swal from "sweetalert2";
   export default {
     components: {
         AgGridVue,
         datePicker: DatePickerEditor,
-        Swal
+  },
+  mounted(){
+    this.facStatus();
   },
   data() {
     return{
-      rowData:[{
-        fac_code: "",
-        model_name: "",
-        fac_location:"",
-        fac_pattern:"",
-        employee_code:"",
-        fac_status:""
-      }],
+      rowData:[],
       columnDefs:[
-        { field:"fac_code", headerName: "설비코드", flex: 2 },
+        { field:"fac_code", headerName: "설비코드", flex: 2,  },
         { field:"model_name", headerName: "설비이름", flex: 2 },
         { field:"fac_location", headerName: "설비위치", flex: 2 },
         { field:"fac_pattern", headerName: "설비유형", flex: 2 },
         { field:"employee_code", headerName: "담당자", flex: 2 },
-        { field:"fac_status", headerName: "설비상태", flex: 2 },
+        { field:"fac_status", headerName: "설비상태", flex: 2, 
+        cellStyle: params => {
+              if(params.value == "가동"){
+                return { color: '#22C55E', textAlign:'center', fontWeight: 'bold' };
+              }else if(params.value == "비가동"){
+                return { color: 'red', textAlign:'center', fontWeight: 'bold'};
+              }
+              return null;
+            }},
       ],
-      gridOptions:{
-        pagination: true,
-          paginationPageSize: 5,
-          paginationPageSizeSelector: [5, 10, 20, 50],
+      gridOptions: {
+          domLayout: "autoHeight",
+          singleClickEdit: true,
+          suppressRowClickSelection: true,
+          pagination: true,
+          paginationPageSize: 10,
+          paginationPageSizeSelector: false,
           overlayNoRowsTemplate: '표시할 값이 없습니다.',
-        defaultColDef: {
-         sortable: true, //정렬가능
-         resizable: true //마우스드래그
-      }
-     }
+          defaultColDef: {
+            suppressMovable: true,
+            resizable: false,
+            sortable: false,
+            cellStyle: { textAlign: "center" },
+          },
+        },
     }
   },
   methods:{
-
+    //조회
+    async facStatus() {
+      await axios.get('/api/fac/facStatus')
+        .then(res => {
+          console.log(res.data)
+          this.rowData = res.data;
+        })
+    }
   },
 }
 </script>

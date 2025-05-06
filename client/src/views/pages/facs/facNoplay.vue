@@ -205,7 +205,7 @@ export default {
         async modifyUnplay() {
             const res = await axios.get('/api/fac/unFacCheck', {
                 params: {
-                    unplayCode: this.rowData2.unplay_code
+                    unplayCode: this.rowData2[0].unplay_code
                 }
             })
                 .catch((err) => console.log(err));
@@ -222,6 +222,7 @@ export default {
             await axios.put('/api/fac/modifyUnplay', {
                 unplayFac: this.rowData2[0]
             })
+            
                 .then(res => {
                     if (res.data.affectedRows > 0) {
                         Swal.fire({
@@ -229,7 +230,18 @@ export default {
                             text: '수정이 완료되었습니다.',
                             icon: 'success',
                             confirmButtonText: '확인'
+                        }).then(() =>{
+                            this.unFacList();
                         });
+                        this.rowData =      {
+                            unplay_code: "",
+                            unplay_reason_code: "",
+                            employee_code: "",
+                            unplay_start_date: "",
+                            unplay_end_date: "",
+                            note: "",
+                            fac_code: '',
+                }
 
                     } else {
                         Swal.fire({
@@ -255,8 +267,10 @@ export default {
         },
         //삭제
         async deleteUnplay() {
-            await axios.delete('/api/fac/delUnplay' + this.rowData)
+            await axios.delete(`/api/fac/delUnplay/${this.rowData2[0].unplay_code}`)
                 .then((res) => {
+                    console.log("삭제 요청 코드:", this.rowData2[0].unplay_code);
+
                     if (res.data.affectedRows < 1) {
                         Swal.fire({
                             title: '삭제 실패',
@@ -270,7 +284,19 @@ export default {
                             text: '정상적으로 삭제가 완료되었습니다.',
                             icon: 'success',
                             confirmButtonText: '확인'
+                        })
+                        .then(() =>{
+                            this.unFacList();
                         });
+                        this.rowData =      {
+                            unplay_code: "",
+                            unplay_reason_code: "",
+                            employee_code: "",
+                            unplay_start_date: "",
+                            unplay_end_date: "",
+                            note: "",
+                            fac_code: '',
+                }
                     }
                 })
                 .catch((err) => console.log(err));

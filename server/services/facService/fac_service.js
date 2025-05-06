@@ -30,9 +30,18 @@ const unplayAll = async (unplayCode) => {
 }
 
 //설비상태확인
-const statuFac = async (facCode) => {
-  let list = await mariaDB.query('statusList', facCode)
-  return list;
+const statuFac = async ({type, keyword}) => {
+  let searchCondition ={};
+  let convertedCondition = '';
+
+  if (type && keyword) {
+    searchCondition[type] = keyword;
+    const converted = convertObjToAry(searchCondition, []);
+    convertedCondition = converted.searchKeyword;
+  }
+
+  const result = await mariaDB.query('statusList', { searchCondition: convertedCondition}).catch((err) => console.log(err));
+  return result;
 }
 
 //비가동설비 등록
@@ -46,7 +55,7 @@ const addUnFac = async (unplayFac)=> {
 }
 //비가동 설비 수정
 const modifyUnplay = async (unplayInfo)=> {
-  let updatefac = [unplayInfo, unplayInfo.unplay_code]
+  let updateUnplay = [unplayInfo, unplayInfo.unplay_code]
   let result = await mariaDB.query('updateUnplay', updateUnplay).catch((err)=> console.log(err))
   if(result.affectedRows < 1){
     return result;
@@ -69,7 +78,7 @@ const deleteUnplay = async(unplayCode) =>{
   }
   return result;
 }
-
+//비가동사유
 const reason = async() =>{
   let list = await mariaDB.query("reasonFac");
   return list

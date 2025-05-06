@@ -66,9 +66,10 @@ router.get ('/facList', async (req, res)=>{
     res.send(list);
 })
 
+//설비 상태 리스트
 router.get('/facStatus', async (req, res)=>{
-    const { facCode} = req.query;
-    let list = await facService.statuFac(facCode).catch((err) => console.log(err));
+    const { type, keyword} = req.query;
+    let list = await facService.statuFac({ type, keyword}).catch((err) => console.log(err));
     res.send(list);
 })
 
