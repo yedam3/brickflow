@@ -93,8 +93,12 @@
             <div class="col">
                 <div class="d-flex justify-content-between mb-3">
                     <h4 class="text-start m-0">생산 제품 목록</h4>
-                    <Button label="행추가" severity="success" @click="addRow" />
-                    <Button label="행삭제" severity="danger" @click="deleteRow" />
+                    <div class="row">
+                        <div class="col">
+                            <Button label="행추가" severity="success me-2" @click="addRow" />
+                            <Button label="행삭제" severity="danger" @click="deleteRow" />
+                        </div>
+                    </div>
                 </div>
                 <div class="ag-wrapper" style="border: none;">
                     <ag-grid-vue ref="mainGrid" class="ag-theme-alpine custom-grid-theme" :columnDefs="prodListDefs" :rowData="rowData"
