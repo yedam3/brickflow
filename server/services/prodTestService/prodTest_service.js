@@ -67,7 +67,6 @@ const testAdd = async (testInfo) => {
                                           testInfo[0].prod_code 
       ])
   await conn.commit();
-    //
   }catch{
     if (conn) await conn.rollback();
     return result;
