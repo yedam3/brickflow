@@ -131,7 +131,6 @@ export default {
 
         // 그리드 행 클릭 메소드
         onRowClicked(event) {
-            console.log(event.data.product_order_code);
             this.$emit('selectPlanOrder', event.data);
             this.close();
         },

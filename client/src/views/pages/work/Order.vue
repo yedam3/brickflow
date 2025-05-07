@@ -341,7 +341,7 @@ export default {
             this.formData.start_date = product_order_data.start_date;
             this.formData.end_date = product_order_data.end_date;
             this.formData.note = product_order_data.note;
-            
+
             result = await axios.get(`/api/work/order/workDetail/${planOrder.product_order_code}`).catch((err) => console.error(err));
             const work_detail_list = result.data;
             for (let detail of work_detail_list) {
