@@ -115,7 +115,6 @@ export default {
             }).catch(error => { console.error(error) });
 
             let matList = result.data;
-            console.log("matList: ", matList);
             for(let data of matList) {
                 this.rowData.push({
                     mat_LOT: data.mat_LOT,

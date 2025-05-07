@@ -4,7 +4,7 @@ SELECT CONCAT('PO-',IFNULL(MAX(CAST(SUBSTR(product_order_code, 4) AS SIGNED)),10
 FROM product_order
 `;
 
-// 자재 요구량 조회
+// 자재 요구량 조회 (plan_code)
 const findMatReqByPlan_code = `
 SELECT pd.prod_code, b.mat_code, m.mat_name,
     SUM(pd.plan_quantity * b.quantity) AS req_material_quantity,
@@ -25,6 +25,23 @@ FROM plan p
 WHERE p.plan_code = ?
 GROUP BY pd.prod_code, b.mat_code
 ORDER BY pd.prod_code, b.mat_code;
+`;
+
+// 자재 요구량 조회 (prod_code)
+const findAllMatReqByProd_code = `
+SELECT prod.prod_code, b.mat_code, m.mat_name,
+    SUM(? * b.quantity) AS req_material_quantity
+FROM prod prod
+	JOIN BOM b ON prod.prod_code = b.prod_code
+    JOIN mat m ON b.mat_code = m.mat_code
+	LEFT JOIN 
+		(SELECT  item_code,
+			SUM(store_quantity) AS store_quantity
+		 FROM store
+		 GROUP BY item_code) s ON b.mat_code = s.item_code
+WHERE prod.prod_code = ?
+GROUP BY prod.prod_code, b.mat_code
+ORDER BY prod.prod_code, b.mat_code
 `;
 
 // 생산지시 목록 조회
@@ -72,7 +89,7 @@ FROM work_detail
 WHERE product_order_code = ?
 `;
 
-// 생산 상품 자재 홀드 조회
+// 생산 상품 자재 홀드 조회 (product_order_detail_code)
 const findAllMatHoldByProduct_order_detail_code = `
 SELECT DISTINCT od.prod_code, mh.mat_code, m.mat_name, mh.hold_quantity,
     (pd.plan_quantity * b.quantity) AS req_material_quantity
@@ -84,7 +101,7 @@ FROM mat_hold mh
 	JOIN BOM b ON wd.prod_code = b.prod_code AND mh.mat_code = b.mat_code
 	JOIN order_detail od ON od.orders_code = p.orders_code AND od.prod_code = wd.prod_code
     JOIN mat m ON b.mat_code = m.mat_code
-WHERE mh.product_order_detail_code =  ?
+WHERE mh.product_order_detail_code = ?
 `;
 
 // 생산 상품 자재 LOT 조회
@@ -98,7 +115,7 @@ WHERE mh.product_order_detail_code = ? AND mh.mat_code = ?
 // 생산 상품 자재 재고 조회
 const findAllProdMatQtyByMat_code = `
 SELECT b.prod_code, s.lot AS 'mat_LOT', m.mat_code, m.mat_name, ms.store_date AS 'store_date',
-    (SUM(s.inbound_quantity) - SUM(s.dispatch_quantity)) AS 'available_qty'
+    (SUM(s.inbound_quantity) - SUM(COALESCE(s.dispatch_quantity, 0))) AS 'available_qty'
 FROM store s
 	LEFT JOIN mat_store ms ON ms.mat_LOT = s.LOT AND ms.mat_code = s.item_code
 	JOIN mat m ON ms.mat_code = m.mat_code
@@ -132,7 +149,7 @@ const findProcess_flowByProd_code = `
 // 생산 지시 등록
 const insertProduct_order = `
 INSERT INTO product_order(product_order_code, plan_code, product_order_name, employee_code, start_date, end_date, finish_status, note)
-VALUES(?, ?, ?, ?, ?, ?, 'WS1', ?)
+VALUES(?, COALESCE(NULL, ?), ?, ?, ?, ?, 'WS1', ?)
 `;
 
 // 생산 지시 코드 조회 (증가코드)
@@ -258,13 +275,19 @@ FROM work_process
 WHERE product_order_detail_code = ?
 `;
 
+// 생산 제품 자재 홀드량 조회 (prod_code)
+const findAllMat_holdByProd_code = `
+
+`;
+
 module.exports = {
     getOrder_code,
-    findMatReqByPlan_code,
+    findMatReqByPlan_code,                                  // 자재 요구량 조회 (plan_code)
+    findAllMatReqByProd_code,                               // 자재 요구량 조회 (prod_code)
     findAllProductOrderByProduct_order_code,
     findAllWorkDetailByProduct_order_code,                  // 생산 지시 상세 조회
     findProduct_order_detail_codeByProduct_order_code,      // 생산 지시 상세 코드 조회 (생산 지시 코드 - product_order_code)
-    findAllMatHoldByProduct_order_detail_code,              // 생산 상품 자재 홀드 조회
+    findAllMatHoldByProduct_order_detail_code,              // 생산 상품 자재 홀드 조회 (product_order_detail_code)
     findAllMat_HoldByProduct_order_detail_codeAndMat_code,  // 생산 상품 자재 LOT 조회
     findAllProdMatQtyByMat_code,                            // 생산 상품 자재 재고 조회
 

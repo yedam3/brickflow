@@ -10,10 +10,19 @@ router.get("/orderAutoCode", async (req, res) => {
     res.send(product_order_code);
 });
 
-// 자재 계산
+// 자재 요구량 조회 (plan_code)
 router.get("/matReqQty/:plan_code", async (req, res) => {
     let plan_code = req.params.plan_code;
     let result = await orderService.findMatReqByPlan_code(plan_code).catch((err) => console.error(err));
+    res.send(result);
+});
+
+// 자재 요구량 조회 (prod_code)
+router.get("/matReqQtyByProd_code", async (req, res) => {
+    let { prod_code, quantity } = req.query;
+    console.log(prod_code);
+    console.log(quantity);
+    let result = await orderService.findAllMatReqByProd_code(prod_code, quantity).catch((err) => console.error(err));
     res.send(result);
 });
 
@@ -89,6 +98,7 @@ router.put("/update", async (req, res) => {
     res.send(result);
 });
 
+// 생산 지시 삭제
 router.delete("/delete/:product_order_code", async (req, res) => {
     let product_order_code = req.params.product_order_code;
     let result = await orderService.deleteProduct_order(product_order_code).catch((err) => console.error(err));

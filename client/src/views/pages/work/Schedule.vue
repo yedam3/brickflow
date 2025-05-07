@@ -368,9 +368,6 @@ export default {
                 this.formData.orders_code = order.orders_code;
                 this.formData.order_name = order.order_name;
                 this.rowData = [...data];
-                
-                
-                console.log(this.rowData);
 
                 this.ag_grid_cols.prod_name = false;
                 this.ag_grid_cols.quantity = false;
@@ -428,14 +425,22 @@ export default {
                 planData: this.formData,
                 planDetailData: this.rowData,
             }).then(res => {
-                console.log(res);
-                Swal.fire({
-                    title: '성공',
-                    text: '생산 계획이 정상적으로 등록되었습니다.',
-                    icon: 'success',
+                if(res.data.affectedRows > 0) {
+                    Swal.fire({
+                        title: '성공',
+                        text: '생산 계획이 정상적으로 등록되었습니다.',
+                        icon: 'success',
+                        confirmButtonText: '확인'
+                    });
+                    this.clearForm();
+                } else {
+                    Swal.fire({
+                    title: '정보',
+                    text: '생산 계획 등록이 정상적 등록되지지 않았습니다.',
+                    icon: 'info',
                     confirmButtonText: '확인'
                 });
-                this.clearForm();
+                }
             }).catch(err => {
                 console.error(err);
                 Swal.fire({
