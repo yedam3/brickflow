@@ -20,15 +20,17 @@ const deliveryRouter = require("./routers/salesrouter/delivery_router.js");
 const workRouters = require("./routers/workRouter/work_routers.js");
 const matRouter = require("./routers/matRouter/mat_router.js");
 const matCheckRouter = require("./routers/matRouter/mat_check_router.js");
-const qualRouter = require("./routers/qualRouter/qual_router.js");
+const qualRouter = require("./routers/qualRouter/prodCheck_router.js");
 const facRouter = require("./routers/facRouter/fac_router.js");
 const agTest = require("./routers/agTest_router.js");
-const adminRouter = require("./routers/adminRouter/admin_router.js");
 
 const matRedayRouter = require("./routers/matRouter/mat_stroe_router.js");
 
 const proceRouter = require('./routers/proceRouter/proce_Router.js');
 const prodTestRouter = require('./routers/prodTestRouter/prodTest_router.js');
+
+const processRouter = require('./routers/adminRouter/processFlow_router.js');
+const bomRotuer = require('./routers/adminRouter/bom_router.js');
 // 기본 라우팅
 app.get("/", (req, res) => {
     res.send("Welcome!!");
@@ -40,12 +42,13 @@ app.use("/sales", deliveryRouter);
 app.use("/mat", matRouter);
 app.use("/work", workRouters);
 app.use("/fac", facRouter);
-app.use("/qual", qualRouter);
 app.use("/", agTest);
 
 app.use("/mat", matCheckRouter);
-app.use("/admin", adminRouter);
 
 app.use('/mat',matRedayRouter);
 app.use('/proce',proceRouter);
 app.use('/test',prodTestRouter);
+
+app.use('/admin',processRouter);
+app.use('/admin',bomRotuer);

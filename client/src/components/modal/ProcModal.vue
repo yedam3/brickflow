@@ -97,11 +97,11 @@
       close() {
         this.$emit("close");
       },
-      procList() {
-        axios.get('/api/admin/processflow/:prodno')  
+      async procList() {
+        await axios.get('/api/admin//processAll/')  
           .then(res => {
+            console.log('결과',res.data)
             this.rowData = res.data;
-            console.log("공정모달나와라",res.data);
           })
           .catch(error => {
             console.error(error);

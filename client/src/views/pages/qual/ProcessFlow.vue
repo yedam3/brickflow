@@ -141,7 +141,7 @@ export default{
  methods: {
    async ProcData() {
      try {
-       const response = await axios.get('/api/admin/processflow/');
+       const response = await axios.get('/api/admin/processflow');
        this.rowData = response.data;
      } catch (err) {
        console.error('데이터 조회 실패:', err);
@@ -149,7 +149,6 @@ export default{
    },
    prodCellClicked(event){
      let proc = event.data.prod_code;
-     console.log('넘기는제품값'+proc);
      this.prodIndex = event.rowIndex
      axios.get('/api/admin/processflow/'+ proc)
                 .then(res => {
@@ -194,24 +193,15 @@ export default{
    },
    //공정코드를 클릭했을때 모달창 열기
    procCellClicked(parmas){
-     if (parmas.colDef.field == "process_code") {
+     if (parmas.colDef.field == "process_code" || parmas.colDef.field == "process_name") {
        this.selectedSecondIndex = parmas.rowIndex;;
        this.showProcModal = true;
+       console.log('모달값',parmas);
      }
    },
      //공정 모달창 값 전달
      procSelected(proc) {
-     for (let rowInclude of this.rowData2) {
-       if (rowInclude.process_code == proc.process_code) {
-         Swal.fire({
-           title: '실패',
-           text: '같은 공정을 기입할 수 없습니다.',
-           icon: 'error',
-           confirmButtonText: '확인'
-         });
-         return;
-       }
-     }
+     
      this.rowData2[this.selectedSecondIndex].process_code = proc.process_code;
      this.rowData2[this.selectedSecondIndex].process_name = proc.process_name;
      // 새 배열로 설정하여 AG Grid가 반영하게 만듬
@@ -232,8 +222,8 @@ export default{
          return;
      }
      }
-     const res = axios.post('/api/admin/proSave', {
-       insertbom: this.rowData2,
+     const res = axios.post('/api/admin/procsave', {
+      insertProc: this.rowData2,
        
      })
        .then(res => {
@@ -270,7 +260,7 @@ export default{
                          mat_name: "",
                          quantity: "",
                        }];
-       this.BomData();
+       this.ProcData();
    },
    //초기화
    resetList(){

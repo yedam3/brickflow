@@ -4,7 +4,7 @@ const work = require('./sqls/work/work.js');
 const order = require('./sqls/work/order.js');
 const mat = require('./sqls/mat/mat.js');
 const fac = require('./sqls/fac/fac.js');
-const qual = require('./sqls/qual/qual.js');
+const prodcheck = require('./sqls/qual/prodcheck.js');
 const agTest = require('./sqls/agTest.js')
 const matCheck = require('./sqls/mat/matCheck.js');
 const matStore = require('./sqls/mat/matStore.js');
@@ -12,8 +12,8 @@ const matStore = require('./sqls/mat/matStore.js');
 const procedure = require('./sqls/prodTest/procedure.js')
 const prodTest = require('./sqls/prodTest/prodTest.js')
 
-
-
+const bom = require('./sqls/admin/bom.js');
+const processFlow = require('./sqls/admin/processFlow.js');
 
 
 
@@ -24,10 +24,12 @@ module.exports = {
     ...order,
     ...mat,
     ...fac,
-    ...qual,
+    ...prodcheck,
     ...agTest,
     ...matCheck,
     ...matStore,
     ...procedure,
-    ...prodTest
+    ...prodTest,
+    ...bom,
+    ...processFlow,
 }
