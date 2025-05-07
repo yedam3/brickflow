@@ -1,6 +1,11 @@
 // fac.js
+// 비가동설비코드
 const autoUnCode = `SELECT CONCAT('UNP-',IFNULL(MAX(CAST(SUBSTR(unplay_code,5) AS SIGNED)),100)+1) AS unplay_code
 FROM fac_none_play`;
+
+//설비수리코드
+const autoReCode = `SELECT CONCAT('REF-',IFNULL(MAX(CAST(SUBSTR(repaire_code,5) AS SIGNED)),100)+1) AS repaire_code
+FROM repaire`;
 
 //설비 조회
 const selectFacList =
@@ -56,14 +61,20 @@ const facCheck =
 //설비 등록
 //비가동
 const addNoFac =
-`INSERT INTO fac_none_play(unplay_code, 
-                           unplay_reason_code, 
-                           employee_code, 
-                           unplay_start_date, 
-                           unplay_end_date,
-                           note,
-                           fac_code)
-VALUES(?,?,?,?,?,?,?)`
+`INSERT INTO fac_none_play (
+  unplay_code, 
+  unplay_reason_code, 
+  employee_code, 
+  unplay_start_date, 
+  unplay_end_date, 
+  note, 
+  fac_code
+)
+SELECT ?, s.sub_code_name, ?, ?, ?, ?, ?
+FROM main_codes m
+  JOIN sub_codes s ON m.main_code = s.main_code
+WHERE s.main_code = 'NR' AND s.sub_code = ?
+LIMIT 1`
 
 //수정
 //비가동수정
@@ -78,10 +89,68 @@ const delUnplay =
 `DELETE FROM fac_none_play
 WHERE unplay_code = ?`
 
-const reasonFac =
-`SELECT s.sub_code_name
- FROM main_codes m join sub_codes s on(m.main_code = s.main_code)
- WHERE s.main_code = "NR"`
+//비가동 사유
+const reasonFac = `
+  SELECT s.sub_code AS unplay_reason_code,
+         s.sub_code_name
+  FROM main_codes m
+  JOIN sub_codes s ON m.main_code = s.main_code
+  WHERE s.main_code = "NR"
+`
+//수리결과
+const facResult = 
+`SELECT s.sub_code AS fac_result,
+         s.sub_code_name
+  FROM main_codes m
+  JOIN sub_codes s ON m.main_code = s.main_code
+  WHERE s.main_code = "OH"`
+
+//비가동고장리스트
+const repaireList = 
+`SELECT unplay_code,
+        unplay_reason_code,
+        employee_code,
+        unplay_start_date,
+        unplay_end_date,
+        note,
+        fac_code
+FROM fac_none_play
+WHERE unplay_reason_code IN (SELECT s.sub_code_name
+                            FROM main_codes m join sub_codes s on(m.main_code = s.main_code)
+                            WHERE s.sub_code_name = '고장')`
+
+//비가동 수리처리
+const repaireFac =
+`INSERT INTO repaire (
+  repaire_code, 
+  note, 
+  repaire_add_date, 
+  repaire_finish_date, 
+  employee_code, 
+  fac_code, 
+  fac_history,
+  break_status,
+  fac_result
+)
+SELECT ?,?,?,?,?,?,?,?,s.sub_code_name
+FROM main_codes m
+JOIN sub_codes s ON m.main_code = s.main_code
+WHERE s.main_code = 'OH' AND s.sub_code = ? 
+LIMIT 1;`
+
+//수리설비 조회
+const repList =
+`SELECT repaire_code,
+        employee_code,
+        repaire_add_date,
+        repaire_finish_date,
+        fac_code,
+        fac_result,
+        break_code,
+        unplay_code,
+        note,
+        fac_history
+FROM repaire`
 
 module.exports = {
   autoUnCode,
@@ -94,4 +163,9 @@ module.exports = {
   reasonFac,
   facModal,
   statusList,
+  repaireList,
+  autoReCode,
+  repaireFac,
+  facResult,
+  repList,
 };

@@ -1,31 +1,30 @@
 <template>
-  <div class="p-2 row" style="background-color: white; width: 220px; ">
-    <h7>설비조회</h7>
-    <div class="form-check form-check-inline col" style="font-size: 14px;">
-      <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1">
-      <label class="form-check-label" for="inlineRadio1">전체</label>
+  <div class="card border-0" style="background-color: white; height: 800px; ">
+    <div class="d-flex justify-content-start">
+      <div class="input-group mb-5" style="width: 65%;">
+        <!-- 검색 조건 선택 -->
+        <select v-model="searchType" class="form-select" aria-label="Default select example">
+          <option value="" selected>전체</option>
+          <option value="">가동</option>
+          <option value="">비가동</option>
+        </select>
+        <!-- 검색어 입력 -->
+        <input type="text" v-model="searchText" placeholder="검색어 입력" class="form-control w-50" style="width: 100%"
+          @keydown.enter="facStatus" />
+        <!-- 검색 버튼 -->
+        <button @click="facStatus" class="btn btn-primary">
+          <i class="pi pi-search"></i>
+        </button>
+      </div>
     </div>
-    <div class="form-check form-check-inline col">
-      <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2">
-      <label class="form-check-label" for="inlineRadio2">가동</label>
+    <div class="col" style="margin-right: 50px; ">
+      <div class="ag-wrapper d-flex justify-content-center">
+        <ag-grid-vue class="ag-theme-alpine custom-grid-theme" style="width: 100%; height:  500px;"
+          :columnDefs="columnDefs" :rowData="rowData" :gridOptions="gridOptions" @cellClicked="comCellClicked">
+        </ag-grid-vue>
+      </div>
     </div>
-    <div class="form-check form-check-inline col">
-      <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option3">
-      <label class="form-check-label" for="inlineRadio2">비가동</label>
-    </div>
-    <div class="col d-flex justify-content-end p-4" >
-                    <Button label="조회" severity="success" class="" @click="facStatus"></Button>
-                </div>
   </div>
-  <br>
-  <div class="col" style="margin-right: 50px; ">
-            <div class="ag-wrapper d-flex justify-content-center">
-                <ag-grid-vue class="ag-theme-alpine custom-grid-theme" style="width: 100%; height:  500px;"
-                    :columnDefs="columnDefs" :rowData="rowData" :gridOptions="gridOptions"
-                    @cellClicked="comCellClicked">
-                </ag-grid-vue>
-            </div>
-        </div> 
 </template>
 
 <script>
@@ -88,3 +87,14 @@
   },
 }
 </script>
+
+<style scoped>
+.btn-primary {
+      background-color: rgb(230, 171, 98);
+      border-color: rgb(230, 171, 98);
+  }
+
+::v-deep(.ag-theme-alpine .ag-header-cell-label) {
+      justify-content: center;
+  }
+</style>

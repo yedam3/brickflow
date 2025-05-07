@@ -1,40 +1,38 @@
 <template>
     <div >
-        <div >
-            <div class="p-4 row" style="width: 400px; height: auto; background-color: white;">
-                <div class="col">
-                    <h6 style="color: gray;">비가동 설비조회</h6>
-                    <h7>비가동사유<select value="" class="form-select form-control"
-                            style="width: 100px; height: 25px; border: 1px solid gray; font-size: 10px; color: gray;">
-                            <option value="">선택</option>
-                            <option value="">1</option>
-                            <option value="">2</option>
-                            <option value="">3</option>
-                        </select></h7>
+            <div class="card border-0" style=" height: 800px; background-color: white;">
+                <div class="d-flex justify-content-start">
+                    <div class="input-group mb-5" style="width: 65%;">
+                        <!-- 검색 조건 선택 -->
+                        <select v-model="searchType" class="form-select" aria-label="Default select example">
+                            <option value="mat_name" selected></option>
+                            <option value="o.mat_order_code"></option>
+                        </select>
+                        <!-- 검색어 입력 -->
+                        <input type="text" v-model="searchText" placeholder="검색어 입력" class="form-control w-50"
+                            style="width: 100%" @keydown.enter="unFacList" />
+                        <!-- 검색 버튼 -->
+                        <button @click="unFacList" class="btn btn-primary">
+                            <i class="pi pi-search"></i>
+                        </button>
+                    </div>
                 </div>
-                <div class="col d-flex justify-content-end p-4" >
-                    <Button label="조회" severity="success" class="" @click="unFacList"></Button>
-                </div>
-            </div>
-
-        </div>
-        <div>
             <div class="ag-wrapper d-flex justify-content-center">
                 <ag-grid-vue class="ag-theme-alpine custom-grid-theme" style="width: 100%; height: 400px;"
                     :columnDefs="columnDefs" :rowData="rowData2" :gridOptions="gridOptions"
                     @cellClicked="comCellClicked"  @rowClicked="clicked">
                 </ag-grid-vue>
             </div>
-        </div>
     </div>
-    <br>
-    <div class="ag-theme-alpine" style="width: 800px; height: 250px; background-color: white;">
-        <div class="d-flex flex-wrap gap-4">
             <div class="p-4">
                 <h6>비가동코드 <input type="text" v-model="rowData.unplay_code" class="form-control" style="border: 1px solid black; width: 100px;"></h6>
                 <h6>비가동사유코드 <select v-model="rowData.unplay_reason_code" class="form-select form-control" style="height: 34px; border: 1px solid black ; font-size: 12px; color: gray; width: 100px;" >
-                      <option value="">선택</option>
-                      <option value="">1</option>
+                      <option value="">비가동사유</option>
+                      <option v-for="reFac in reasonFacAry" 
+                            :key="reFac.unplay_reason_code" 
+                            :value="reFac.unplay_reason_code">
+                            {{ reFac.sub_code_name }}
+                        </option>
                     </select></h6>
                 <h6>설비코드 <input type="text" v-model="rowData.fac_code" class="form-control" style="border: 1px solid black; width: 100px;" @click="facModalList" readonly ></h6>
             </div>
@@ -51,8 +49,7 @@
                     <Button label="삭제" severity="danger" class="me-5" @click="deleteUnplay" />
                 </div>
             </div>
-        </div>
-    </div>
+</div>
     <!--설비모달창-->
     <FacListModal
         :visible="showFacModal"
@@ -99,6 +96,8 @@ export default {
                     fac_code: '',
                 }
             ],
+            searchType: "",  // 검색 조건 
+            searchText: "", 
             columnDefs: [
                 { field: "fac_code", headerName: "설비코드", flex: 3, },
                 { field: "unplay_code", headerName: "비가동설비코드", flex: 3, },
@@ -126,11 +125,13 @@ export default {
             },
             showFacModal: false,
             selectedRowIndexes: [],
+            reasonFacAry: [],
         }
     },
     mounted() {
         this.autoUnCode();
         this.unFacList();
+        this.reasonFac();
     },
     methods: {
         //
@@ -171,7 +172,6 @@ export default {
                             this.unFacList();
                         });
                         this.rowData =      {
-                            unplay_code: "",
                             unplay_reason_code: "",
                             employee_code: "",
                             unplay_start_date: "",
@@ -198,7 +198,6 @@ export default {
                     });
                     return;
                 });
-           
             this.autoUnCode();
         },
         //수정
@@ -234,7 +233,6 @@ export default {
                             this.unFacList();
                         });
                         this.rowData =      {
-                            unplay_code: "",
                             unplay_reason_code: "",
                             employee_code: "",
                             unplay_start_date: "",
@@ -267,10 +265,20 @@ export default {
         },
         //삭제
         async deleteUnplay() {
-            await axios.delete(`/api/fac/delUnplay/${this.rowData2[0].unplay_code}`)
-                .then((res) => {
-                    console.log("삭제 요청 코드:", this.rowData2[0].unplay_code);
+            if (!this.rowData2 || this.rowData2.length === 0 || !this.rowData2[0].unplay_code) {
+                Swal.fire({
+                    title: '삭제 실패',
+                    text: '삭제할 항목이 선택되지 않았습니다.',
+                    icon: 'warning',
+                    confirmButtonText: '확인'
+                });
+                return;
+            }
+            const unplayCode = this.rowData2[0].unplay_code;
 
+            await axios.delete(`/api/fac/delUnplay/${unplayCode}`)
+                .then((res) => {
+                    console.log("삭제 요청 코드:", unplayCode);
                     if (res.data.affectedRows < 1) {
                         Swal.fire({
                             title: '삭제 실패',
@@ -285,31 +293,43 @@ export default {
                             icon: 'success',
                             confirmButtonText: '확인'
                         })
-                        .then(() =>{
-                            this.unFacList();
-                        });
-                        this.rowData =      {
-                            unplay_code: "",
+                            .then(() => {
+                                this.unFacList();
+                            });
+                        this.rowData = {
                             unplay_reason_code: "",
                             employee_code: "",
                             unplay_start_date: "",
                             unplay_end_date: "",
                             note: "",
-                            fac_code: '',
-                }
+                            fac_code: ''
+                        };
+                        this.rowData2 = [];
                     }
                 })
-                .catch((err) => console.log(err));
+                .catch((err) => {
+                    console.log("삭제 중 오류:", err);
+                    Swal.fire({
+                        title: '오류 발생',
+                        text: '서버 요청 중 문제가 발생했습니다.',
+                        icon: 'error',
+                        confirmButtonText: '확인'
+                    });
+                });
+                //====================== 코드 갱신
             this.autoUnCode();
+            //==========================
         },
-        //
+        //선택한 값 불러오기
         clicked(event) {
             console.log(event.data);
             this.rowData = event.data;
         },
         //조회
         async unFacList() {
-            await axios.get('/api/fac/unFacList')
+            await axios.get('/api/fac/unFacList', {
+
+            })
                 .then(res => {
                     console.log(res.data)
                     this.rowData2 = res.data;
@@ -322,6 +342,17 @@ export default {
         //설비 모달 리스트
         async facSelected(data) {
             this.rowData.fac_code =data.fac_code
+        },
+        //비가동 사유
+        async reasonFac() {
+            await axios.get('/api/fac/reasonFac')
+                .then(res => {
+                    console.log(res.data);
+                    this.reasonFacAry = res.data;
+
+                    this.reasonFacAry = [...res.data];
+                })
+                .catch(err => console.error(err));
         }
     }
 }
