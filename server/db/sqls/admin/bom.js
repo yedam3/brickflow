@@ -6,11 +6,17 @@ const autoBomCode =
 `SELECT CONCAT('bom-',IFNULL(MAX(CAST(SUBSTR(BOM_code,5) AS SIGNED)),100)+1) AS BOM_code
 FROM BOM`;
 
-// 제품 조회
+// process_flow_code 자동 생성
+const autoProFlowCode = 
+`SELECT CONCAT('pro-',IFNULL(MAX(CAST(SUBSTR(process_flow_code,5) AS SIGNED)),100)+1) AS process_flow_code
+FROM process_flow`;
+
+// BOM 관리
+// 1.제품 조회
 const prodList = `SELECT prod_code,
 	                     prod_name
                          FROM prod`;
-// BOM 조회
+// 2.BOM 조회
 const bomList = `SELECT bom_code,
 		                mat_code,
                         prod_code,
@@ -23,7 +29,7 @@ const bomList = `SELECT bom_code,
                         FROM BOM
                  WHERE prod_code = ?`;
 
-// BOM 저장
+// 3.BOM 저장
 // 일단 다 삭제
 const bomDelete = `DELETE FROM BOM
                  WHERE prod_code = ?`
@@ -32,11 +38,12 @@ const bomDelete = `DELETE FROM BOM
 const bomSave = `INSERT INTO BOM (bom_code, mat_code, prod_code, quantity)
                     VALUES(?, ?, ?, ?)`
 
-module.exports = {
+module.exports 
+= {
     autoBomCode,
+    autoProFlowCode,
     prodList,
     bomList,
     bomDelete,
     bomSave,
-    
-};
+}
