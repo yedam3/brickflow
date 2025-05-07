@@ -8,6 +8,10 @@ router.get("/autoUnCode", async (req, res) => {
     let autoUnCode = await facService.autoUnCode().catch((err)=> console.log(err));
     res.send(autoUnCode);
 })
+router.get("/autoReCode", async (req, res) => {
+    let autoReCode = await facService.autoReCode().catch((err) => console.log(err));
+    res.send(autoReCode);
+})
 
 router.get("/addFac", async (req, res) => {
     const { type, keyword } = req.query;
@@ -26,8 +30,13 @@ router.get("/unFacList", async (req, res)=> {
 //비가동 등록
 router.post("/addUnFac", async (req,res)=>{
     const {unplayFac} = req.body;
-    console.log("asdfasdf", unplayFac);
     let result = await facService.addUnFac(unplayFac).catch(err => console.log(err));
+    res.send(result);
+})
+//비가동수리 처리
+router.post("/repaireFac", async (req,res)=>{
+    const {repaireFac} = req.body;
+    let result = await facService.repaireFac(repaireFac).catch(err => console.log(err));
     res.send(result);
 })
 
@@ -73,7 +82,23 @@ router.get('/facStatus', async (req, res)=>{
     res.send(list);
 })
 
+//비가동 사유
+router.get('/reasonFac', async(req,res) => {
+    let result = await facService.reason().catch((err) => console.log(err));
+    res.send(result)
+})
+//수리결과
+router.get('/facResult', async(req, res) => {
+    let result = await facService.facResult().catch((err)=> console.log(err));
+    res.send(result)
+})
 
+//비가동수리
+router.get('/repaireList', async(req, res)=>{
+    const { type, keyword} = req.query;
+    let list = await facService.repaireList({type, keyword}).catch((err)=> console.log(err));
+    res.send(list);
+})
 
 
 module.exports = router;
