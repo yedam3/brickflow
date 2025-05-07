@@ -63,20 +63,21 @@
                 <InputText v-model="formData.plan_name" size="large" placeholder="(입력)" />
               </InputGroup>
             </div>
-          </div>  
-          <div class="col-4">
-  <InputGroup>
-    <InputGroupAddon>
-      창고
-    </InputGroupAddon>
-    <select class="form-select" v-model="formData.plan_name">
-      <option disabled value="">창고 선택</option>
-      <option v-for="store in storeListAry" :key="store.storage_code" :value="store.store_name">
-        {{ store.store_name }}
-      </option>
-    </select>
-  </InputGroup>
-</div>
+          </div>
+          <div class="mb-5 row">
+         
+          </div>
+          <!-- <div class="mb-5 row">
+            <div class="col-auto">
+              <select class="form-select col" aria-label="Default select example" v-model="formData.storage_code">
+                <option disabled selected value="">창고</option>
+                <option v-for="store in storeListAry" :key="store.storage_code" :value="store.storage_code">
+                  {{ store.store_name   }}
+                </option>
+              </select>
+            </div>
+          </div> -->
+
         </template>
       </Card>
     </div>
