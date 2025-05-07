@@ -1,3 +1,4 @@
+const { keyword } = require("color-convert");
 const mariaDB = require("../../db/mapper.js");
 const { findAllWorkDetailByProduct_order_code } = require("../../db/sqlList.js");
 const { updateUnplay } = require("../../db/sqls/fac/fac.js");
@@ -123,6 +124,20 @@ const repaireList = async({type, keyword})=>{
   const result = await mariaDB.query('repaireList', { searchCondition: convertedCondition}).catch((err) => console.log(err));
   return result;
 }
+//수리 목록
+const repList = async({type, keyword}) => {
+  let searchCondition ={};
+  let convertedCondition = '';
+
+  if (type && keyword) {
+    searchCondition[type] = keyword;
+    const converted = convertObjToAry(searchCondition, []);
+    convertedCondition = converted.searchKeyword;
+  }
+
+  const result = await mariaDB.query('repList', { searchCondition: convertedCondition}).catch((err) => console.log(err));
+  return result;
+}
 
 module.exports = {
   autoUnCode,
@@ -139,4 +154,5 @@ module.exports = {
   statuFac,
   repaireList,
   facResult,
+  repList,
 }

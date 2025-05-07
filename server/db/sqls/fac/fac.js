@@ -136,7 +136,7 @@ SELECT ?,?,?,?,?,?,?,?,s.sub_code_name
 FROM main_codes m
 JOIN sub_codes s ON m.main_code = s.main_code
 WHERE s.main_code = 'OH' AND s.sub_code = ? 
-LIMIT 1;`
+LIMIT 1`
 
 //수리설비 조회
 const repList =
@@ -150,7 +150,8 @@ const repList =
         unplay_code,
         note,
         fac_history
-FROM repaire`
+FROM repaire
+WHERE 1=1`
 
 module.exports = {
   autoUnCode,
