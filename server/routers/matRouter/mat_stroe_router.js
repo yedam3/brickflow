@@ -65,4 +65,19 @@ router.get("/matUseCheck/:mit",async(req,res)=>{
                                      .catch((err) => console.log(err));
   res.send(result);
 })
+
+//자재재고 조회
+router.get('/matStorepage',async(req,res) => {
+  const {type,keyword} =req.query;
+  let list = await matStoreService.matStoreList({type,keyword})
+                                       .catch((err) => console.log(err));
+  res.send(list);
+})
+//자재 LOT 조회
+router.get('/matLotList/:matCode' ,async(req,res) => {
+  const matCode= req.params.matCode;
+  let list = await matStoreService.matLotList(matCode)
+                                .catch((err) => console.log(err));
+   res.send(list);
+})
 module.exports = router;

@@ -147,6 +147,28 @@ const matUseCheck = async(matLot) => {
                            .catch((err) => console.log(err));
   return result;
 }
+
+//자재 재고 조회 
+const matStoreList = async ({ type, keyword }) => {
+  let searchCondition = {};
+  let convertedCondition = ''; // 기본값
+  if (type && keyword) {
+    searchCondition[type] = keyword;
+    // selected 배열을 넣어줘야 작동
+    const converted = convertLikeToQuery(searchCondition, []); 
+    convertedCondition = converted.serchKeyword;
+  }
+  const result = await mariaDB.query('matStorePageList', { searchcondition: convertedCondition })
+                                  .catch((err) => console.log(err));
+      return result;
+}
+//자재별 LOT 조회
+const matLotList = async(matCode) => {
+  const result = await mariaDB.query('matLotList',matCode)
+                               .catch((err) => console.log(err));
+
+  return result;
+}
 module.exports={
   storeReadyList,
   matAuto,
@@ -156,5 +178,7 @@ module.exports={
   storeUpdate,
   storageList,
   deleteSore,
-  matUseCheck
+  matUseCheck,
+  matStoreList,
+  matLotList
 }

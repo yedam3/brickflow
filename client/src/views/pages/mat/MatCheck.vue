@@ -142,7 +142,7 @@ export default {
             columnDefs: [
                 { field: "mat_order_code", headerName: "발주코드", flex: 1 },
                 { field: "mat_order_name", headerName: "발주명", flex: 1 },
-                { field: "mat_order_detailCode", headerName: "발주디테일", flex: 2 },
+                { field: "mat_order_detailCode", headerName: "발주디테일",  hide: true },
                 { field: "company_name", headerName: "업체명", flex: 1 },
                 { field: "mat_name", headerName: "자재명", flex: 2},
                 {

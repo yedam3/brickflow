@@ -119,7 +119,7 @@
           { field: "mat_name", headerName: "자재명", flex: 1 },
           { field: "mat_order_code", headerName: "발주코드", flex: 1 },
           { field: "company_name", headerName: "업체명", flex: 1 },
-          { field: "check_code", headerName: "검수코드", flex: 1 },
+          { field: "check_code", headerName: "검수코드", hide:true},
           { field: "mat_check_pass", headerName: "입고가능수량", flex: 1,
           valueFormatter: (params) => {
                 return params.value != null ? `${params.value}개` : '';

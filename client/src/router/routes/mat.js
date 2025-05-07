@@ -19,4 +19,9 @@ export default[
         name: 'MatStore',
         component: () => import('@/views/pages/mat/MatStore.vue')
     },
+    { 
+        path: 'mat/matList',
+        name : 'MatList',
+        component: () => import('@/views/pages/mat/MatStoreList.vue')
+    },
 ]
