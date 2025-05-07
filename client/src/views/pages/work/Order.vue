@@ -44,7 +44,7 @@
                                 <InputGroupAddon>
                                     계획 코드
                                 </InputGroupAddon>
-                                <InputText v-model="formData.plan_code" size="large" placeholder="" />
+                                <InputText v-model="formData.plan_code" size="large" placeholder="" readOnly />
                             </InputGroup>
                         </div>
                         <div class="col-4">
@@ -52,7 +52,7 @@
                                 <InputGroupAddon>
                                     계획명
                                 </InputGroupAddon>
-                                <InputText v-model="formData.plan_name" size="large" placeholder="" />
+                                <InputText v-model="formData.plan_name" size="large" placeholder="" readOnly />
                             </InputGroup>
                         </div>
                     </div>
@@ -126,7 +126,7 @@
     </PlanOrderModal>
 
     <!-- 자재 재고 조회 모달창 -->
-    <MatStock :visible="showMatStockModal" @close="showMatStockModal = false" :mat_code="selectMat_code" :mat_list="selectMat_list" 
+    <MatStock :visible="showMatStockModal" @close="showMatStockModal = false" :prod_code="selectProd_code" :mat_code="selectMat_code" :mat_list="selectMat_list" 
         @matHoldData="matData"></MatStock>
 </template>
 
@@ -153,6 +153,8 @@ export default {
             showPlanOrderModal: false,
             showMatStockModal: false,
 
+            // 선택된 제품 코드
+            selectProd_code: null,
             // 선택된 자재 코드
             selectMat_code: null,
             // 선택된 자재 리스트
@@ -333,11 +335,11 @@ export default {
             for (let detail of work_detail_list) {
                 this.rowData.push({
                     product_order_detail_code: detail.product_order_detail_code,    // 생산 지시 상세 코드 
-                    prod_code: detail.prod_code,            // 제품코드
-                    prod_name: detail.prod_name,            // 제품명
-                    order_quantity: detail.order_quantity,  // 지시수량
-                    priority: detail.priority,              // 우선순위
-                    quantity: detail.quantity,              // 주문량
+                    prod_code: detail.prod_code,                                    // 제품코드
+                    prod_name: detail.prod_name,                                    // 제품명
+                    order_quantity: detail.order_quantity,                          // 지시수량
+                    priority: detail.priority,                                      // 우선순위
+                    quantity: detail.quantity,                                      // 주문량
                 });
                 result = await axios.get(`/api/work/order/loadMatQty/${detail.product_order_detail_code}`).catch((err) => console.error(err));
                 const mat_qty_list = result.data;
@@ -351,8 +353,8 @@ export default {
                     });
                     result = await axios.get(`/api/work/order/loadMat`, {
                         params: {
-                            product_order_detail_code: detail.product_order_detail_code,// 생산 지시 상세 코드드
-                            mat_code: matQty.mat_code,                                  // 자재 코드
+                            product_order_detail_code: detail.product_order_detail_code,    // 생산 지시 상세 코드
+                            mat_code: matQty.mat_code,                                      // 자재 코드
                         }
                     }).catch((err) => console.error(err));
                     const mat_list = result.data;
@@ -366,12 +368,16 @@ export default {
                     }
                 }
             };
-
+            this.rowData = [...this.rowData];
             this.secondRowData = [...this.secondRowData];
         },
 
         // 자재 선택 모달창
         matRowClicked(params) {
+            // 자재 선택 모달창 값 전달 - prod_code;
+            this.selectProd_code = params.data.prod_code;
+            console.log(this.selectProd_code);
+
             // 자재 선택 모달창 값 전달 - mat_code
             this.selectMat_code = params.data.mat_code;
 
@@ -379,8 +385,9 @@ export default {
             let matHoldList = [];
 
             for (let data of this.matHoldDataList) {
-                if (data.mat_code == params.data.mat_code) {
+                if (data.mat_code == params.data.mat_code && data.prod_code == params.data.prod_code) {
                     matHoldList.push({
+                        prod_code: data.prod_code,
                         mat_code: data.mat_code,
                         mat_LOT: data.mat_LOT,
                         hold_quantity: data.mat_hold_qty,
@@ -412,7 +419,7 @@ export default {
             this.secondRowData = [...this.secondRowData];
         },
 
-        //행추가
+        // 행추가
         addRow() {
             if(this.formData.plan_code != '') {
                 Swal.fire({
@@ -434,7 +441,7 @@ export default {
             this.rowData = [...this.rowData];
         },
 
-        //행삭제
+        // 행삭제
         deleteRow() {
             if (this.formData.plan_code != '') {
                 Swal.fire({
@@ -541,7 +548,7 @@ export default {
             if(result.data.affectedRows > 0 ) {
                 Swal.fire({
                     title: '성공',
-                    text: '생산 지시가 정상적으로 삭제제되었습니다.',
+                    text: '생산 지시가 정상적으로 삭제되었습니다.',
                     icon: 'success',
                     confirmButtonText: '확인'
                 });

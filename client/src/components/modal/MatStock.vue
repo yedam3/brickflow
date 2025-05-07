@@ -39,6 +39,10 @@ export default {
             type: Boolean,
             required: true,
         },
+        prod_code: {
+            type: String,
+            required: false
+        },
         mat_code: {
             type: String,
             required: false,
@@ -46,16 +50,11 @@ export default {
         mat_list: {
             type: Array,
             required: false,
-        }
+        },
     },
     
     watch: {
         visible(newVal) {
-            if (newVal) {
-                this.matStockList();
-            }
-        },
-        mat_code(newVal) {
             if (newVal) {
                 this.matStockList();
             }
@@ -107,9 +106,27 @@ export default {
 
         // 제품별 자재 재고 목록 조회 API
         async matStockList() {
-            const result = await axios.get(`/api/work/order/matQty/${this.mat_code}`).catch(error => { console.error(error) });
+            this.rowData = [];
+            const result = await axios.get(`/api/work/order/matQty`, {
+                params: {
+                    prod_code: this.prod_code,
+                    mat_code: this.mat_code,
+                },
+            }).catch(error => { console.error(error) });
+
             let matList = result.data;
-            this.rowData = [...matList];
+            console.log("matList: ", matList);
+            for(let data of matList) {
+                this.rowData.push({
+                    mat_LOT: data.mat_LOT,
+                    mat_code: data.mat_code,
+                    mat_name: data.mat_name,
+                    store_date: data.store_date,
+                    available_qty: data.available_qty,
+                });
+            }
+
+            this.rowData = [...this.rowData];
 
             this.setMatHoldData(); 
         },
@@ -140,7 +157,7 @@ export default {
             if (this.mat_list && this.mat_list.length > 0) {
                 this.rowData = this.rowData.map(row => {
                     const match = this.mat_list.find(item => {
-                        return(item.mat_LOT.toLowerCase() == row.mat_LOT.toLowerCase() && item.mat_code.toLowerCase() == row.mat_code.toLowerCase())
+                        return (item.mat_LOT.toLowerCase() == row.mat_LOT.toLowerCase() && item.mat_code.toLowerCase() == row.mat_code.toLowerCase())
                     });
                     if (match) {
                         return { ...row, mat_hold_qty: match.hold_quantity };
