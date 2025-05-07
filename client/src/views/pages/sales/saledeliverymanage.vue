@@ -29,7 +29,7 @@
       <div class="ag-wrapper justify-content-center" style="border: none;">
         <ag-grid-vue class="ag-theme-alpine" style="width: 100%; 
         height: 200px;" :columnDefs="seColumnDefs" :rowData="serowData" :gridOptions="gridOptions"
-          :defaultColDef="defaultColDef">
+          :defaultColDef="defaultColDef" @rowClicked = "selectedProd">
         </ag-grid-vue>
       </div>
 
@@ -51,9 +51,9 @@
   <OrderModal ref="orderModal" :visible="showOrderModal" @close="showOrderModal = false" @selectOrder="orderSelected">
   </OrderModal>
 
-  <!-- 업체 모달창-->
+  <!-- 업체 모달창
   <ProdComModal :visible="showComModal" rowSelection="multiple" @close="showComModal = false" @selectCom="comSelected">
-  </ProdComModal>
+  </ProdComModal> -->
 </template>
 
 <script>
@@ -90,29 +90,36 @@ export default {
       ],
 
       //주문요구 수량 그리드
-      serowData: [{
-        prod_code: '',
-        prod_name: '',
-        demand: '',
-        alreadydelivery: '',
-        proyetdeliveryd_code: '',
-        delivery_quantity: '',
-      }],
+      serowData: [
+        // {
+        // prod_code: '',
+        // prod_name: '',
+        // delivery_demand: '',
+        // alreadydelivery: '',
+        // proyetdeliveryd_code: '',
+        // delivery_quantity: '',
+        // }
+      ],
+
+      // 주문 요구수량 선택 행 번호
+      selectedSerowIndex: null,
       seColumnDefs: [
         { field: "prod_code", headerName: "제품코드", flex: 2, cellStyle: { textAlign: "center" } },
         { field: "prod_name", headerName: "제품명", flex: 2, editable: true, cellStyle: { textAlign: "center" } },
-        { field: "demand", headerName: "요구량", flex: 2, cellStyle: { textAlign: "center" } },
+        { field: "delivery_demand", headerName: "요구량", flex: 2, cellStyle: { textAlign: "center" } },
         { field: "alreadydelivery", headerName: "기납기량", flex: 2, cellStyle: { textAlign: "center" } },
         { field: "yetdelivery", headerName: "미납기량", flex: 2, editable: true, cellStyle: { textAlign: "center" } },
-        { field: "delivery_quantity", headerName: "출고량", flex: 2, editable: true, cellStyle: { textAlign: "center" } },
+        { field: "delivery_quantity", headerName: "출고량", flex: 2, editable: true, cellStyle: { textAlign: "center" }},
       ],
-      throwData: [{
-        prod_prod_LOT: '',
-        prod_code: '',
-        prod_name: '',
-        delivery_before_quantity: '',
-        delivery_quantity: '',
-      }],
+      throwData: [
+      // {
+      //   prod_prod_LOT: '',
+      //   prod_code: '',
+      //   prod_name: '',
+      //   delivery_before_quantity: '',
+      //   delivery_quantity: '',
+      //   }
+      ],
       thColumnDefs: [
         { field: "prod_LOT", headerName: "제품LOT", flex: 2, cellStyle: { textAlign: "center" } },
         { field: "prod_code", headerName: "제품코드", flex: 2, editable: true, cellStyle: { textAlign: "center" } },
@@ -138,20 +145,20 @@ export default {
       this.rowData[0].sales_order_code = result.data[0].sales_order_code;
       //this.secondRowData[0].sales_order_code = result.data[0].sales_order_code;
     },
-    //업체명을 클릭했을때 모달창 열기 comCellClicked
-    comCellClicked(params) {
-      if (params.colDef.field == "company_name") {
-        this.selectedSecondIndex = params.rowIndex;
-        this.showComModal = true;
-      }
-    },
-    //업체 모달창 값 전달
-    comSelected(com) {
-      this.rowData[0].company_code = com.company_code;
-      this.rowData[0].company_name = com.company_name;
-      // 새 배열로 설정하여 AG Grid가 반영하게 만듬
-      this.rowData = [...this.rowData];
-    },
+    // //업체명을 클릭했을때 모달창 열기 comCellClicked
+    // comCellClicked(params) {
+    //   if (params.colDef.field == "company_name") {
+    //     this.selectedSecondIndex = params.rowIndex;
+    //     this.showComModal = true;
+    //   }
+    // },
+    // //업체 모달창 값 전달
+    // comSelected(com) {
+    //   this.rowData[0].company_code = com.company_code;
+    //   this.rowData[0].company_name = com.company_name;
+    //   // 새 배열로 설정하여 AG Grid가 반영하게 만듬
+    //   this.rowData = [...this.rowData];
+    // },
 
     // 주문 모달창
     orderList() {
@@ -166,20 +173,24 @@ export default {
           console.log(res.data);
           const serverRowData = res.data;
           //this.rowData[0].orders_code = res.orders_code;
-          this.rowData = [serverRowData];
+          this.rowData = [...serverRowData];
 
         })
         .catch((err) => console.log(err));
 
       //상세 그리드로 전달
-      await axios.get('/api/sales/detail', {
-        params: {
-          orders_code: order.orders_code
-        }
-      })
+      await axios.get(`/api/sales/detail/${order.orders_code}`)
         .then(res => {
-          this.serowData = res.data;
-        })
+          const serverRowData = res.data;
+          for (let data of serverRowData) {
+            this.serowData.push({
+              prod_code: data.prod_code,
+              prod_name: data.prod_name,
+              delivery_demand: data.quantity,
+            })
+          }
+          this.serowData = [...this.serowData];
+        });
     },
     fullCheck() {
       //메인그리드 값 다들어 갔는지 체크
@@ -214,79 +225,6 @@ export default {
           return 1;
         }
       }
-    },
-    async addDelivery() {
-  // 1. 출고 코드 자동 생성 요청 
-  const deliveryCodeResponse = await axios.get('/api/sales/deliveryAdd')
-    .catch((err) => {
-      console.log(err);
-      Swal.fire({
-        title: '출고 코드 생성 실패',
-        text: '출고 코드 생성에 실패했습니다.',
-        icon: 'error',
-        confirmButtonText: '확인'
-      });
-      return;
-    });
-
-  if (!deliveryCodeResponse || !deliveryCodeResponse.data) {
-    return;
-  }
-
-  // 자동 생성된 출고 코드 받기
-  const deliveryCode = deliveryCodeResponse.data.code;
-
-  // 2. 주문 코드 중복 여부 체크
-  try {
-    const res = await axios.post('/api/sales/deliveryCheck', {
-      deliveryCode: this.rowData[0].delivery_code
-    });
-
-    if (!res.data || !Array.isArray(res.data) || res.data.length === 0) {
-      Swal.fire({
-        title: '출고 코드 확인 실패',
-        text: '응답 데이터가 잘못되었습니다.',
-        icon: 'error',
-        confirmButtonText: '확인'
-      });
-      return;
-    }
-
-    if (res.data[0].checkCount > 0) {
-      Swal.fire({
-        title: '등록 실패',
-        text: '이미 등록이 진행중입니다.',
-        icon: 'error',
-        confirmButtonText: '확인'
-      });
-      return;
-    }
-  } catch (err) {
-    console.error('Order Check Error:', err);
-    Swal.fire({
-      title: '출고 코드 확인 실패',
-      text: '알 수 없는 오류가 발생했습니다.',
-      icon: 'error',
-      confirmButtonText: '확인'
-    });
-    return;
-  }
-
-    // //출고등록
-    // async addDelivery() {
-    //   const res = await axios.post('/api/sales/deliveryCheck', {
-    //     deliveryCode: this.rowData[0].delivery_code
-
-    //   })
-    //     .catch(err) { console.error('Order Check Error:', err);
-    //     Swal.fire({
-    //       title: '출고 코드 확인 실패',
-    //       text: '알 수 없는 오류가 발생.',
-    //       icon: 'error',
-    //       confirmButtonText: '확인'
-    //     });
-    //     return;
-    //   }
       //출고 등록
       axios.post('/api/sales/deliveryAdd', {
         deliveryCode: this.rowData[0],
@@ -350,29 +288,68 @@ export default {
               confirmButtonText: '확인'
             });
             this.rowData = [{
-              orders_code: "",
-              order_name: "",
-              orders_date: this.getToday(),
-              sdel_date: "",
-              employee_code: "",
-              company_code: "",
-              note: "",
-            }];
-            this.secondRowData = [{
+              delivery_code: '',
+              delivery_name: '',
               orders_code: '',
-              prod_code: '',
-              prod_name: '',
-              quantity: '',
-              totalorderprice: '',
-              note: '',
+              order_name: '',
+              company_code: '',
+            }],
+              this.serowData = [{                
+                 prod_code: '',
+                 prod_name: '',
+                 delivery_demand: '',
+                 alreadydelivery: '',
+                 proyetdeliveryd_code: '',
+                 delivery_quantity: '',               
             }]
           }
         })
         .catch((err) => console.log(err));
+    },
+    async selectedProd(params) {
+      if (params.data.lotList == undefined || params.data.lotList == null){ // lotList가 없으면 lotList를 만들고 있으면 else 뒤에있는 정보를 보여줘라
+        const res = await axios.get(`/api/sales/deliveryCheck/${params.data.prod_code}`)
+        console.log(res.data)
+        const serowData = res.data;
+        let detailList = [];
+        for (let a of serowData)
+          detailList.push({
+            prod_LOT: a.prod_LOT,                        // 제품 LOT
+            prod_code: a.prod_code,                     // 제품 코드
+            prod_name: a.prod_name,                     // 제품명
+            delivery_before_quantity: a.delivery_before_quantity, // 출고 가능 수량
+            delivery_quantity: ''                          // 출고 수량 (사용자 입력용으로 비워둠)
+          }) 
+        // 두번째 그리드의 선택한 제품에 정보를 추가
+        params.data.lotList = detailList;
+        // 세번째 그리드 출력
+        this.throwData = detailList;
+      } else {
+        this.throwData = params.data.lotList;
+      }
+    },
+    watch: {
+      quantity_check_ary: {
+        handler(errAry) {
+          let quatityTotal = errAry.reduce((quantitySum, quantityInfo, idx) => {
+            //1) 체크여부
+            quantityInfo.check = (quantityInfo.check_quantity > 0);
 
+            //2) 총 출고 수량의 합계
+            return quantitySum += quantityInfo.check_quantity;
+          }, 0);
+
+          if (quatityTotal > this.info.check_quantity) {
+            
+            for (let check of this.quantity_check_ary) {
+              check.quantityInfo.check_quantity = 0;
+            }
+          }
+        },
+        deep: true
+      }
     }
-    
-  }
+ }
 }
 </script>
 
