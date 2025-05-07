@@ -1,5 +1,6 @@
 //sqlList.js
 const sales = require('./sqls/sales/sales.js');
+const delivery = require('./sqls/sales/delivery.js');
 const work = require('./sqls/work/work.js');
 const order = require('./sqls/work/order.js');
 const mat = require('./sqls/mat/mat.js');
@@ -33,5 +34,6 @@ module.exports = {
     ...procedure,
     ...prodTest,
     ...label,
-    ...mainPage
+    ...mainPage,
+    ...delivery,
 }
