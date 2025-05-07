@@ -72,7 +72,7 @@
               <select class="form-select col" aria-label="Default select example" v-model="formData.storage_code">
                 <option disabled selected value="">창고</option>
                 <option v-for="store in storeListAry" :key="store.storage_code" :value="store.storage_code">
-                  {{ store.store_name }}
+                  {{ store.store_name   }}
                 </option>
               </select>
             </div>
