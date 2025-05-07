@@ -138,6 +138,7 @@ export default {
   mounted() {
     
   },
+  
   methods: {
     // 사이트 접속시  자동증가
     async autosalescode() {
@@ -268,44 +269,134 @@ export default {
         this.serowData = [];
 
     },
-    //삭제
-    async deliveryDelete() {
-      await axios.delete('/api/sales/deliveryDelete/' + this.rowData[0].delivery_code)
-        .then((res) => {
-          if (res.data.affectedRows < 1) {
-            Swal.fire({
-              title: '삭제 실패',
-              text: '삭제 실패 하였습니다.',
-              icon: 'error',
-              confirmButtonText: '확인'
-            });
+    // 삭제
+async deliveryDelete() {
+  // 출고 코드가 비어있으면 삭제를 진행하지 않도록 처리
+  if (!this.rowData[0].delivery_code) {
+    Swal.fire({
+      title: '삭제 실패',
+      text: '삭제할 출고를 선택해주세요.',
+      icon: 'warning',
+      confirmButtonText: '확인'
+    });
+    return;
+  }
 
-          } else {
-            Swal.fire({
-              title: '삭제 완료',
-              text: '정상적으로 삭제가 완료되었습니다.',
-              icon: 'success',
-              confirmButtonText: '확인'
-            });
-            this.rowData = [{
-              delivery_code: '',
-              delivery_name: '',
-              orders_code: '',
-              order_name: '',
-              company_code: '',
-            }],
-              this.serowData = [{                
-                 prod_code: '',
-                 prod_name: '',
-                 delivery_demand: '',
-                 alreadydelivery: '',
-                 proyetdeliveryd_code: '',
-                 delivery_quantity: '',               
-            }]
-          }
-        })
-        .catch((err) => console.log(err));
-    },
+  try {
+    const res = await axios.delete('/api/sales/deliveryDelete/' + this.rowData[0].delivery_code);
+
+    if (res.data.affectedRows < 1) {
+      Swal.fire({
+        title: '삭제 실패',
+        text: '삭제 실패 하였습니다.',
+        icon: 'error',
+        confirmButtonText: '확인'
+      });
+    } else {
+      Swal.fire({
+        title: '삭제 완료',
+        text: '정상적으로 삭제가 완료되었습니다.',
+        icon: 'success',
+        confirmButtonText: '확인'
+      });
+
+      // 데이터 초기화
+      this.rowData = [{
+        delivery_code: '',
+        delivery_name: '',
+        orders_code: '',
+        order_name: '',
+        company_code: '',
+      }];
+      this.serowData = [{
+        prod_code: '',
+        prod_name: '',
+        delivery_demand: '',
+        alreadydelivery: '',
+        proyetdeliveryd_code: '',
+        delivery_quantity: '',
+      }];
+      this.throwData = []; // 세 번째 그리드 초기화
+    }
+  } catch (err) {
+    console.error(err);
+    Swal.fire({
+      title: '삭제 실패',
+      text: '삭제 중 오류가 발생했습니다.',
+      icon: 'error',
+      confirmButtonText: '확인'
+    });
+  }
+},
+
+// 제품 선택
+async selectedProd(params) {
+  // `lotList`가 없으면 새로 가져와서 데이터를 설정
+  if (!params.data.lotList) {
+    try {
+      const res = await axios.get(`/api/sales/deliveryCheck/${params.data.prod_code}`);
+      console.log(res.data);
+      const serowData = res.data;
+      
+      let detailList = serowData.map(a => ({
+        prod_LOT: a.prod_LOT, // 제품 LOT
+        prod_code: a.prod_code, // 제품 코드
+        prod_name: a.prod_name, // 제품명
+        delivery_before_quantity: a.delivery_before_quantity, // 출고 가능 수량
+        delivery_quantity: '' // 출고 수량 (사용자 입력용으로 비워둠)
+      }));
+
+      // 두 번째 그리드에 데이터를 추가하고 세 번째 그리드로 출력
+      params.data.lotList = detailList;
+      this.throwData = detailList;
+    } catch (err) {
+      console.error(err);
+      Swal.fire({
+        title: '오류',
+        text: '제품 LOT 정보를 가져오는 데 실패했습니다.',
+        icon: 'error',
+        confirmButtonText: '확인'
+      });
+    }
+  } else {
+    this.throwData = params.data.lotList; // 이미 존재하는 데이터가 있다면 그대로 사용
+  }
+},
+
+// 제품 선택
+async selectedProd(params) {
+  // `lotList`가 없으면 새로 가져와서 데이터를 설정
+  if (!params.data.lotList) {
+    try {
+      const res = await axios.get(`/api/sales/deliveryCheck/${params.data.prod_code}`);
+      console.log(res.data);
+      const serowData = res.data;
+      
+      let detailList = serowData.map(a => ({
+        prod_LOT: a.prod_LOT, // 제품 LOT
+        prod_code: a.prod_code, // 제품 코드
+        prod_name: a.prod_name, // 제품명
+        delivery_before_quantity: a.delivery_before_quantity, // 출고 가능 수량
+        delivery_quantity: '' // 출고 수량 (사용자 입력용으로 비워둠)
+      }));
+
+      // 두 번째 그리드에 데이터를 추가하고 세 번째 그리드로 출력
+      params.data.lotList = detailList;
+      this.throwData = detailList;
+    } catch (err) {
+      console.error(err);
+      Swal.fire({
+        title: '오류',
+        text: '제품 LOT 정보를 가져오는 데 실패했습니다.',
+        icon: 'error',
+        confirmButtonText: '확인'
+      });
+    }
+  } else {
+    this.throwData = params.data.lotList; // 이미 존재하는 데이터가 있다면 그대로 사용
+  }
+},
+
     async selectedProd(params) {
       if (params.data.lotList == undefined || params.data.lotList == null){ // lotList가 없으면 lotList를 만들고 있으면 else 뒤에있는 정보를 보여줘라
         const res = await axios.get(`/api/sales/deliveryCheck/${params.data.prod_code}`)
@@ -330,26 +421,30 @@ export default {
     },
     watch: {
       quantity_check_ary: {
-        handler(errAry) {
+        handler(quantityAry) {        
           let quatityTotal = errAry.reduce((quantitySum, quantityInfo, idx) => {
-            //1) 체크여부
-            quantityInfo.check = (quantityInfo.check_quantity > 0);
-
-            //2) 총 출고 수량의 합계
-            return quantitySum += quantityInfo.check_quantity;
-          }, 0);
-
-          if (quatityTotal > this.info.check_quantity) {
+            quantityInfo.check = (quantityInfo.delivery_check > 0);
+            //총 출고 수량의 합계
+            return quantitySum += quantityInfo.check_quantity; }, 0);
             
-            for (let check of this.quantity_check_ary) {
-              check.quantityInfo.check_quantity = 0;
-            }
+            if (quatityTotal > this.delivery_demand) {
+              
+          
+          //사용자에게 알림
+          this.$nextTick(() => {
+            Swal.fire({
+              title:'출고 수량 초과',
+              text: '요구 수량을 초과할 수 없습니다.',
+              icon: 'error',
+              confirmButtonText:'확인'
+             });
+            });
           }
         },
         deep: true
       }
-    }
- }
+    },
+  }  
 }
 </script>
 
