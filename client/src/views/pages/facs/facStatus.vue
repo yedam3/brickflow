@@ -1,51 +1,100 @@
 <template>
-  <div class="p-2 row" style="background-color: white; width: 220px; ">
-    <h7>설비조회</h7>
-    <div class="form-check form-check-inline col" style="font-size: 14px;">
-      <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1">
-      <label class="form-check-label" for="inlineRadio1">전체</label>
+  <div class="card border-0" style="background-color: white; height: 800px; ">
+    <div class="d-flex justify-content-start">
+      <div class="input-group mb-5" style="width: 65%;">
+        <!-- 검색 조건 선택 -->
+        <select v-model="searchType" class="form-select" aria-label="Default select example">
+          <option value="" selected>전체</option>
+          <option value="">가동</option>
+          <option value="">비가동</option>
+        </select>
+        <!-- 검색어 입력 -->
+        <input type="text" v-model="searchText" placeholder="검색어 입력" class="form-control w-50" style="width: 100%"
+          @keydown.enter="facStatus" />
+        <!-- 검색 버튼 -->
+        <button @click="facStatus" class="btn btn-primary">
+          <i class="pi pi-search"></i>
+        </button>
+      </div>
     </div>
-    <div class="form-check form-check-inline col">
-      <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2">
-      <label class="form-check-label" for="inlineRadio2">가동</label>
-    </div>
-    <div class="form-check form-check-inline col">
-      <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option3">
-      <label class="form-check-label" for="inlineRadio2">비가동</label>
+    <div class="col" style="margin-right: 50px; ">
+      <div class="ag-wrapper d-flex justify-content-center">
+        <ag-grid-vue class="ag-theme-alpine custom-grid-theme" style="width: 100%; height:  500px;"
+          :columnDefs="columnDefs" :rowData="rowData" :gridOptions="gridOptions" @cellClicked="comCellClicked">
+        </ag-grid-vue>
+      </div>
     </div>
   </div>
-  <div class="col" style="margin-right: 50px;">
-            <div class="ag-wrapper d-flex justify-content-center">
-                <ag-grid-vue class="ag-theme-alpine custom-grid-theme" style="width: 1000px; height: 400px;"
-                    :columnDefs="columnDefs" :rowData="rowData" :gridOptions="gridOptions"
-                    @cellClicked="comCellClicked">
-                </ag-grid-vue>
-            </div>
-        </div> 
 </template>
 
 <script>
   import { AgGridVue } from "ag-grid-vue3";
   import DatePickerEditor from "../../../components/DatePickerEditor.vue";
   import axios from "axios";
-  import Swal from "sweetalert2";
   export default {
     components: {
         AgGridVue,
         datePicker: DatePickerEditor,
-        Swal
+  },
+  mounted(){
+    this.facStatus();
   },
   data() {
     return{
+      rowData:[],
       columnDefs:[
-        { field:"fac_code", headerName: "설비코드", flex: 2 },
+        { field:"fac_code", headerName: "설비코드", flex: 2,  },
         { field:"model_name", headerName: "설비이름", flex: 2 },
         { field:"fac_location", headerName: "설비위치", flex: 2 },
         { field:"fac_pattern", headerName: "설비유형", flex: 2 },
         { field:"employee_code", headerName: "담당자", flex: 2 },
-        { field:"fac_status", headerName: "설비상태", flex: 2 },
-      ]
+        { field:"fac_status", headerName: "설비상태", flex: 2, 
+        cellStyle: params => {
+              if(params.value == "가동"){
+                return { color: '#22C55E', textAlign:'center', fontWeight: 'bold' };
+              }else if(params.value == "비가동"){
+                return { color: 'red', textAlign:'center', fontWeight: 'bold'};
+              }
+              return null;
+            }},
+      ],
+      gridOptions: {
+          domLayout: "autoHeight",
+          singleClickEdit: true,
+          suppressRowClickSelection: true,
+          pagination: true,
+          paginationPageSize: 10,
+          paginationPageSizeSelector: false,
+          overlayNoRowsTemplate: '표시할 값이 없습니다.',
+          defaultColDef: {
+            suppressMovable: true,
+            resizable: false,
+            sortable: false,
+            cellStyle: { textAlign: "center" },
+          },
+        },
+    }
+  },
+  methods:{
+    //조회
+    async facStatus() {
+      await axios.get('/api/fac/facStatus')
+        .then(res => {
+          console.log(res.data)
+          this.rowData = res.data;
+        })
     }
   },
 }
 </script>
+
+<style scoped>
+.btn-primary {
+      background-color: rgb(230, 171, 98);
+      border-color: rgb(230, 171, 98);
+  }
+
+::v-deep(.ag-theme-alpine .ag-header-cell-label) {
+      justify-content: center;
+  }
+</style>

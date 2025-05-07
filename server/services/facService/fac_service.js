@@ -1,4 +1,5 @@
 const mariaDB = require("../../db/mapper.js");
+const { findAllWorkDetailByProduct_order_code } = require("../../db/sqlList.js");
 const { updateUnplay } = require("../../db/sqls/fac/fac.js");
 const { convertObjToAry } = require("../../utils/converts.js");
 
@@ -8,7 +9,12 @@ const autoUnCode = async() => {
   return list;
 }
 
+const autoReCode = async()=> {
+  let list = await mariaDB.query("autoReCode").catch((err) => console.log(err));
+  return list;
+}
 
+//설비모달창
 const facList = async ({type, keyword})=>{
   let searchCondition ={};
   let convertedCondition = '';
@@ -29,18 +35,41 @@ const unplayAll = async (unplayCode) => {
   return list;
 }
 
+//설비상태확인
+const statuFac = async ({type, keyword}) => {
+  let searchCondition ={};
+  let convertedCondition = '';
+
+  if (type && keyword) {
+    searchCondition[type] = keyword;
+    const converted = convertObjToAry(searchCondition, []);
+    convertedCondition = converted.searchKeyword;
+  }
+
+  const result = await mariaDB.query('statusList', { searchCondition: convertedCondition}).catch((err) => console.log(err));
+  return result;
+}
+
 //비가동설비 등록
 const addUnFac = async (unplayFac)=> {
-  let insertColumns = ['unplay_code', 'unplay_reason_code','employee_code','unplay_start_date','unplay_end_date','note','fac_code'];
+  let insertColumns = ['unplay_code', 'employee_code','unplay_start_date','unplay_end_date','note','fac_code', 'unplay_reason_code'];
   let data = convertObjToAry(unplayFac, insertColumns);
-  console.log("asd", data);
   let resInfo = await mariaDB.query("addNoFac", data).catch(err => console.log(err));
+
+  return resInfo;
+}
+
+//수리 처리
+const repaireFac = async (repaireFac) => {
+  let insertColumns = ['repaire_code', 'note','repaire_add_date','repaire_finish_date','employee_code','fac_code','fac_history','break_status','fac_result',];
+  let data = convertObjToAry(repaireFac, insertColumns);
+  let resInfo = await mariaDB.query("repaireFac", data).catch(err => console.log(err));
 
   return resInfo;
 }
 //비가동 설비 수정
 const modifyUnplay = async (unplayInfo)=> {
-  let updatefac = [unplayInfo, unplayInfo.unplay_code]
+  let updateUnplay = [unplayInfo, unplayInfo.unplay_code]
   let result = await mariaDB.query('updateUnplay', updateUnplay).catch((err)=> console.log(err))
   if(result.affectedRows < 1){
     return result;
@@ -63,9 +92,14 @@ const deleteUnplay = async(unplayCode) =>{
   }
   return result;
 }
-
+//비가동사유
 const reason = async() =>{
-  let list = await mariaDB.query("reasonFac");
+  let list = await mariaDB.query('reasonFac');
+  return list
+}
+//수리결과
+const facResult = async() => {
+  let list = await mariaDB.query('facResult');
   return list
 }
 
@@ -75,14 +109,34 @@ const facModal = async (facCode) => {
   return list;
 }
 
+//비가동설비 수리
+const repaireList = async({type, keyword})=>{
+  let searchCondition ={};
+  let convertedCondition = '';
+
+  if (type && keyword) {
+    searchCondition[type] = keyword;
+    const converted = convertObjToAry(searchCondition, []);
+    convertedCondition = converted.searchKeyword;
+  }
+
+  const result = await mariaDB.query('repaireList', { searchCondition: convertedCondition}).catch((err) => console.log(err));
+  return result;
+}
+
 module.exports = {
   autoUnCode,
+  autoReCode,
   facList,
   unplayAll,
   addUnFac,
+  repaireFac,
   modifyUnplay,
   unFacCheck,
   deleteUnplay,
   reason,
   facModal,
+  statuFac,
+  repaireList,
+  facResult,
 }

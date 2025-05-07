@@ -23,11 +23,60 @@ const testMenuList = async (procCode) => {
 }
 //등록
 const testAdd = async (testInfo) => {
-  for(let test of testInfo){
-    const result = await mariaDB.query('testAdd',)
- }
+  let conn;
+  let result;
+  try{
+    conn = await mariaDB.getConnection();
+    await conn.beginTransaction();
+    for(let test of testInfo){
+     //기본값 설정
+     if(!test.input_quantity){
+      test.input_quantity=0;
+     }
+     if(!test.pass_standard){
+      test.pass_standard=0;
+     }
+     if(!test.test_value){
+      test.test_value=0;
+     }
+    
+
+     //등록 실행
+      let selectedQuery =await mariaDB.selectedQuery("testAdd",[test.work_lot,
+                                                            test.pass_or_not,
+                                                            test.test_item,
+                                                            test.test_name,
+                                                            test.test_value
+          
+                                                          ])
+      result = await conn.query(selectedQuery,[test.work_lot,
+                                                test.pass_or_not,
+                                                test.test_item,
+                                                test.test_name,
+                                                test.test_value])
+    }
+    //공정 업데이트 프로시저 실행
+    let prodQuery = await mariaDB.selectedQuery("workProcessUpdate",[Number(testInfo[0].input_quantity),
+                                                                     testInfo[0].work_lot,
+                                                                     testInfo[0].product_order_detail_code,
+                                                                     testInfo[0].prod_code
+                                                                      ])
+      result = await conn.query(prodQuery,[Number(testInfo[0].input_quantity),
+                                          testInfo[0].work_lot,
+                                          testInfo[0].product_order_detail_code,
+                                          testInfo[0].prod_code 
+      ])
+  await conn.commit();
+  }catch{
+    if (conn) await conn.rollback();
+    return result;
+  }finally{
+    if(conn) conn.release();
+  }
+  return result;
 }
 module.exports = {
     testReadyList,
-    testMenuList
+    testMenuList,
+    testAdd
 }

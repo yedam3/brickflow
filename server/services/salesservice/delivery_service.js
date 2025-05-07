@@ -2,29 +2,6 @@ const {inRange} = require("lodash");
 const mariaDB = require("../../db/mapper.js");
 const { convertObjToAry } = require("../../utils/converts.js");
 
-//업체리스트 조회
-const comList = async ({
-  type,
-  keyword
-}) => {
-  let searchCondition = {};
-  let convertedCondition = ''; // 기본값
-
-  if (type && keyword) {searchCondition[type] = keyword;
-    // selected 배열을 넣어줘야 작동
-    const converted = convertLikeToQuery(searchCondition, []);
-    convertedCondition = converted.serchKeyword;
-  }
-
-  const result = await mariaDB.query('prodComList', {
-      searchcondition: convertedCondition
-    })
-    .catch((err) => console.log(err));
-  return result;
-};
-
-
-
 // 메인조회
 const findMainOrders = async (orders_code) => {
   let list = await mariaDB.query("orderinfochoice", orders_code)
@@ -34,7 +11,16 @@ const findMainOrders = async (orders_code) => {
 const findorders = async (orders_code) => {
   let list = await mariaDB.query("selectorders", orders_code)
     .catch(err => console.log(err));
+  return list;
 }
+
+// 제품 LOT 조회
+const prodcheck = async (prod_LOT) => {
+  let list = await mariaDB.query("prodcheck", prod_LOT)
+    .catch(err => console.log(err));
+   return list;
+}
+
 
 //등록
 const deliveryAdd = async (delivery, deliveryDetail) => {
@@ -73,9 +59,10 @@ const deliveryAdd = async (delivery, deliveryDetail) => {
 
 
 module.exports = {
-  comList,
   findMainOrders,
   findorders,
   deliveryAdd,
   removedelivery,
+  prodcheck,
+  
 }

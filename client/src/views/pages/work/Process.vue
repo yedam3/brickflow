@@ -30,8 +30,8 @@
         <!-- 메인그리드 -->
         <div class="mb-3">
             <div class="ag-wrapper justify-content-center" style="border: none;">
-                <ag-grid-vue class="ag-theme-alpine custom-grid-theme" :columnDefs="columnDefs" :rowData="rowData"
-                    :gridOptions="gridOptions">
+                <ag-grid-vue class="ag-theme-alpine custom-grid-theme" :columnDefs="productOrderColDefs"
+                    :rowData="rowData" :gridOptions="gridOptions">
                 </ag-grid-vue>
             </div>
         </div>
@@ -39,7 +39,7 @@
             <div class="col-6">
                 <h4 class="text-start">작업자</h4>
                 <div class="ag-wrapper justify-content-center" style="border: none;">
-                    <ag-grid-vue class="ag-theme-alpine custom-grid-theme" :columnDefs="columnDefs" :rowData="rowData"
+                    <ag-grid-vue class="ag-theme-alpine custom-grid-theme" :columnDefs="employeeColDefs" :rowData="rowData"
                         :gridOptions="gridOptions">
                     </ag-grid-vue>
                 </div>
@@ -47,32 +47,27 @@
             <div class="col-6">
                 <h4 class="text-start">설비</h4>
                 <div class="ag-wrapper justify-content-center" style="border: none;">
-                    <ag-grid-vue class="ag-theme-alpine custom-grid-theme" :columnDefs="columnDefs" :rowData="rowData"
+                    <ag-grid-vue class="ag-theme-alpine custom-grid-theme" :columnDefs="facColDefs" :rowData="rowData"
                         :gridOptions="gridOptions">
                     </ag-grid-vue>
                 </div>
             </div>
         </div>
         <div class="d-flex justify-content-center mt-3">
-            <Button label="공정시작" severity="info" class="w-40 h-100" size="large"/>
+            <Button label="공정시작" severity="info" class="" size="large" style="width: 20rem; height: 5rem;" @click="startProcess"/>
         </div>
     </div>
 
-    <!--자재 모달창-->
-    <OrderModal :visible="showModal" @close="showModal = false" @select-item="onItemSelected"></OrderModal>
 </template>
 
 <script>
 import { AgGridVue } from "ag-grid-vue3";
 import DatePickerEditor from "../../../components/DatePickerEditor.vue";
 import axios from "axios";
-import OrderModal from "@/components/modal/OrderModal.vue";
 
 export default {
     components: {
         AgGridVue,
-        datePicker: DatePickerEditor,
-        OrderModal,
     },
     data() {
         return {
@@ -87,7 +82,7 @@ export default {
                     note: "",
                 },
             ],
-            columnDefs: [
+            productOrderColDefs: [
                 { field: "mat_order_code", headerName: "생산지시명", flex: 2, cellStyle: { textAlign: "center" } },
                 { field: "company_code", headerName: "제품명", flex: 2, cellStyle: { textAlign: "center" } },
                 { field: "request_date", headerName: "공정명", flex: 2, editable: true, cellStyle: { textAlign: "center" }, cellEditor: "datePicker" },
@@ -97,6 +92,16 @@ export default {
                 { field: "note", headerName: "시작시간", flex: 3, editable: true, cellStyle: { textAlign: "center" } },
                 { field: "note", headerName: "종료시간", flex: 3, editable: true, cellStyle: { textAlign: "center" } },
                 { field: "note", headerName: "생산상탠", flex: 3, editable: true, cellStyle: { textAlign: "center" } },
+            ],
+            employeeColDefs: [
+                { field: "mat_order_code", headerName: "사번", flex: 2, cellStyle: { textAlign: "center" } },
+                { field: "company_code", headerName: "사원명", flex: 2, cellStyle: { textAlign: "center" } },
+                { field: "request_date", headerName: "부서명", flex: 2, cellStyle: { textAlign: "center" } },
+            ],
+            facColDefs: [
+                { field: "fac_code", headerName: "설비코드", flex: 2, cellStyle: { textAlign: "center" } },
+                { field: "fac_name", headerName: "설비명", flex: 2, cellStyle: { textAlign: "center" } },
+                { field: "fac_status", headerName: "설비상태태", flex: 2, cellStyle: { textAlign: "center" } },
             ],
             gridOptions: {
                 domLayout: "autoHeight", //행을 보고 자동으로 hight부여
@@ -112,23 +117,20 @@ export default {
         };
     },
     mounted() {
-        this.autoMatCode();
     },
     methods: {
-        // 사이트 접속시 matCode 자동증가
-        async autoMatCode() {
-            try {
-                const result = await axios.get("/api/mat/autoMatCode");
-                this.rowData[0].mat_order_code = result.data[0].mat_order_code;
-            } catch (err) {
-                console.log(err);
-            }
+        // 생산 지시 조회
+        async productOrderList() {
+
         },
-        matCellClicked(params) {
-            if (params.colDef.field === "mat_code") {
-                this.showModal = true;
-            }
-        },
+
+        // 생산 지시 조회
+        
+
+        // 공정 시작
+        async startProcess() {
+
+        }
     },
 };
 </script>

@@ -22,7 +22,7 @@ FROM plan p
 			SUM(store_quantity) AS store_quantity
 		 FROM store
 		 GROUP BY item_code) s ON b.mat_code = s.item_code
-WHERE p.plan_code = ? AND UPPER(b.pass_or_not) LIKE 'Y'
+WHERE p.plan_code = ?
 GROUP BY pd.prod_code, b.mat_code
 ORDER BY pd.prod_code, b.mat_code;
 `;
@@ -47,45 +47,65 @@ ORDER BY po.product_order_code
 `;
 
 // 생산 지시 조회
-const findAllPlanOrderByProduct_order_code = `
-SELECT po.product_order_code, po.product_order_name, e.emp_name, po.plan_code, p.plan_name, po.start_date, po.end_date, po.note
+const findAllProductOrderByProduct_order_code = `
+SELECT po.product_order_code, po.plan_code, p.plan_name, po.product_order_name, po.employee_code, po.start_date, po.end_date, po.note
 FROM product_order po
 	JOIN plan p ON po.plan_code = p.plan_code
-    JOIN employees e ON e.emp_code = po.employee_code
-WHERE product_order_code = ?
+WHERE po.product_order_code = ?
 `;
 
 // 생산 지시 상세 조회
 const findAllWorkDetailByProduct_order_code = `
-SELECT wd.prod_code, getProdName(wd.prod_code) AS 'prod_name', od.quantity, wd.order_quantity, wd.priority, wd.product_order_code
+SELECT wd.prod_code, prod.prod_name, wd.order_quantity, wd.priority, od.quantity, wd.product_order_detail_code
 FROM work_detail wd
-    LEFT JOIN product_order po ON po.product_order_code = wd.product_order_code
-    LEFT JOIN plan p ON p.plan_code = po.plan_code
-    LEFT JOIN order_detail od ON od.orders_code = p.orders_code AND od.prod_code = wd.prod_code
-WHERE wd.product_order_code = ?
+	JOIN product_order po ON wd.product_order_code = po.product_order_code
+    JOIN plan p ON po.plan_code = p.plan_code
+    JOIN order_detail od ON p.orders_code = od.orders_code AND wd.prod_code = od.prod_code
+    JOIN prod prod ON od.prod_code = prod.prod_code
+WHERE wd.product_order_code =  ?
+`;
+
+// 생산 지시 상세 코드 조회 (생산 지시 코드 - product_order_code)
+const findProduct_order_detail_codeByProduct_order_code = `
+SELECT product_order_detail_code
+FROM work_detail
+WHERE product_order_code = ?
+`;
+
+// 생산 상품 자재 홀드 조회
+const findAllMatHoldByProduct_order_detail_code = `
+SELECT DISTINCT od.prod_code, mh.mat_code, m.mat_name, mh.hold_quantity,
+    (pd.plan_quantity * b.quantity) AS req_material_quantity
+FROM mat_hold mh
+	JOIN work_detail wd ON mh.product_order_detail_code = wd.product_order_detail_code
+	JOIN product_order po ON wd.product_order_code = po.product_order_code
+	JOIN plan p ON po.plan_code = p.plan_code
+	JOIN plan_detail pd ON pd.plan_code = p.plan_code AND pd.prod_code = wd.prod_code
+	JOIN BOM b ON wd.prod_code = b.prod_code AND mh.mat_code = b.mat_code
+	JOIN order_detail od ON od.orders_code = p.orders_code AND od.prod_code = wd.prod_code
+    JOIN mat m ON b.mat_code = m.mat_code
+WHERE mh.product_order_detail_code =  ?
+`;
+
+// 생산 상품 자재 LOT 조회
+const findAllMat_HoldByProduct_order_detail_codeAndMat_code = `
+SELECT mh.mat_code, mh.mat_LOT, mh.hold_quantity, wd.prod_code
+FROM mat_hold mh
+	JOIN work_detail wd ON wd.product_order_detail_code = mh.product_order_detail_code
+WHERE mh.product_order_detail_code = ? AND mh.mat_code = ?
 `;
 
 // 생산 상품 자재 재고 조회
 const findAllProdMatQtyByMat_code = `
-SELECT s.lot AS 'mat_LOT', m.mat_code, m.mat_name, ms.store_date AS 'store_date',
-    (COALESCE(s.inbound_quantity, 0) - COALESCE(s.dispatch_quantity, 0)) AS 'available_qty'
+SELECT b.prod_code, s.lot AS 'mat_LOT', m.mat_code, m.mat_name, ms.store_date AS 'store_date',
+    (SUM(s.inbound_quantity) - SUM(s.dispatch_quantity)) AS 'available_qty'
 FROM store s
 	LEFT JOIN mat_store ms ON ms.mat_LOT = s.LOT AND ms.mat_code = s.item_code
 	JOIN mat m ON ms.mat_code = m.mat_code
-WHERE ms.mat_code = ?
+    JOIN BOM b ON b.mat_code = ms.mat_code
+WHERE b.prod_code = ? AND ms.mat_code = ?
+GROUP BY b.prod_code, s.LOT, m.mat_code, m.mat_name, ms.store_date
 ORDER BY ms.store_date ASC
-`;
-
-// 생산 상품 자재 홀드 조회
-const findAllMatHoldByProdcut_order_detail_code = `
-SELECT wd.prod_code, b.mat_code, m.mat_name, b.quantity AS required_per_unit,
-    (b.quantity * wd.order_quantity) AS total_input_qty
-FROM work_detail wd
-	JOIN BOM b ON b.prod_code = wd.prod_code
-	JOIN mat m ON m.mat_code = b.mat_code
-WHERE wd.product_order_code = ?
-ORDER BY wd.prod_code, b.mat_code
-
 `;
 
 // 생산지시 상태 확인
@@ -101,24 +121,174 @@ SELECT p.plan_code, p.plan_name, p.start_date, p.end_date,
        p.employee_code, e.emp_name, p.note
 FROM plan p
     LEFT JOIN employees e ON p.employee_code = e.emp_code
-WHERE p.plan_code = ?;
+WHERE p.plan_code = ?
 `;
 
-// 생산지시 등록
-const insertInstr = `
+// 상품 공정 흐름도 조회
+const findProcess_flowByProd_code = `
 
+`;
+
+// 생산 지시 등록
+const insertProduct_order = `
+INSERT INTO product_order(product_order_code, plan_code, product_order_name, employee_code, start_date, end_date, finish_status, note)
+VALUES(?, ?, ?, ?, ?, ?, 'WS1', ?)
+`;
+
+// 생산 지시 코드 조회 (증가코드)
+const findProduct_order_detail_codeLast = `
+SELECT CONCAT('WD-',IFNULL(MAX(CAST(SUBSTR(product_order_detail_code, 4) AS SIGNED)),100)+1) AS product_order_detail_code
+FROM work_detail
+`;
+
+// 생산 지시 상세 등록
+const insertProduct_order_detail = `
+INSERT INTO work_detail VALUES(?, ?, ?, ?, ?, ?)
+`;
+
+// 공정 흐름도 조회 (prod_code)
+const findAllProcess_flowByProd_code = `
+SELECT process_flow_code, process_sequence, prod_code, process_code
+FROM process_flow
+WHERE prod_code = ?
+ORDER BY process_sequence ASC
+`;
+
+// 공정 초기 세팅 등록
+const insertWork_process = `
+INSERT INTO work_process
+SELECT CONCAT('WORK-LOT-', IFNULL(MAX(CAST(SUBSTR(work_lot, 10) AS UNSIGNED)), 100) + 1),
+    ?, ?, ?, ?, 0, 0, 0, ?
+FROM (
+    SELECT * FROM work_process 
+    WHERE work_lot LIKE 'WORK-LOT-%' AND LENGTH(SUBSTR(work_lot, 10)) > 0
+) AS wp
+`;
+
+// 생산 계획 상태 변경
+const updatePlanStatusByPlan_code = `
+UPDATE plan
+SET
+    finish_status = ?
+WHERE plan_code = ?
+`;
+
+// 생산 지시 상세 조회 (product_order_code, prod_code)
+const findWork_detailByProduct_order_codeAndProd_code = `
+SELECT product_order_detail_code, prod_code, order_quantity, priority, process_flow_code, product_order_code
+FROM work_detail
+WHERE product_order_code = ? AND prod_code = ?
+`;
+
+// 생산 지시 상세 조회 (LIMIT)
+const findWork_detailByLimit = `
+SELECT *
+FROM work_detail
+ORDER BY product_order_detail_code DESC
+LIMIT ?
+`;
+
+// 자재 홀드 코드 조회
+const findMat_hold_code = `
+SELECT CONCAT('MH-',IFNULL(MAX(CAST(SUBSTR(mat_hold_code, 4) AS SIGNED)),100)+1) AS mat_hold_code
+FROM mat_hold
+`;
+
+// 자재 홀드량 등록
+const insertMat_hold = `
+INSERT INTO mat_hold(mat_hold_code, product_order_detail_code, mat_LOT, hold_quantity, finish_status, mat_code)
+VALUES (?, ?, ?, ?, 'OF1', ?)
+`;
+
+// 생산 지시 수정
+const updateProduct_orderByProduct_order_code = `
+UPDATE product_order
+SET
+	product_order_name = ?,
+    start_date = ?,
+    end_date = ?,
+    note = ?
+WHERE product_order_code = ?
+`;
+
+// 생산 지시 상세 수정
+const updateWork_detailByProduct_order_detail_code = `
+UPDATE work_detail
+SET
+	prod_code = ?,
+    order_quantity = ?,
+    priority = ?
+WHERE product_order_detail_code = ?
+`;
+
+// 생산 지시 자재 홀드량 수정
+const updateMat_holdByProduct_order_detail_codeAndMat_code = `
+UPDATE mat_hold
+SET
+	mat_LOT = ?,
+    hold_quantity = ?
+WHERE product_order_detail_code = ? AND mat_code = ?
+`;
+
+// 생산 지시 삭제
+const deleteProduct_orderByProduct_order_code = `
+DELETE
+FROM product_order
+WHERE product_order_code = ?
+`;
+
+// 생산 지시 상세 삭제
+const deleteWork_detailByProduct_order_code = `
+DELETE
+FROM work_detail
+WHERE product_order_code = ?
+`;
+
+// 생산 지시 홀드량 삭제
+const deleteMat_holdByProduct_order_detail_code = `
+DELETE
+FROM mat_hold
+WHERE product_order_detail_code = ?
+`;
+
+// 생산 지시 공정 초기 세팅 삭제
+const deleteWork_processByProduct_order_Detail_code = `
+DELETE
+FROM work_process
+WHERE product_order_detail_code = ?
 `;
 
 module.exports = {
     getOrder_code,
     findMatReqByPlan_code,
-    findAllPlanOrderByProduct_order_code,
-    findAllWorkDetailByProduct_order_code,
-    findAllProdMatQtyByMat_code,
+    findAllProductOrderByProduct_order_code,
+    findAllWorkDetailByProduct_order_code,                  // 생산 지시 상세 조회
+    findProduct_order_detail_codeByProduct_order_code,      // 생산 지시 상세 코드 조회 (생산 지시 코드 - product_order_code)
+    findAllMatHoldByProduct_order_detail_code,              // 생산 상품 자재 홀드 조회
+    findAllMat_HoldByProduct_order_detail_codeAndMat_code,  // 생산 상품 자재 LOT 조회
+    findAllProdMatQtyByMat_code,                            // 생산 상품 자재 재고 조회
 
-    findAllMatHoldByProdcut_order_detail_code,
+    insertProduct_order,                                    // 생산 지시 등록
+    findProduct_order_detail_codeLast,                      // 생산 지시 상세 코드 조회(자동증가)
+    insertProduct_order_detail,                             // 생산 지시 상세 등록
+    findAllProcess_flowByProd_code,                         // 공정 흐름도 조회 (prod_code)
+    insertWork_process,                                     // 생산 지시 공정 초기 세팅 등록
+    updatePlanStatusByPlan_code,                            // 생산 계획 상태 변경
 
-    findAllPlanOrder,
-    findStatusByPlan_code,
-    insertInstr,
+    findWork_detailByProduct_order_codeAndProd_code,        // 생산 지시 상세 조회 (product_order_code, prod_code)
+    findWork_detailByLimit,                                 // 생산 지시 상세 조회 (LIMIT)
+    findMat_hold_code,                                      // 자재 홀드 코드 조회
+    insertMat_hold,                                         // 생산 자재 홀드량 등록
+
+    updateProduct_orderByProduct_order_code,                // 생산 지시 수정
+    updateWork_detailByProduct_order_detail_code,           // 생산 지시 상세 수정
+    updateMat_holdByProduct_order_detail_codeAndMat_code,   // 생산 지시 자재 홀드량 수정
+
+    findAllPlanOrder,                                       // 생산지시 목록 조회
+    findStatusByPlan_code,                                  // 생산지시 상태 확인
+
+    deleteProduct_orderByProduct_order_code,                // 생산 지시 삭제
+    deleteWork_detailByProduct_order_code,                  // 생산 지시 상세 삭제
+    deleteMat_holdByProduct_order_detail_code,              // 생산 지시 홀드량 삭제
+    deleteWork_processByProduct_order_Detail_code,          // 생산 지시 공정 초기 세팅 삭제
 };
