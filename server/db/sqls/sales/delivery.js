@@ -2,12 +2,12 @@
 
 //등록
 const deliveryAdd =
-  `INSERT INTO delivery(delivery_code, orders_code, company_code, employee_code, delivery_date)
+  `INSERT INTO delivery_manage(delivery_code, orders_code, company_code, employee_code, delivery_date)
 VALUES( ? , ? , ? , ? , ? )`;
 // delivery_code  자동 부여
 const deliveryAutoOrder =
-  `SELECT CONCAT('OUT-', IFNULL(MAX(CAST(SUBSTR(orders_code, 5) AS SIGNED)), 100) + 1) AS code
-  FROM orders`;
+  `SELECT CONCAT('OUT-', IFNULL(MAX(CAST(SUBSTR(delivery_code, 5) AS SIGNED)), 100) + 1) AS code
+  FROM delivery_manage`;
 
 //상세등록
 const deliveryDetailAdd = 

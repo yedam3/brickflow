@@ -11,6 +11,11 @@ router.get("/comList", async (req, res) => {
     res.send(comList);
 });
 
+router.get('/deliveryAutoCode', async (req, res) => {
+  const result = await deliveryService.getAutoDeliveryCode();
+  res.send(result);
+});
+
 //출고 등록
 router.post('/deliveryAdd', async (req, res) => {
   const { delivery, deliveryDetail } = req.body;

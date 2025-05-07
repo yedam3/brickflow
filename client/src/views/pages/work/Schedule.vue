@@ -173,8 +173,8 @@ export default {
                 orders_code: false,         // 주문번호
                 orders_date: false,         // 시작_일자
                 del_date: false,            // 종료_일자
-                prod_name: false,            // 제품명
-                quantity: false,             // 수량(주문상세)
+                prod_name: false,           // 제품명
+                quantity: false,            // 수량(주문상세)
                 unshippedQty: false,        // 미출고량
                 prePlannedQty: false,       // 기계획량
                 unplannedQty: false,        // 미계획량
@@ -183,7 +183,7 @@ export default {
 
             gridOptions: {
                 domLayout: "autoHeight",            // 행을 보고 자동으로 hight부여
-                singleClickEdit: true,              // 한번클릭했을때 수정
+                singleClickEdit: true,              // 한번 클릭 했을 때 수정
                 suppressRowClickSelection: true,    // 행 클릭할 때 체크박스 선택 방지
                 defaultColDef: {
                     suppressMovable: true,          // 셀 이동 금지

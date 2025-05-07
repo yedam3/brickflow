@@ -36,6 +36,11 @@ const findorders = async (orders_code) => {
     .catch(err => console.log(err));
 }
 
+const getAutoDeliveryCode = async () => {
+  const result = await mariaDB.query('deliveryAutoOrder');
+  return result[0]; // { code: 'OUT-101' }
+};
+
 //등록
 const deliveryAdd = async (delivery, deliveryDetail) => {
   delivery.delivery_code = (await mariaDB.query('deliveryAutoOrder'))[0].code;
@@ -78,4 +83,5 @@ module.exports = {
   findorders,
   deliveryAdd,
   removedelivery,
+  getAutoDeliveryCode,
 }

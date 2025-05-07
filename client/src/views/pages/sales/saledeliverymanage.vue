@@ -18,7 +18,6 @@
 
 
   <div class="row">
-
     <div class="col-6">
       <div class="row">
         <div class="col">
@@ -62,13 +61,14 @@ import { AgGridVue } from 'ag-grid-vue3';
 import axios from 'axios';
 import OrderModal from '@/components/modal/OrderModal.vue';
 import ProdComModal from "@/components/modal/ProdComModal.vue";
-
+import Swal from 'sweetalert2'; 
 
 export default {
   components: {
     AgGridVue,
     OrderModal,
     ProdComModal,
+    Swal,
    
   },
   data() {
@@ -76,7 +76,7 @@ export default {
       // 메인 그리드
       rowData: [{
         delivery_code: '',
-        delivery_code: '',
+        delivery_name: '',
         orders_code: '',
         order_name:'',
         company_code:'',
@@ -215,30 +215,80 @@ export default {
         }
       }
     },
-
-    //출고등록
     async addDelivery() {
-      const res = await axios.post('/api/sales/orderCheck', {
-        deliveryCode: this.rowData[0].delivery_code
+  // 1. 출고 코드 자동 생성 요청 
+  const deliveryCodeResponse = await axios.get('/api/sales/deliveryAdd')
+    .catch((err) => {
+      console.log(err);
+      Swal.fire({
+        title: '출고 코드 생성 실패',
+        text: '출고 코드 생성에 실패했습니다.',
+        icon: 'error',
+        confirmButtonText: '확인'
+      });
+      return;
+    });
 
-      })
-        .catch((err) => console.log(err));
-      if (res.data[0].checkCount > 0) {
-        Swal.fire({
-          title: '등록 실패',
-          text: '이미 등록이 진행중 입니다.',
-          icon: 'error',
-          confirmButtonText: '확인'
-        });
-        return;
-      }
-      if (this.fullCheck() == 1) {
-        return;
-      } else if (this.fullCheck() == 2) {
-        return;
-      }
-      //등록
-      axios.post('/api/sales/salesOrderAdd', {
+  if (!deliveryCodeResponse || !deliveryCodeResponse.data) {
+    return;
+  }
+
+  // 자동 생성된 출고 코드 받기
+  const deliveryCode = deliveryCodeResponse.data.code;
+
+  // 2. 주문 코드 중복 여부 체크
+  try {
+    const res = await axios.post('/api/sales/deliveryCheck', {
+      deliveryCode: this.rowData[0].delivery_code
+    });
+
+    if (!res.data || !Array.isArray(res.data) || res.data.length === 0) {
+      Swal.fire({
+        title: '출고 코드 확인 실패',
+        text: '응답 데이터가 잘못되었습니다.',
+        icon: 'error',
+        confirmButtonText: '확인'
+      });
+      return;
+    }
+
+    if (res.data[0].checkCount > 0) {
+      Swal.fire({
+        title: '등록 실패',
+        text: '이미 등록이 진행중입니다.',
+        icon: 'error',
+        confirmButtonText: '확인'
+      });
+      return;
+    }
+  } catch (err) {
+    console.error('Order Check Error:', err);
+    Swal.fire({
+      title: '출고 코드 확인 실패',
+      text: '알 수 없는 오류가 발생했습니다.',
+      icon: 'error',
+      confirmButtonText: '확인'
+    });
+    return;
+  }
+
+    // //출고등록
+    // async addDelivery() {
+    //   const res = await axios.post('/api/sales/deliveryCheck', {
+    //     deliveryCode: this.rowData[0].delivery_code
+
+    //   })
+    //     .catch(err) { console.error('Order Check Error:', err);
+    //     Swal.fire({
+    //       title: '출고 코드 확인 실패',
+    //       text: '알 수 없는 오류가 발생.',
+    //       icon: 'error',
+    //       confirmButtonText: '확인'
+    //     });
+    //     return;
+    //   }
+      //출고 등록
+      axios.post('/api/sales/deliveryAdd', {
         deliveryCode: this.rowData[0],
         salesOrderDetail: this.serowData
       })
