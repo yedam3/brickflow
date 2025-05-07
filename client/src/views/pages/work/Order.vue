@@ -102,7 +102,7 @@
                 </div>
                 <div class="ag-wrapper" style="border: none;">
                     <ag-grid-vue ref="mainGrid" class="ag-theme-alpine custom-grid-theme" :columnDefs="prodListDefs" :rowData="rowData"
-                        :gridOptions="gridOptions">
+                        :gridOptions="gridOptions" @cellClicked="prodCellClicked" @cellValueChanged="onProdValueChanged">
                     </ag-grid-vue>
                 </div>
             </div>
@@ -128,6 +128,9 @@
     <!-- 자재 재고 조회 모달창 -->
     <MatStock :visible="showMatStockModal" @close="showMatStockModal = false" :prod_code="selectProd_code" :mat_code="selectMat_code" :mat_list="selectMat_list" 
         @matHoldData="matData"></MatStock>
+
+    <!-- 제품 조회 모달창 -->
+    <ProdModal :visible="showProdModal" @close="showProdModal = false" @selectProd="prodSelected"></ProdModal>
 </template>
 
 <script>
@@ -139,6 +142,7 @@ import Swal from 'sweetalert2';
 import PlanModal from "@/components/modal/PlanModal.vue";
 import PlanOrderModal from "@/components/modal/PlanOrderModal.vue"
 import MatStock from "@/components/modal/MatStock.vue";
+import ProdModal from "@/components/modal/ProdModal.vue";
 
 export default {
     components: {
@@ -146,12 +150,14 @@ export default {
         PlanModal,
         PlanOrderModal,
         MatStock,
+        ProdModal,
     },
     data() {
         return {
             showPlanModal: false,
             showPlanOrderModal: false,
             showMatStockModal: false,
+            showProdModal: false,
 
             // 선택된 제품 코드
             selectProd_code: null,
@@ -160,6 +166,8 @@ export default {
             // 선택된 자재 리스트
             selectMat_list: null,
 
+            // 제품 선택 행
+            selectedProdIndex: null,
             // 자재 홀드량 선택 행
             selectedSecondIndex: null,
 
@@ -204,16 +212,17 @@ export default {
             prodListDefs: [
                 { checkboxSelection: true, width: 50 },
                 { field: "prod_code", headerName: "제품코드", flex: 1.5, cellStyle: { textAlign: "center" } },
-                { field: "prod_name", headerName: "제품명", flex: 3, cellStyle: { textAlign: "center" } },
+                { field: "prod_name", headerName: "제품명", flex: 2.5, cellStyle: { textAlign: "center" } },
                 { field: "order_quantity", headerName: "지시수량", flex: 1.5, cellStyle: { textAlign: "center" } },
                 { field: "priority", headerName: "우선순위", flex: 1.5, cellStyle: { textAlign: "center" } },
-                { field: "quantity", headerName: "주문량", flex: 1, cellStyle: { textAlign: "center" } },
+                { field: "quantity", headerName: "주문량", flex: 1, editable: true, cellStyle: { textAlign: "center" } },
             ],
             matHoldListDefs: [
                 { field: "prod_code", headerName: "제품코드", flex: 2, cellStyle: { textAlign: "center" } },
                 { field: "mat_code", headerName: "자재코드", flex: 2, cellStyle: { textAlign: "center" } },
-                { field: "mat_name", headerName: "자재명", flex: 3, cellStyle: { textAlign: "center" } },
-                { field: "req_material_quantity", headerName: "요구량", flex: 1, cellStyle: { textAlign: "center" } },
+                { field: "mat_name", headerName: "자재명", flex: 2.5, cellStyle: { textAlign: "center" } },
+                { field: "req_material_quantity", headerName: "요구량", flex: 1.5, cellStyle: { textAlign: "center" } },
+                { field: "mat_LOTs", headerName: "자재명", flex: 1, cellStyle: { textAlign: "center" } },
                 { field: "material_input_qunatity", headerName: "투입량", flex: 1, cellStyle: { textAlign: "center" } },
             ],
             gridOptions: {
@@ -227,6 +236,9 @@ export default {
                 },
             },
         };
+    },
+    watch() {
+
     },
     mounted() {
         this.autoOrder_Code();
@@ -376,7 +388,6 @@ export default {
         matRowClicked(params) {
             // 자재 선택 모달창 값 전달 - prod_code;
             this.selectProd_code = params.data.prod_code;
-            console.log(this.selectProd_code);
 
             // 자재 선택 모달창 값 전달 - mat_code
             this.selectMat_code = params.data.mat_code;
@@ -456,6 +467,7 @@ export default {
             const selectedData = selectedNodes.map(node => node.data);
 
             this.rowData = this.rowData.filter(row => !selectedData.includes(row));
+            this.nonePlanOrder();
         },
 
         // 생산 지시 등록
@@ -541,8 +553,13 @@ export default {
         // 생산 지시 삭제
         async deleteProductOrder() {
             // 생산 계획을 가져왔는 지 확인
-            if (this.editMode == false) {
-
+            if (this.formData == '') {
+                Swal.fire({
+                    title: '알림',
+                    text: '생산 계획이 존재 하지 않습니다.',
+                    icon: 'question',
+                    confirmButtonText: '확인'
+                });
             };
             let result = await axios.delete(`/api/work/order/delete/${this.formData.product_order_code}`).catch((err) => console.error(err));
             if(result.data.affectedRows > 0 ) {
@@ -560,6 +577,51 @@ export default {
                     confirmButtonText: '확인'
                 });
             }
+        },
+
+        // 제품 명 제품 코드 선택 시 모달창 열기
+        prodCellClicked(params) {
+            if((params.colDef.field == "prod_code" || params.colDef.field == "prod_name")) {
+                this.selectedProdIndex = params.rowIndex;
+                this.showProdModal = true;
+            }
+        },
+
+        // 제품 모달창 값 전달
+        prodSelected(prod) {
+            this.rowData[this.selectedProdIndex].prod_code = prod.prod_code;
+            this.rowData[this.selectedProdIndex].prod_name = prod.prod_name;
+            this.rowData[this.selectedProdIndex].priority = this.selectedProdIndex + 1;
+            this.rowData[this.selectedProdIndex].order_quantity = 0;
+
+            this.rowData = [...this.rowData];
+        },
+
+        onProdValueChanged(params) {
+            this.nonePlanOrder();
+        },
+        // 생산 제품 자재 요구량 조회 (prod_code)
+        async nonePlanOrder() {
+            this.secondRowData = [];
+            for(let prodData of this.rowData) {
+                let result = await axios.get(`/api/work/order/matReqQtyByProd_code`, {
+                    params: {
+                        prod_code: prodData.prod_code,
+                        quantity: prodData.quantity,
+                    }
+                }).catch((err) => console.log(err));
+                for(let matData of result.data) {
+                    this.secondRowData.push({
+                        prod_code: matData.prod_code,
+                        mat_code: matData.mat_code,
+                        mat_name: matData.mat_name,
+                        req_material_quantity: matData.req_material_quantity,
+                        mat_LOT: "",
+                        material_input_qunatity: 0,
+                    });
+                }
+            }
+            this.secondRowData = [...this.secondRowData];
         },
     },
 };
