@@ -146,7 +146,7 @@ const repList =
         repaire_finish_date,
         fac_code,
         fac_result,
-        break_code,
+        break_status,
         unplay_code,
         note,
         fac_history
