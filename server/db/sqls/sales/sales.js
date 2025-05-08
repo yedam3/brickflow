@@ -34,8 +34,21 @@ const orderinfochoice =
 
 // 상세조회
 const selectorders =
-  `
-  SELECT od.orders_detail_code, od.orders_code, od.quantity, od.price, od.note, od.prod_code, od.finish_status, prod.prod_name
+  `SELECT orders_detail_code
+        , orders_code
+        , quantity
+        , price
+        , note
+        , prod_code
+        , getProdName(prod_code) AS prod_name
+        , finish_status
+
+FROM order_detail
+WHERE orders_code = ? `;
+
+//제품 모달창
+const prodselect =
+`SELECT od.orders_detail_code, od.orders_code, od.quantity, od.price, od.note, od.prod_code, od.finish_status, prod.prod_name
   FROM order_detail od JOIN prod prod ON od.prod_code = prod.prod_code
   WHERE od.orders_code = ? `;
 
@@ -99,5 +112,6 @@ module.exports = {
   salesAutoOrderDetail,
   orderinfochoice,
   orderDeleteDetail,
-  ordersUpdateDetail
+  ordersUpdateDetail,
+  prodselect,
 };

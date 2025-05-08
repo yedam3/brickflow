@@ -21,7 +21,7 @@
 
      <div class="text-end mt-3 mb-3">
      <Button label="초기화" severity="success" class="me-3" @click="resetList"/>
-     <Button label="저장" severity="info" class="me-3" @click="bomSave"/>
+     <Button label="저장" severity="info" class="me-3" @click="prodCheckSave"/>
    </div>
 
    <div class="text-end mt-3 mb-3">
@@ -48,7 +48,7 @@
      :gridOptions="gridOptions"
       rowSelection="multiple"
      :defaultColDef="defaultColDef2"
-     @cellClicked="bomCellClicked">
+     @cellClicked="checkCellClicked">
    </ag-grid-vue>
    </div>
  </div>
@@ -80,13 +80,15 @@ export default{
        {
          prod_code: "",
          prod_name: "",
+         process_code: "",
+         quantity: "",
        }
      ],
      columnDefs: [
        { field: 'prod_code', headerName: '제품코드',flex:3,editable:true},
        { field: 'prod_name', headerName: '제품명' ,flex:4,editable:true},
        { field: 'process_code', headerName: '공정진행코드' ,flex:3,editable:true},
-       { field: 'created_quantity', headerName: '생산량 ' ,flex:2,editable:true},
+       { field: 'quantity', headerName: '생산량 ' ,flex:2,editable:true},
        
      ],
      gridOptions:{
@@ -106,18 +108,38 @@ export default{
 
     rowData2: [
     {
-     mat_code: "",
+     test_proc_code: "",
      prod_code: "",
      prod_name: "",
-     mat_name: "",
-     quantity: "",
+     check_list: "부품 누락",
+     pass_quantity: "",
+     error_quantity: "",
+    },
+    {
+     test_proc_code: "",
+     prod_code: "",
+     prod_name: "",
+     check_list: "외관",
+     pass_quantity: "",
+     error_quantity: "",
+    },
+    {
+     test_proc_code: "",
+     prod_code: "",
+     prod_name: "",
+     check_list: "포장상태",
+     pass_quantity: "",
+     error_quantity: "",
     }
     ],
     columnDefs2: [
     { headerCheckboxSelection: true, checkboxSelection: true, width: 50 },
-       { field: 'mat_code', headerName: '검수항목',flex:3,editable:true},
-       { field: 'prod_code', headerName: '불량량',flex:3,editable:true},
-       { field: 'prod_name', headerName: '합격량' ,flex:4,editable:true},
+       { field: 'test_proc_code', headerName: '제품검수코드',flex:4,editable:true},
+       { field: 'prod_code', headerName: '제품코드',flex:3,editable:true},
+       { field: 'prod_name', headerName: '제품명',flex:3,editable:true},
+       { field: 'check_list', headerName: '검수항목',flex:3,editable:true},
+       { field: 'pass_quantity', headerName: '합격량' ,flex:3,editable:true},
+       { field: 'error_quantity', headerName: '불량량' ,flex:3,editable:true},
      ],
      gridOptions2:{
        domLayout: "autoHeight", //행을 보고 자동으로 hight부여
@@ -144,16 +166,17 @@ export default{
  methods: {
    async prodcheckData() {
      try {
-       const response = await axios.get('/api/admin/prodcheck');
+       const response = await axios.get('/api/qual/prodcheck');
        this.rowData = response.data;
      } catch (err) {
        console.error('데이터 조회 실패:', err);
      }
+     console.log('값',this.rowData);
    },
    prodCellClicked(event){
-     let bom = event.data.prod_code;
+     let prodcheck = event.data.process_code;
      this.prodIndex = event.rowIndex
-     axios.get('/api/admin/bom/' + bom)
+     axios.get('/api/qual/prodcheck/' + prodcheck)
                 .then(res => {
                  console.log(res);
                       this.rowData2 = res.data;
@@ -218,7 +241,7 @@ export default{
      this.rowData2 = [...this.rowData2];
    },
    //저장
-   async bomSave(){
+   async prodCheckSave(){
 
      for(let data of this.rowData2) {
        console.log(data);
@@ -232,7 +255,7 @@ export default{
          return;
      }
      }
-     const res = axios.post('/api/admin/bomsave', {
+     const res = axios.post('/api/qual/bomsave', {
        insertbom: this.rowData2,
        
      })

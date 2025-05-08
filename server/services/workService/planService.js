@@ -309,6 +309,12 @@ const findAllProd = async () => {
     return prodList;
 }
 
+// 생산 계획 상태 확인
+const findPlanFinish_statusByPlan_code = async (plan_code) => {
+    let result = await mariaDB.query("findPlanFinish_statusByPlan_code", plan_code).catch((err) => console.error(err));
+    return result;
+}
+
 module.exports = {
     getPlan_code,
     findAllOrders,
@@ -322,4 +328,5 @@ module.exports = {
     updatePlanByPlan_code,
     deletePlanByPlan_code,
     findAllProd,
+    findPlanFinish_statusByPlan_code,   // 생산 계획 상태 확인
 };

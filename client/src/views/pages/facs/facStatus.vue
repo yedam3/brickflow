@@ -4,9 +4,9 @@
       <div class="input-group mb-5" style="width: 65%;">
         <!-- 검색 조건 선택 -->
         <select v-model="searchType" class="form-select" aria-label="Default select example">
-          <option value="" selected>전체</option>
-          <option value="">가동</option>
-          <option value="">비가동</option>
+          <option value="" selected style="color: gray;">전체</option>
+          <option v-for="staFac in statusFacAry" :key="staFac.fac_status"
+            :value="staFac.fac_status">{{ staFac.sub_code_name }}</option>
         </select>
         <!-- 검색어 입력 -->
         <input type="text" v-model="searchText" placeholder="검색어 입력" class="form-control w-50" style="width: 100%"
@@ -36,9 +36,6 @@
         AgGridVue,
         datePicker: DatePickerEditor,
   },
-  mounted(){
-    this.facStatus();
-  },
   data() {
     return{
       rowData:[],
@@ -48,11 +45,18 @@
         { field:"fac_location", headerName: "설비위치", flex: 2 },
         { field:"fac_pattern", headerName: "설비유형", flex: 2 },
         { field:"employee_code", headerName: "담당자", flex: 2 },
-        { field:"fac_status", headerName: "설비상태", flex: 2, 
+        { field:"fac_status", headerName: "설비상태", flex: 2,
+        valueFormatter:(params) => {
+          if(params.value == 'FS2'){
+            return params.value = '비가동';
+          } else  if(params.value == 'FS1'){
+            return params.value = '가동';
+          }
+        }, 
         cellStyle: params => {
-              if(params.value == "가동"){
+              if(params.value == "FS1"){
                 return { color: '#22C55E', textAlign:'center', fontWeight: 'bold' };
-              }else if(params.value == "비가동"){
+              }else if(params.value == "FS2"){
                 return { color: 'red', textAlign:'center', fontWeight: 'bold'};
               }
               return null;
@@ -73,7 +77,13 @@
             cellStyle: { textAlign: "center" },
           },
         },
+        statusFacAry: []
     }
+  },
+  async mounted(){
+    await this.facStatus();
+    await this.updateList();
+    await this.statusFac();
   },
   methods:{
     //조회
@@ -83,8 +93,25 @@
           console.log(res.data)
           this.rowData = res.data;
         })
+    },
+    async updateList(){
+      await axios.put('/api/fac/updateList', {
+        params:{
+          facCode: this.rowData[0].fac_code,
+          facStatus: this.rowData.fac_status}
+    });
+      this.facStatus(); 
+    },
+    async statusFac() {
+      await axios.get('/api/fac/facStatus')
+        .then(res => {
+          console.log(res.data);
+          this.statusFacAry = res.data;
+          this.statusFacAry = [...res.data];
+        })
+        .catch(err => console.log(err));
     }
-  },
+  }
 }
 </script>
 

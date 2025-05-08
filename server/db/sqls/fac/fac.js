@@ -13,12 +13,8 @@ const selectFacList =
         model_name,
         fac_location,
         employee_code,
-        fac_pattern,
-        install_date,
-        inspection_cycle,
-        image,
         fac_status
-FROM fac`;
+FROM fac`
 
 //설비상태페이지 리스트
 const statusList =
@@ -85,9 +81,9 @@ WHERE unplay_code = ?`
 
 //삭제
 //비가동설비 삭제
-const delUnplay =
-`DELETE FROM fac_none_play
-WHERE unplay_code = ?`
+// const delUnplay =
+// `DELETE FROM fac_none_play
+// WHERE unplay_code = ?`
 
 //비가동 사유
 const reasonFac = `
@@ -104,6 +100,14 @@ const facResult =
   FROM main_codes m
   JOIN sub_codes s ON m.main_code = s.main_code
   WHERE s.main_code = "OH"`
+
+  //설비상태
+const facStatus =
+`SELECT s.sub_code AS fac_status,
+         s.sub_code_name
+  FROM main_codes m
+  JOIN sub_codes s ON m.main_code = s.main_code
+  WHERE s.main_code = "FS"`
 
 //비가동고장리스트
 const repaireList = 
@@ -146,12 +150,16 @@ const repList =
         repaire_finish_date,
         fac_code,
         fac_result,
-        break_code,
+        break_status,
         unplay_code,
         note,
         fac_history
 FROM repaire
 WHERE 1=1`
+
+//가동, 비가동 업데이트
+const updateList =
+`UPDATE fac SET fac_status = ? WHERE fac_code = ?`
 
 module.exports = {
   autoUnCode,
@@ -160,7 +168,7 @@ module.exports = {
   unplayList,
   updateUnplay,
   facCheck,
-  delUnplay,
+  // delUnplay,
   reasonFac,
   facModal,
   statusList,
@@ -169,4 +177,6 @@ module.exports = {
   repaireFac,
   facResult,
   repList,
+  updateList,
+  facStatus,
 };

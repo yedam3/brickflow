@@ -134,7 +134,7 @@ WHERE plan_code = ?
 
 // 주문 상태 확인 (출고완료)
 const findOrder_statusByOrders_code = `
-SELECT COUNT(*) AS 'check'
+SELECT COUNT(*) AS 'status'
 FROM orders
 WHERE orders_code = ? AND orders_code = 'OS4'
 `;
@@ -201,13 +201,20 @@ const updateOrderDetailByOrders_code = `
 UPDATE order_detail
 SET
     finish_status = ?
-WHERE order_detail_code = ?
+WHERE orders_detail_code = ?
 `;
 
 // 제품 검색
 const findAllProd = `
 SELECT prod_code, prod_name, unit, by_unit_number
 FROM prod
+`;
+
+// 생산 계획 상태 확인
+const findPlanFinish_statusByPlan_code = `
+SELECT finish_code
+FROM plan
+WHERE plan_code = ?
 `;
 
 module.exports = {
@@ -228,4 +235,5 @@ module.exports = {
     updateOrdersByOrders_code,          // 주문 상태 변경
     updateOrderDetailByOrders_code,     // 주문 상세 상태 변경
     findAllProd,
+    findPlanFinish_statusByPlan_code,   // 생산 계획 상태 확인
 };

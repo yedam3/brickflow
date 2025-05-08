@@ -98,6 +98,9 @@ const insertProduct_order = async (orderData, orderDetailDataList, matHoldDataLi
     let conn;
     let result;
 
+    console.log(orderData);
+
+    const order_fields = ["product_order_code", "plan_code", "product_order_name", "employee_code", "start_date", "end_date", "note"];
     const orderDetail_fields = ["product_order_detail_code", "prod_code", "order_quantity", "priority", "process_flow_code", "product_order_code"];
     const matHold_fields = ["mat_hold_code", "product_order_detail_code", "mat_LOT", "hold_quantity", "mat_code"];
     
@@ -108,11 +111,16 @@ const insertProduct_order = async (orderData, orderDetailDataList, matHoldDataLi
         // 생산 지시 등록
         orderData.start_date = dateFormat(orderData.start_date);
         orderData.end_date = dateFormat(orderData.end_date);
-        let selectedQuery = mariaDB.selectedQuery("insertProduct_order", Object.values(orderData));
-        result = await conn.query(selectedQuery, Object.values(orderData));
+        let selectedQuery = mariaDB.selectedQuery("insertProduct_order", convertObjToAry(orderData, order_fields));
+        result = await conn.query(selectedQuery, convertObjToAry(orderData, order_fields));
+
+        // 생산 계획 상태 변경
+        let planData = ["OC2", orderData.plan_code];
+        selectedQuery = mariaDB.selectedQuery("updatePlanStatusByPlan_code", planData);
+        result = await conn.query(selectedQuery, planData);
 
         // 공정 흐름도 
-        
+
         // 생산 지시 상세 등록 / 생산 지시 공정 초기 세팅 등록
         for (let orderDetailData of orderDetailDataList) {
             // 생산 지시 상세 코드 조회
@@ -131,7 +139,7 @@ const insertProduct_order = async (orderData, orderDetailDataList, matHoldDataLi
             // 공정 흐름도 조회 (prod_code)
             selectedQuery = mariaDB.selectedQuery("findAllProcess_flowByProd_code", orderDetailData.prod_code);
             result = await conn.query(selectedQuery, orderDetailData.prod_code);
-                
+
             // 생산 지시 공정 초기 세팅 등록
             let cnt = 1;
             for(let processFlowData of result) {
@@ -139,7 +147,7 @@ const insertProduct_order = async (orderData, orderDetailDataList, matHoldDataLi
                 if(cnt > 1) {
                     order_quantity = 0;
                 }
-                let workProcessData = [orderDetailData.product_order_detail_code, processFlowData.process_flow_code, orderDetailData.prod_code, order_quantity, cnt];
+                let workProcessData = [orderDetailData.product_order_detail_code, processFlowData.process_code, orderDetailData.prod_code, order_quantity, cnt];
 
                 selectedQuery = mariaDB.selectedQuery("insertWork_process", workProcessData);
                 result = await conn.query(selectedQuery, workProcessData);
@@ -165,25 +173,21 @@ const insertProduct_order = async (orderData, orderDetailDataList, matHoldDataLi
 
             // 자재 홀드량 등록
             for(let matData of matHoldData.mat_LOTs) {
+
                 // 자재 홀드 코드 조회
                 selectedQuery = mariaDB.selectedQuery("findMat_hold_code");
                 result = await conn.query(selectedQuery);
 
                 newMatData.mat_hold_code = result[0].mat_hold_code;
                 newMatData.mat_LOT = matData.mat_LOT;
-                newMatData.hold_quantity = parseInt(matHoldData.material_input_qunatity);
+                newMatData.hold_quantity = parseInt(matData.mat_hold_qty);
                 newMatData.mat_code = matData.mat_code;
 
                 selectedQuery = mariaDB.selectedQuery("insertMat_hold", Object.values(newMatData));
                 result = await conn.query(selectedQuery, Object.values(newMatData));
             }
         }
-
-        // 생산 계획 상태 변경
-        let planData = ["OC2", orderData.plan_code];
-        selectedQuery = mariaDB.selectedQuery("updatePlanStatusByPlan_code", planData);
-        result = await conn.query(selectedQuery, planData);
-
+        
         await conn.commit();
     } catch (err) {
         if (conn) await conn.rollback();
@@ -196,48 +200,81 @@ const insertProduct_order = async (orderData, orderDetailDataList, matHoldDataLi
 
 // 생산 지시 수정
 const updateProduct_order = async (orderData, workDetailList, matHoldDataList) => {
-    let conn;
-    let result;
+    // let conn;
+    // let result;
 
-    const product_order_fields = ["product_order_name", "start_date", "end_date", "note", "product_order_code"];
-    const work_detail_fields = ["prod_code", "order_quantity", "priority", "product_order_detail_code"];
-    const mat_hold_fields = ["mat_LOT", "mat_hold_qty", "product_order_detail_code", "mat_code"];
+    // const product_order_fields = ["product_order_name", "start_date", "end_date", "note", "product_order_code"];
+    // const work_detail_fields = ["prod_code", "order_quantity", "priority", "product_order_detail_code"];
+    // const mat_hold_fields = ["mat_LOT", "mat_hold_qty", "product_order_detail_code", "mat_code"];
 
-    try {
-        conn = await mariaDB.getConnection();
-        await conn.beginTransaction();
+    // try {
+    //     conn = await mariaDB.getConnection();
+    //     await conn.beginTransaction();
 
-        // 생산 지시 자재 홀드량 수정 / 생산 지시 공정 초기 세팅 수정 / 생산 지시 상세 수정
-        for(let workDetailData of workDetailList) {
-            // 생산 지시 자재 홀드량 수정
-            for (let matHoldData of matHoldDataList) {
-                console.log("matholdData: ",matHoldData)
-                for (let matData of matHoldData.mat_LOTs) {
-                    matData.product_order_detail_code = workDetailData.product_order_detail_code
-                        selectedQuery = mariaDB.selectedQuery("updateMat_holdByProduct_order_detail_codeAndMat_code", convertObjToAry(matData, mat_hold_fields));
-                    result = await conn.query(selectedQuery, convertObjToAry(matData, mat_hold_fields));
-                }
-            }
+    //     // 생산 지시 상세 수정 / 생산 지시 자재 홀드량 수정 / 생산 지시 공정 초기 세팅 수정
+    //     for(let workDetailData of workDetailList) {
 
-            // 생산 지시 공정 초기 세팅 수정
+    //         // 생산 지시 코드 조회 (product_order_code, prod_code)
+    //         let _data = [orderData.product_order_code, workDetailData.prod_code];
+    //         selectedQuery = mariaDB.selectedQuery("findWork_detailByProduct_order_codeAndProd_code", _data);
+    //         result = await conn.query(selectedQuery, _data);
 
-            // 생산 지시 상세 수정
-            selectedQuery = mariaDB.selectedQuery("updateWork_detailByProduct_order_detail_code", convertObjToAry(workDetailData, work_detail_fields));
-            result = await conn.query(selectedQuery, convertObjToAry(workDetailData, work_detail_fields));
-        }
+    //         // 생산 지시 상세 수정
+    //         workDetailData.product_order_detail_code = result[0].product_order_detail_code;
+    //         selectedQuery = mariaDB.selectedQuery("updateWork_detailByProduct_order_detail_code", convertObjToAry(workDetailData, work_detail_fields));
+    //         result = await conn.query(selectedQuery, convertObjToAry(workDetailData, work_detail_fields));
 
-        // 생산 지시 수정
-        orderData.start_date = dateFormat(orderData.start_date);
-        orderData.end_date = dateFormat(orderData.end_date);
-        selectedQuery = mariaDB.selectedQuery("updateProduct_orderByProduct_order_code", convertObjToAry(orderData, product_order_fields));
-        result = await conn.query(selectedQuery, convertObjToAry(orderData, product_order_fields));
+    //         // 생산 지시 자재 홀드량 삭제
 
-        await conn.commit();
-    } catch(err) {
-        console.log(err);
-    } finally {
-        if(conn) conn.release();
-    }
+    //         // 생산 지시 자재 홀드량 수정
+    //         for (let matHoldData of matHoldDataList) {
+    //             for (let matData of matHoldData.mat_LOTs) {
+    //                 console.log(workDetailData.product_order_detail_code);
+    //                 matData.product_order_detail_code = workDetailData.product_order_detail_code;
+    //                 selectedQuery = mariaDB.selectedQuery("updateMat_holdByProduct_order_detail_codeAndMat_code", convertObjToAry(matData, mat_hold_fields));
+    //                 result = await conn.query(selectedQuery, convertObjToAry(matData, mat_hold_fields));
+    //             }
+    //         }
+
+    //         if(typeof orderData.product_order_code !== 'undefined') {
+    //             // 생산 지시 공정 초기 세팅 값 삭제
+    //             selectedQuery = mariaDB.selectedQuery("deleteWork_processByProduct_order_Detail_code", workDetailData.product_order_detail_code);
+    //             result = await conn.query(selectedQuery, workDetailData.product_order_detail_code);
+
+    //             // 생산 지시 공정 초기 세팅 등록
+    //             // 공정 흐름도 조회 (prod_code)
+    //             selectedQuery = mariaDB.selectedQuery("findAllProcess_flowByProd_code", workDetailData.prod_code);
+    //             result = await conn.query(selectedQuery, workDetailData.prod_code);
+
+    //             // 생산 지시 공정 초기 세팅 등록
+    //             let cnt = 1;
+    //             for(let processFlowData of result) {
+    //                 let quantity = workDetailData.quantity;
+    //                 if(cnt > 1) {
+    //                     quantity = 0;
+    //                 }
+    //                 let workProcessData = [workDetailData.product_order_detail_code, processFlowData.process_flow_code, workDetailData.prod_code, quantity, cnt];
+
+    //                 selectedQuery = mariaDB.selectedQuery("insertWork_process", workProcessData);
+    //                 result = await conn.query(selectedQuery, workProcessData);
+    //                 cnt++;
+    //             }
+    //         }
+    //     }
+
+    //     // 생산 지시 수정
+    //     orderData.start_date = dateFormat(orderData.start_date);
+    //     orderData.end_date = dateFormat(orderData.end_date);
+    //     selectedQuery = mariaDB.selectedQuery("updateProduct_orderByProduct_order_code", convertObjToAry(orderData, product_order_fields));
+    //     result = await conn.query(selectedQuery, convertObjToAry(orderData, product_order_fields));
+
+    //     await conn.commit();
+    // } catch(err) {
+    //     if(conn) await conn.rollback();
+    //     console.log(err);
+    // } finally {
+    //     if(conn) conn.release();
+    // }
     return result;
 };
 
@@ -272,10 +309,12 @@ const deleteProduct_order = async (product_order_code) => {
         selectedQuery = mariaDB.selectedQuery("findAllProductOrderByProduct_order_code", product_order_code);
         result = await conn.query(selectedQuery, product_order_code);
 
-        // 생산 계획 상태 변경
-        const plan_status = ["OC1", result[0].plan_code];
-        selectedQuery = mariaDB.selectedQuery("updatePlanStatusByPlan_code", plan_status);
-        result = await conn.query(selectedQuery, plan_status);
+        if(Array.isArray(result) && result.length > 0 && typeof result[0].plan_code !== 'undefined') {
+            // 생산 계획 상태 변경
+            const plan_status = ["OC1", result[0].plan_code];
+            selectedQuery = mariaDB.selectedQuery("updatePlanStatusByPlan_code", plan_status);
+            result = await conn.query(selectedQuery, plan_status);
+        }
 
         // 생산 지시 삭제
         selectedQuery = mariaDB.selectedQuery("deleteProduct_orderByProduct_order_code", product_order_code);

@@ -29,6 +29,15 @@ router.post('/deliveryDetail', async (req, res) => {
   res.send(result);
 })
 
+
+//값체크
+router.post('/deliveryCheck', async (req, res) => {
+    const {deliveryCode} = req.body;
+    let list = await deliveryService.deliveryCheck(deliveryCode)
+                               .catch((err)=> console.log(err));
+    res.send(list);
+})
+
 //삭제
 router.delete('/deliveryDelete/:delivery_code', async (req, res) => {
     let deliverycode = req.params.delivery_code;

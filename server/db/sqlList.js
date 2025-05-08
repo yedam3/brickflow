@@ -20,7 +20,7 @@ const mainPage = require('./sqls/mainPage/mainPage.js');
 const login = require('./sqls/login/login.js');
 
 
-
+const prodCheck = require('./sqls/qual/prodcheck.js');
 
 module.exports = {
     ...work,
@@ -41,4 +41,5 @@ module.exports = {
     ...mainPage,
     ...delivery,
     ...login
+    ...prodCheck,
 }
