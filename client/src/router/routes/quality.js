@@ -1,6 +1,6 @@
 export default[
   {
-    path: '/admin/prodcheck',
+    path: '/qual/prodcheck',
     name: 'prodcheck',
     component: () => import('@/views/pages/qual/Prodcheck.vue')
   },

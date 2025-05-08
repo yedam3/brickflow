@@ -17,9 +17,7 @@ const bom = require('./sqls/admin/bom.js');
 const processFlow = require('./sqls/admin/processFlow.js');
 const label = require('./sqls/mat/label.js');
 const mainPage = require('./sqls/mainPage/mainPage.js');
-
-
-
+const prodCheck = require('./sqls/qual/prodcheck.js');
 
 module.exports = {
     ...work,
@@ -39,4 +37,5 @@ module.exports = {
     ...label,
     ...mainPage,
     ...delivery,
+    ...prodCheck,
 }
