@@ -91,7 +91,8 @@ WHERE product_order_code = ?
 
 // 생산 상품 자재 홀드 조회 (product_order_detail_code)
 const findAllMatHoldByProduct_order_detail_code = `
-SELECT DISTINCT wd.prod_code, mh.mat_code, m.mat_name, mh.hold_quantity,
+SELECT DISTINCT wd.prod_code, mh.mat_code, m.mat_name,
+	SUM(mh.hold_quantity) AS hold_quantity,
     (wd.order_quantity * b.quantity) AS req_material_quantity
 FROM mat_hold mh
 	JOIN work_detail wd ON mh.product_order_detail_code = wd.product_order_detail_code
@@ -99,6 +100,7 @@ FROM mat_hold mh
 	JOIN BOM b ON wd.prod_code = b.prod_code AND mh.mat_code = b.mat_code
     JOIN mat m ON b.mat_code = m.mat_code
 WHERE mh.product_order_detail_code = ?
+GROUP BY wd.prod_code, mh.mat_code, m.mat_name, wd.order_quantity, b.quantity
 `;
 
 // 생산 상품 자재 LOT 조회
@@ -124,7 +126,7 @@ ORDER BY ms.store_date ASC
 
 // 생산지시 상태 확인
 const findStatusByPlan_code = `
-SELECT finish_status
+SELECT finish_status AS 'status'
 FROM product_order
 WHERE plan_code = ?;
 `;

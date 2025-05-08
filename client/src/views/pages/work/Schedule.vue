@@ -411,15 +411,17 @@ export default {
                 });
                 return;
             }
-            const order_statusRes = await axios.get(`/api/work/plan/order_statusCheck/${this.formData.orders_code}`).catch((err) => console.error(err));
-            if (order_statusRes.data.check > 0) {
-                Swal.fire({
+            if(this.formData.orders_code !== '') {
+                const order_statusRes = await axios.get(`/api/work/plan/order_statusCheck/${this.formData.orders_code}`).catch((err) => console.error(err));
+                if (order_statusRes.data.check > 0) {
+                    Swal.fire({
                     title: '실패',
                     text: '이미 출고가 완료된 건입니다.',
                     icon: 'error',
                     confirmButtonText: '확인'
                 });
                 return;
+            }
             }
             await axios.post("/api/work/plan/plan", {
                 planData: this.formData,
@@ -538,9 +540,9 @@ export default {
             });
         },
 
-        // 생산계획 상태 확인
+        // 생산지시 상태 확인
         async planOrderStatusCheck(plan_code) {
-            let res = await axios.get(`/work/order/findStatusByPlan_code`, {
+            let res = await axios.get(`/api/work/order/orderStatus/${plan_code}`, {
             }).catch((err) => {
                 console.error(err);
             })
