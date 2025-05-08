@@ -18,7 +18,8 @@ router.get('/processflow/:prodno', async (req, res) => {
 });
 //. 공정 전체 조회
 router.get('/processAll',async(req,res) => {
-    let list = await processFlowService.allProc();
+    let list = await processFlowService.allProc()
+                     .catch((err) => console.log(err));
     res.send(list);
 })
 
