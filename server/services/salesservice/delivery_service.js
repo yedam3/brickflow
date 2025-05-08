@@ -64,7 +64,27 @@ const deliveryAdd = async (delivery, deliveryDetail) => {
     return result;
 }
 
+//수정
+const modifydelivery = async () => {
 
+    let updateInfo ={
+
+    }
+    let result = await mariaDB.query('', [])
+    .catch((err) => console.log(err));
+    if (result.affectedRows < 1) {
+    return result;
+    }
+    for(let detail of deliveryDetail){
+        let updateDetailIndo = {
+
+        }
+        result = await mariaDB.query('',[]
+            .catch((err)=> console.log));
+        
+    }
+    return result;
+}
 
 //값중복확인
 const deliveryCheck = async (deliveryCode) => {

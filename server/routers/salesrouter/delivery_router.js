@@ -29,6 +29,9 @@ router.post('/deliveryDetail', async (req, res) => {
   res.send(result);
 })
 
+//수정
+router.put('/delivery')
+
 
 //값체크
 router.post('/deliveryCheck', async (req, res) => {
