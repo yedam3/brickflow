@@ -4,9 +4,9 @@
       <div class="input-group mb-5" style="width: 65%;">
         <!-- 검색 조건 선택 -->
         <select v-model="searchType" class="form-select" aria-label="Default select example">
-          <option value="" selected>전체</option>
-          <option value="">수리완료</option>
-          <option value="">수리불가</option>
+          <option value="" selected style="color: gray;">전체</option>
+          <option v-for="reFac in resultFacAry" :key="reFac.fac_result"
+            :value="reFac.fac_result">{{ reFac.sub_code_name }}</option>
         </select>
         <!-- 검색어 입력 -->
         <input type="text" v-model="searchText" placeholder="검색어 입력" class="form-control w-50" style="width: 100%"
@@ -49,10 +49,17 @@
         { field:"repaire_finish_date", headerName: "수리처리일자", flex: 2,  },
         { field:"fac_code", headerName: "설비코드", flex: 2,  },
         { field:"fac_result", headerName: "수리결과", flex: 2,  
+        valueFormatter:(params) => {
+          if(params.value == 'OH1'){
+            return params.value = '수리완료';
+          } else  if(params.value == 'OH2'){
+            return params.value = '수리불가';
+          }
+        }, 
           cellStyle: params => {
-            if(params.value == "수리완료"){
+            if(params.value == "OH1"){
                 return { color: '#22C55E', textAlign:'center', fontWeight: 'bold' };
-              }else if(params.value == "수리불가"){
+              }else if(params.value == "OH2"){
                 return { color: 'red', textAlign:'center', fontWeight: 'bold'};
               }
               return null;
@@ -77,7 +84,12 @@
             cellStyle: { textAlign: "center" },
           },
         },
+        resultFacAry:[]
       }
+    },
+    mounted(){
+      this.repaireFac();
+      this.facResult();
     },
     methods: {
       //조회
@@ -87,7 +99,16 @@
           console.log(res.data)
           this.rowData = res.data;
         })
-      }
+      },
+      //수리결과
+      async facResult(){
+      await axios.get('/api/fac/facResult')
+      .then(res => {
+        this.resultFacAry = res.data;
+        this.resultFacAry = {...res.data};
+      })
+      .catch(err => console.error(err));
+    }
     },
   }
 </script>

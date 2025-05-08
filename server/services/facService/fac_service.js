@@ -77,7 +77,12 @@ const modifyUnplay = async (unplayInfo)=> {
   }
   return result;
 }
-
+//가동업뎃
+const updateList = async ({ facCode, facStatus }) => {
+  const params = [facStatus, facCode]
+  const result = await mariaDB.query('updateList', params).catch((err) => console.log(err));
+  return result;
+}
 //값 중복확인
 const unFacCheck = async (unplayCode) => {
   console.log(unplayCode);
@@ -86,13 +91,13 @@ const unFacCheck = async (unplayCode) => {
 }
 
 //비가동 설비 삭제
-const deleteUnplay = async(unplayCode) =>{
-  let result = await mariaDB.query('delUnplay', unplayCode).catch((err)=> console.log(err))
-  if (result.affectedRows < 1) {
-    return result;
-  }
-  return result;
-}
+// const deleteUnplay = async(unplayCode) =>{
+//   let result = await mariaDB.query('delUnplay', unplayCode).catch((err)=> console.log(err))
+//   if (result.affectedRows < 1) {
+//     return result;
+//   }
+//   return result;
+// }
 //비가동사유
 const reason = async() =>{
   let list = await mariaDB.query('reasonFac');
@@ -101,6 +106,11 @@ const reason = async() =>{
 //수리결과
 const facResult = async() => {
   let list = await mariaDB.query('facResult');
+  return list
+}
+//설비상태
+const facStatus = async() => {
+  let lsit = await mariaDB.query('facStatus');
   return list
 }
 
@@ -148,11 +158,13 @@ module.exports = {
   repaireFac,
   modifyUnplay,
   unFacCheck,
-  deleteUnplay,
+  // deleteUnplay,
   reason,
   facModal,
   statuFac,
   repaireList,
   facResult,
   repList,
+  updateList,
+  facStatus,
 }
