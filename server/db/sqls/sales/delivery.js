@@ -14,9 +14,9 @@ const deliveryAutoOrder =
   `SELECT CONCAT('DEL-', IFNULL(MAX(CAST(SUBSTR(delivery_code, 5) AS SIGNED)), 100) + 1) AS code
   FROM delivery_manage`;
 
- // 상세출고코드 자동 부여
- const deliveryAutoDetailOrder =
-   `SELECT CONCAT('DEL-', IFNULL(MAX(CAST(SUBSTR(delivery_code, 5) AS SIGNED)), 100) + 1) AS code
+// 상세출고코드 자동 부여
+const deliveryAutoDetailOrder =
+  `SELECT CONCAT('DEL-', IFNULL(MAX(CAST(SUBSTR(delivery_code, 5) AS SIGNED)), 100) + 1) AS code
   FROM delivery_manage_detail`;
 
 //등록
@@ -25,9 +25,21 @@ const deliveryAdd =
 VALUES( ? , ? , ? , ? , ? )`;
 
 //상세등록
-const deliveryDetailAdd = 
-   `INSERT INTO delivery_manage_detail(delivery_detail_code, prod_code, delivery_quantity, prod_LOT, delivery_code)
+const deliveryDetailAdd =
+  `INSERT INTO delivery_manage_detail(delivery_detail_code, prod_code, delivery_quantity, prod_LOT, delivery_code)
 VALUES( ? , ? , ? , ? , ?)`;
+
+//수정
+const deliveryUpdate = `
+UPDATE delivery_manage
+SET ?
+WHERE delivery_code = ?`
+
+//상세 수정
+const deliveryDetailUpdate = `
+UPDATE delivery_manage_detail
+SET ?
+WHERE delivery_detail_code = ?`
 
 
 
@@ -56,5 +68,7 @@ module.exports = {
   deliveryDetailDelete,
   prodcheck,
   addCheck,
-deliveryAutoDetailOrder,
+  deliveryAutoDetailOrder,
+  deliveryUpdate,
+  deliveryDetailUpdate,
 }
