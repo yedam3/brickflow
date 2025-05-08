@@ -98,7 +98,8 @@
         this.$emit("close");
       },
       async procList() {
-        await axios.get('/api/admin//processAll/')  
+        alert('ee')
+        await axios.get('/api/admin/processAll')  
           .then(res => {
             console.log('결과',res.data)
             this.rowData = res.data;

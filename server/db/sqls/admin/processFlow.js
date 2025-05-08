@@ -35,16 +35,16 @@ const procSave = `INSERT INTO process_flow(process_flow_code, prod_code, process
                     VALUES(?, ?, ?,NOW(),?)`
 
 //3. 공정조회
-const procAllList = `SELECT process_flow_code,
+const procAllList = `  SELECT process_flow_code,
                          process_date,
                          process_sequence,
                          emp_code,
                          prod_code,
-                         pf.process_code,
+                         p.process_code,
                          getProdName(prod_code) as prod_name,
                          p.process_name
                   FROM process_flow pf 
-                  JOIN process p
+                  RIGHT JOIN process p
                     ON (pf.process_code = p.process_code)`
 
 
