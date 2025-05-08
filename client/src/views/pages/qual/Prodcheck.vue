@@ -24,10 +24,6 @@
      <Button label="저장" severity="info" class="me-3" @click="prodCheckSave"/>
    </div>
 
-   <div class="text-end mt-3 mb-3">
-     <Button label="행추가" severity="success" class="me-3" @click="addRow"/>
-     <Button label="행삭제" severity="danger" class="me-3" @click="deleteRow"/>  
-   </div>
  <div class="par-grid">
    <div class="prod-grid">
      <ag-grid-vue style="width: 700px; height: 500px;"
@@ -87,7 +83,7 @@ export default{
      columnDefs: [
        { field: 'prod_code', headerName: '제품코드',flex:3,editable:true},
        { field: 'prod_name', headerName: '제품명' ,flex:4,editable:true},
-       { field: 'process_code', headerName: '공정진행코드' ,flex:3,editable:true},
+       { field: 'work_lot', headerName: '공정LOT' ,flex:4},
        { field: 'quantity', headerName: '생산량 ' ,flex:2,editable:true},
        
      ],
@@ -108,7 +104,8 @@ export default{
 
     rowData2: [
     {
-     test_proc_code: "",
+     work_lot: "",
+     prod_check_code: "",
      prod_code: "",
      prod_name: "",
      check_list: "부품 누락",
@@ -116,7 +113,8 @@ export default{
      error_quantity: "",
     },
     {
-     test_proc_code: "",
+     work_lot: "",
+     prod_check_code: "",
      prod_code: "",
      prod_name: "",
      check_list: "외관",
@@ -124,7 +122,8 @@ export default{
      error_quantity: "",
     },
     {
-     test_proc_code: "",
+     work_lot: "",
+     prod_check_code: "",
      prod_code: "",
      prod_name: "",
      check_list: "포장상태",
@@ -134,10 +133,11 @@ export default{
     ],
     columnDefs2: [
     { headerCheckboxSelection: true, checkboxSelection: true, width: 50 },
-       { field: 'test_proc_code', headerName: '제품검수코드',flex:4,editable:true},
+       { field: 'work_lot', headerName: '공정LOT' ,flex:3},
+       { field: 'prod_check_code', headerName: '제품검수코드',flex:4,editable:true},
        { field: 'prod_code', headerName: '제품코드',flex:3,editable:true},
        { field: 'prod_name', headerName: '제품명',flex:3,editable:true},
-       { field: 'check_list', headerName: '검수항목',flex:3,editable:true},
+       { field: 'check_list', headerName: '검수항목',flex:4,editable:true},
        { field: 'pass_quantity', headerName: '합격량' ,flex:3,editable:true},
        { field: 'error_quantity', headerName: '불량량' ,flex:3,editable:true},
      ],
@@ -174,7 +174,7 @@ export default{
      console.log('값',this.rowData);
    },
    prodCellClicked(event){
-     let prodcheck = event.data.process_code;
+     let prodcheck = event.data.work_lot;
      this.prodIndex = event.rowIndex
      axios.get('/api/qual/prodcheck/' + prodcheck)
                 .then(res => {

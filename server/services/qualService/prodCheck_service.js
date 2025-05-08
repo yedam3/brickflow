@@ -6,7 +6,7 @@ const { retry } = require("rxjs");
 //제품검수관리
 //1. 제품조회
 const  prodList = async () => {
-  let list = await mariaDB.query('prodList');
+  let list = await mariaDB.query('prodCheckList');
   return list;
 }
 
