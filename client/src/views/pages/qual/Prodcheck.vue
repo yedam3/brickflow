@@ -132,7 +132,6 @@ export default{
     }
     ],
     columnDefs2: [
-    { headerCheckboxSelection: true, checkboxSelection: true, width: 50 },
        { field: 'work_lot', headerName: '공정LOT' ,flex:3},
        { field: 'prod_check_code', headerName: '제품검수코드',flex:4,editable:true},
        { field: 'prod_code', headerName: '제품코드',flex:3,editable:true},
