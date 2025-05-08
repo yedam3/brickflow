@@ -161,7 +161,7 @@ export default {
       axios.post('/api/fac/repaireFac', {
         repaireFac: this.rowData2
       })
-      .then(res => {
+      .then(async res => {
         if (res.data.affectedRows > 0) {
           Swal.fire({
             title: '처리성공',

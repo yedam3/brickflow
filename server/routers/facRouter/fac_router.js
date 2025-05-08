@@ -35,10 +35,14 @@ router.post("/addUnFac", async (req,res)=>{
 })
 //비가동수리 처리
 router.post("/repaireFac", async (req,res)=>{
-    const {repaireFac} = req.body;
-    let result = await facService.repaireFac(repaireFac).catch(err => console.log(err));
-    res.send(result);
-})
+    try {
+        const result = await facService.addUnFac(req.body.unplayFac);
+        res.send(result);
+      } catch (err) {
+        console.error(err);
+        res.status(500).send('비가동 등록 중 오류 발생');
+      }
+    });
 
 //비가동설비 수정
 router.put("/modifyUnplay", async(req, res)=>{
@@ -46,7 +50,12 @@ router.put("/modifyUnplay", async(req, res)=>{
     let result = await facService.modifyUnplay(unplayFac).catch((err) => console.log(err));
     res.send(result);
 })
-
+//비가동 업뎃
+router.put('/updateList', async (req, res) => {
+    const { facStatus, facCode } = req.body;
+    let result = await facService.updateList({facStatus, facCode}).catch((err)=> console.log(err));
+    res.send(result);
+})
 //값 체크
 router.get('/unFacCheck', async (req, res)=> {
     const {unplayCode} = req.query;
@@ -55,11 +64,11 @@ router.get('/unFacCheck', async (req, res)=> {
 })
 
 //비가동 설비 삭제
-router.delete('/delUnplay/:ucd', async(req,res)=>{
-    let unplayCode = req.params.ucd;
-    let result = await facService.deleteUnplay(unplayCode)
-    res.send(result);
-})
+// router.delete('/delUnplay/:ucd', async(req,res)=>{
+//     let unplayCode = req.params.ucd;
+//     let result = await facService.deleteUnplay(unplayCode)
+//     res.send(result);
+// })
 
 //설비 모달리스트
 router.get('/facModal', async (req, res) => {
@@ -98,6 +107,11 @@ router.get('/facResult', async(req, res) => {
     let result = await facService.facResult().catch((err)=> console.log(err));
     res.send(result)
 })
+//설비상태
+router.get('/facStatus', async(req,res) => {
+    let result = await facService.facStatus().catch((err)=> console.log(err));
+    res.send(result)
+}) 
 
 //비가동수리
 router.get('/repaireList', async(req, res)=>{
