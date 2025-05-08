@@ -102,24 +102,34 @@ router.beforeEach(async (to, from, next) => {
     //부서 권한 설정
     //startWith /admin으로 시작하는 맞으면 TRUE 아니면 FALSE
     if (to.path.startsWith('/admin') && store.dep !== '관리자') {
+      if(store.dep !== '관리자'){
         return next('/error');
+       }
       }
       if (to.path.startsWith('/mat') && store.dep !== '자재') {
         if(store.dep !== '관리자'){
         return next('/error');
-     }
+       }
       }
       if(to.path.startsWith('/work') && store.dep !== '생산'){
-        return next('/error');
+        if(store.dep !== '관리자'){
+          return next('/error');
+         }
       }
       if(to.path.startsWith('/qual') && store.dep !== '품질'){
-        return next('/error');
+        if(store.dep !== '관리자'){
+          return next('/error');
+         }
       }
       if(to.path.startsWith('/fac') && store.dep !== '설비'){
-        return next('/error');
+        if(store.dep !== '관리자'){
+          return next('/error');
+         }
       }
       if(to.path.startsWith('/seller') && store.dep !== '영업'){
-        return next('/error');
+        if(store.dep !== '관리자'){
+          return next('/error');
+         }
       }
     
       // 모든 조건 통과 시 이동
