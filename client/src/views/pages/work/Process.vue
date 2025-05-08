@@ -91,7 +91,7 @@ export default {
                 { field: "note", headerName: "생산량", flex: 3, editable: true, cellStyle: { textAlign: "center" } },
                 { field: "note", headerName: "시작시간", flex: 3, editable: true, cellStyle: { textAlign: "center" } },
                 { field: "note", headerName: "종료시간", flex: 3, editable: true, cellStyle: { textAlign: "center" } },
-                { field: "note", headerName: "생산상탠", flex: 3, editable: true, cellStyle: { textAlign: "center" } },
+                { field: "note", headerName: "생산상태", flex: 3, editable: true, cellStyle: { textAlign: "center" } },
             ],
             employeeColDefs: [
                 { field: "mat_order_code", headerName: "사번", flex: 2, cellStyle: { textAlign: "center" } },
@@ -101,7 +101,7 @@ export default {
             facColDefs: [
                 { field: "fac_code", headerName: "설비코드", flex: 2, cellStyle: { textAlign: "center" } },
                 { field: "fac_name", headerName: "설비명", flex: 2, cellStyle: { textAlign: "center" } },
-                { field: "fac_status", headerName: "설비상태태", flex: 2, cellStyle: { textAlign: "center" } },
+                { field: "fac_status", headerName: "설비상태", flex: 2, cellStyle: { textAlign: "center" } },
             ],
             gridOptions: {
                 domLayout: "autoHeight", //행을 보고 자동으로 hight부여
@@ -120,11 +120,14 @@ export default {
 
     },
     mounted() {
+        this.productOrderList();
     },
     methods: {
         // 생산 지시 조회
         async productOrderList() {
-
+            await axios.get(`/api/work/process/productOrderList`).then(res => {
+                console.log(res);
+            }).catch((err) => console.log(err));
         },
 
         // 생산 지시 조회

@@ -260,7 +260,7 @@ const deletePlanByPlan_code = async (plan_code, orders_code) => {
         conn =  await mariaDB.getConnection();
         await conn.beginTransaction();
 
-        // 생산 계획 삭제제
+        // 생산 계획 삭제
         let selectedQuery = mariaDB.selectedQuery("deletePlanByPlan_code", plan_code);
         result = await conn.query(selectedQuery, plan_code);
         
