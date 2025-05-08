@@ -35,6 +35,9 @@ const bomRotuer = require('./routers/adminRouter/bom_router.js');
 const labelRouter = require('./routers/matRouter/label_router.js');
 
 const mainPageRouter = require('./routers/mainRouter/main_router.js');
+
+const prodCheckRouter = require('./routers/qualRouter/prodCheck_router.js');
+
 // 기본 라우팅
 app.get("/", (req, res) => {
     res.send("Welcome!!");
@@ -59,3 +62,5 @@ app.use('/admin',bomRotuer);
 app.use('/label',labelRouter);
 
 app.use('/main',mainPageRouter);
+
+app.use('/qual',prodCheckRouter);

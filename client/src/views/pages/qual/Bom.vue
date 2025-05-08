@@ -45,7 +45,7 @@
      class="ag-theme-alpine"
      :columnDefs="columnDefs2"
      :rowData="rowData2"
-     :gridOptions="gridOptions2"
+     :gridOptions="gridOptions"
       rowSelection="multiple"
      :defaultColDef="defaultColDef2"
      @cellClicked="bomCellClicked">
@@ -118,7 +118,7 @@ export default{
        { field: 'mat_name', headerName: '자재명 ' ,flex:3,editable:true},
        { field: 'quantity', headerName: '수량 ' ,flex:2,editable:true},
      ],
-     gridOptions2:{
+     gridOptions:{
        domLayout: "autoHeight", //행을 보고 자동으로 hight부여
         suppressRowClickSelection: true, //	행 클릭할 때 체크박스 선택 방지
         overlayNoRowsTemplate: '표시할 값이 없습니다.',

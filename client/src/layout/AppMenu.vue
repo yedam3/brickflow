@@ -176,7 +176,7 @@ const model = ref([
                     {
                         label: '제품 검수',
                         icon: 'pi pi-fw pi-times-circle',
-                        to: '/admin/prodcheck'
+                        to: '/qual/prodcheck'
                     },
                     //신현욱
                     {
