@@ -24,10 +24,10 @@ const prodcheck = async (prod_LOT) => {
 
 //등록
 const deliveryAdd = async (delivery, deliveryDetail) => {
-  delivery.delivery_code = (await mariaDB.query('deliveryAutoOrder'))[0].code;
+  delivery.delivery_code = (await mariaDB.query('deliveryAutoOrder'))[0].code; // 출고코드 자동생성
   console.log(delivery.delivery_code);
   let result = await mariaDB.query('deliveryAdd', [
-    delivery.delivery_code
+      delivery.delivery_code
     , delivery.orders_code
     , delivery.company_code
     , delivery.employee_code
@@ -45,6 +45,13 @@ const deliveryAdd = async (delivery, deliveryDetail) => {
   }
   return result;
 }
+
+
+//값중복확인
+      const deliveryCheck = async (deliveryCode) => {
+        let list = await mariaDB.query('addCheck', deliveryCode)
+        return list;
+      }
 
 //삭제
       const removedelivery = async (delivery_code) => {
@@ -64,5 +71,6 @@ module.exports = {
   deliveryAdd,
   removedelivery,
   prodcheck,
+  deliveryCheck,
   
 }

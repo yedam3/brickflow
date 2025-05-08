@@ -158,28 +158,27 @@ export default {
 
     // 주문 모달창
     orderList() {
-      this.showOrderModal = true;
+      this.showOrderModal = true; 
     },
+    
     // 제품 조회 모달창
     prodList() {
             this.showProdModal = true;
-        },
-        // 제품 명 제품 코드 선택 시 모달창 열기
-        prodCellClicked(params) {
-            if((params.colDef.field == "prod_code" || params.colDef.field == "prod_name")) {
-                this.selectedSecondIndex = params.rowIndex;
-                this.showProdModal = true;
-            }
-        },
-
-        // 제품 모달창 값 전달
-        prodSelected(prod) {
-            this.secondRowData[this.selectedSecondIndex].prod_code = prod.prod_code;
-            this.secondRowData[this.selectedSecondIndex].prod_name = prod.prod_name;
-            this.secondRowData = [...this.secondRowData];
-        },
-
-
+    },
+        
+    // 제품 명 제품 코드 선택 시 모달창 열기
+    prodCellClicked(params) {
+        if((params.colDef.field == "prod_code" || params.colDef.field == "prod_name")) {
+             this.selectedSecondIndex = params.rowIndex;
+            this.showProdModal = true;
+          }
+       },
+    // 제품 모달창 값 전달
+    prodSelected(prod) {
+        this.secondRowData[this.selectedSecondIndex].prod_code = prod.prod_code;
+        this.secondRowData[this.selectedSecondIndex].prod_name = prod.prod_name;
+        this.secondRowData = [...this.secondRowData];
+    },
     //현재날짜 가져오기
     getToday() {
       const today = new Date();
@@ -210,24 +209,6 @@ export default {
       this.secondRowData = this.secondRowData.filter(row => !selectedData.includes(row));
     },
 
-    // 주문 모달창 값 전달
-    //메인 그리드로 주문코드 전달
-    /*
-    async orderSelected(order) {
-      console.log(order)
-      await axios.get('/api/work/plan/orderList', {
-        params: {
-          orders_code: order.orders_code
-        }
-      }).then(res => {
-        console.log(res)
-        const rowData = res.data;
-        this.rowData[0].orders_code = res.orders_code;
-        this.rowData = [...rowData];
-      })
-        .catch((err) => console.error(err));
-    },
-*/
     //주문 목록 조회
     async orderSelected(order) {
       console.log(order)
@@ -247,18 +228,17 @@ export default {
         console.log(res.data);
         const serverRowData = res.data; // 응답받은 주문 데이터를 변수에 저장.
         //this.rowData[0].orders_code = res.orders_code;
-        this.rowData = [serverRowData]; //  rouwData를 새 배열로 재할당(AG grid 등에 전달된 데이터)
+        this.rowData = [...serverRowData]; //  rouwData를 새 배열로 재할당(AG grid 등에 전달된 데이터)
       })
         .catch((err) => console.log(err));
       
       //상세 그리드로 전달
-      await axios.get('/api/sales/detail', {
-        params: {
-          orders_code: order.orders_code // 선택한 주문 코드를 파라미터로 전달
-        }
-      })
+      await axios.get(`/api/sales/detail/${order.orders_code}`)
         .then(res => {
+          console.log(res.data)
           this.secondRowData = res.data; // 응답받은 데이터를 상세 그리드 데이터로 설정
+          console.log(res.data);
+          this.secondRowData = [...this.secondRowData]
       })
     },
 
@@ -300,7 +280,6 @@ export default {
     async addOrder() {
       const res = await axios.post('/api/sales/orderCheck', {
         orderCode: this.rowData[0].orders_code
-
       })
         .catch((err) => console.log(err));
       if (res.data[0].checkCount > 0) {
