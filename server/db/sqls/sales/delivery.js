@@ -7,13 +7,17 @@ SELECT SUM(inbound_quantity) - SUM(dispatch_quantity) as delivery_before_quantit
 FROM store
 WHERE item_code =?
 GROUP BY item_code, lot
-HAVING SUM(inbound_quantity) - SUM(dispatch_quantity) > 0;
-`
+HAVING SUM(inbound_quantity) - SUM(dispatch_quantity) > 0;`
 
 // 출고코드 자동 부여
 const deliveryAutoOrder =
   `SELECT CONCAT('DEL-', IFNULL(MAX(CAST(SUBSTR(delivery_code, 5) AS SIGNED)), 100) + 1) AS code
   FROM delivery_manage`;
+
+ // 상세출고코드 자동 부여
+ const deliveryAutoDetailOrder =
+   `SELECT CONCAT('DEL-', IFNULL(MAX(CAST(SUBSTR(delivery_code, 5) AS SIGNED)), 100) + 1) AS code
+  FROM delivery_manage_detail`;
 
 //등록
 const deliveryAdd =
@@ -22,8 +26,10 @@ VALUES( ? , ? , ? , ? , ? )`;
 
 //상세등록
 const deliveryDetailAdd = 
-   `INSERT INTO delivery(delivery_detail_code, prod_code, delivery_quantity, prod_LOT, delivery_code)
+   `INSERT INTO delivery_manage_detail(delivery_detail_code, prod_code, delivery_quantity, prod_LOT, delivery_code)
 VALUES( ? , ? , ? , ? , ?)`;
+
+
 
 //삭제
 const deliveryDelete =
@@ -50,5 +56,5 @@ module.exports = {
   deliveryDetailDelete,
   prodcheck,
   addCheck,
-
+deliveryAutoDetailOrder,
 }
