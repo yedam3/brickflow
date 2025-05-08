@@ -127,7 +127,7 @@ export default {
     },
     methods: {
         async countList(){
-            await axios.get('/api/main/count')
+            await axios.get('/api/main/count',{ withCredentials: true })
                         .then(res => {
                             console.log(res.data[0][0].orderCount)
                             this.info.orderCount = res.data[0][0].orderCount;
@@ -143,10 +143,10 @@ export default {
             const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
             const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
 
-            const line = await axios.get('/api/main/lineChart');
-            const bar = await axios.get('/api/main/barChart');
-            const pie = await axios.get('/api/main/pieChart');
-            const pop = await axios.get('/api/main/popChart');
+            const line = await axios.get('/api/main/lineChart',{ withCredentials: true });
+            const bar = await axios.get('/api/main/barChart',{ withCredentials: true });
+            const pie = await axios.get('/api/main/pieChart',{ withCredentials: true });
+            const pop = await axios.get('/api/main/popChart',{ withCredentials: true });
             const groupLine = {};
             const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 

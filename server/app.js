@@ -11,7 +11,7 @@ app.use(express.json());
 //세션 이용
 const session =require('express-session');
 //cors 이용
-// const cors = require('cors');
+const cors = require('cors');
 
 // Server 실행
 app.listen(3000, () => {
@@ -23,7 +23,7 @@ app.listen(3000, () => {
 let sessionSettion = session({
     secret : '@$@)_TQWATI)_QW%Q^TEWYJIOWE!_$#!@$()',
     resave :false,
-    saveUninitialized :true,
+    saveUninitialized :false,
     //세션을 얼마나 가지고 있을건지 설정
     cookie :{
         httpOnly : true,
@@ -65,7 +65,7 @@ app.get("/", (req, res) => {
 //세션활용
 app.use(sessionSettion);
 // //CORS 모든 정책활용
-// app.use(cors());
+app.use(cors());
 // 라우터 모듈 등록
 app.use("/sales", salesRouter);
 app.use("/sales", deliveryRouter);

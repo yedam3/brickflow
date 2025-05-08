@@ -26,7 +26,7 @@
                                 <label for="rememberme1">Remember me</label>
                             </div>
                         </div>
-                        <Button label="Sign In" class="w-full" as="router-link" to="/" style="background-color: #FF9900; border: #FF9900;"></Button>
+                        <Button label="Sign In" class="w-full" style="background-color: #FF9900; border: #FF9900;" @click="loginBtn"></Button>
                     </div>
                 </div>
             </div>
@@ -36,6 +36,8 @@
 
 <script>
 import FloatingConfigurator from '@/components/FloatingConfigurator.vue';
+import axios from 'axios';
+import { useUserStore } from '@/stores/user';
 
 export default {
   components: {
@@ -48,6 +50,36 @@ export default {
       checked: false,
     };
   },
+  methods: {
+    loginBtn () {
+        axios.post('/api/login/',{
+            id:this.id,
+            pwd:this.password
+        },
+        //cors 정책 통과
+        { withCredentials: true } 
+    )
+        .then(async res => {
+            console.log(res.data)
+            if(res.data.result == 'success'){
+                //피니아 중간 저장소에 등록
+                let result  = await axios.get('/api/session')
+                                    .catch((err) => console.log(err));
+                console.log(result)
+                const store = useUserStore();
+
+                store.setUser({
+                    id: this.id,
+                    empName : result.data.empName,
+                    dep : result.data.dep
+                })
+                this.$router.push('/');
+            }else{
+                alert('실패')
+            }
+        })
+    }
+  }
 };
 </script>
 <style scoped>

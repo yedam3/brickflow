@@ -1,8 +1,19 @@
 <script setup>
 import { useLayout } from '@/layout/composables/layout';
 import AppConfigurator from './AppConfigurator.vue';
-
+import { useUserStore } from '@/stores/user';
+import axios from 'axios';
+import router from '@/router';
+const userStore = useUserStore();
 const { toggleMenu, toggleDarkMode, isDarkTheme } = useLayout();
+
+const logout = async () => {
+    await axios.post('/api/logout')
+                .catch((err) => console.log(err));
+   
+    userStore.logout();
+    router.push('/auth/login');
+}
 </script>
 
 <template>
@@ -57,19 +68,13 @@ const { toggleMenu, toggleDarkMode, isDarkTheme } = useLayout();
             >
                 <i class="pi pi-ellipsis-v"></i>
             </button>
-
+            <p class="mt-2 text-center text-muted font-weight-bold">{{ userStore.empName }}님 환영합니다.</p>
             <div class="layout-topbar-menu hidden lg:block">
                 <div class="layout-topbar-menu-content">
-                    <button type="button" class="layout-topbar-action">
-                        <i class="pi pi-calendar"></i>
-                        <span>Calendar</span>
-                    </button>
-                    <button type="button" class="layout-topbar-action">
-                        <i class="pi pi-inbox"></i>
-                        <span>Messages</span>
-                    </button>
-                    <button type="button" class="layout-topbar-action">
-                        <i class="pi pi-user"></i>
+               
+                    
+                    <button type="button" class="layout-topbar-action" @click="logout">
+                        <i class="pi-sign-out"></i>
                         <span>Profile</span>
                     </button>
                 </div>
