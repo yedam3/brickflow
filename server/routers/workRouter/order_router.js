@@ -94,7 +94,8 @@ router.post("/insert", async (req, res) => {
 // 생산 지시 수정
 router.put("/update", async (req, res) => {
     let {orderData, workDetailList, matHoldDataList} = req.body;
-    let result = await orderService.updateProduct_order(orderData, workDetailList, matHoldDataList).catch((err) => console.error(err));
+    let result = await orderService.deleteProduct_order(orderData.product_order_code).catch((err) => console.error(err));
+    result = await orderService.insertProduct_order(orderData, workDetailList, matHoldDataList).catch((err) => console.error(err));
     res.send(result);
 });
 

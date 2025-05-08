@@ -6,7 +6,7 @@
 
         <CModalBody>
             <div class="text-end mb-3">
-                <Button label="자동계산" severity="success" size="large" @click="" />
+                <Button label="자동계산" severity="success" size="large" @click="autoHold" />
             </div>
             <div class="ag-theme-alpine align-content-center">
                 <AgGridVue style="width: 100%; height: 100%" class="ag-theme-alpine" :columnDefs="columnDefs"
@@ -28,6 +28,8 @@
 <script>
 import { AgGridVue } from "ag-grid-vue3";
 import axios from "axios";
+
+import Swal from 'sweetalert2';
 
 export default {
     name: "OrderModal",
@@ -51,6 +53,10 @@ export default {
             type: Array,
             required: false,
         },
+        mat_req_qty: {
+            type: Number,
+            required: false,
+        }
     },
     
     watch: {
@@ -129,11 +135,30 @@ export default {
 
             this.setMatHoldData(); 
         },
+        autoHold() {
+            let mat_list = [];
+
+            this.rowData.sort((a, b) => new Date(a.store_date) - new Date(b.store_date));
+
+            let remainingQty = this.mat_req_qty;
+
+            for (let row of this.rowData) {
+                const availableQty = parseInt(row.available_qty || "0", 10);
+                if (remainingQty <= 0) break;
+
+                const holdQty = Math.min(availableQty, remainingQty);
+                row.mat_hold_qty = holdQty;
+                remainingQty -= holdQty;
+            }
+            console.log(this.rowData);
+        },
 
         // 자재 확보 버튼
         matSecure() {
             this.mat_data = [];
+            let totalQty = 0;
             for(let row of this.rowData) {
+                totalQty += parseInt(row.mat_hold_qty);
                 if(row.mat_hold_qty != '' && row.mat_hold_qty > 0) {
                     this.mat_data.push({
                         mat_code: row.mat_code,
@@ -142,13 +167,22 @@ export default {
                     })
                 }
             }
+            if(this.mat_req_qty > totalQty) {
+                Swal.fire({
+                    title: '실패',
+                    text: '자재 최소 요구량이 충족하지 않습니다.',
+                    icon: 'error',
+                    confirmButtonText: '확인'
+                });
+                return;
+            }
             this.$emit('matHoldData', this.mat_data);
             this.close();
         },
 
         // 그리드 행 클릭 메소드
         onRowClicked() {
-
+        
         },
 
         // 자재 홀드량 반영
