@@ -201,7 +201,7 @@ const updateOrderDetailByOrders_code = `
 UPDATE order_detail
 SET
     finish_status = ?
-WHERE order_detail_code = ?
+WHERE orders_detail_code = ?
 `;
 
 // 제품 검색
