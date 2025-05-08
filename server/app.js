@@ -8,11 +8,30 @@ const app = express();
 app.use(express.urlencoded({ extended: false }));
 // content-type : application/json
 app.use(express.json());
+//세션 이용
+const session =require('express-session');
+//cors 이용
+// const cors = require('cors');
+
 // Server 실행
 app.listen(3000, () => {
     console.log("Server Start");
     console.log("http://localhost:3000");
 });
+
+//세션설정
+let sessionSettion = session({
+    secret : '@$@)_TQWATI)_QW%Q^TEWYJIOWE!_$#!@$()',
+    resave :false,
+    saveUninitialized :true,
+    //세션을 얼마나 가지고 있을건지 설정
+    cookie :{
+        httpOnly : true,
+        secure : false,
+        //유효기간
+        maxAge : 60000
+      }
+})
 // 라우팅 등록 영역
 const salesRouter = require("./routers/salesrouter/sales_router.js");
 const deliveryRouter = require("./routers/salesrouter/delivery_router.js");
@@ -35,10 +54,16 @@ const bomRotuer = require('./routers/adminRouter/bom_router.js');
 const labelRouter = require('./routers/matRouter/label_router.js');
 
 const mainPageRouter = require('./routers/mainRouter/main_router.js');
+
+const loginRoter = require('./routers/loginRouter/login_router.js');
 // 기본 라우팅
 app.get("/", (req, res) => {
     res.send("Welcome!!");
 });
+//세션활용
+app.use(sessionSettion);
+// //CORS 모든 정책활용
+// app.use(cors());
 // 라우터 모듈 등록
 app.use("/sales", salesRouter);
 app.use("/sales", deliveryRouter);
@@ -59,3 +84,9 @@ app.use('/admin',bomRotuer);
 app.use('/label',labelRouter);
 
 app.use('/main',mainPageRouter);
+app.use('/',loginRoter);
+
+
+
+
+
