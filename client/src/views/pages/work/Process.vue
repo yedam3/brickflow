@@ -31,7 +31,7 @@
         <div class="mb-3">
             <div class="ag-wrapper justify-content-center" style="border: none;">
                 <ag-grid-vue class="ag-theme-alpine custom-grid-theme" :columnDefs="productOrderColDefs"
-                    :rowData="rowData" :gridOptions="gridOptions">
+                    :rowData="productOrderData" :gridOptions="gridOptions">
                 </ag-grid-vue>
             </div>
         </div>
@@ -72,14 +72,19 @@ export default {
     data() {
         return {
             //메인그리드
-            rowData: [
+            productOrderData: [
                 {
-                    mat_order_code: "",
-                    company_code: "",
-                    request_date: "",
-                    delivery_date: "",
-                    emp_code: "",
-                    note: "",
+                    product_order_code: "",         // 생산 지시 코드
+                    prod_name: "",                  // 제품명
+                    process_name: "",               // 공정명
+                    process_seq: "",                // 공정 순서
+                    order_quantity: "",             // 지시량
+                    input_quantity: "",             // 투입량
+                    created_quantity: "",           // 생산량
+                    error_quantity: "",             // 불량량량
+                    work_start_date: "",            // 시작 시간
+                    work_end_date: "",              // 종료 시간
+                    finish_status: "",              // 상태
                 },
             ],
             productOrderColDefs: [
@@ -87,11 +92,12 @@ export default {
                 { field: "company_code", headerName: "제품명", flex: 2, cellStyle: { textAlign: "center" } },
                 { field: "request_date", headerName: "공정명", flex: 2, editable: true, cellStyle: { textAlign: "center" }, cellEditor: "datePicker" },
                 { field: "delivery_date", headerName: "공정순서", flex: 3, editable: true, cellStyle: { textAlign: "center" }, cellEditor: "datePicker" },
-                { field: "emp_code", headerName: "지시량", flex: 3, cellStyle: { textAlign: "center" } },
-                { field: "note", headerName: "생산량", flex: 3, editable: true, cellStyle: { textAlign: "center" } },
-                { field: "note", headerName: "시작시간", flex: 3, editable: true, cellStyle: { textAlign: "center" } },
-                { field: "note", headerName: "종료시간", flex: 3, editable: true, cellStyle: { textAlign: "center" } },
-                { field: "note", headerName: "생산상태", flex: 3, editable: true, cellStyle: { textAlign: "center" } },
+                { field: "order_quantity", headerName: "지시량", flex: 3, cellStyle: { textAlign: "center" } },
+                { field: "input_quantity", headerName: "지시량", flex: 3, cellStyle: { textAlign: "center" } },
+                { field: "created_quantity", headerName: "생산량", flex: 3, editable: true, cellStyle: { textAlign: "center" } },
+                { field: "work_start_date", headerName: "시작시간", flex: 3, editable: true, cellStyle: { textAlign: "center" } },
+                { field: "work_end_date", headerName: "종료시간", flex: 3, editable: true, cellStyle: { textAlign: "center" } },
+                { field: "finish_status", headerName: "상태", flex: 3, editable: true, cellStyle: { textAlign: "center" } },
             ],
             employeeColDefs: [
                 { field: "mat_order_code", headerName: "사번", flex: 2, cellStyle: { textAlign: "center" } },
