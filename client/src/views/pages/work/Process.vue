@@ -31,7 +31,7 @@
         <div class="mb-3">
             <div class="ag-wrapper justify-content-center" style="border: none;">
                 <ag-grid-vue class="ag-theme-alpine custom-grid-theme" :columnDefs="productOrderColDefs"
-                    :rowData="productOrderData" :gridOptions="gridOptions">
+                    :rowData="productOrderDataList" :gridOptions="gridOptions" @rowClicked="productOrderRowClicked">
                 </ag-grid-vue>
             </div>
         </div>
@@ -39,7 +39,7 @@
             <div class="col-6">
                 <h4 class="text-start">작업자</h4>
                 <div class="ag-wrapper justify-content-center" style="border: none;">
-                    <ag-grid-vue class="ag-theme-alpine custom-grid-theme" :columnDefs="employeeColDefs" :rowData="rowData"
+                    <ag-grid-vue class="ag-theme-alpine custom-grid-theme" :columnDefs="employeeColDefs" :rowData="empDataList"
                         :gridOptions="gridOptions">
                     </ag-grid-vue>
                 </div>
@@ -47,7 +47,7 @@
             <div class="col-6">
                 <h4 class="text-start">설비</h4>
                 <div class="ag-wrapper justify-content-center" style="border: none;">
-                    <ag-grid-vue class="ag-theme-alpine custom-grid-theme" :columnDefs="facColDefs" :rowData="rowData"
+                    <ag-grid-vue class="ag-theme-alpine custom-grid-theme" :columnDefs="facColDefs" :rowData="facDataList"
                         :gridOptions="gridOptions">
                     </ag-grid-vue>
                 </div>
@@ -71,42 +71,86 @@ export default {
     },
     data() {
         return {
-            //메인그리드
-            productOrderData: [
+            //  생산 지시 데이터 목록
+            productOrderDataList: [
+                // {
+                //     product_order_code: "",         // 생산 지시 코드
+                //     prod_name: "",                  // 제품명
+                //     process_name: "",               // 공정명
+                //     process_sequence: "",           // 공정 순서
+                //     order_quantity: "",             // 지시량
+                //     input_quantity: "",             // 투입량
+                //     created_quantity: "",           // 생산량
+                //     error_quantity: "",             // 불량량
+                //     work_start_date: "",            // 시작 시간
+                //     work_end_date: "",              // 종료 시간
+                //     finish_status: "",              // 상태
+                // },
+            ],
+            // 사원 데이터 목록
+            empDataList: [
+                // {
+                //     emp_code: "",                   // 사번
+                //     emp_name: "",                   // 사원명
+                //     department_name: "",            // 부서명
+                // }
+            ],
+            // 설비 데이터 목록
+            facDataList: [
+                // {
+                //     fac_code: "",                   // 설비 코드
+                //     model_name: "",                 // 설비명
+                //     fac_status: "",                 // 설비 상태
+                // }
+            ],
+
+            // 공정 시작 데이터
+            processData: {
+
+            },
+
+            // AG-GRID 정보
+            productOrderColDefs: [
+                { field: "product_order_code", headerName: "생산지시명", flex: 2, cellStyle: { textAlign: "center" } },
+                { field: "prod_name", headerName: "제품명", flex: 3, cellStyle: { textAlign: "center" } },
+                { field: "process_name", headerName: "공정명", flex: 3, cellStyle: { textAlign: "center" }, cellEditor: "datePicker" },
+                { field: "process_sequence", headerName: "공정순서", flex: 1.5, cellStyle: { textAlign: "center" }, cellEditor: "datePicker" },
+                { field: "order_quantity", headerName: "지시량", flex: 1.5, cellStyle: { textAlign: "center" } },
+                { field: "order_quantity", headerName: "지시량", flex: 1.5, cellStyle: { textAlign: "center" } },
+                { field: "created_quantity", headerName: "생산량", flex: 1.5, cellStyle: { textAlign: "center" } },
+                { field: "error_quantity", headerName: "불량량", flex: 1.5, cellStyle: { textAlign: "center" } },
+                { field: "work_start_date", headerName: "시작시간", flex: 3, cellStyle: { textAlign: "center" } },
+                { field: "work_end_date", headerName: "종료시간", flex: 3, cellStyle: { textAlign: "center" } },
                 {
-                    product_order_code: "",         // 생산 지시 코드
-                    prod_name: "",                  // 제품명
-                    process_name: "",               // 공정명
-                    process_seq: "",                // 공정 순서
-                    order_quantity: "",             // 지시량
-                    input_quantity: "",             // 투입량
-                    created_quantity: "",           // 생산량
-                    error_quantity: "",             // 불량량량
-                    work_start_date: "",            // 시작 시간
-                    work_end_date: "",              // 종료 시간
-                    finish_status: "",              // 상태
+                    field: "finish_status", headerName: "상태", flex: 2,
+                    valueFormatter: params => {
+                        if(params.value === 'PP1') {
+                            return '지시중';
+                        } else if(params.value == 'PP2') {
+                            return '생산중';
+                        } else if(params.value == 'PP3') {
+                            return '부분 생산 완료';
+                        }
+                    },
+                    cellStyle: params => {
+                        if(params.value === 'PP1') {
+                            return { textAlign: 'center', fontWeight: 'bold', color: '#6c757d' };
+                        } else if(params.value == 'PP2') {
+                            return { textAlign: 'center', fontWeight: 'bold', color: '#007bff' };
+                        } else if(params.value == 'PP3') {
+                            return { textAlign: 'center', fontWeight: 'bold', color: '#28a745' };
+                        }
+                    }
                 },
             ],
-            productOrderColDefs: [
-                { field: "mat_order_code", headerName: "생산지시명", flex: 2, cellStyle: { textAlign: "center" } },
-                { field: "company_code", headerName: "제품명", flex: 2, cellStyle: { textAlign: "center" } },
-                { field: "request_date", headerName: "공정명", flex: 2, editable: true, cellStyle: { textAlign: "center" }, cellEditor: "datePicker" },
-                { field: "delivery_date", headerName: "공정순서", flex: 3, editable: true, cellStyle: { textAlign: "center" }, cellEditor: "datePicker" },
-                { field: "order_quantity", headerName: "지시량", flex: 3, cellStyle: { textAlign: "center" } },
-                { field: "input_quantity", headerName: "지시량", flex: 3, cellStyle: { textAlign: "center" } },
-                { field: "created_quantity", headerName: "생산량", flex: 3, editable: true, cellStyle: { textAlign: "center" } },
-                { field: "work_start_date", headerName: "시작시간", flex: 3, editable: true, cellStyle: { textAlign: "center" } },
-                { field: "work_end_date", headerName: "종료시간", flex: 3, editable: true, cellStyle: { textAlign: "center" } },
-                { field: "finish_status", headerName: "상태", flex: 3, editable: true, cellStyle: { textAlign: "center" } },
-            ],
             employeeColDefs: [
-                { field: "mat_order_code", headerName: "사번", flex: 2, cellStyle: { textAlign: "center" } },
-                { field: "company_code", headerName: "사원명", flex: 2, cellStyle: { textAlign: "center" } },
-                { field: "request_date", headerName: "부서명", flex: 2, cellStyle: { textAlign: "center" } },
+                { field: "emp_code", headerName: "사번", flex: 2, cellStyle: { textAlign: "center" } },
+                { field: "emp_name", headerName: "사원명", flex: 2, cellStyle: { textAlign: "center" } },
+                { field: "department_name", headerName: "부서명", flex: 2, cellStyle: { textAlign: "center" } },
             ],
             facColDefs: [
                 { field: "fac_code", headerName: "설비코드", flex: 2, cellStyle: { textAlign: "center" } },
-                { field: "fac_name", headerName: "설비명", flex: 2, cellStyle: { textAlign: "center" } },
+                { field: "model_name", headerName: "설비명", flex: 2, cellStyle: { textAlign: "center" } },
                 { field: "fac_status", headerName: "설비상태", flex: 2, cellStyle: { textAlign: "center" } },
             ],
             gridOptions: {
@@ -127,17 +171,61 @@ export default {
     },
     mounted() {
         this.productOrderList();
+        this.empList();
     },
     methods: {
         // 생산 지시 조회
         async productOrderList() {
             await axios.get(`/api/work/process/productOrderList`).then(res => {
-                console.log(res);
+                const list = res.data
+                this.productOrderDataList = [...list];
+                // for(let data of list) {
+                //     this.productOrderData.push({
+                //         product_order_code: data.product_order_code,    // 생산 지시 코드
+                //         prod_name: data.prod_name,                      // 제품명
+                //         process_name: data.process_name,                // 공정명
+                //         process_sequence: data.process_sequence,        // 공정 순서
+                //         order_quantity: data.order_quantity,            // 지시량
+                //         input_quantity: data.input_quantity,            // 투입량
+                //         created_quantity: data.created_quantity,        // 생산량
+                //         error_quantity: data.error_quantity,            // 불량량
+                //         work_start_date: data.work_start_date,          // 시작 시간
+                //         work_end_date: data.work_end_date,              // 종료 시간
+                //         finish_status: data.finish_status,              // 상태
+                //     });
+                // }
+            }).catch((err) => console.log(err));
+        },
+        
+        // 사원 목록 조회
+        async empList() {
+            await axios.get(`/api/work/process/empList`).then(res => {
+                const list = res.data
+                this.empDataList = [...list];
+                // for(let data of list) {
+                //     this.productOrderData.push({
+                //         emp_code: data.emp_code,                   // 사번
+                //         emp_name: data.emp_name,                   // 사원명
+                //         department_name: data.department_name,     // 부서명
+                //     });
+                // }
             }).catch((err) => console.log(err));
         },
 
-        // 생산 지시 조회
-        
+        // 생산 행 클릭 - 설비 목록 조회
+        async productOrderRowClicked(params) {
+            await axios.get(`/api/work/process/facList`).then(res => {
+                const list = res.data;
+                this.facDataList = [...list];
+                // for(let data of list) {
+                //     this.productOrderData.push({
+                //         fac_code: data.fac_code,                     // 설비 코드
+                //         model_name: data.model_name,                 // 설비명
+                //         fac_status: data.fac_status,                 // 설비 상태
+                //     });
+                // }
+            }).catch((err) => console.error);
+        },
 
         // 공정 시작
         async startProcess() {

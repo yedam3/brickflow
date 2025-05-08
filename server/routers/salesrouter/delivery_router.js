@@ -29,10 +29,6 @@ router.post('/deliveryDetail', async (req, res) => {
   res.send(result);
 })
 
-//수정
-
-
-
 //값체크
 router.post('/deliveryCheck', async (req, res) => {
     const {deliveryCode} = req.body;
