@@ -40,6 +40,6 @@ module.exports = {
     ...label,
     ...mainPage,
     ...delivery,
-    ...login
+    ...login,
     ...prodCheck,
 }
