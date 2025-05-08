@@ -30,7 +30,7 @@ router.post('/deliveryDetail', async (req, res) => {
 })
 
 //수정
-router.put('/delivery')
+
 
 
 //값체크
