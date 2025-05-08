@@ -22,7 +22,7 @@ FROM plan p
 			SUM(store_quantity) AS store_quantity
 		 FROM store
 		 GROUP BY item_code) s ON b.mat_code = s.item_code
-WHERE p.plan_code = ? AND UPPER(b.pass_or_not) LIKE 'Y'
+WHERE p.plan_code = ?
 GROUP BY pd.prod_code, b.mat_code
 ORDER BY pd.prod_code, b.mat_code;
 `;
@@ -60,7 +60,7 @@ SELECT wd.prod_code, prod.prod_name, wd.order_quantity, wd.priority, od.quantity
 FROM work_detail wd
 	JOIN product_order po ON wd.product_order_code = po.product_order_code
     JOIN plan p ON po.plan_code = p.plan_code
-    JOIN order_detail od ON p.orders_code = od.orders_code
+    JOIN order_detail od ON p.orders_code = od.orders_code AND wd.prod_code = od.prod_code
     JOIN prod prod ON od.prod_code = prod.prod_code
 WHERE wd.product_order_code =  ?
 `;
@@ -74,7 +74,7 @@ WHERE product_order_code = ?
 
 // 생산 상품 자재 홀드 조회
 const findAllMatHoldByProduct_order_detail_code = `
-SELECT DISTINCT od.prod_code, b.mat_code, m.mat_name, mh.hold_quantity,
+SELECT DISTINCT od.prod_code, mh.mat_code, m.mat_name, mh.hold_quantity,
     (pd.plan_quantity * b.quantity) AS req_material_quantity
 FROM mat_hold mh
 	JOIN work_detail wd ON mh.product_order_detail_code = wd.product_order_detail_code
@@ -84,7 +84,7 @@ FROM mat_hold mh
 	JOIN BOM b ON wd.prod_code = b.prod_code AND mh.mat_code = b.mat_code
 	JOIN order_detail od ON od.orders_code = p.orders_code AND od.prod_code = wd.prod_code
     JOIN mat m ON b.mat_code = m.mat_code
-WHERE mh.product_order_detail_code = ?
+WHERE mh.product_order_detail_code =  ?
 `;
 
 // 생산 상품 자재 LOT 조회
@@ -97,12 +97,14 @@ WHERE mh.product_order_detail_code = ? AND mh.mat_code = ?
 
 // 생산 상품 자재 재고 조회
 const findAllProdMatQtyByMat_code = `
-SELECT s.lot AS 'mat_LOT', m.mat_code, m.mat_name, ms.store_date AS 'store_date',
-    (COALESCE(s.inbound_quantity, 0) - COALESCE(s.dispatch_quantity, 0)) AS 'available_qty'
+SELECT b.prod_code, s.lot AS 'mat_LOT', m.mat_code, m.mat_name, ms.store_date AS 'store_date',
+    (SUM(s.inbound_quantity) - SUM(s.dispatch_quantity)) AS 'available_qty'
 FROM store s
 	LEFT JOIN mat_store ms ON ms.mat_LOT = s.LOT AND ms.mat_code = s.item_code
 	JOIN mat m ON ms.mat_code = m.mat_code
-WHERE ms.mat_code = ?
+    JOIN BOM b ON b.mat_code = ms.mat_code
+WHERE b.prod_code = ? AND ms.mat_code = ?
+GROUP BY b.prod_code, s.LOT, m.mat_code, m.mat_name, ms.store_date
 ORDER BY ms.store_date ASC
 `;
 
@@ -142,6 +144,25 @@ FROM work_detail
 // 생산 지시 상세 등록
 const insertProduct_order_detail = `
 INSERT INTO work_detail VALUES(?, ?, ?, ?, ?, ?)
+`;
+
+// 공정 흐름도 조회 (prod_code)
+const findAllProcess_flowByProd_code = `
+SELECT process_flow_code, process_sequence, prod_code, process_code
+FROM process_flow
+WHERE prod_code = ?
+ORDER BY process_sequence ASC
+`;
+
+// 공정 초기 세팅 등록
+const insertWork_process = `
+INSERT INTO work_process
+SELECT CONCAT('WORK-LOT-', IFNULL(MAX(CAST(SUBSTR(work_lot, 10) AS UNSIGNED)), 100) + 1),
+    ?, ?, ?, ?, 0, 0, 0, ?
+FROM (
+    SELECT * FROM work_process 
+    WHERE work_lot LIKE 'WORK-LOT-%' AND LENGTH(SUBSTR(work_lot, 10)) > 0
+) AS wp
 `;
 
 // 생산 계획 상태 변경
@@ -230,6 +251,13 @@ FROM mat_hold
 WHERE product_order_detail_code = ?
 `;
 
+// 생산 지시 공정 초기 세팅 삭제
+const deleteWork_processByProduct_order_Detail_code = `
+DELETE
+FROM work_process
+WHERE product_order_detail_code = ?
+`;
+
 module.exports = {
     getOrder_code,
     findMatReqByPlan_code,
@@ -241,8 +269,10 @@ module.exports = {
     findAllProdMatQtyByMat_code,                            // 생산 상품 자재 재고 조회
 
     insertProduct_order,                                    // 생산 지시 등록
-    findProduct_order_detail_codeLast,                      // 생산 지시 코드 조회(자동증가)
+    findProduct_order_detail_codeLast,                      // 생산 지시 상세 코드 조회(자동증가)
     insertProduct_order_detail,                             // 생산 지시 상세 등록
+    findAllProcess_flowByProd_code,                         // 공정 흐름도 조회 (prod_code)
+    insertWork_process,                                     // 생산 지시 공정 초기 세팅 등록
     updatePlanStatusByPlan_code,                            // 생산 계획 상태 변경
 
     findWork_detailByProduct_order_codeAndProd_code,        // 생산 지시 상세 조회 (product_order_code, prod_code)
@@ -260,4 +290,5 @@ module.exports = {
     deleteProduct_orderByProduct_order_code,                // 생산 지시 삭제
     deleteWork_detailByProduct_order_code,                  // 생산 지시 상세 삭제
     deleteMat_holdByProduct_order_detail_code,              // 생산 지시 홀드량 삭제
+    deleteWork_processByProduct_order_Detail_code,          // 생산 지시 공정 초기 세팅 삭제
 };

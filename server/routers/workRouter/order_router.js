@@ -60,9 +60,9 @@ router.get("/loadMat", async (req, res) => {
 });
 
 // 생산 상품 자재 재고 조회
-router.get("/matQty/:mat_code", async (req, res) => {
-    let mat_code = req.params.mat_code;
-    let matList = await orderService.findAllProdMatQtyByMat_code(mat_code).catch((err) => {
+router.get("/matQty", async (req, res) => {
+    let { prod_code, mat_code } = req.query;
+    let matList = await orderService.findAllProdMatQtyByMat_code(prod_code, mat_code).catch((err) => {
         console.error(err);
     })
     res.send(matList);

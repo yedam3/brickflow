@@ -42,8 +42,9 @@ const findAllWorkDetailByProduct_order_code = async (product_order_code) => {
 }
 
 // 생산 상품 자재 재고 조회
-const findAllProdMatQtyByMat_code = async (mat_code) => {
-    let result = await mariaDB.query("findAllProdMatQtyByMat_code", mat_code).catch((err) => {
+const findAllProdMatQtyByMat_code = async (prod_code, mat_code) => {
+    const prodMatData = [prod_code, mat_code];
+    let result = await mariaDB.query("findAllProdMatQtyByMat_code", prodMatData).catch((err) => {
         console.error(err);
     });
     return result;
@@ -104,21 +105,36 @@ const insertProduct_order = async (orderData, orderDetailDataList, matHoldDataLi
         result = await conn.query(selectedQuery, Object.values(orderData));
 
         // 공정 흐름도 
-
-        // 생산 지시 상세 등록
+            console.log(orderDetailDataList);
+        // 생산 지시 상세 등록 / 생산 지시 공정 초기 세팅 등록
         for (let orderDetailData of orderDetailDataList) {
-
-            // 생산 지시 코드 조회(자동증가)
-            selectedQuery = mariaDB.selectedQuery("findProduct_order_detail_codeLast");
-            result = await conn.query(selectedQuery);
+            console.log(orderDetailData);
+            // 생산 지시 상세 코드 조회
+            selectedQuery = mariaDB.selectedQuery("findProduct_order_detail_codeLast", orderData.product_order_code);
+            result = await conn.query(selectedQuery, orderData.product_order_code);
 
             orderDetailData.product_order_detail_code = result[0].product_order_detail_code;
-
+    
             orderDetailData.product_order_code = orderData.product_order_code;
             orderDetailData.process_flow_code = "공정 흐름도 임시데이터";
 
+            // 생산 지시 상세 등록
             selectedQuery = mariaDB.selectedQuery("insertProduct_order_detail", convertObjToAry(orderDetailData, orderDetail_fields));
             result = await conn.query(selectedQuery, convertObjToAry(orderDetailData, orderDetail_fields));
+
+            // 공정 흐름도 조회 (prod_code)
+            selectedQuery = mariaDB.selectedQuery("findAllProcess_flowByProd_code", orderDetailData.prod_code);
+            result = await conn.query(selectedQuery, orderDetailData.prod_code);
+                
+            // 생산 지시 공정 초기 세팅 등록
+            let cnt = 1;
+            for(let processFlowData of result) {
+                console.log(processFlowData);
+                const workProcessData = [orderDetailData.product_order_detail_code, processFlowData.process_flow_code, orderDetailData.prod_code, orderDetailData.order_quantity, cnt];
+                selectedQuery = mariaDB.selectedQuery("insertWork_process", workProcessData);
+                result = await conn.query(selectedQuery, workProcessData);
+                cnt++;
+            }
         }
 
         // 생산 지시 자재 홀드량 등록
@@ -157,7 +173,7 @@ const insertProduct_order = async (orderData, orderDetailDataList, matHoldDataLi
         let planData = ["OC2", orderData.plan_code];
         selectedQuery = mariaDB.selectedQuery("updatePlanStatusByPlan_code", planData);
         result = await conn.query(selectedQuery, planData);
-
+        await conn.rollback();
         await conn.commit();
     } catch (err) {
         if (conn) await conn.rollback();
@@ -193,7 +209,6 @@ const updateProduct_order = async (orderData, workDetailList, matHoldDataList) =
             }
 
             // 생산 지시 상세 수정
-            console.log(convertObjToAry(workDetailData, work_detail_fields));
             selectedQuery = mariaDB.selectedQuery("updateWork_detailByProduct_order_detail_code", convertObjToAry(workDetailData, work_detail_fields));
             result = await conn.query(selectedQuery, convertObjToAry(workDetailData, work_detail_fields));
         }
@@ -201,7 +216,6 @@ const updateProduct_order = async (orderData, workDetailList, matHoldDataList) =
         // 생산 지시 수정
         orderData.start_date = dateFormat(orderData.start_date);
         orderData.end_date = dateFormat(orderData.end_date);
-        console.log(orderData);
         selectedQuery = mariaDB.selectedQuery("updateProduct_orderByProduct_order_code", convertObjToAry(orderData, product_order_fields));
         result = await conn.query(selectedQuery, convertObjToAry(orderData, product_order_fields));
 
@@ -227,9 +241,14 @@ const deleteProduct_order = async (product_order_code) => {
         let selectedQuery = mariaDB.selectedQuery("findProduct_order_detail_codeByProduct_order_code", product_order_code);
         result = await conn.query(selectedQuery, product_order_code);
 
-        // 생산 자재 요구량 삭제
+        // 생산 지시 자재 요구량 / 공정 초기 세팅 값 삭제
         for(let work_detail of result) {
+            // 생산 지시 자재 요구량 삭제
             selectedQuery = mariaDB.selectedQuery("deleteMat_holdByProduct_order_detail_code", work_detail.product_order_detail_code);
+            result = await conn.query(selectedQuery, work_detail.product_order_detail_code);
+
+            // 공정 초기 세팅 삭제
+            selectedQuery = mariaDB.selectedQuery("deleteWork_processByProduct_order_Detail_code", work_detail.product_order_detail_code);
             result = await conn.query(selectedQuery, work_detail.product_order_detail_code);
         }
 

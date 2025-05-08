@@ -10,9 +10,9 @@
         </select>
         <!-- 검색어 입력 -->
         <input type="text" v-model="searchText" placeholder="검색어 입력" class="form-control w-50" style="width: 100%"
-          @keydown.enter="facStatus" />
+          @keydown.enter="repaireFac" />
         <!-- 검색 버튼 -->
-        <button @click="facStatus" class="btn btn-primary">
+        <button @click="repaireFac" class="btn btn-primary">
           <i class="pi pi-search"></i>
         </button>
       </div>
@@ -35,6 +35,9 @@
     components: {
       AgGridVue,
       datePicker: DatePickerEditor,
+    },
+    mounted(){
+      this.repaireFac();
     },
     data(){
       return{
@@ -77,8 +80,9 @@
       }
     },
     methods: {
+      //조회
       async repaireFac(){
-        await axios.get('')
+        await axios.get('/api/fac/repList')
         .then(res => {
           console.log(res.data)
           this.rowData = res.data;
