@@ -75,6 +75,6 @@ router.get("/prodList", async (req, res) => {
         console.error(err);
     })
     res.send(prodList);
-})
+});
 
 module.exports = router;

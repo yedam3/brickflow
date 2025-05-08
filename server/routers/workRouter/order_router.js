@@ -78,7 +78,7 @@ router.get("/matQty", async (req, res) => {
 });
 
 // 생산 지시 상태 확인
-router.get("/findStatusByPlan_code/:plan_code", async (req, res) => {
+router.get("/orderStatus/:plan_code", async (req, res) => {
     let plan_code = req.params.plan_code;
     let result = await orderService.findStatusByPlan_code(plan_code).catch((err) => console.error(err));
     res.send(result);

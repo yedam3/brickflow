@@ -299,7 +299,6 @@ export default {
                 const data = res.data;
                 let cnt = 1;
                 for (let obj of data) {
-                    console.log(obj);
                     this.rowData.push({
                         prod_code: obj.prod_code,
                         prod_name: obj.prod_name,
@@ -480,6 +479,9 @@ export default {
 
         // 생산 지시 등록
         async addPlanOrder() {
+            if(this.insertVaildation() > 0) {
+                return;
+            }
             let orderData = {
                 product_order_code: this.formData.product_order_code,
                 plan_code: this.formData.plan_code,
@@ -510,9 +512,6 @@ export default {
                     confirmButtonText: '확인'
                 });
             }
-
-            console.log(this.rowData);
-            console.log(this.secondRowData);
         },
 
         // 생산 지시 수정
@@ -521,6 +520,9 @@ export default {
             if(this.editMode == false) {
 
             };
+            if(this.anotherVaildation() > 0) {
+                return;
+            }
             for(let data of this.secondRowData) {
                 if(!Array.isArray(data.mat_LOTs)) {
                     Swal.fire({
@@ -565,6 +567,9 @@ export default {
                     confirmButtonText: '확인'
                 });
             };
+            if(this.anotherVaildation() > 0) {
+                return;
+            }
             let result = await axios.delete(`/api/work/order/delete/${this.formData.product_order_code}`).catch((err) => console.error(err));
             if(result.data.affectedRows > 0 ) {
                 Swal.fire({
@@ -613,7 +618,7 @@ export default {
                         prod_code: prodData.prod_code,
                         quantity: prodData.order_quantity,
                     }
-                }).catch((err) => console.log(err));
+                }).catch((err) => console.error(err));
                 for(let matData of result.data) {
                     this.secondRowData.push({
                         prod_code: matData.prod_code,
@@ -626,6 +631,43 @@ export default {
                 }
             }
             this.secondRowData = [...this.secondRowData];
+        },
+
+        insertVaildation() {
+            if( this.formData.product_order_name == '' || 
+                this.formData.start_date == '' ||
+                this.formData.end_date == '' ) {
+                Swal.fire({
+                    title: '실패',
+                    text: '모든 항목을 입력해주세요',
+                    icon: 'error',
+                    confirmButtonText: '확인'
+                });
+                return 1;
+            }
+            for(let data of this.rowData) {
+                if(data.req_material_quantity < data.material_input_qunatity) {
+                    Swal.fire({
+                        title: '실패',
+                        text: '투입량이 요구량보다 적습니다.',
+                        icon: 'error',
+                        confirmButtonText: '확인'
+                    });
+                    return 1;
+                }
+            }
+        },
+        async anotherVaildation() {
+            let result = await axios.get(`/api/work/order/productOrderStatus/${this.formData.product_order_code}`).catch((err) => console.error(err));
+            if(result.data.check != 'WS1') {
+                Swal.fire({
+                    title: '실패',
+                    text: '이미 진행중이거나 생산이 완료된 지시입니다.',
+                    icon: 'error',
+                    confirmButtonText: '확인'
+                });
+                return 1;
+            }
         },
     },
 };

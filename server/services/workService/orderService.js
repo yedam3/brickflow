@@ -147,7 +147,7 @@ const insertProduct_order = async (orderData, orderDetailDataList, matHoldDataLi
                 if(cnt > 1) {
                     order_quantity = 0;
                 }
-                let workProcessData = [orderDetailData.product_order_detail_code, processFlowData.process_flow_code, orderDetailData.prod_code, order_quantity, cnt];
+                let workProcessData = [orderDetailData.product_order_detail_code, processFlowData.process_code, orderDetailData.prod_code, order_quantity, cnt];
 
                 selectedQuery = mariaDB.selectedQuery("insertWork_process", workProcessData);
                 result = await conn.query(selectedQuery, workProcessData);
@@ -173,13 +173,6 @@ const insertProduct_order = async (orderData, orderDetailDataList, matHoldDataLi
 
             // 자재 홀드량 등록
             for(let matData of matHoldData.mat_LOTs) {
-                console.log("ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ")
-                console.log(matHoldData.mat_LOTs);
-                console.log("ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ")
-                console.log(matData);
-                console.log("ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ")
-                console.log(matData.mat_hold_qty);
-                console.log("ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ")
 
                 // 자재 홀드 코드 조회
                 selectedQuery = mariaDB.selectedQuery("findMat_hold_code");
