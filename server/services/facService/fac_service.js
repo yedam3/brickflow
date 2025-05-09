@@ -2,7 +2,7 @@ const { keyword } = require("color-convert");
 const mariaDB = require("../../db/mapper.js");
 const { findAllWorkDetailByProduct_order_code } = require("../../db/sqlList.js");
 const { updateUnplay } = require("../../db/sqls/fac/fac.js");
-const { convertObjToAry } = require("../../utils/converts.js");
+const { dateFormat,convertObjToAry } = require("../../utils/converts.js");
 
 // 자동 matcode 증가
 const autoUnCode = async() => {
@@ -12,6 +12,11 @@ const autoUnCode = async() => {
 
 const autoReCode = async()=> {
   let list = await mariaDB.query("autoReCode").catch((err) => console.log(err));
+  return list;
+}
+
+const autoFacCode = async()=>{
+  let list = await mariaDB.query("autoFacCode").catch((err) => console.log(err));
   return list;
 }
 
@@ -62,6 +67,15 @@ const addUnFac = async (unplayFac)=> {
   let insertColumns = ['unplay_code', 'employee_code','unplay_start_date','unplay_end_date','note','fac_code', 'unplay_reason_code'];
   let data = convertObjToAry(unplayFac, insertColumns);
   let resInfo = await mariaDB.query("addNoFac", data).catch(err => console.log(err));
+
+  return resInfo;
+}
+//설비등록
+const addFac = async (facCode)=> {
+  facCode.install_date = dateFormat(facCode.install_date)
+  let insertColumns = ['fac_code','model_name','fac_location','employee_code','fac_pattern','install_date','inspection_cycle','image','fac_status'];
+  let data = convertObjToAry(facCode, insertColumns);
+  let resInfo = await mariaDB.query("addFac", data).catch(err => console.log(err));
 
   return resInfo;
 }
@@ -116,7 +130,12 @@ const facResult = async() => {
 }
 //설비상태
 const facStatus = async() => {
-  let lsit = await mariaDB.query('facStatus');
+  let list = await mariaDB.query('facStatus');
+  return list
+}
+//설비유형
+const facPattern = async() => {
+  let list = await mariaDB.query('facPattern');
   return list
 }
 
@@ -158,6 +177,7 @@ const repList = async({type, keyword}) => {
 module.exports = {
   autoUnCode,
   autoReCode,
+  autoFacCode,
   facList,
   unplayAll,
   addUnFac,
@@ -174,4 +194,6 @@ module.exports = {
   updateList,
   facStatus,
   facListAll,
+  addFac,
+  facPattern,
 }

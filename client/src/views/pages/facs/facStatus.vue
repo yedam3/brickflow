@@ -103,7 +103,7 @@
       this.facStatus(); 
     },
     async statusFac() {
-      await axios.get('/api/fac/facStatus')
+      await axios.get('/api/fac/statusFac')
         .then(res => {
           console.log(res.data);
           this.statusFacAry = res.data;

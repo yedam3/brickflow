@@ -12,7 +12,12 @@ router.get("/autoReCode", async (req, res) => {
     let autoReCode = await facService.autoReCode().catch((err) => console.log(err));
     res.send(autoReCode);
 })
+router.get("/autoFacCode", async (req, res) => {
+    let autoFacCode = await facService.autoFacCode().catch((err) => console.log(err));
+    res.send(autoFacCode);
+})
 
+//
 router.get("/addFac", async (req, res) => {
     const { type, keyword } = req.query;
     let facList = await facService.findAll({ type, keyword }).catch(err => console.log(err));
@@ -26,7 +31,12 @@ router.get("/unFacList", async (req, res)=> {
 
     res.send(unplayList);
 })
-
+//설비등록
+router.post("/addFac", async (req, res)=> {
+    const {facCode} = req.body;
+    let result = await facService.addFac(facCode).catch(err => console.log(err));
+    res.send(result);
+})
 //비가동 등록
 router.post("/addUnFac", async (req,res)=>{
     const {unplayFac} = req.body;
@@ -105,10 +115,15 @@ router.get('/facResult', async(req, res) => {
     res.send(result)
 })
 //설비상태
-router.get('/facStatus', async(req,res) => {
+router.get('/statusFac', async(req,res) => {
     let result = await facService.facStatus().catch((err)=> console.log(err));
     res.send(result)
 }) 
+//설비유형
+router.get('/facPattern', async(req, res) => {
+    let result = await facService.facPattern().catch((err)=> console.log(err));
+    res.send(result);
+})
 
 //비가동수리
 router.get('/repaireList', async(req, res)=>{
