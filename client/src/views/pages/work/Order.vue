@@ -1,6 +1,6 @@
 <template>
     <div class="card border-0" style="height: 800px">
-        <div class="font-semibold text-xl mb-4">생산 지시 관리</div>
+        <div class="font-semibold text-xl mb-2">생산 지시 관리</div>
 
         <div class="text-end mt-3 mb-3">
             <Button label="계획목록" severity="success" class="me-3" @click="planList" />
@@ -606,9 +606,11 @@ export default {
             this.rowData = [...this.rowData];
         },
 
+        // 제품 Grid 값 변경 감지
         onProdValueChanged(params) {
             this.nonePlanOrder();
         },
+
         // 생산 제품 자재 요구량 조회 (prod_code)
         async nonePlanOrder() {
             this.secondRowData = [];
@@ -633,6 +635,7 @@ export default {
             this.secondRowData = [...this.secondRowData];
         },
 
+        // Insert Vaildation
         insertVaildation() {
             if( this.formData.product_order_name == '' || 
                 this.formData.start_date == '' ||
@@ -657,6 +660,8 @@ export default {
                 }
             }
         },
+
+        // Vaildation
         async anotherVaildation() {
             let result = await axios.get(`/api/work/order/productOrderStatus/${this.formData.product_order_code}`).catch((err) => console.error(err));
             if(result.data.check != 'WS1') {

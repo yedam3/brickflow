@@ -1,19 +1,25 @@
 // 생산 지시 목록 조회 - 생산 완료(WS3) 제외
 const findAllProduct_order = `
-SELECT po.product_order_code, wp.process_sequence, wp.order_quantity, wp.input_quantity, wp.created_quantity, wp.error_quantity,
+SELECT wp.work_lot, po.product_order_name, wp.process_sequence, wp.order_quantity, wp.input_quantity, wp.created_quantity, wp.error_quantity,
 	getProdName(wp.prod_code) AS prod_name,
-	getProcessName(wp.process_code) AS process_name,
-	IFNULL(work.work_start_date, "") AS 'work_start_date', IFNULL(work.work_end_date, "") AS 'work_end_date',
+	wp.process_code, getProcessName(wp.process_code) AS process_name,
+    IFNULL(work.work_start_date,'') AS work_start_date,
+    IFNULL(work.work_end_date,'') AS work_end_date,
 	CASE
-        WHEN (wp.created_quantity + (wp.error_quantity - wp.order_quantity)) = wp.input_quantity AND wp.input_quantity > 0 THEN 'PP3'
-        WHEN (wp.created_quantity + (wp.error_quantity - wp.order_quantity)) < wp.input_quantity THEN 'PP2'
-        ELSE 'PP1'
+        WHEN wp.input_quantity = 0 THEN 'PP1'
+        WHEN IFNULL(work.work_end_date,'') = '' THEN 'PP2'
+        WHEN wp.input_quantity > 0 THEN 'PP3'
     END AS 'finish_status'
 FROM work_process wp
-	JOIN work_detail wd ON wd.product_order_detail_code = wp.product_order_detail_code
-	JOIN product_order po ON po.product_order_code = wd.product_order_code AND po.finish_status NOT LIKE 'WS3'
-    LEFT JOIN work_data work ON work.work_lot LIKE wp.work_lot
-WHERE wp.order_quantity > 0 AND (wp.order_quantity = wp.input_quantity) = 0
+    LEFT JOIN work_data work ON work.work_lot = wp.work_lot
+	LEFT JOIN work_detail wd ON (wd.product_order_detail_code = wp.product_order_detail_code)
+	LEFT JOIN product_order po ON (po.product_order_code = wd.product_order_code)
+    LEFT JOIN process pr  ON (wp.process_code = pr.process_code)
+WHERE wp.order_quantity > 0	
+	AND wp.order_quantity > wp.input_quantity
+    AND IFNULL(work.work_data_code,'') = (SELECT IFNULL(MAX(wd.work_data_code),'')
+                                  FROM work_data wd
+								WHERE wd.worK_lot = work.work_lot);
 `;
 
 // 사원 목록 조회

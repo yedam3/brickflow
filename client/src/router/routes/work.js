@@ -15,6 +15,16 @@ export default[
         component: () => import('@/views/pages/work/Order.vue')
     },
     {
+        path: '/work/do',
+        name: 'Do',
+        component: () => import('@/views/pages/work/Do.vue')
+    },
+    {
+        path: '/work/data',
+        name: 'Data',
+        component: () => import('@/views/pages/work/Data.vue')
+    },
+    {
         path: '/work/process',
         name: 'Process',
         component: () => import('@/views/pages/work/Process.vue')
