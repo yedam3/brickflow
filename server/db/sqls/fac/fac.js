@@ -7,6 +7,11 @@ FROM fac_none_play`;
 const autoReCode = `SELECT CONCAT('REF-',IFNULL(MAX(CAST(SUBSTR(repaire_code,5) AS SIGNED)),100)+1) AS repaire_code
 FROM repaire`;
 
+//설비코드
+const autoFacCode = `SELECT CONCAT('FAC-',IFNULL(MAX(CAST(SUBSTR(fac_code,5) AS SIGNED)),100)+1) AS fac_code
+FROM fac`
+
+
 //설비 조회
 const selectFacList =
 `SELECT fac_code,
@@ -59,7 +64,24 @@ const facCheck =
 
 
 //설비 등록
-
+const addFac =
+`INSERT INTO fac (
+    fac_code,
+    model_name,
+    fac_location,
+    employee_code,
+    fac_pattern,
+    install_date,
+    inspection_cycle,
+    image,
+    fac_status
+)
+VALUES (
+    ?,?,?,?,                       
+    (SELECT sub_code FROM sub_codes WHERE main_code = 'FC' AND sub_code = ?),
+    ?,?,?,
+    (SELECT sub_code FROM sub_codes WHERE main_code = 'FS' AND sub_code = ?)    
+)`
 //비가동
 const addNoFac =
 `INSERT INTO fac_none_play (
@@ -113,6 +135,14 @@ const facStatus =
   FROM main_codes m
   JOIN sub_codes s ON m.main_code = s.main_code
   WHERE s.main_code = "FS"`
+  
+//설비유형
+const facPattern =
+`SELECT s.sub_code AS fac_pattern,
+         s.sub_code_name
+  FROM main_codes m
+  JOIN sub_codes s ON m.main_code = s.main_code
+  WHERE s.main_code = "FC"`
 
 //비가동고장리스트
 const repaireList = 
@@ -168,6 +198,7 @@ const updateList =
 
 module.exports = {
   autoUnCode,
+  autoFacCode,
   selectFacList, 
   addNoFac,
   unplayList,
@@ -184,4 +215,6 @@ module.exports = {
   repList,
   updateList,
   facStatus,
+  addFac,
+  facPattern,
 };

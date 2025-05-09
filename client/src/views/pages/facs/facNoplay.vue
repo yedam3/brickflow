@@ -170,7 +170,7 @@ export default {
                             unplay_end_date: "",
                             note: "",
                             fac_code: '',
-                }
+                                 }
                     } else {
                         Swal.fire({
                             title: '등록 실패',
