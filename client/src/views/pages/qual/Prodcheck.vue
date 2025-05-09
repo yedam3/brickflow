@@ -42,20 +42,13 @@
      :columnDefs="columnDefs2"
      :rowData="rowData2"
      :gridOptions="gridOptions"
+      @cellValueChanged="testChange"
       rowSelection="multiple"
-     :defaultColDef="defaultColDef2"
-     @cellClicked="checkCellClicked">
+     :defaultColDef="defaultColDef2">
    </ag-grid-vue>
    </div>
  </div>
  </div>
-  <!-- 자재코드 모달창-->
-  <MatModal
-       :visible="showMatModal"
-       rowSelection="multiple"
-       @close="showMatModal = false"
-       @selectMat="matSelected"
-  ></MatModal>
 
 </template>
 
@@ -63,11 +56,9 @@
 import { AgGridVue } from 'ag-grid-vue3';
 import axios from 'axios';
 import Swal from 'sweetalert2';
-import MatModal from '@/components/modal/MatModal.vue';
 export default{
    components: {
    AgGridVue,
-   MatModal,
    Swal
  },
  data() {
@@ -149,58 +140,23 @@ export default{
         onGridReady: function (event) {
         event.api.sizeColumnsToFit();
        },
-     }
+     },
+     pinnedBottomRowData: [
+      {check_list: '합계', work_lot: null, prod_code: null, prod_name: null, check_list: null, pass_quantity: null, error_quantity: 0}
+     ]
     },
-    info:{
-      quantity: '',
-      error_quantity: '',
-    },
-    error_check_ary: [
-            {check_list: '부품 누락', check: false, error_quantity: 0 },
-            {check_list: '외관', check: false, error_quantity: 0 },
-            {check_list: '포장상태', check: false, error_quantity: 0 },
-    ],
     showMatModal: false,
     //상세그리드 행 인덱스
     selectedSecondIndex: null,
     prodIndex : null,
+    firstIndex : null
    };
  },
  mounted() {
    this.prodcheckData();
+
  },
- watch : {
-        error_check_ary : {
-            handler(errAry) {
-                let errTotal = errAry.reduce((errSum, errInfo, idx) => { 
-                     //1) 체크여부
-                     errInfo.check = (errInfo.error_quantity > 0);
-
-                    //2) 총 불량량의 합계
-                    return errSum += errInfo.error_quantity; }, 0);
-                
-                if(errTotal > this.info.check_quantity ){
-                   alert('불량량의 합이 검수량을 넘어섰습니다.');
-                   for(let check of this.error_check_ary){
-                          check.error_quantity = 0;
-                   }
-                }
-            },
-            deep: true
-        },
-        'info.check_quantity': function (newVal) {
-            // check_quantity가 바뀔 때도 불량 총합과 비교
-            let errTotal = this.error_check_ary.reduce((sum, item) => {
-                return sum + item.error_quantity;
-            }, 0);
-
-            if (errTotal > newVal) {
-                // info.check_quantity 값을 수정하려면 this를 통해 접근해야 합니다.
-                this.info.check_quantity = errTotal;  // 여기에서 check_quantity 수정
-                alert('불량량의 합이 검수량을 넘어섰습니다.');
-            }
-        }
-    },
+ 
  methods: {
    async prodcheckData() {
      try {
@@ -209,9 +165,9 @@ export default{
      } catch (err) {
        console.error('데이터 조회 실패:', err);
      }
-     console.log('값',this.rowData);
    },
    prodCellClicked(event){
+     this.firstIndex = event.rowIndex
      let prodCode = event.data.prod_code;
      let prodName = event.data.prod_name;
      let workLot = event.data.work_lot;
@@ -227,121 +183,29 @@ export default{
      this.rowData2 =  [...this.rowData2];
      this.prodIndex = event.rowIndex
     } ,
-   //행추가
-   addRow(){
-   if(this.prodIndex == null){
-     Swal.fire({
-           title: '실패',
-           text: '제품을 클릭해주세요',
-           icon: 'error',
-           confirmButtonText: '확인'
-         });
-         return;
-   }
-   this.rowData2.push({  mat_code: "",
-                         prod_code : this.rowData[this.prodIndex].prod_code,
-                         prod_name: this.rowData[this.prodIndex].prod_name,
-                         mat_name: "",
-                         quantity: "",
-                         })
-   
- // 새 배열로 설정하여 AG Grid가 반영하게 만듬
-   this.rowData2 = [...this.rowData2];  
-  },
-  //행삭제
-   deleteRow() {
-     const selectedNodes = this.$refs.secondGrid.api.getSelectedNodes();
-     const selectedData = selectedNodes.map(node => node.data);
+    testChange(event) {
+      // 변경시 변경한 index값 저장
+      let rowIndex = event.rowIndex;
+      //ROWDATA2의 저장한 index의 값을 가져와서 error_quantity에 바뀐값을 기입
+      this.rowData2[rowIndex].error_quantity = event.data.error_quantity;
+      let sum = 0 ;
+      for(let value of this.rowData2){
+        sum += Number(value.error_quantity);
+      }
+      console.log(sum)
+       if(sum > Number(this.rowData[this.firstIndex].quantity)){
+        Swal.fire({
+            title: '실패',
+            text: '검수량 보다 값이 많습니다.',
+            icon: 'error',
+            confirmButtonText: '확인'
+          });
+        this.rowData2[rowIndex].error_quantity = 0;
+        this.rowData2 = [...this.rowData2]
+      }
+    } ,
   
-     // rowData2에서 선택된 행을 제외한 나머지만 남긴다
-     this.rowData2 = this.rowData2.filter(row => !selectedData.includes(row));
-   },
-   //자재코드를 클릭했을때 모달창 열기
-   bomCellClicked(parmas){
-     if (parmas.colDef.field == "mat_code") {
-       this.selectedSecondIndex = parmas.rowIndex;;
-       this.showMatModal = true;
-     }
-   },
-     //자재 모달창 값 전달
-     matSelected(mat) {
-     for (let rowInclude of this.rowData2) {
-       if (rowInclude.mat_code == mat.mat_code) {
-         Swal.fire({
-           title: '실패',
-           text: '같은 자재를 기입할 수 없습니다.',
-           icon: 'error',
-           confirmButtonText: '확인'
-         });
-         return;
-       }
-     }
-     this.rowData2[this.selectedSecondIndex].mat_code = mat.mat_code;
-     this.rowData2[this.selectedSecondIndex].mat_name = mat.mat_name;
-     // 새 배열로 설정하여 AG Grid가 반영하게 만듬
-     this.rowData2 = [...this.rowData2];
-   },
-   //저장
-   async prodCheckSave(){
-
-     for(let data of this.rowData2) {
-       console.log(data);
-       if(data.mat_code == '' || data.prod_code == '' || data.prod_name == '' || data.mat_name ==''|| data.quantity ==0){
-         Swal.fire({
-           title: '실패',
-           text: '값을 다 입력해주세요',
-           icon: 'error',
-           confirmButtonText: '확인'
-         });
-         return;
-     }
-     }
-     const res = axios.post('/api/qual/bomsave', {
-       insertbom: this.rowData2,
-       
-     })
-       .then(res => {
-         if (res.data.affectedRows > 0) {
-           Swal.fire({
-             title: '등록 성공',
-             text: '정상적으로 등록이 완료되었습니다.',
-             icon: 'success',
-             confirmButtonText: '확인'
-           });
-         } else {
-           Swal.fire({
-             title: '등록 실패',
-             text: '등록이 실패하였습니다..',
-             icon: 'error',
-             confirmButtonText: '확인'
-             
-           });
-         }
-       })
-       .catch(error => {
-         console.error(error);
-         Swal.fire({
-           title: '등록 실패',
-           text: '알수 없는 오류가 발생하였습니다..',
-           icon: 'error',
-           confirmButtonText: '확인'
-         });
-         return;
-       });
-       this.rowData2 = [{
-                         mat_code: "",
-                         prod_name: "",
-                         mat_name: "",
-                         quantity: "",
-                       }];
-       this.BomData();
-   },
-   //초기화
-   resetList(){
-     this.rowData2 = [];
-   }
- 
- }
+ },
 };
  
 
