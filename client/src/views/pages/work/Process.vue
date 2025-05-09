@@ -80,6 +80,8 @@ export default {
             //  생산 지시 데이터 목록
             productOrderDataList: [
                 // {
+                //     work_lot: "",                   // 공정 LOT
+                //     product_order_code: "",         // 생산 지시 코드
                 //     product_order_name: "",         // 생산 지시명
                 //     prod_name: "",                  // 제품명
                 //     process_code: "",               // 공정 코드
@@ -125,12 +127,13 @@ export default {
 
             // AG-GRID 정보
             productOrderColDefs: [
+                { field: "work_lot", headerName: "Work_LOT", flex: 2, cellStyle: { textAlign: "center" } },
                 { field: "product_order_name", headerName: "생산지시명", flex: 3, cellStyle: { textAlign: "center" } },
                 { field: "prod_name", headerName: "제품명", flex: 3, cellStyle: { textAlign: "center" } },
                 { field: "process_name", headerName: "공정명", flex: 3, cellStyle: { textAlign: "center" }, cellEditor: "datePicker" },
                 { field: "process_sequence", headerName: "공정순서", flex: 1.5, cellStyle: { textAlign: "center" }, cellEditor: "datePicker" },
                 { field: "order_quantity", headerName: "지시량", flex: 1.5, cellStyle: { textAlign: "center" } },
-                { field: "order_quantity", headerName: "지시량", flex: 1.5, cellStyle: { textAlign: "center" } },
+                { field: "input_quantity", headerName: "투입량", flex: 1.5, cellStyle: { textAlign: "center" } },
                 { field: "created_quantity", headerName: "생산량", flex: 1.5, cellStyle: { textAlign: "center" } },
                 { field: "error_quantity", headerName: "불량량", flex: 1.5, cellStyle: { textAlign: "center" } },
                 { field: "work_start_date", headerName: "시작시간", flex: 3, cellStyle: { textAlign: "center" } },
@@ -211,6 +214,8 @@ export default {
                 this.productOrderDataList = [...list];
                 // for(let data of list) {
                 //     this.productOrderData.push({
+                //         work_lot: data.work_lot,                                   // 공정 LOT
+                //         product_order_code: data.product_order_code,    // 생산 지시 코드
                 //         product_order_name: data.product_order_name,    // 생산 지시명
                 //         prod_name: data.prod_name,                      // 제품명
                 //         process_code: data.process_code,                // 공정 코드
@@ -225,7 +230,7 @@ export default {
                 //         finish_status: data.finish_status,              // 상태
                 //     });
                 // }
-            }).catch((err) => console.log(err));
+            }).catch((err) => console.error(err));
         },
 
         // 사원 목록 조회
@@ -240,7 +245,7 @@ export default {
                 //         department_name: data.department_name,     // 부서명
                 //     });
                 // }
-            }).catch((err) => console.log(err));
+            }).catch((err) => console.error(err));
         },
 
         // 생산 행 클릭 - 설비 목록 조회
@@ -248,30 +253,36 @@ export default {
             await axios.get(`/api/work/process/facList`).then(res => {
                 const list = res.data;
                 this.facDataList = [...list];
+                
                 for (let data of list) {
                     this.productOrderData.push({
                         fac_code: data.fac_code,                            // 설비 코드
                         model_name: data.model_name,                        // 설비명
                         fac_status: data.fac_status,                        // 설비 상태
                     });
-                }
-
-                this.processData.process = {
-                    product_order_name: params.data.product_order_code,     // 생산 지시명
-                    prod_name: params.data.prod_name,                       // 제품명
-                    process_code: params.data.process_code,                 // 공정 코드
-                    process_name: params.data.process_name,                 // 공정명
-                    process_sequence: params.data.process_sequence,         // 공정 순서
-                    order_quantity: params.data.order_quantity,             // 지시량
-                    input_quantity: params.data.input_quantity,             // 투입량
-                    created_quantity: params.data.created_quantity,         // 생산량
-                    error_quantity: params.data.error_quantity,             // 불량량
-                    work_start_date: params.data.work_start_date,           // 시작 시간
-                    work_end_date: params.data.work_end_date,               // 종료 시간
-                    finish_status: params.data.finish_status,               // 상태
-
-                }
+                };
             }).catch((err) => console.error);
+            
+            this.processData = {
+                
+            }
+
+            this.processData.process = {
+                work_lot:   params.data.work_lot,                       // 공정 LOT
+                product_order_name: params.data.product_order_code,     // 생산 지시명
+                prod_name: params.data.prod_name,                       // 제품명
+                process_code: params.data.process_code,                 // 공정 코드
+                process_name: params.data.process_name,                 // 공정명
+                process_sequence: params.data.process_sequence,         // 공정 순서
+                order_quantity: params.data.order_quantity,             // 지시량
+                input_quantity: params.data.input_quantity,             // 투입량
+                created_quantity: params.data.created_quantity,         // 생산량
+                error_quantity: params.data.error_quantity,             // 불량량
+                work_start_date: params.data.work_start_date,           // 시작 시간
+                work_end_date: params.data.work_end_date,               // 종료 시간
+                finish_status: params.data.finish_status,               // 상태
+
+            };
         },
 
         // 사원 행 클릭
@@ -290,14 +301,13 @@ export default {
                 model_name: params.data.model_name,         // 설비명
                 fac_status: params.data.fac_status,         // 설비 상태
             }
-        }
+        },
+        
+        // 공정 시작
+        startProcess() {
+            this.$router.push({ name: 'Do', query:{ work_lot: this.processData.process.work_lot, emp_code: this.processData.emp.emp_code, fac_code: this.processData.fac.fac_code}});
+        },
     },
-
-    // 공정 시작
-    startProcess() {
-        console.log("공정시작")
-        console.log(this.processData);
-    }
 }
 </script>
 

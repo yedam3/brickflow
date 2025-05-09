@@ -98,14 +98,46 @@ export default {
     },
     data() {
         return {
+
+            // 공정 LOT
+            work_lot: null,
+            // 사번 코드
+            emp_code: null,
+            // 설비 코드
+            fac_code: null,
         };
     },
     watch() {
 
     },
     mounted() {
+        const processData = this.$route.query;
+        if(typeof processData.work_lot !== 'undefined') {
+            this.work_lot = processData.work_lot;
+            this.emp_code = processData.emp_code;
+            this.fac_code = processData.fac_code;
+
+            this.displayLoad();
+        }
     },
     methods: {
+        async displayLoad() {
+
+            // 공정 정보 조회
+            await axios.get(`/api/work/process/workLot/${this.work_lot}`).then(res => {
+                console.log(res.data);
+            }).catch((err) => console.error(err));
+
+            // 작업자 정보 조회
+            await axios.get(`/api/work/work/process/emp_code/${this.emp_code}`).then(res => {
+                console.log(res.data);
+            }).catch((err) => console.error(err));
+
+            // 설비 정보 조회
+            await axios.get(`/api/work/process/fac_code/${this.fac_code}`).then(res => {
+                console.log(res.data);
+            }).catch((err) => console.error(err));
+        },
     },
 };
 </script>
