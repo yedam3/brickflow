@@ -282,10 +282,11 @@ export default {
         orderCode: this.rowData[0].orders_code
       })
         .catch((err) => console.log(err));
-      if (res.data[0].checkCount > 0) {
+        
+      if (res.data[0].checkCount < 1) {
         Swal.fire({
           title: '등록 실패',
-          text: '이미 등록이 진행중 입니다.',
+          text: '이미 등록된 주문입니다.',
           icon: 'error',
           confirmButtonText: '확인'
         });
