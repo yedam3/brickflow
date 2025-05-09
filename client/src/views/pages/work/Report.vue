@@ -1,6 +1,6 @@
 <template>
     <div class="card border-0" style="height: 800px">
-        <div class="font-semibold text-xl mb-4">생산 전표 관리</div>
+        <div class="font-semibold text-xl mb-2">생산 전표 관리</div>
         <div class="text-end mt-3 mb-3">
             <div class="row justify-content-between align-items-center">
                 <div class="col-auto">

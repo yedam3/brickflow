@@ -1,6 +1,6 @@
 <template>
     <div class="card border-0" style="height: 800px">
-        <div class="font-semibold text-xl mb-4">생산 계획 관리</div>
+        <div class="font-semibold text-xl mb-2">생산 계획 관리</div>
 
         <div class="font-semibold text-l mb-4">생산 계획 등록</div>
 
