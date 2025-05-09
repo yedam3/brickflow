@@ -35,14 +35,11 @@ router.post("/addUnFac", async (req,res)=>{
 })
 //비가동수리 처리
 router.post("/repaireFac", async (req,res)=>{
-    try {
-        const result = await facService.addUnFac(req.body.unplayFac);
-        res.send(result);
-      } catch (err) {
-        console.error(err);
-        res.status(500).send('비가동 등록 중 오류 발생');
-      }
-    });
+    const {unplayFac} = req.body;
+    const result = await facService.repaireFac(unplayFac).catch(err => console.log(err));
+    res.send(result);
+
+});
 
 //비가동설비 수정
 router.put("/modifyUnplay", async(req, res)=>{

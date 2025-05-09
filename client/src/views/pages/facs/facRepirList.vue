@@ -4,7 +4,7 @@
       <div class="input-group mb-5" style="width: 65%;">
         <!-- 검색 조건 선택 -->
         <select v-model="searchType" class="form-select" aria-label="Default select example">
-          <option value="" selected style="color: gray;">전체</option>
+          <option value="" disabled style="color: gray;">전체</option>
           <option v-for="reFac in resultFacAry" :key="reFac.fac_result"
             :value="reFac.fac_result">{{ reFac.sub_code_name }}</option>
         </select>
@@ -36,11 +36,8 @@
       AgGridVue,
       datePicker: DatePickerEditor,
     },
-    mounted(){
-      this.repaireFac();
-    },
     data(){
-      return{
+      return{ 
         rowData:[],
         columnDefs:[
         { field:"repaire_code", headerName: "설비수리코드", flex: 2,  },
@@ -49,13 +46,11 @@
         { field:"repaire_finish_date", headerName: "수리처리일자", flex: 2,  },
         { field:"fac_code", headerName: "설비코드", flex: 2,  },
         { field:"fac_result", headerName: "수리결과", flex: 2,  
-        valueFormatter:(params) => {
-          if(params.value == 'OH1'){
-            return params.value = '수리완료';
-          } else  if(params.value == 'OH2'){
-            return params.value = '수리불가';
-          }
-        }, 
+          valueFormatter: (params) => {
+            if (params.value === 'OH1') return '수리완료';
+            if (params.value === 'OH2') return '수리불가';
+            return params.value;
+          }, 
           cellStyle: params => {
             if(params.value == "OH1"){
                 return { color: '#22C55E', textAlign:'center', fontWeight: 'bold' };
@@ -93,23 +88,26 @@
     },
     methods: {
       //조회
-      async repaireFac(){
-        await axios.get('/api/fac/repList')
-        .then(res => {
-          console.log(res.data)
-          this.rowData = res.data;
-        })
+      async repaireFac() {
+        const params = {
+          type: this.searchType,
+          keyword: this.searchText
+        };
+        await axios.get('/api/fac/repList', { params })
+          .then(res => {
+            this.rowData = res.data;
+          })
+          .catch(err => console.error(err));
       },
-      //수리결과
-      async facResult(){
+    //수리결과
+    async facResult() {
       await axios.get('/api/fac/facResult')
-      .then(res => {
-        this.resultFacAry = res.data;
-        this.resultFacAry = {...res.data};
-      })
-      .catch(err => console.error(err));
+        .then(res => {
+          this.resultFacAry = res.data;
+        })
+        .catch(err => console.error(err));
     }
-    },
+  },
   }
 </script>
 
