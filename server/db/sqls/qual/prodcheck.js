@@ -2,7 +2,7 @@
 
 // prod_check_code 자동 생성
 const autoProdCheckCode = 
-`SELECT CONCAT('pcc-',IFNULL(MAX(CAST(SUBSTR(prod_check_code,5) AS SIGNED)),100)+1) AS prod_check_code
+`SELECT CONCAT('pcc-',IFNULL(MAX(CAST(SUBSTR(prod_check_code,5) AS SIGNED)),100)+1)
 FROM error_standard`;
 
 //제품검수
@@ -18,12 +18,13 @@ const prodCheckList = `SELECT w.process_sequence,
                           WHERE w2.product_order_detail_code = w.product_order_detail_code)
                           GROUP BY w.prod_code,w.product_order_detail_code
                           HAVING quantity > 0`;
-//2. 검수결과등록
-const prodCheckSave = ``;
+
+
+
+
 
 
 module.exports = {
   autoProdCheckCode,
   prodCheckList,
-  prodCheckSave,
 }
