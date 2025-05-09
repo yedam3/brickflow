@@ -50,11 +50,30 @@ router.post('/deliveryCheck', async (req, res) => {
 })
 
 //삭제
-router.delete('/deliveryDelete/:delivery_code', async (req, res) => {
+router.delete('/deliveryDelete', async (req, res) => {
     let deliverycode = req.params.delivery_code;
-    let resInfo = await deliveryService.removeorder(deliverycode)
+    let resInfo = await deliveryService.removedelivery(deliverycode)
     res.send(resInfo);
 });
+
+router.get('/deliveryModal', async (req, res) => {
+   const {
+     type,
+     keyword
+   } = req.query; // comList?type=값&keyword=값
+   let deliveryList = await deliveryService.deliveryList({
+       type,
+       keyword
+     })
+     .catch((err) => console.log(err));
+   res.send(deliveryList);
+})
+router.get('/deldetail/:orders_code', async (req, res) => { 
+  const orderCode = req.params.orders_code;
+  let findOrders = await deliveryService.deliveryDetailRender(orderCode)
+    .catch((err) => console.log(err));
+  res.send(findOrders);
+})
 
 
 module.exports = router;

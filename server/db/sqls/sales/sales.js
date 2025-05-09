@@ -48,18 +48,8 @@ const selectorders =
     , prod_code
     , getProdName(prod_code) AS prod_name
     , finish_status
-    FROM order_detail o
+    FROM order_detail o 
     WHERE orders_code = ?`;
-//   `SELECT orders_detail_code
-//   , orders_code
-//   , quantity, price
-//   , note
-//   , prod_code
-//   , getProdName(prod_code) AS prod_name
-//   , finish_status
-
-// FROM order_detail
-// WHERE orders_code = ?`;
 
 //제품 모달창
 const prodselect =
