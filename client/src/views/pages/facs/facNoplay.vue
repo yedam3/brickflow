@@ -30,7 +30,7 @@
                                 style="border: 1px solid black; width: 100px;"></h6>
                         <h6>비가동사유코드 <select v-model="rowData.unplay_reason_code" class="form-select form-control"
                                 style="height: 34px; border: 1px solid black ; font-size: 12px; color: gray; width: 100px;">
-                                <option value="">비가동사유</option>
+                                <option disabled value="">비가동사유</option>
                                 <option v-for="reFac in reasonFacAry" :key="reFac.unplay_reason_code"
                                     :value="reFac.unplay_reason_code">
                                     {{ reFac.sub_code_name }}
@@ -137,31 +137,13 @@ export default {
         this.autoUnCode();
         this.unFacList();
         this.reasonFac();
-        this.updatePlay()
     },
     methods: {
-        //
         async autoUnCode(){
             const result = await axios.get("/api/fac/autoUnCode");
             this.rowData.unplay_code = result.data[0].unplay_code;
         },
         async addUnFac() {
-            console.log(this.rowData.unplay_code);
-            const res = await axios.get('/api/fac/unFacCheck', {
-                params: {
-                    unplayCode: this.rowData.unplay_code
-                }
-            })
-                .catch((err) => console.log(err));
-            if (res.data[0].checkCount > 0) {
-                Swal.fire({
-                    title: '등록 실패',
-                    text: '이미 등록이 진행된 설비코드입니다.',
-                    icon: 'error',
-                    confirmButtonText: '확인'
-                });
-                return;
-            }
             console.log(this.rowData);
             //등록
             axios.post('/api/fac/addUnFac', {
@@ -231,60 +213,99 @@ export default {
             await axios.put('/api/fac/modifyUnplay', {
                 unplayFac: this.rowData2[0]
             })
-            
-                .then(res => {
-                    if (res.data.affectedRows > 0) {
-                        Swal.fire({
-                            title: '수정 완료',
-                            text: '수정이 완료되었습니다.',
-                            icon: 'success',
-                            confirmButtonText: '확인'
-                        }).then(() =>{
-                            this.unFacList();
-                        });
-                        this.rowData =      {
-                            unplay_reason_code: "",
-                            employee_code: "",
-                            unplay_start_date: "",
-                            unplay_end_date: "",
-                            note: "",
-                            fac_code: '',
-                }
-
-                    } else {
-                        Swal.fire({
-                            title: '수정 실패',
-                            text: '수정을 실패하였습니다.',
-                            icon: 'error',
-                            confirmButtonText: '확인'
-                        });
-                        return;
-                    }
-                })
-                .catch(err => {
-                    console.error(err);
+            .then(res => {
+                if (res.data.affectedRows > 0) {
+                    Swal.fire({
+                        title: '수정 완료',
+                        text: '수정이 완료되었습니다.',
+                        icon: 'success',
+                        confirmButtonText: '확인'
+                    }).then(() =>{
+                        this.unFacList();
+                    });
+                    this.rowData =      {
+                        unplay_reason_code: "",
+                        employee_code: "",
+                        unplay_start_date: "",
+                        unplay_end_date: "",
+                        note: "",
+                        fac_code: '',
+                        }
+                } else {
                     Swal.fire({
                         title: '수정 실패',
-                        text: '알수 없는 에러.',
+                        text: '수정을 실패하였습니다.',
                         icon: 'error',
                         confirmButtonText: '확인'
                     });
-                    return
+                    return;
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                Swal.fire({
+                    title: '수정 실패',
+                    text: '알수 없는 에러.',
+                    icon: 'error',
+                    confirmButtonText: '확인'
                 });
+                return
+            });
             this.autoUnCode();
         },
-        //가동처리
-        async updatePlay(){
-            await axios.put('/api/fac/updateList', {
+        // 가동처리
+        updatePlay() {
+            axios.put('/api/fac/updateList', {
+                params: {
                 facCode: this.rowData.fac_code,
                 facStatus: "FS1"
+                }
             })
-            this.facStatus();
+            .then(() => {
+                return axios.get('/api/fac/facStatus');
+            })
+            .then(res => {
+                if (res.data.affectedRows > 0) {
+                    Swal.fire({
+                        title: '가동처리 완료',
+                        text: '가동처리가 완료되었습니다.',
+                        icon: 'success',
+                        confirmButtonText: '확인'
+                    }).then(() => {
+                    this.unFacList();
+                });
+                this.rowData = {
+                    unplay_reason_code: "",
+                    employee_code: "",
+                    unplay_start_date: "",
+                    unplay_end_date: "",
+                    note: "",
+                    fac_code: '',
+                };
+                } else {
+                    Swal.fire({
+                        title: '가동처리 실패',
+                        text: '가동처리를 실패하였습니다.',
+                        icon: 'error',
+                        confirmButtonText: '확인'
+                    });
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                Swal.fire({
+                    title: '가동처리 실패',
+                    text: '알 수 없는 에러.',
+                    icon: 'error',
+                    confirmButtonText: '확인'
+                });
+            })
+            .finally(() => {
+            this.autoUnCode();
+            });
         },
-        async facStatus() {
-            const res = await axios.get('/api/fac/facStatus');
-            console.log('설비 상태 목록:', res.data);
-        },
+
+
         // //삭제
         // async deleteUnplay() {
         //     if (!this.rowData2 || this.rowData2.length === 0 || !this.rowData2[0].unplay_code) {

@@ -13,6 +13,10 @@ const selectFacList =
         model_name,
         fac_location,
         employee_code,
+        fac_pattern,
+        install_date,
+        inspection_cycle,
+        image,
         fac_status
 FROM fac`
 
@@ -55,6 +59,7 @@ const facCheck =
 
 
 //설비 등록
+
 //비가동
 const addNoFac =
 `INSERT INTO fac_none_play (
@@ -123,7 +128,7 @@ WHERE unplay_reason_code IN (SELECT s.sub_code_name
                             FROM main_codes m join sub_codes s on(m.main_code = s.main_code)
                             WHERE s.sub_code_name = '고장')`
 
-//비가동 수리처리
+//비가동 수리처리 등록
 const repaireFac =
 `INSERT INTO repaire (
   repaire_code, 

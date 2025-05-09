@@ -4,7 +4,7 @@
       <div class="input-group mb-5" style="width: 65%;">
         <!-- 검색 조건 선택 -->
         <select v-model="searchType" class="form-select" aria-label="Default select example">
-          <option value="" selected style="color: gray;">전체</option>
+          <option value="" style="color: gray;">전체</option>
           <option v-for="staFac in statusFacAry" :key="staFac.fac_status"
             :value="staFac.fac_status">{{ staFac.sub_code_name }}</option>
         </select>

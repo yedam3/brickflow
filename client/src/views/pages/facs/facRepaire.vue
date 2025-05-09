@@ -41,7 +41,7 @@
         <div class="input-group mb-5 col">
           <span class="input-group-text" id="basic-addon1">수리결과</span>
           <select v-model="rowData2.fac_result" class="form-select col" aria-label="Default select example" >
-            <option disabled selected value="">수리결과</option>
+            <option disabled value="" style="color: gray;">수리결과</option>
             <option v-for="repFac in facResultAry" :key="repFac.fac_result" :value="repFac.fac_result">
               {{ repFac.sub_code_name }}
             </option>
@@ -97,7 +97,6 @@ export default {
           unplay_reason_code: "",
           employee_code: "",
           unplay_start_date: "",
-          unplay_end_date: "",
           note: "",
           fac_code: '',
         }
@@ -121,7 +120,6 @@ export default {
         { field: "unplay_reason_code", headerName: "비가동사유코드", flex: 3, },
         { field: "employee_code", headerName: "당담자", flex: 3, },
         { field: "unplay_start_date", headerName: "비가동시작일시", flex: 3, },
-        { field: "unplay_end_date", headerName: "비가동종료일시", flex: 3, },
         { field: "note", headerName: "비고", flex: 3, },
       ],
       gridOptions: {
@@ -161,7 +159,7 @@ export default {
       axios.post('/api/fac/repaireFac', {
         repaireFac: this.rowData2
       })
-      .then(async res => {
+      .then(res => {
         if (res.data.affectedRows > 0) {
           Swal.fire({
             title: '처리성공',
@@ -169,7 +167,7 @@ export default {
             icon: 'success',
             confirmButtonText: '확인'
           }).then(() => {
-
+            this.repaireList();
           });
           this.rowData2 = {
           repaire_code:"",
@@ -223,7 +221,6 @@ export default {
       await axios.get('/api/fac/facResult')
       .then(res => {
         this.facResultAry = res.data;
-        this.facResultAry = {...res.data};
       })
       .catch(err => console.error(err));
     }

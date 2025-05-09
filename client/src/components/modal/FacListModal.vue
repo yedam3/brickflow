@@ -89,11 +89,15 @@
           valueFormatter:(params) => {
           if(params.value == 'FS1'){
             return params.value = '가동';
-          } 
-        }, 
+          } else  if(params.value == 'FS2'){
+            return params.value = '비가동';
+        }
+      },
         cellStyle: params => {
               if(params.value == "FS1"){
                 return { color: '#22C55E', textAlign:'center', fontWeight: 'bold' };
+              } else if(params.value == "FS2"){
+                return { color: 'red', textAlign:'center', fontWeight: 'bold'};
               }
               return null;
             }}

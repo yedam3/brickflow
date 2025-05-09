@@ -36,6 +36,12 @@ const unplayAll = async (unplayCode) => {
   return list;
 }
 
+//설비조회
+const facListAll = async (facCode) => {
+  let list = await mariaDB.query("selectFacList", facCode);
+  return list;
+}
+
 //설비상태확인
 const statuFac = async ({type, keyword}) => {
   let searchCondition ={};
@@ -47,7 +53,7 @@ const statuFac = async ({type, keyword}) => {
     convertedCondition = converted.searchKeyword;
   }
 
-  const result = await mariaDB.query('statusList', { searchCondition: convertedCondition}).catch((err) => console.log(err));
+  const result = await mariaDB.query('selectFacList', { searchCondition: convertedCondition}).catch((err) => console.log(err));
   return result;
 }
 
@@ -167,4 +173,5 @@ module.exports = {
   repList,
   updateList,
   facStatus,
+  facListAll,
 }
