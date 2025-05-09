@@ -2,7 +2,7 @@
 const findAllProduct_order = `
 SELECT wp.work_lot, po.product_order_name, wp.process_sequence, wp.order_quantity, wp.input_quantity, wp.created_quantity, wp.error_quantity,
 	getProdName(wp.prod_code) AS prod_name,
-	wp.process_code, getProcessName(wp.process_code) AS process_name,
+	getProcessName(wp.process_code) AS process_name,
     IFNULL(work.work_start_date,'') AS work_start_date,
     IFNULL(work.work_end_date,'') AS work_end_date,
 	CASE
@@ -17,9 +17,10 @@ FROM work_process wp
     LEFT JOIN process pr  ON (wp.process_code = pr.process_code)
 WHERE wp.order_quantity > 0	
 	AND wp.order_quantity > wp.input_quantity
+    AND pr.process_type = 'PT1'
     AND IFNULL(work.work_data_code,'') = (SELECT IFNULL(MAX(wd.work_data_code),'')
                                   FROM work_data wd
-								WHERE wd.worK_lot = work.work_lot);
+								WHERE wd.worK_lot = work.work_lot)
 `;
 
 // 사원 목록 조회
@@ -45,8 +46,34 @@ FROM fac fac
     LEFT OUTER JOIN fac_none_play fn ON fn.fac_code LIKE fac.fac_code
 `;
 
+// 정보 조회
+const findProcessInfo = `
+
+`;
+
+// 공정 정보 조회
+const findWork_processByWork_lot = `
+
+`;
+
+// 작업자 정보 조회
+const findEmployeesByEmp_code = `
+
+`;
+
+
+// 설비 정보 조회
+const findFacByFac_code = `
+
+`;
+
 module.exports = {
     findAllProduct_order,               // 생산 지시 목록 조회 - 생산 완료(WS3) 제외
     findAllEmployees,                   // 사원 목록 조회
     findAllFac,                         // 설비 목록 조회
+
+    findProcessInfo,                    // 정보 조회
+    findWork_processByWork_lot,         // 공정 정보 조회
+    findEmployeesByEmp_code,            // 작업자 정보 조회
+    findFacByFac_code,                  // 설비 정보 조회
 }

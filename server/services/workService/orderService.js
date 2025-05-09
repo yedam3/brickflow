@@ -98,8 +98,6 @@ const insertProduct_order = async (orderData, orderDetailDataList, matHoldDataLi
     let conn;
     let result;
 
-    console.log(orderData);
-
     const order_fields = ["product_order_code", "plan_code", "product_order_name", "employee_code", "start_date", "end_date", "note"];
     const orderDetail_fields = ["product_order_detail_code", "prod_code", "order_quantity", "priority", "process_flow_code", "product_order_code"];
     const matHold_fields = ["mat_hold_code", "product_order_detail_code", "mat_LOT", "hold_quantity", "mat_code"];
