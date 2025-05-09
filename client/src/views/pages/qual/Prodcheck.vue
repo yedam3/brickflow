@@ -123,7 +123,6 @@ export default{
     },
     {
      work_lot: "",
-     prod_check_code: "",
      prod_code: "",
      prod_name: "",
      check_list: "포장상태",
@@ -133,12 +132,11 @@ export default{
     ],
     columnDefs2: [
        { field: 'work_lot', headerName: '공정LOT' ,flex:3},
-       { field: 'prod_check_code', headerName: '제품검수코드',flex:4,editable:true},
-       { field: 'prod_code', headerName: '제품코드',flex:3,editable:true},
-       { field: 'prod_name', headerName: '제품명',flex:3,editable:true},
-       { field: 'check_list', headerName: '검수항목',flex:4,editable:true},
-       { field: 'pass_quantity', headerName: '합격량' ,flex:3,editable:true},
-       { field: 'error_quantity', headerName: '불량량' ,flex:3,editable:true},
+       { field: 'prod_code', headerName: '제품코드',flex:2,editable:true},
+       { field: 'prod_name', headerName: '제품명',flex:2,editable:true},
+       { field: 'check_list', headerName: '검수항목',flex:2,editable:true},
+       { field: 'pass_quantity', headerName: '합격량' ,flex:2,editable:true},
+       { field: 'error_quantity', headerName: '불량량' ,flex:2,editable:true},
      ],
      gridOptions2:{
        domLayout: "autoHeight", //행을 보고 자동으로 hight부여
@@ -153,6 +151,15 @@ export default{
        },
      }
     },
+    info:{
+      quantity: '',
+      error_quantity: '',
+    },
+    error_check_ary: [
+            {check_list: '부품 누락', check: false, error_quantity: 0 },
+            {check_list: '외관', check: false, error_quantity: 0 },
+            {check_list: '포장상태', check: false, error_quantity: 0 },
+    ],
     showMatModal: false,
     //상세그리드 행 인덱스
     selectedSecondIndex: null,
@@ -162,6 +169,38 @@ export default{
  mounted() {
    this.prodcheckData();
  },
+ watch : {
+        error_check_ary : {
+            handler(errAry) {
+                let errTotal = errAry.reduce((errSum, errInfo, idx) => { 
+                     //1) 체크여부
+                     errInfo.check = (errInfo.error_quantity > 0);
+
+                    //2) 총 불량량의 합계
+                    return errSum += errInfo.error_quantity; }, 0);
+                
+                if(errTotal > this.info.check_quantity ){
+                   alert('불량량의 합이 검수량을 넘어섰습니다.');
+                   for(let check of this.error_check_ary){
+                          check.error_quantity = 0;
+                   }
+                }
+            },
+            deep: true
+        },
+        'info.check_quantity': function (newVal) {
+            // check_quantity가 바뀔 때도 불량 총합과 비교
+            let errTotal = this.error_check_ary.reduce((sum, item) => {
+                return sum + item.error_quantity;
+            }, 0);
+
+            if (errTotal > newVal) {
+                // info.check_quantity 값을 수정하려면 this를 통해 접근해야 합니다.
+                this.info.check_quantity = errTotal;  // 여기에서 check_quantity 수정
+                alert('불량량의 합이 검수량을 넘어섰습니다.');
+            }
+        }
+    },
  methods: {
    async prodcheckData() {
      try {
@@ -173,18 +212,21 @@ export default{
      console.log('값',this.rowData);
    },
    prodCellClicked(event){
-     let prodcheck = event.data.work_lot;
+     let prodCode = event.data.prod_code;
+     let prodName = event.data.prod_name;
+     let workLot = event.data.work_lot;
+
+     for(let value of this.rowData2){
+      value.work_lot = workLot;
+      value.prod_name = prodName;
+      value.prod_code = prodCode;
+      value.pass_quantity = ''  
+      value.error_quantity = ''
+     }
+
+     this.rowData2 =  [...this.rowData2];
      this.prodIndex = event.rowIndex
-     axios.get('/api/qual/prodcheck/' + prodcheck)
-                .then(res => {
-                 console.log(res);
-                      this.rowData2 = res.data;
-                      this.rowData2 = [...this.rowData2];  
-                }).catch(error => {
-                 console.error(error);
-                });
-                console.log(event);
-       },
+    } ,
    //행추가
    addRow(){
    if(this.prodIndex == null){
