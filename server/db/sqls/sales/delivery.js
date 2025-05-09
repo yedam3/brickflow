@@ -1,3 +1,6 @@
+
+
+
 //출고 가능 수량그리드에 조회
 const prodcheck = `
 SELECT SUM(inbound_quantity) - SUM(dispatch_quantity) as delivery_before_quantity,
@@ -21,13 +24,13 @@ const deliveryAutoDetailOrder =
 
 //등록
 const deliveryAdd =
-  `INSERT INTO delivery_manage(delivery_code, orders_code, company_code, employee_code, delivery_date)
-VALUES( ? , ? , ? , ? , ? )`;
+  `INSERT INTO delivery_manage(delivery_code, orders_code, company_code, employee_code, delivery_date, finish_status)
+VALUES( ? , ? , ? , ? , ?, 'OS4' )`;
 
 //상세등록
 const deliveryDetailAdd =
-  `INSERT INTO delivery_manage_detail(delivery_detail_code, prod_code, delivery_quantity, prod_LOT, delivery_code)
-VALUES( ? , ? , ? , ? , ?)`;
+  `INSERT INTO delivery_manage_detail(delivery_detail_code, prod_code, delivery_quantity, prod_LOT, delivery_code, finish_status)
+VALUES( ? , ? , ? , ? , ?, ?)`;
 
 //수정
 const deliveryUpdate = `
@@ -64,11 +67,12 @@ module.exports = {
   deliveryAdd,
   deliveryAutoOrder,
   deliveryDetailAdd,
-  deliveryDelete,
-  deliveryDetailDelete,
   prodcheck,
   addCheck,
   deliveryAutoDetailOrder,
   deliveryUpdate,
   deliveryDetailUpdate,
+  deliveryDelete,
+  deliveryDetailDelete,
+  
 }

@@ -2,11 +2,15 @@ const express = require("express");
 const router = express.Router();
 const deliveryService = require("../../services/salesservice/delivery_service.js");
 
-// // 주문 목록 조회 (요구량 포함)
-// router.get('/orderList', async (req, res) => {
-//   const orderList = await orderService.getOrders(); // 이 안에서 demand 포함된 데이터 가져옴
-//   res.send(orderList);
-// });
+//업체리스트
+router.get("/comList", async (req, res) => {
+    //쿼리 스트링 형식으로 받기 => 선택값
+    const { type, keyword } = req.query; // comList?type=값&keyword=값
+    let comList = await salesService.comList({type,keyword})
+                                      .catch((err)=> console.log(err));
+    res.send(comList);
+});
+
 
 // 제품LOT조건 조회
 router.get('/deliveryCheck/:prodCode', async (req, res) => {
@@ -26,6 +30,14 @@ router.post('/deliveryAdd', async (req, res) => {
 router.post('/deliveryDetail', async (req, res) => {
   const { delivery, deliveryDetail } = req.body;
   let result = await deliveryService.deliveryAdd(delivery, deliveryDetail);
+  res.send(result);
+})
+
+//수정
+router.put('/deliveryModify', async (req, res) => {
+  const { delivery,deliveryDetail} = req.body;
+  let result = await deliveryService.modifydelivery(delivery, deliveryDetail)
+                                    .catch((err) => console.log(err));
   res.send(result);
 })
 

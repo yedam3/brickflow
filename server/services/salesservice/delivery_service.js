@@ -1,10 +1,29 @@
-const {
-    inRange
-} = require("lodash");
+const {inRange} = require("lodash");
 const mariaDB = require("../../db/mapper.js");
-const {
-    convertObjToAry
-} = require("../../utils/converts.js");
+const { convertObjToAry } = require("../../utils/converts.js");
+
+//업체리스트 조회
+const comList = async ({
+  type,
+  keyword
+}) => {
+  let searchCondition = {};
+  let convertedCondition = ''; // 기본값
+
+  if (type && keyword) {
+    searchCondition[type] = keyword;
+    // selected 배열을 넣어줘야 작동
+    const converted = convertLikeToQuery(searchCondition, []);
+    convertedCondition = converted.serchKeyword;
+  }
+
+  const result = await mariaDB.query('prodComList', {
+      searchcondition: convertedCondition
+    })
+    .catch((err) => console.log(err));
+  return result;
+};
+
 
 // 메인조회
 const findMainOrders = async (orders_code) => {
@@ -65,22 +84,28 @@ const deliveryAdd = async (delivery, deliveryDetail) => {
 }
 
 //수정
-const modifydelivery = async () => {
+const modifydelivery = async (delivery,deliveryDetail) => {
 
-    let updateInfo ={
+    let updateInfo = {
+       company_code: delivery.company_code,
+       employee_code: delivery.employee_code,
+       delivery_date: delivery.delivery_date,
+       delivery_name: delivery.delivery_name,
 
     }
-    let result = await mariaDB.query('', [])
+    let result = await mariaDB.query('deliveryUpdate', [updateInfo, ])
     .catch((err) => console.log(err));
-    if (result.affectedRows < 1) {
+    if (result.affectedRows > 0) {
     return result;
     }
     for(let detail of deliveryDetail){
         let updateDetailIndo = {
-
+            delivery_quantity: detail.delivery_quantity,
+            demend: detail.demend,
+            prod_code: detail.prod_code,
         }
-        result = await mariaDB.query('',[]
-            .catch((err)=> console.log));
+        result = await mariaDB.query('deliveryDetailUpdate ', [updateDetailIndo,detail.delivery_detail_code]
+            .catch((err)=> console.log(err)));
         
     }
     return result;
@@ -92,7 +117,7 @@ const deliveryCheck = async (deliveryCode) => {
     return list;
 }
 
-//삭제
+// //삭제
 const removedelivery = async (delivery_code) => {
     let result = await mariaDB.query("deliveryDelete", [delivery_code])
         .catch(err => console.log(err));
@@ -108,8 +133,9 @@ module.exports = {
     findMainOrders,
     findorders,
     deliveryAdd,
-    removedelivery,
     prodcheck,
     deliveryCheck,
+    modifydelivery,
+    removedelivery,
 
 }

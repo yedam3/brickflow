@@ -35,16 +35,31 @@ const orderinfochoice =
 // 상세조회
 const selectorders =
   `SELECT orders_detail_code
-        , orders_code
-        , quantity
-        , price
-        , note
-        , prod_code
-        , getProdName(prod_code) AS prod_name
-        , finish_status
+  , orders_code
+  , quantity AS delivery_demand,
+    (SELECT IFNULL(SUM(delivery_quantity),0)
+     FROM delivery_manage_detail d JOIN delivery_manage m ON(d.delivery_code = m.delivery_code)
+     WHERE orders_code = o.orders_code AND prod_code = o.prod_code) AS alreadydelivery,
+    quantity - (SELECT IFNULL(SUM(delivery_quantity),0)
+     FROM delivery_manage_detail d JOIN delivery_manage m ON(d.delivery_code = m.delivery_code)
+      WHERE orders_code = o.orders_code AND prod_code = o.prod_code) AS yetdelivery
+    , price
+    , note
+    , prod_code
+    , getProdName(prod_code) AS prod_name
+    , finish_status
+    FROM order_detail o
+    WHERE orders_code = ?`;
+//   `SELECT orders_detail_code
+//   , orders_code
+//   , quantity, price
+//   , note
+//   , prod_code
+//   , getProdName(prod_code) AS prod_name
+//   , finish_status
 
-FROM order_detail
-WHERE orders_code = ? `;
+// FROM order_detail
+// WHERE orders_code = ?`;
 
 //제품 모달창
 const prodselect =

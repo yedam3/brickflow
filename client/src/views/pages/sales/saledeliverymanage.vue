@@ -3,12 +3,13 @@
     <div class="card border-0 h-100">
         <div class="font-semibold text-xl mb-4">출고 관리</div>
         <div class="text-end mt-3 mb-3">
-            <Button label="출고조회" severity="success" class="me-3" @click="" />
+            <Button label="출고조회" severity="success" class="me-3" @click="orderList" />
             <Button label="주문조회" severity="success" class="me-3" @click="orderList" />
             <Button label="등록" severity="info" class="me-3" @click="addDelivery" />
             <Button label="수정" severity="help" class="me-3" @click="modifyOrder" />
             <Button label="삭제" severity="danger" class="me-5" @click="deliveryDelete" />
         </div>
+        <!-- 메인 그리드 -->
         <ag-grid-vue class="ag-theme-alpine" style="width: 100%; 
     height: 150px;" :columnDefs="columnDefs" :rowData="rowData" :gridOptions="gridOptions"
             :defaultColDef="defaultColDef" @cellClicked="comCellClicked">
@@ -47,24 +48,25 @@
     </div>
 
     <!-- 주문 목록 조회 모달창 -->
-    <OrderModal ref="orderModal" :visible="showOrderModal" @close="showOrderModal = false" @selectOrder="orderSelected">
-    </OrderModal>
-
+    <OrderModal ref="orderModal" :visible="showOrderModal" @close="showOrderModal = false" @selectOrder="orderSelected"></OrderModal>
+    <!-- 업체 모달창-->
+    <ProdComModal :visible="showComModal" rowSelection="multiple" @close="showComModal = false" @selectCom="comSelected"></ProdComModal>
 
 </template>
 
 <script>
 import { AgGridVue } from 'ag-grid-vue3';
 import axios from 'axios';
-import OrderModal from '@/components/modal/OrderModal.vue';
-import ProdComModal from "@/components/modal/ProdComModal.vue";
+import OrderModal from '@/components/modal/OrderModal.vue'; // 주문 모달
+import ProdComModal from "@/components/modal/ProdComModal.vue"; //업체 모달
 import Swal from 'sweetalert2';
+
 
 export default {
     components: {
         AgGridVue,
-        OrderModal,
-        ProdComModal,
+        OrderModal, // 주문 모달
+        ProdComModal, // 업체 모달
         Swal,
 
     },
@@ -76,7 +78,7 @@ export default {
                 delivery_name: '',
                 orders_code: '',
                 order_name: '',
-                company_code: '',
+                company_name: '',
             }],
             columnDefs: [
                 { field: 'delivery_code', headerName: '출고코드', hide: true },
@@ -109,7 +111,15 @@ export default {
                 { field: "yetdelivery", headerName: "미납기량", flex: 2, editable: true, cellStyle: { textAlign: "center" } },
                 { field: "delivery_quantity", headerName: "출고량", flex: 2, editable: true, cellStyle: { textAlign: "center" } },
             ],
-            throwData: [],
+            throwData: [
+                {
+                    prod_LOT: '',
+                    prod_code: '',
+                    prod_name: '',
+                    delivery_before_quantity: '',
+                    delivery_quantity: '',
+                }
+            ],
             thColumnDefs: [
                 { field: "prod_LOT", headerName: "제품LOT", flex: 2, cellStyle: { textAlign: "center" } },
                 { field: "prod_code", headerName: "제품코드", flex: 2, editable: true, cellStyle: { textAlign: "center" } },
@@ -134,6 +144,21 @@ export default {
             this.rowData[0].sales_order_code = result.data[0].sales_order_code;
             //this.secondRowData[0].sales_order_code = result.data[0].sales_order_code;
         },
+        //업체명을 클릭했을때 모달창 열기 comCellClicked
+        comCellClicked(params) {
+            if (params.colDef.field == "company_name") {
+                this.selectedSecondIndex = params.rowIndex;
+                this.showComModal = true;
+            }
+        },
+        //업체 모달창 값 전달
+        comSelected(com) {
+            this.rowData[0].company_code = com.company_code;
+            this.rowData[0].company_name = com.company_name;
+            // 새 배열로 설정하여 AG Grid가 반영하게 만듬
+            this.rowData = [...this.rowData];
+        },
+
         // 주문 모달창
         orderList() {
             this.showOrderModal = true;
@@ -143,7 +168,11 @@ export default {
             // await axios.get(`/api/sales/orders/:orders_code`, {
             await axios.get(`/api/sales/orders/${order.orders_code}`)
                 .then(res => {
-                    const serverRowData = res.data;
+                    let serverRowData = res.data;
+                    for (let value of serverRowData) { 
+                        value.delivery_name = '' // 빈값을 넣어주는거
+                        value.company_name = ''
+                    }
                     //this.rowData[0].orders_code = res.orders_code;
                     this.rowData = [...serverRowData];
 
@@ -154,18 +183,23 @@ export default {
             await axios.get(`/api/sales/detail/${order.orders_code}`)
                 .then(res => {
                     const serverRowData = res.data;
+                    console.log('12323')
+                    console.log(serverRowData)
                     this.serowData = []; //  다른 주문건을 클릭했을때 기존에 있던 항목을 초기화
                     for (let data of serverRowData) {
                         this.serowData.push({
                             prod_code: data.prod_code,
                             prod_name: data.prod_name,
-                            delivery_demand: data.quantity,
+                            delivery_demand: data.delivery_demand,
+                            alreadydelivery: data.alreadydelivery,
+                            yetdelivery: data.yetdelivery,
                         })
                     }
                     this.serowData = [...this.serowData]; // 그리드로 보내준다.
                 });
         },
         fullCheck() {
+            console.log('ㅇㅇㅇ' + this.rowData[0].delivery_name)
             //메인그리드 값 다들어 갔는지 체크
             if (this.rowData[0].delivery_code == '' || this.rowData[0].orders_code == '', this.rowData[0].delivery_name == '') {
                 Swal.fire({
@@ -176,18 +210,10 @@ export default {
                 });
                 return 1;
 
-            } if (this.rowData[0].delivery_date < this.rowData[0].request_date) {
-                Swal.fire({
-                    title: '실패',
-                    text: '납기일자가 주문일자보다 빠릅니다.',
-                    icon: 'error',
-                    confirmButtonText: '확인'
-                });
-                return 2;
-            }
+            } 
             //상세그리드 값 다들어 갔는지 체크
             for (let rowInclude of this.serowData) {
-                if (rowInclude.orders_code == '' || rowInclude.order_name, rowInclude.prod_code == 0) {
+                if (rowInclude.orders_code == '' || rowInclude.order_name == '' ||  rowInclude.prod_code == 0) {
                     Swal.fire({
                         title: '실패',
                         text: '값을 다입력하십시오',
@@ -262,65 +288,6 @@ export default {
             this.serowData = [];
         },
 
-        // 삭제
-        // async deliveryDelete() {
-        //   // 출고 코드가 비어있으면 삭제를 진행하지 않도록 처리
-        //   if (!this.rowData[0].delivery_code) {
-        //     Swal.fire({
-        //       title: '삭제 실패',
-        //       text: '삭제할 출고를 선택해주세요.',
-        //       icon: 'warning',
-        //       confirmButtonText: '확인'
-        //     });
-        //     return;
-        //   }
-
-        //   try {
-        //     const res = await axios.delete('/api/sales/deliveryDelete/:delivery_code' + this.rowData[0].delivery_code);
-
-        //     if (res.data.affectedRows < 1) {
-        //       Swal.fire({
-        //         title: '삭제 실패',
-        //         text: '삭제 실패 하였습니다.',
-        //         icon: 'error',
-        //         confirmButtonText: '확인'
-        //       });
-        //     } else {
-        //       Swal.fire({
-        //         title: '삭제 완료',
-        //         text: '정상적으로 삭제가 완료되었습니다.',
-        //         icon: 'success',
-        //         confirmButtonText: '확인'
-        //       });
-
-        //       // 데이터 초기화
-        //       this.rowData = [{
-        //         delivery_code: '',
-        //         delivery_name: '',
-        //         orders_code: '',
-        //         order_name: '',
-        //         company_code: '',
-        //       }];
-        //       this.serowData = [{
-        //         prod_code: '',
-        //         prod_name: '',
-        //         delivery_demand: '',
-        //         alreadydelivery: '',
-        //         proyetdeliveryd_code: '',
-        //         delivery_quantity: '',
-        //       }];
-        //       this.throwData = []; // 세 번째 그리드 초기화
-        //     }
-        //   } catch (err) {
-        //     console.error(err);
-        //     Swal.fire({
-        //       title: '삭제 실패',
-        //       text: '삭제 중 오류가 발생했습니다.',
-        //       icon: 'error',
-        //       confirmButtonText: '확인'
-        //     });
-        //   }
-        // },
 
         //제품선택
         async selectedProd(params) {
@@ -368,35 +335,72 @@ export default {
             }
             this.serowData[this.selectedSecondIndex].delivery_quantity = sum; // 합계를 두번째 그리드 출고량에 디스플레이
             this.serowData = [...this.serowData] // 재배열
-        }
+        },
 
+        // 수정
+        async modifyOrder() {
+            //수정 시작
+            
+            await axios.put('/api/sales/deliveryModify', {
+                delivery: this.rowData[0],
+                deliveryDetail: this.serowData
+            })
+                .then(res => {
+                    if (res.data.affectedRows > 0) {
+                        Swal.fire({
+                            title: '수정 완료',
+                            text: '수정이 완료되었습니다.',
+                            icon: 'success',
+                            confirmButtonText: '확인'
+                        });
+                    } else {
+                        Swal.fire({
+                            title: '수정 실패',
+                            text: '수정을 실패하였습니다.',
+                            icon: 'error',
+                            confirmButtonText: '확인'
+                        });
+                        return;
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    Swal.fire({
+                        title: '수정 실패',
+                        text: '알수 없는 에러.',
+                        icon: 'error',
+                        confirmButtonText: '확인'
+                    })
+                })
 
+        },
+        // // 삭제
+        // async deliveryDelete() {
+        //     await axios.delete('/api/sales/deliveryDelete/:delivery_code')
+        //     then.((res) => {
+        //         if (res.data.affectedRows < 1) {
+        //             Swal.fire({
+        //                 title: '삭제 실패',
+        //                 text: '삭제 실패 하였습니다.',
+        //                 icon: 'error',
+        //                 confirmButtonText: '확인'
+        //             });
+        //         } else {
+        //             Swal.fire({
+        //                 title: '삭제 완료',
+        //                 text: '정상적으로 삭제가 완료되었습니다.',
+        //                 icon: 'success',
+        //                 confirmButtonText: '확인'
+        //             });
+        //             this.rowData = [{
+                        
+        //             }];   
+        //         }
+        //     })
+        //         .catch((err) => console.log(err));
+        // }
     },
-
-    // watch: {
-    //   throwData: {
-    //     handler(serowData) {
-    //       let quatityTotal = serowData.reduce((quantitySum, quantityInfo) => { // reduce(총합계, 현재값)=
-    //         //총 출고 수량의 합계
-    //         return quantitySum += quantityInfo.delivery_quantity;
-    //       }, 0);
-    //       //사용자에게 알림
-    //       if (Number(quatityTotal) > Number(this.serowData[this.selectedSecondIndex].delivery_demand)) {
-
-    //         this.$nextTick(() => {
-    //           Swal.fire({
-    //             title: '출고 수량 초과',
-    //             text: '요구 수량을 초과할 수 없습니다.',
-    //             icon: 'error',
-    //             confirmButtonText: '확인'
-    //           });
-    //         });
-    //       }
-    //     },
-    //     deep: true
-    //   }
-    // } 
-}
+};
 </script>
 
 <style>
