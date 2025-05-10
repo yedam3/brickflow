@@ -172,9 +172,9 @@ export default {
                     field: "fac_status", headerName: "설비상태", flex: 2,
                     valueFormatter: params => {
                         if(params.value === 'FS1') {
-                            return '가동';
+                            return '사용가능';
                         } else if(params.value == 'FS2') {
-                            return '';
+                            return '사용불가';
                         }
                     },
                     cellStyle: params => {
@@ -250,7 +250,7 @@ export default {
 
         // 생산 행 클릭 - 설비 목록 조회
         async productOrderRowClicked(params) {
-            await axios.get(`/api/work/process/facList`).then(res => {
+            await axios.get(`/api/work/process/facList/${params.data.work_lot}`).then(res => {
                 const list = res.data;
                 this.facDataList = [...list];
                 
@@ -268,7 +268,7 @@ export default {
             }
 
             this.processData.process = {
-                work_lot:   params.data.work_lot,                       // 공정 LOT
+                work_lot: params.data.work_lot,                         // 공정 LOT
                 product_order_name: params.data.product_order_code,     // 생산 지시명
                 prod_name: params.data.prod_name,                       // 제품명
                 process_code: params.data.process_code,                 // 공정 코드

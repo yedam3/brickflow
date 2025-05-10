@@ -114,12 +114,21 @@ WHERE mh.product_order_detail_code = ? AND mh.mat_code = ?
 // 생산 상품 자재 재고 조회
 const findAllProdMatQtyByMat_code = `
 SELECT b.prod_code, s.lot AS 'mat_LOT', m.mat_code, m.mat_name, ms.store_date AS 'store_date',
-    (SUM(s.inbound_quantity) - SUM(COALESCE(s.dispatch_quantity, 0))) AS 'available_qty'
+    (
+		SUM(s.inbound_quantity) - SUM(COALESCE(s.dispatch_quantity, 0)) - COALESCE(
+			(
+				SELECT SUM(hold_quantity)
+                FROM mat_hold mh
+                WHERE mh.mat_LOT = s.lot
+					AND mh.mat_code = ms.mat_code AND mh.finish_status = 'OF1'
+			), 
+		0)
+    ) AS available_qty
 FROM store s
 	LEFT JOIN mat_store ms ON ms.mat_LOT = s.LOT AND ms.mat_code = s.item_code
 	JOIN mat m ON ms.mat_code = m.mat_code
     JOIN BOM b ON b.mat_code = ms.mat_code
-WHERE b.prod_code = ? AND ms.mat_code = ?
+WHERE b.prod_code = 'PROD-105' AND ms.mat_code = 'mat-103'
 GROUP BY b.prod_code, s.LOT, m.mat_code, m.mat_name, ms.store_date
 ORDER BY ms.store_date ASC
 `;

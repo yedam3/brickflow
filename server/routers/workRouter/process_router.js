@@ -15,8 +15,9 @@ router.get('/empList', async (req, res) => {
 });
 
 // 설비 목록 조회
-router.get('/facList', async (req, res) => {
-    let list = await processService.findAllFac().catch((err) => console.error(err));
+router.get('/facList/:work_lot', async (req, res) => {
+    const work_lot = req.params.work_lot;
+    let list = await processService.findAllFac(work_lot).catch((err) => console.error(err));
     res.send(list);
 });
 
