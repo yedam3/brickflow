@@ -16,12 +16,12 @@
             </thead>
             <tbody>
                 <tr>
-                    <td>공정1</td>
-                    <td>설비1</td>
-                    <td>제품1</td>
-                    <td>신현욱</td>
-                    <td>20</td>
-                    <td>20</td>
+                    <td>{{ this.processInfo.process_name }}</td>
+                    <td>{{ this.processInfo.model_name }}</td>
+                    <td>{{ this.processInfo.prod_name }}</td>
+                    <td>{{ this.processInfo.emp_name }}</td>
+                    <td>{{ this.processInfo.processed_quantity }}</td>
+                    <td>{{ this.processInfo.unprocessed_quantity }}</td>
                 </tr>
             </tbody>
             
@@ -36,11 +36,11 @@
             </thead>
             <tbody>
                 <tr>
-                    <td>20</td>
-                    <td>0</td>
-                    <td>20</td>
-                    <td colspan="2">2024-04-04 17:00</td>
-                    <td>2024. 4. 4 오전 5:10:23</td>
+                    <td>{{ this.processInfo.input_quantity }}</td>
+                    <td>{{ this.processInfo.error_quantity }}</td>
+                    <td>{{ this.processInfo.created_quantity }}</td>
+                    <td colspan="2">{{ this.processInfo.work_start_date }}</td>
+                    <td>{{ this.processInfo.work_end_date }}</td>
                 </tr>
             </tbody>
         </table>
@@ -48,15 +48,15 @@
         <div class="row text-center mt-4">
             <div class="col-4">
                 <div class="border p-2 bg-warning text-white">투입량</div>
-                <div class="border p-2 bg-white">20</div>
+                <div class="border p-2 bg-white">{{ this.processInfo.input_quantity }}</div>
             </div>
             <div class="col-4">
                 <div class="border p-2 bg-warning text-white">불량량</div>
-                <div class="border p-2 bg-white">0</div>
+                <div class="border p-2 bg-white">{{ this.processInfo.error_quantity }}</div>
             </div>
             <div class="col-4">
                 <div class="border p-2 bg-warning text-white">입고량</div>
-                <div class="border p-2 bg-white">20</div>
+                <div class="border p-2 bg-white">{{ this.processInfo.created_quantity }}</div>
             </div>
         </div>
 
@@ -98,45 +98,74 @@ export default {
     },
     data() {
         return {
-
             // 공정 LOT
             work_lot: null,
             // 사번 코드
             emp_code: null,
             // 설비 코드
             fac_code: null,
+
+            // 공정 정보
+            processInfo: {
+                work_lot: "",               // 공정 LOT
+                process_code: "",           // 공정 코드
+                process_name: "",           // 공정명
+                fac_code: "",               // 설비 코드
+                model_name: "",             // 설비명
+                prod_code: "",              // 제품 코드
+                prod_name: "",              // 제품명
+                emp_code: "",               // 사번
+                emp_name: "",               // 사원명
+                processed_quantity: "",     // 기작업량
+                unprocessed_quantity: "",   // 미작업량
+                order_quantity: "",         // 지시량
+                input_quantity: "",         // 투입량
+                error_quantity: "",         // 불량량
+                created_quantity: "",       // 생산량
+                process_sequence: "",       // 공정 순서
+                work_start_date: "",        // 작업 시작 일시
+                work_end_date: "",          // 작업 종료 일시
+            }
         };
     },
     watch() {
 
     },
     mounted() {
-        const processData = this.$route.query;
-        if(typeof processData.work_lot !== 'undefined') {
-            this.work_lot = processData.work_lot;
-            this.emp_code = processData.emp_code;
-            this.fac_code = processData.fac_code;
+        const processInfoData = this.$route.query;
+        if(typeof processInfoData.work_lot !== 'undefined') {
+            this.work_lot = processInfoData.work_lot;
+            this.emp_code = processInfoData.emp_code;
+            this.fac_code = processInfoData.fac_code;
 
             this.displayLoad();
         }
     },
     methods: {
         async displayLoad() {
-
-            // 공정 정보 조회
-            await axios.get(`/api/work/process/workLot/${this.work_lot}`).then(res => {
-                console.log(res.data);
+            await axios.get(`/api/work/process/select`, {
+                params: {
+                    work_lot: this.work_lot,
+                    emp_code: this.emp_code,
+                    fac_code: this.fac_code,
+                }
+            }).then(res => {
+                this.processInfo = res.data;
             }).catch((err) => console.error(err));
+            // // 공정 정보 조회
+            // await axios.get(`/api/work/process/workLot/${this.work_lot}`).then(res => {
+            //     console.log(res.data);
+            // }).catch((err) => console.error(err));
 
-            // 작업자 정보 조회
-            await axios.get(`/api/work/work/process/emp_code/${this.emp_code}`).then(res => {
-                console.log(res.data);
-            }).catch((err) => console.error(err));
+            // // 작업자 정보 조회
+            // await axios.get(`/api/work/work/process/emp_code/${this.emp_code}`).then(res => {
+            //     console.log(res.data);
+            // }).catch((err) => console.error(err));
 
-            // 설비 정보 조회
-            await axios.get(`/api/work/process/fac_code/${this.fac_code}`).then(res => {
-                console.log(res.data);
-            }).catch((err) => console.error(err));
+            // // 설비 정보 조회
+            // await axios.get(`/api/work/process/fac_code/${this.fac_code}`).then(res => {
+            //     console.log(res.data);
+            // }).catch((err) => console.error(err));
         },
     },
 };
