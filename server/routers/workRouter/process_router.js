@@ -49,4 +49,20 @@ router.get('/fac/:fac_code', async (req, res) => {
     res.send(result);
 });
 
+// 작업 시작
+router.post('/start', async (req, res) => {
+    const processStartData = req.body;
+    console.log(processStartData)
+    let result = await processService.processStart(processStartData).catch((err) => console.error(err));
+    res.send(result);
+});
+
+// 작업 종료
+router.post('/end', async(req, res) => {
+    const processEndData = req.body;
+    let result = await processService.processEnd(processEndData).catch((err) => console.error(err));
+    res.send(result);
+});
+
+
 module.exports = router;

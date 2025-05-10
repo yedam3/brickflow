@@ -22,7 +22,6 @@ const findAllFac = async (work_lot) => {
 // 정보 조회
 const findProcessInfo = async (work_lot, emp_code, fac_code) => {
     let processInfoData = [fac_code, emp_code, work_lot]
-
     let result = await mariaDB.query('findProcessInfoWork_lotAndEmp_codeAndFac_code', processInfoData).catch((err) => console.error(err));
     return result[0];
 };
@@ -46,15 +45,17 @@ const findFacByFac_code = async (fac_code) => {
 };
 
 // 작업 시작
-
-// 공정 현황 수정
-const updateWork_Process = async () => {
-
+const processStart = async (processStartData) => {
+    const processStart_fields = ["work_lot", "fac_code", "employee_code", "input_quantity"];
+    let result = await mariaDB.query('processStart', convertObjToAry(processStartData, processStart_fields)).catch((err) => console.error(err));
+    return result;
 };
 
-// 실적 등록
-const insertWork_data = async() => {
-
+// 작업 종료
+const processEnd = async (processEndData) => {
+    const processEnd_fields = ["work_lot", "fac_code", "employee_code", "error_quantity", "created_quantity"];
+    let result = await mariaDB.query('processEnd', convertObjToAry(processEndData, processEnd_fields)).catch((err) => console.error(err));
+    return result;
 };
 
 module.exports = {
@@ -67,7 +68,6 @@ module.exports = {
     findEmployeesByEmp_code,            // 작업자 정보 조회
     findFacByFac_code,                  // 설비 정보 조회
 
-
-    updateWork_Process,                 // 공정 현황 수정
-    insertWork_data                     // 실적 등록
+    processStart,                       // 작업 시작
+    processEnd                          // 작업 종료
 }

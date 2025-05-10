@@ -15,9 +15,9 @@ export default[
         component: () => import('@/views/pages/work/Order.vue')
     },
     {
-        path: '/work/do',
-        name: 'Do',
-        component: () => import('@/views/pages/work/Do.vue')
+        path: '/work/control',
+        name: 'Control',
+        component: () => import('@/views/pages/work/Control.vue')
     },
     {
         path: '/work/data',

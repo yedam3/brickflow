@@ -50,20 +50,29 @@ WHERE wp.work_lot = ?
 
 // 정보 조회
 const findProcessInfoWork_lotAndEmp_codeAndFac_code = `
-SELECT wp.process_code, fc.fac_code AS 'fac_code', emp.emp_code AS 'emp_code', wp.prod_code, wp.order_quantity, wp.input_quantity, wp.error_quantity, wp.created_quantity, wp.process_sequence,
-	getProdName(wp.prod_code) AS 'prod_name',
-	getProcessName(wp.process_code) AS 'process_name', 
-	getFacModelName(fc.fac_code) AS 'model_name',
-	getEmpName(emp.emp_code) AS 'emp_name',
-	IFNULL(dd.input_quantity, 0) AS 'processed_quantity',
-    IFNULL(dd.order_quantity, 0) - IFNULL(dd.input_quantity, 0) AS 'unprocessed_quantity',
-    IFNULL(dd.work_start_date, '') AS 'work_start_date',
-    IFNULL(dd.work_end_date, '') AS 'work_end_date'
+SELECT wp.process_code,fc.fac_code AS 'fac_code', emp.emp_code AS 'emp_code', wp.prod_code, wp.order_quantity, wp.process_sequence,
+    getProdName(wp.prod_code) AS prod_name,
+    getProcessName(wp.process_code) AS process_name, 
+    getFacModelName(fc.fac_code) AS model_name,
+    getEmpName(emp.emp_code) AS emp_name,
+    IFNULL(dd.input_quantity, 0) AS processed_quantity,
+    (
+        SELECT wp2.order_quantity
+        FROM work_process wp2
+        WHERE wp2.work_lot = wp.work_lot AND wp2.process_sequence = 1
+    ) -
+    (
+        SELECT SUM(wp3.error_quantity + wp3.created_quantity)
+        FROM work_process wp3
+        WHERE wp3.work_lot = wp.work_lot
+    ) AS 'unprocessed_quantity',
+    IFNULL(dd.work_start_date, '') AS work_start_date,
+    IFNULL(dd.work_end_date, '') AS work_end_date
 FROM work_process wp
-	LEFT JOIN work_data dd ON wp.work_lot = dd.work_lot
-	LEFT JOIN work_detail wd ON wp.product_order_detail_code = wd.product_order_detail_code
-    LEFT JOIN fac fc ON fc.fac_code = ?
-    LEFT JOIN employees emp ON emp.emp_code = ?
+LEFT JOIN work_data dd ON wp.work_lot = dd.work_lot
+LEFT JOIN work_detail wd ON wp.product_order_detail_code = wd.product_order_detail_code
+LEFT JOIN fac fc ON fc.fac_code = ?
+LEFT JOIN employees emp ON emp.emp_code = ?
 WHERE wp.work_lot = ?
 `;
 
@@ -83,15 +92,28 @@ const findFacByFac_code = `
 
 `;
 
-// 
+// 작업 시작
+const processStart = `
+CALL processStart(?, ?, ?, ?, @result_code, @result);
+SELECT @result_code AS 'result_code', @result AS 'result';
+`;
+
+// 작업 종료
+const processEnd = `
+CALL processEnd(?, ?, ?, ?, ?, @result_code, @result);
+SELECT @result_code AS 'result_code', @result AS 'result';
+`;
 
 module.exports = {
     findAllProduct_order,                           // 생산 지시 목록 조회 - 생산 완료(WS3) 제외
     findAllEmployees,                               // 사원 목록 조회
-    findAllFacByWork_lot,                        // 설비 목록 조회
+    findAllFacByWork_lot,                           // 설비 목록 조회
 
     findProcessInfoWork_lotAndEmp_codeAndFac_code,  // 정보 조회
     findWork_processByWork_lot,                     // 공정 정보 조회
     findEmployeesByEmp_code,                        // 작업자 정보 조회
     findFacByFac_code,                              // 설비 정보 조회
+
+    processStart,                                   // 작업 시작
+    processEnd,                                     // 작업 종료
 }

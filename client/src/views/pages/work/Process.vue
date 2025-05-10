@@ -305,7 +305,7 @@ export default {
         
         // 공정 시작
         startProcess() {
-            this.$router.push({ name: 'Do', query:{ work_lot: this.processData.process.work_lot, emp_code: this.processData.emp.emp_code, fac_code: this.processData.fac.fac_code}});
+            this.$router.push({ name: 'Control', query:{ work_lot: this.processData.process.work_lot, emp_code: this.processData.emp.emp_code, fac_code: this.processData.fac.fac_code}});
         },
     },
 }
