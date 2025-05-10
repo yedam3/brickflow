@@ -21,8 +21,8 @@ router.get("/orders/:orders_code", async (req, res) => { // /orders/ORD-999 or /
 });
 
 //상세조회
-router.get('/detail', async (req, res) => {
-    const { orders_code } = req.query;
+router.get('/detail/:orders_code', async (req, res) => {
+    const { orders_code } =  req.params;
     let findorders = await salesService.findorders(orders_code)
         .catch((err) => console.log(err));
     res.send(findorders);
@@ -66,6 +66,8 @@ router.post('/orderCheck',async (req,res)=>{
                                .catch((err)=> console.log(err));
     res.send(list);
 })
+
+
 
 
 

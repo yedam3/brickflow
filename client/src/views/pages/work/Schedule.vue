@@ -1,6 +1,6 @@
 <template>
     <div class="card border-0" style="height: 800px">
-        <div class="font-semibold text-xl mb-4">생산 계획 관리</div>
+        <div class="font-semibold text-xl mb-2">생산 계획 관리</div>
 
         <div class="font-semibold text-l mb-4">생산 계획 등록</div>
 
@@ -173,8 +173,8 @@ export default {
                 orders_code: false,         // 주문번호
                 orders_date: false,         // 시작_일자
                 del_date: false,            // 종료_일자
-                prod_name: false,            // 제품명
-                quantity: false,             // 수량(주문상세)
+                prod_name: false,           // 제품명
+                quantity: false,            // 수량(주문상세)
                 unshippedQty: false,        // 미출고량
                 prePlannedQty: false,       // 기계획량
                 unplannedQty: false,        // 미계획량
@@ -183,7 +183,7 @@ export default {
 
             gridOptions: {
                 domLayout: "autoHeight",            // 행을 보고 자동으로 hight부여
-                singleClickEdit: true,              // 한번클릭했을때 수정
+                singleClickEdit: true,              // 한번 클릭 했을 때 수정
                 suppressRowClickSelection: true,    // 행 클릭할 때 체크박스 선택 방지
                 defaultColDef: {
                     suppressMovable: true,          // 셀 이동 금지
@@ -368,9 +368,6 @@ export default {
                 this.formData.orders_code = order.orders_code;
                 this.formData.order_name = order.order_name;
                 this.rowData = [...data];
-                
-                
-                console.log(this.rowData);
 
                 this.ag_grid_cols.prod_name = false;
                 this.ag_grid_cols.quantity = false;
@@ -414,9 +411,10 @@ export default {
                 });
                 return;
             }
-            const order_statusRes = await axios.get(`/api/work/plan/order_statusCheck/${this.formData.orders_code}`).catch((err) => console.error(err));
-            if (order_statusRes.data.check > 0) {
-                Swal.fire({
+            if(this.formData.orders_code !== '') {
+                const order_statusRes = await axios.get(`/api/work/plan/order_statusCheck/${this.formData.orders_code}`).catch((err) => console.error(err));
+                if (order_statusRes.data.check > 0) {
+                    Swal.fire({
                     title: '실패',
                     text: '이미 출고가 완료된 건입니다.',
                     icon: 'error',
@@ -424,18 +422,27 @@ export default {
                 });
                 return;
             }
+            }
             await axios.post("/api/work/plan/plan", {
                 planData: this.formData,
                 planDetailData: this.rowData,
             }).then(res => {
-                console.log(res);
-                Swal.fire({
-                    title: '성공',
-                    text: '생산 계획이 정상적으로 등록되었습니다.',
-                    icon: 'success',
+                if(res.data.affectedRows > 0) {
+                    Swal.fire({
+                        title: '성공',
+                        text: '생산 계획이 정상적으로 등록되었습니다.',
+                        icon: 'success',
+                        confirmButtonText: '확인'
+                    });
+                    this.clearForm();
+                } else {
+                    Swal.fire({
+                    title: '정보',
+                    text: '생산 계획 등록이 정상적 등록되지지 않았습니다.',
+                    icon: 'info',
                     confirmButtonText: '확인'
                 });
-                this.clearForm();
+                }
             }).catch(err => {
                 console.error(err);
                 Swal.fire({
@@ -533,9 +540,9 @@ export default {
             });
         },
 
-        // 생산계획 상태 확인
+        // 생산지시 상태 확인
         async planOrderStatusCheck(plan_code) {
-            let res = await axios.get(`/work/order/findStatusByPlan_code`, {
+            let res = await axios.get(`/api/work/order/orderStatus/${plan_code}`, {
             }).catch((err) => {
                 console.error(err);
             })

@@ -43,9 +43,16 @@ const pieChart = `
     JOIN order_detail l ON o.orders_code = l.orders_code AND a.prod_code = l.prod_code
     GROUP BY a.prod_code
 `
+const popChart = `
+    SELECT getMatName(mat_code) matName,
+       SUM(IFNULL(store_quantity,0)) quantity
+FROM mat_store
+GROUP BY getMatName(mat_code)
+`
 module.exports={
     countList,
     lineChart,
     barChart,
-    pieChart
+    pieChart,
+    popChart
 }

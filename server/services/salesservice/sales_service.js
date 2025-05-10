@@ -67,7 +67,7 @@ const findOrderAll = async (orderCode) => {
 // 메인조회
 const findMainOrders = async (orders_code) => {
   let list = await mariaDB.query("orderinfochoice", orders_code)
-  return list[0];
+  return list;
 }
 
 // 상세그리드 조회

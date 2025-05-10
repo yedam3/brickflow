@@ -18,24 +18,9 @@ const model = ref([
                 icon: 'pi pi-fw pi-user  pi-spin',
                 items: [
                     {
-                        label: '출고 관리',
-                        icon: 'pi pi-fw pi-times-circle',
-                        to: '/'
-                    },
-                    {
-                        label: '완제품 입고관리',
-                        icon: 'pi pi-fw pi-times-circle',
-                        to: '/'
-                    },
-                    {
-                        label: '반품관리',
-                        icon: 'pi pi-fw pi-sign-in',
-                        to: '/'
-                    },
-                    {
                         label: '공정 흐름도 관리',
                         icon: 'pi pi-fw pi-sign-in',
-                        to: '/admin/proessflow'
+                        to: '/admin/processflow'
                     },
                     {
                         label: '사원 관리',
@@ -131,10 +116,11 @@ const model = ref([
                         to: '/mat/store'
                     },
                     {
-                        label: 'AG테스트',
+                        label: '자재재고조회',
                         icon: 'pi pi-fw pi-lock',
-                        to: '/mat/practice'
-                    }
+                        to: '/mat/matList'
+                    },
+                    
                 ]
             },
             {
@@ -188,14 +174,9 @@ const model = ref([
                 icon: 'pi pi-spin pi-file-edit',
                 items: [
                     {
-                        label: '자재 검수',
-                        icon: 'pi pi-fw pi-sign-in',
-                        to: '/'
-                    },
-                    {
                         label: '제품 검수',
                         icon: 'pi pi-fw pi-times-circle',
-                        to: '/admin/prodcheck'
+                        to: '/qual/prodcheck'
                     },
                     //신현욱
                     {

@@ -23,9 +23,15 @@ const pieChart = async() => {
                             .catch((err) => console.log(err));
     return list;                            
 }
+const popChart = async() => {
+    let list = await mariaDB.query('popChart')
+                            .catch((err) => console.log(err));
+    return list;                            
+}
 module.exports={
     countList,
     lineChart,
     barChart,
-    pieChart
+    pieChart,
+    popChart
 }

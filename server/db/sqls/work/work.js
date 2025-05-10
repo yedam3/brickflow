@@ -61,6 +61,13 @@ WHERE od.orders_code = ?
 ORDER BY od.orders_detail_code
 `;
 
+// 주문 상세 조회 (orders_code)
+const findAllOrder_detailByOrders_code = `
+SELECT orders_detail_code, orders_code
+FROM order_detail
+WHERE orders_code = ?
+`;
+
 // 생산 계획 조회
 const findAllPlan = `
 SELECT p.plan_code, getOrderName(p.orders_code) AS order_name, p.plan_name, p.employee_code,
@@ -127,7 +134,7 @@ WHERE plan_code = ?
 
 // 주문 상태 확인 (출고완료)
 const findOrder_statusByOrders_code = `
-SELECT COUNT(*) AS 'check'
+SELECT COUNT(*) AS 'status'
 FROM orders
 WHERE orders_code = ? AND orders_code = 'OS4'
 `;
@@ -181,12 +188,20 @@ FROM plan_detail
 WHERE plan_code = ?
 `;
 
-// 주문 "생산중"으로 상태 변경
+// 주문 상태 변경
 const updateOrdersByOrders_code = `
 UPDATE orders
-	SET
-		finish_status = ?
+SET
+	finish_status = ?
 WHERE orders_code = ?
+`;
+
+// 주문 상세 상태 변경
+const updateOrderDetailByOrders_code = `
+UPDATE order_detail
+SET
+    finish_status = ?
+WHERE orders_detail_code = ?
 `;
 
 // 제품 검색
@@ -195,10 +210,18 @@ SELECT prod_code, prod_name, unit, by_unit_number
 FROM prod
 `;
 
+// 생산 계획 상태 확인
+const findPlanFinish_statusByPlan_code = `
+SELECT finish_code
+FROM plan
+WHERE plan_code = ?
+`;
+
 module.exports = {
     getPlan_code,
     findAllOrders,
     findByOrders_code,
+    findAllOrder_detailByOrders_code,   // 주문 상세 조회 (orders_code)
     findAllPlan,
     findPlanDetailByPlan_code,
     existsByPlan_code,
@@ -209,6 +232,8 @@ module.exports = {
     updatePlanDetailByPlan_code,
     deletePlanByPlan_code,
     deletePlanDetailByPlan_code,
-    updateOrdersByOrders_code,
+    updateOrdersByOrders_code,          // 주문 상태 변경
+    updateOrderDetailByOrders_code,     // 주문 상세 상태 변경
     findAllProd,
+    findPlanFinish_statusByPlan_code,   // 생산 계획 상태 확인
 };

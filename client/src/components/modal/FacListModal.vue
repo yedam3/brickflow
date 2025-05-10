@@ -86,13 +86,22 @@
           { field: "fac_location", header: "설비위치", flex: 1},
           { field: "employee_code", header: "담당자", flex: 1},
           { field: "fac_status", header: "설비상태", flex: 1,
-            cellStyle: params => {
-              if(params.value == "가동"){
+          valueFormatter:(params) => {
+          if(params.value == 'FS1'){
+            return params.value = '가동';
+          } else  if(params.value == 'FS2'){
+            return params.value = '비가동';
+        }
+      },
+        cellStyle: params => {
+              if(params.value == "FS1"){
                 return { color: '#22C55E', textAlign:'center', fontWeight: 'bold' };
+              } else if(params.value == "FS2"){
+                return { color: 'red', textAlign:'center', fontWeight: 'bold'};
               }
               return null;
-            }
-          },
+            }}
+            ,
         ],
         gridOptions: {
           domLayout: "autoHeight",

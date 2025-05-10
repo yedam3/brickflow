@@ -74,7 +74,7 @@
         </div>
         <div class="col-span-12 xl:col-span-6">
             <div class="card flex flex-col items-center">
-                <div class="font-semibold text-xl mb-4">Polar Area</div>
+                <div class="font-semibold text-xl mb-4">주간 자재 입고량</div>
                 <Chart type="polarArea" :data="polarData" :options="polarOptions" />
             </div>
         </div>
@@ -127,7 +127,7 @@ export default {
     },
     methods: {
         async countList(){
-            await axios.get('/api/main/count')
+            await axios.get('/api/main/count',{ withCredentials: true })
                         .then(res => {
                             console.log(res.data[0][0].orderCount)
                             this.info.orderCount = res.data[0][0].orderCount;
@@ -143,9 +143,10 @@ export default {
             const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
             const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
 
-            const line = await axios.get('/api/main/lineChart');
-            const bar = await axios.get('/api/main/barChart');
-            const pie = await axios.get('/api/main/pieChart');
+            const line = await axios.get('/api/main/lineChart',{ withCredentials: true });
+            const bar = await axios.get('/api/main/barChart',{ withCredentials: true });
+            const pie = await axios.get('/api/main/pieChart',{ withCredentials: true });
+            const pop = await axios.get('/api/main/popChart',{ withCredentials: true });
             const groupLine = {};
             const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
@@ -282,23 +283,19 @@ export default {
                 }
             };
 
-            
+            let popLabel = pop.data.map(item => item.matName);
+            let popQuantity = pop.data.map(item => item.quantity);
             
 
             this.polarData = {
                 datasets: [
                     {
-                        data: [11, 16, 7, 3],
-                        backgroundColor: [
-                            documentStyle.getPropertyValue('--p-indigo-500'),
-                            documentStyle.getPropertyValue('--p-purple-500'),
-                            documentStyle.getPropertyValue('--p-teal-500'),
-                            documentStyle.getPropertyValue('--p-orange-500')
-                        ],
-                        label: 'My dataset'
+                        data: popQuantity,
+                        backgroundColor: colors
+                        
                     }
                 ],
-                labels: ['Indigo', 'Purple', 'Teal', 'Orange']
+                labels: popLabel
             };
             this.polarOptions = {
                 plugins: {

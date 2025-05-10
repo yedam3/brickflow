@@ -1,6 +1,7 @@
 const { forEach } = require("lodash");
 const mariaDB = require("../../db/mapper.js");
 const { convertObjToAry } = require("../../utils/converts.js");
+const { retry } = require("rxjs");
 
 //BOM관리
 // 1. 제품조회
@@ -13,7 +14,7 @@ const findBom = async (prno)=>{
   let list = await mariaDB.query('bomList',prno);
   return list;
 }
-
+//3. 저장
 const saveBom = async(bomsave)=>{
     //삭제
     console.log('wer'+bomsave);
@@ -43,7 +44,8 @@ const saveBom = async(bomsave)=>{
  }
 }
 
-module.exports = {
+module.exports 
+= {
   findProd,
   findBom,
   saveBom,

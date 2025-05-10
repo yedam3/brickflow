@@ -6,7 +6,7 @@
 
         <CModalBody>
             <div class="text-end mb-3">
-                <Button label="자동계산" severity="success" size="large" @click="" />
+                <Button label="자동계산" severity="success" size="large" @click="autoHold" />
             </div>
             <div class="ag-theme-alpine align-content-center">
                 <AgGridVue style="width: 100%; height: 100%" class="ag-theme-alpine" :columnDefs="columnDefs"
@@ -29,6 +29,8 @@
 import { AgGridVue } from "ag-grid-vue3";
 import axios from "axios";
 
+import Swal from 'sweetalert2';
+
 export default {
     name: "OrderModal",
     components: {
@@ -39,11 +41,22 @@ export default {
             type: Boolean,
             required: true,
         },
+        prod_code: {
+            type: String,
+            required: false
+        },
         mat_code: {
             type: String,
-            required: true,
+            required: false,
         },
-            
+        mat_list: {
+            type: Array,
+            required: false,
+        },
+        mat_req_qty: {
+            type: Number,
+            required: false,
+        }
     },
     
     watch: {
@@ -52,17 +65,14 @@ export default {
                 this.matStockList();
             }
         },
-        mat_code(newVal) {
-            if (newVal) {
-                this.matStockList();
-            }
-        }
     },
     data() {
         return {
             rowData: [],
 
             mat_data: [],
+
+            mat_hold_data: [],
 
             columnDefs: [
                 { field: "mat_LOT", headerName: "LOT번호", flex: 1 },
@@ -95,7 +105,6 @@ export default {
         this.matStockList();
     },
     methods: {
-
         // 모달창 닫기 이벤트
         close() {
             this.$emit("close");
@@ -103,15 +112,53 @@ export default {
 
         // 제품별 자재 재고 목록 조회 API
         async matStockList() {
-            const result = await axios.get(`/api/work/order/matQty/${this.mat_code}`).catch(error => { console.error(error) });
+            this.rowData = [];
+            const result = await axios.get(`/api/work/order/matQty`, {
+                params: {
+                    prod_code: this.prod_code,
+                    mat_code: this.mat_code,
+                },
+            }).catch(error => { console.error(error) });
+
             let matList = result.data;
-            this.rowData = [...matList];
+            for(let data of matList) {
+                this.rowData.push({
+                    mat_LOT: data.mat_LOT,
+                    mat_code: data.mat_code,
+                    mat_name: data.mat_name,
+                    store_date: data.store_date,
+                    available_qty: data.available_qty,
+                });
+            }
+
+            this.rowData = [...this.rowData];
+
+            this.setMatHoldData(); 
+        },
+        autoHold() {
+            let mat_list = [];
+
+            this.rowData.sort((a, b) => new Date(a.store_date) - new Date(b.store_date));
+
+            let remainingQty = this.mat_req_qty;
+
+            for (let row of this.rowData) {
+                const availableQty = parseInt(row.available_qty || "0", 10);
+                if (remainingQty <= 0) break;
+
+                const holdQty = Math.min(availableQty, remainingQty);
+                row.mat_hold_qty = holdQty;
+                remainingQty -= holdQty;
+            }
+            console.log(this.rowData);
         },
 
         // 자재 확보 버튼
         matSecure() {
             this.mat_data = [];
+            let totalQty = 0;
             for(let row of this.rowData) {
+                totalQty += parseInt(row.mat_hold_qty);
                 if(row.mat_hold_qty != '' && row.mat_hold_qty > 0) {
                     this.mat_data.push({
                         mat_code: row.mat_code,
@@ -120,13 +167,38 @@ export default {
                     })
                 }
             }
+            if(this.mat_req_qty > totalQty) {
+                Swal.fire({
+                    title: '실패',
+                    text: '자재 최소 요구량이 충족하지 않습니다.',
+                    icon: 'error',
+                    confirmButtonText: '확인'
+                });
+                return;
+            }
             this.$emit('matHoldData', this.mat_data);
             this.close();
         },
 
         // 그리드 행 클릭 메소드
         onRowClicked() {
+        
         },
+
+        // 자재 홀드량 반영
+        setMatHoldData() {
+            if (this.mat_list && this.mat_list.length > 0) {
+                this.rowData = this.rowData.map(row => {
+                    const match = this.mat_list.find(item => {
+                        return (item.mat_LOT.toLowerCase() == row.mat_LOT.toLowerCase() && item.mat_code.toLowerCase() == row.mat_code.toLowerCase())
+                    });
+                    if (match) {
+                        return { ...row, mat_hold_qty: match.hold_quantity };
+                    }
+                    return row;
+                });
+            }
+        }
     },
 };
 </script>

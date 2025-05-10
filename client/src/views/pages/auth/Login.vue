@@ -1,6 +1,6 @@
 <template>
     <FloatingConfigurator />
-    <div class="bg-surface-50 dark:bg-surface-950 flex items-center justify-center min-h-screen min-w-[100vw] overflow-hidden">
+    <div class="background-img dark:bg-surface-950 flex items-center justify-center min-h-screen min-w-[100vw] overflow-hidden">
         <div class="flex flex-col items-center justify-center">
             <div style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, #FF9900 10%, rgba(33, 150, 243, 0) 30%)">
                 <div class="w-full bg-surface-0 dark:bg-surface-900 py-20 px-8 sm:px-20" style="border-radius: 53px">
@@ -26,7 +26,7 @@
                                 <label for="rememberme1">Remember me</label>
                             </div>
                         </div>
-                        <Button label="Sign In" class="w-full" as="router-link" to="/" style="background-color: #FF9900; border: #FF9900;"></Button>
+                        <Button label="Sign In" class="w-full" style="background-color: #FF9900; border: #FF9900;" @click="loginBtn"></Button>
                     </div>
                 </div>
             </div>
@@ -36,6 +36,8 @@
 
 <script>
 import FloatingConfigurator from '@/components/FloatingConfigurator.vue';
+import axios from 'axios';
+import { useUserStore } from '@/stores/user';
 
 export default {
   components: {
@@ -48,6 +50,36 @@ export default {
       checked: false,
     };
   },
+  methods: {
+    loginBtn () {
+        axios.post('/api/login/',{
+            id:this.id,
+            pwd:this.password
+        },
+        //cors 정책 통과
+        { withCredentials: true } 
+    )
+        .then(async res => {
+            console.log(res.data)
+            if(res.data.result == 'success'){
+                //피니아 중간 저장소에 등록
+                let result  = await axios.get('/api/session')
+                                    .catch((err) => console.log(err));
+                console.log(result)
+                const store = useUserStore();
+
+                store.setUser({
+                    id: this.id,
+                    empName : result.data.empName,
+                    dep : result.data.dep
+                })
+                this.$router.push('/');
+            }else{
+                alert('실패')
+            }
+        })
+    }
+  }
 };
 </script>
 <style scoped>
@@ -59,5 +91,9 @@ export default {
 .pi-eye-slash {
     transform: scale(1.6);
     margin-right: 1rem;
+}
+
+.background-img {
+    background-image: url('../../../assets/background.png');
 }
 </style>

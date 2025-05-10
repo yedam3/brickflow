@@ -77,16 +77,16 @@ export default {
                             return '지시등록';
                         } else if(params.value === 'WS2') {
                             return '생산중';
-                        } else if(params.value === 'SW3') {
+                        } else if(params.value === 'WS3') {
                             return '생산완료';
                         }
                     },
                     cellStyle: params => {
-                        if(params.value === 'OS1') {
+                        if(params.value === 'WS1') {
                             return { textAlign: 'center', fontWeight: 'bold', color: '#6c757d' };
-                        } else if(params.value == 'OS2') {
+                        } else if(params.value == 'WS2') {
                             return { textAlign: 'center', fontWeight: 'bold', color: '#fd7e14' };
-                        } else if(params.value == 'OS3') {
+                        } else if(params.value == 'WS3') {
                             return { textAlign: 'center', fontWeight: 'bold', color: '#28a745' };
                         }
                     }

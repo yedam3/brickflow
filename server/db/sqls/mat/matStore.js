@@ -122,6 +122,49 @@ const matUseCheck = `
                    ON(s.mat_lot = h.mat_lot)
 WHERE s.mat_lot = ? 
 `
+
+
+//자재 재고 확인 
+const matStorePageList = `
+ SELECT 
+    m.mat_code,
+    mat_name,
+    SUM(IFNULL(inbound_quantity,0)) - SUM(IFNULL(dispatch_quantity,0)) AS store_quantity,
+    safe_inventory,
+    CASE 
+        WHEN safe_inventory - (SUM(IFNULL(inbound_quantity,0)) - SUM(IFNULL(dispatch_quantity,0))) < 0 
+            THEN 0
+        ELSE safe_inventory - (SUM(IFNULL(inbound_quantity,0)) - SUM(IFNULL(dispatch_quantity,0)))
+    END AS require_quantity,
+    CASE 
+        WHEN safe_inventory = 0 THEN 0
+        WHEN ROUND(((SUM(IFNULL(inbound_quantity,0)) - SUM(IFNULL(dispatch_quantity,0))) / safe_inventory) * 100) >100 THEN 100
+        ELSE ROUND(((SUM(IFNULL(inbound_quantity,0)) - SUM(IFNULL(dispatch_quantity,0))) / safe_inventory) * 100)
+    END AS percentage
+
+FROM mat m 
+LEFT JOIN store s ON m.mat_code = s.item_code
+WHERE 1=1
+:searchcondition
+GROUP BY m.mat_code
+ORDER BY percentage ASC;
+`
+
+const matLotList = `
+ SELECT 
+    m.mat_code,
+    mat_name,
+    lot,
+    SUM(IFNULL(inbound_quantity,0)) - SUM(IFNULL(dispatch_quantity,0)) AS store_quantity,
+    s.storage_code,
+    store_name
+    FROM mat m 
+LEFT JOIN store s ON m.mat_code = s.item_code
+	 JOIN storage r ON s.storage_code = r.storage_code
+WHERE m.mat_code = ?
+GROUP BY  lot
+HAVING store_quantity > 0
+`
 module.exports = {
   possilbleList,
   autoMatLot,
@@ -134,5 +177,7 @@ module.exports = {
   storageList,
   storeDelete,
   storageDelete,
-  matUseCheck
+  matUseCheck,
+  matStorePageList,
+  matLotList
 }
