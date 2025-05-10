@@ -68,9 +68,11 @@ router.get('/deliveryModal', async (req, res) => {
      .catch((err) => console.log(err));
    res.send(deliveryList);
 })
-router.get('/deldetail/:orders_code', async (req, res) => { 
+
+router.get('/deldetail/:orders_code/:delivery_code', async (req, res) => { 
   const orderCode = req.params.orders_code;
-  let findOrders = await deliveryService.deliveryDetailRender(orderCode)
+  const delivery_code = req.params.delivery_code;
+  let findOrders = await deliveryService.deliveryDetailRender(orderCode,delivery_code)
     .catch((err) => console.log(err));
   res.send(findOrders);
 })

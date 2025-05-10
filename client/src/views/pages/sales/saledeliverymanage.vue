@@ -179,7 +179,7 @@ export default {
                 .catch((err) => console.log(err));
 
             //상세 그리드로 전달
-            await axios.get(`/api/sales/deldetail/${order.orders_code}`)
+            await axios.get(`/api/sales/deldetail/${order.orders_code}/${order.delivery_code}`)
                 .then(res => {
                     const serverRowData = res.data;
                     console.log(serverRowData)
@@ -189,8 +189,8 @@ export default {
                             prod_code: data.prod_code,
                             prod_name: data.prod_name,
                             delivery_demand: data.delivery_demand,
-                            alreadydelivery: data.alreadydelivery,
-                            yetdelivery: data.yetdelivery,
+                            alreadydelivery: data.alreadydelivery - data.delivery_quantity,
+                            yetdelivery: Number(data.yetdelivery) + Number(data.delivery_quantity),
                             delivery_detail_code: data.delivery_detail_code
                         })
                         console.log(data.delivery_detail_code)    
@@ -282,6 +282,11 @@ export default {
             if (this.fullCheck() == 1) {
                 return;
             } else if (this.fullCheck() == 2) {
+                return;
+
+            }
+            if(this.serowData[0].delivery_detail_code){
+                alert("ff");
                 return;
             }
             //등록 
@@ -381,6 +386,10 @@ export default {
             if (this.fullCheck() == 1) {
                 return;
             } else if (this.fullCheck() == 2) {
+                return;
+            }
+            if(!this.serowData[0].delivery_detail_code){
+                alert("ff");
                 return;
             }
             //수정 시작
