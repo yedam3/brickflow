@@ -128,7 +128,7 @@ FROM store s
 	LEFT JOIN mat_store ms ON ms.mat_LOT = s.LOT AND ms.mat_code = s.item_code
 	JOIN mat m ON ms.mat_code = m.mat_code
     JOIN BOM b ON b.mat_code = ms.mat_code
-WHERE b.prod_code = 'PROD-105' AND ms.mat_code = 'mat-103'
+WHERE b.prod_code = ? AND ms.mat_code = ?
 GROUP BY b.prod_code, s.LOT, m.mat_code, m.mat_name, ms.store_date
 ORDER BY ms.store_date ASC
 `;
