@@ -129,25 +129,14 @@ const deliveryAdd = async (delivery, deliveryDetail) => {
 //수정
 const modifydelivery = async (delivery,deliveryDetail) => {
 
-    let updateInfo = {
-       company_code: delivery.company_code,
-       employee_code: delivery.employee_code,
-       delivery_date: delivery.delivery_date,
-       delivery_name: delivery.delivery_name,
-
-    }
-    let result = await mariaDB.query('deliveryUpdate', [updateInfo, ])
+    let result = await mariaDB.query('deliveryUpdate', [delivery.delivery_name,delivery.company_code,delivery.delivery_code ])
     .catch((err) => console.log(err));
     if (result.affectedRows > 0) {
     return result;
     }
     for(let detail of deliveryDetail){
-        let updateDetailIndo = {
-            delivery_quantity: detail.delivery_quantity,
-            demend: detail.demend,
-            prod_code: detail.prod_code,
-        }
-        result = await mariaDB.query('deliveryDetailUpdate ', [updateDetailIndo,detail.delivery_detail_code]
+        
+        result = await mariaDB.query('deliveryDetailUpdate ', [detail.delivery_quantity,detail.delivery_code]
             .catch((err)=> console.log(err)));
         
     }
@@ -171,8 +160,8 @@ const removedelivery = async (delivery_code) => {
     return result;
 };
 //두번쨰 그리드 값전달
-const deliveryDetailRender = async (ordersCode) => { 
-    const result = await mariaDB.query('deliveryDetailRender', ordersCode)
+const deliveryDetailRender = async (ordersCode,delivery_code) => { 
+    const result = await mariaDB.query('deliveryDetailRender',[ordersCode,delivery_code])
         .catch(err => console.log(err));
     return result;
 }

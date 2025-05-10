@@ -35,16 +35,20 @@ VALUES( ? , ? , ? , ? , ?)`;
 //수정
 const deliveryUpdate = `
 UPDATE delivery_manage
-SET ?
+SET delivery_name = ?, company_code = ?
 WHERE delivery_code = ?`
 
 //상세 수정
 const deliveryDetailUpdate = `
 UPDATE delivery_manage_detail
-SET ?
+SET delivery_quantity =?
 WHERE delivery_detail_code = ?`
 
-
+//재고수정
+const storageDeliveryUpdate = `
+UPDATE store
+SET dispatch_quantity = ? , LOT = ? 
+WHERE doc_code = ?  `
 
 //삭제
 const deliveryDelete =
@@ -85,6 +89,8 @@ UPDATE orders
 SET finish_status = ?
 WHERE orders_code = ? `
 
+
+//모달
 const deliveryModal = `
   SELECT m.delivery_code,
     delivery_name,
@@ -98,14 +104,15 @@ const deliveryModal = `
     company_code,
     delivery_date
   FROM delivery_manage m JOIN delivery_manage_detail d ON(m.delivery_code = d.delivery_code)
+GROUP BY delivery_code
   `
 const deliveryDetailRender = `
-SELECT orders_detail_code, o.orders_code, quantity AS delivery_demand,
+SELECT orders_detail_code, o.orders_code, quantity AS delivery_demand,delivery_quantity,
   (SELECT IFNULL(SUM(delivery_quantity), 0) FROM delivery_manage_detail d JOIN delivery_manage m ON(d.delivery_code = m.delivery_code) WHERE orders_code = o.orders_code AND prod_code = o.prod_code) AS alreadydelivery,
   quantity - (SELECT IFNULL(SUM(delivery_quantity), 0) FROM delivery_manage_detail d JOIN delivery_manage m ON(d.delivery_code = m.delivery_code) WHERE orders_code = o.orders_code AND prod_code = o.prod_code) AS yetdelivery, price, note, o.prod_code, getProdName(o.prod_code) AS prod_name, finish_status, delivery_detail_code
 FROM order_detail o JOIN delivery_manage d ON(o.orders_code = d.orders_code)
 JOIN delivery_manage_detail de ON(de.delivery_code = d.delivery_code AND o.prod_code = de.prod_code)
-WHERE o.orders_code = ?
+WHERE o.orders_code = ? AND de.delivery_code = ?;
 `
 module.exports = {
   deliveryAdd,
@@ -122,6 +129,8 @@ module.exports = {
   addStoreProd,
   deliveryStatus,
   deliveryModal,
-  deliveryDetailRender
+  deliveryDetailRender,
+storageDeliveryUpdate
+
   
 }
