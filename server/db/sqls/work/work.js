@@ -6,22 +6,22 @@ FROM plan
 
 // 주문 목록 조회
 const findAllOrders = `
-SELECT o.orders_code, 
-       o.order_name, 
+SELECT o.orders_code, o.order_name, o.note, o.finish_status, 
        DATE_FORMAT(o.orders_date, '%Y-%m-%d') AS orders_date,
        DATE_FORMAT(o.del_date, '%Y-%m-%d') AS del_date,
-       o.note, 
-       o.finish_status, 
        CONCAT(
-        getProdName(od.prod_code),
+        prod.prod_name,
         CASE 
             WHEN COUNT(od.prod_code) > 1 THEN CONCAT(' 외 ', COUNT(od.prod_code) - 1, '건')
             ELSE ''
         END
     ) AS prod_name
 FROM orders o
-JOIN order_detail od ON o.orders_code = od.orders_code
-GROUP BY o.orders_code, o.order_name, o.orders_date, o.del_date, o.note, o.finish_status;
+	JOIN order_detail od ON o.orders_code = od.orders_code
+	JOIN prod prod ON od.prod_code = prod.prod_code
+WHERE 1=1
+    :searchCondition
+GROUP BY o.orders_code, o.order_name, o.orders_date, o.del_date, o.note, o.finish_status
 `;
 
 // 주문 상세 조회
@@ -70,11 +70,11 @@ WHERE orders_code = ?
 
 // 생산 계획 조회
 const findAllPlan = `
-SELECT p.plan_code, getOrderName(p.orders_code) AS order_name, p.plan_name, p.employee_code,
+SELECT p.plan_code, o.order_name, p.plan_name, p.employee_code,
         DATE_FORMAT(p.start_date, '%Y-%m-%d') AS start_date,
         DATE_FORMAT(p.end_date, '%Y-%m-%d') AS end_date,
 		CONCAT(
-        getProdName(od.prod_code),
+        prod.prod_name,
         CASE 
             WHEN COUNT(od.prod_code) > 1 THEN CONCAT(' 외 ', COUNT(DISTINCT od.prod_code) - 1, '건')
             ELSE ''
@@ -86,7 +86,11 @@ FROM plan p
 	JOIN ( SELECT DISTINCT orders_code, prod_code 
 			FROM order_detail
 	) od ON p.orders_code = od.orders_code
-GROUP BY p.plan_code, order_name, p.plan_name, p.start_date, p.end_date, p.finish_status, od.orders_code;
+    JOIN orders o ON od.orders_code = o.orders_code
+    JOIN prod prod ON od.prod_code = prod.prod_code
+WHERE 1=1
+    :searchCondition
+GROUP BY p.plan_code, o.order_name, p.plan_name, p.start_date, p.end_date, p.finish_status, od.orders_code
 `;
 
 // 생산 계획 상세 조회
@@ -208,6 +212,8 @@ WHERE orders_detail_code = ?
 const findAllProd = `
 SELECT prod_code, prod_name, unit, by_unit_number
 FROM prod
+WHERE 1=1
+    :searchCondition
 `;
 
 // 생산 계획 상태 확인

@@ -50,7 +50,7 @@ SELECT po.product_order_code, po.product_order_name, po.finish_status, sc.sub_co
 	DATE_FORMAT(po.start_date, '%Y-%m-%d') AS start_date,
     DATE_FORMAT(po.end_date, '%Y-%m-%d') AS end_date,
     CONCAT(
-        getProdName(wd.prod_code),
+        prod.prod_name,
         CASE 
             WHEN COUNT(wd.prod_code) > 1 THEN CONCAT(' 외 ', COUNT(DISTINCT wd.prod_code) - 1, '건')
             ELSE ''
@@ -59,6 +59,9 @@ SELECT po.product_order_code, po.product_order_name, po.finish_status, sc.sub_co
 FROM product_order po
 	JOIN sub_codes sc ON po.finish_status = sc.sub_code
 	LEFT JOIN work_detail wd ON wd.product_order_code = po.product_order_code
+    LEFT JOIN prod prod ON wd.prod_code = prod.prod_code
+WHERE 1=1
+    :searchCondition
 GROUP BY po.product_order_code, po.product_order_name, po.finish_status, sc.sub_code_name, po.plan_code, po.start_date, po.end_date
 ORDER BY po.product_order_code
 `;

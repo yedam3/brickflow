@@ -103,6 +103,29 @@ CALL processEnd(?, ?, ?, ?, ?, @result_code, @result);
 SELECT @result_code AS 'result_code', @result AS 'result';
 `;
 
+// 지시 목록 조회
+const findAllPlanOrderName = `
+SELECT DISTINCT o.order_name
+FROM work_process wp
+	JOIN work_detail wd ON wp.product_order_detail_code = wd.product_order_detail_code
+	JOIN product_order po ON wd.product_order_code = po.product_order_code
+	JOIN plan p ON po.plan_code = p.plan_code
+	JOIN orders o ON p.orders_code = o.orders_code
+`;
+
+// 공정 목록 조회
+const findAllProcessName = `
+SELECT DISTINCT p.process_name
+FROM work_process wp
+	JOIN process p ON wp.process_code = p.process_code
+`;
+// 제품 목록 조회
+const findAllProdName = `
+SELECT DISTINCT pd.prod_name
+FROM work_process wp
+    JOIN prod pd ON wp.prod_code = pd.prod_code
+`;
+
 module.exports = {
     findAllProduct_order,                           // 생산 지시 목록 조회 - 생산 완료(WS3) 제외
     findAllEmployees,                               // 사원 목록 조회
@@ -115,4 +138,8 @@ module.exports = {
 
     processStart,                                   // 작업 시작
     processEnd,                                     // 작업 종료
+
+    findAllPlanOrderName,                           // 지시 목록 조회
+    findAllProcessName,                             // 공정 목록 조회
+    findAllProdName,                                // 제품 목록 조회
 }

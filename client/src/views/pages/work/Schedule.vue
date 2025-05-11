@@ -113,9 +113,12 @@
 </template>
 
 <script>
+import axios from "axios";
+
+import { useUserStore } from '@/stores/user';
+
 import { AgGridVue } from "ag-grid-vue3";
 import DatePickerEditor from "../../../components/DatePickerEditor.vue";
-import axios from "axios";
 import Swal from 'sweetalert2';
 
 import OrderModal from "@/components/modal/OrderModal.vue";
@@ -254,7 +257,7 @@ export default {
                 plan_code: this.formData.plan_code, // 생산계획_코드
                 orders_code: "",                    // 주문_코드
                 plan_name: "",                      // 생산계획명
-                employee_code: "",                  // 담당자
+                employee_code: useUserStore().id,   // 담당자
                 start_date: "",                     // 시작_일자
                 end_date: "",                       // 종료_일자
                 finish_status: "",                  // 처리_상태
@@ -273,7 +276,7 @@ export default {
                 this.formData.employee_code == '' ||
                 this.formData.start_date == '' ||
                 this.formData.end_date == ''
-                // || this.formData.finish_status == '' ||
+                || this.formData.finish_status == ''
                 // this.formData.note == ''
             ) {
                 Swal.fire({

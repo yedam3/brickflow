@@ -1,5 +1,5 @@
 const mariaDB = require("../../db/mapper.js");
-const { convertObjToAry, dateFormat } = require("../../utils/converts.js");
+const { convertLikeToQuery, convertObjToAry, dateFormat } = require("../../utils/converts.js");
 
 // 생산지시코드 자동증가
 const getOrder_code = async () => {
@@ -27,10 +27,28 @@ const findAllMatReqByProd_code = async (prod_code, quantity) => {
 }
 
 // 생산 지시 목록 조회
-const findAllPlanOrder = async () => {
-    let result = await mariaDB.query("findAllPlanOrder").catch((err) => {
-        console.error(err);
-    })
+const findAllPlanOrder = async (type, keyword) => {
+    let searchCondition = {};
+    let convertedCondition = '';
+    switch (type) {
+        case "product_order_name":
+            type = "po.product_order_name";
+            break;
+        case "product_order_code":
+            type = "po.product_order_code";
+            break;
+        case "prod_name":
+            type = "prod.prod_name";
+            break;
+        default:
+            break;
+    }
+    if(type && keyword) {
+        searchCondition[type] = keyword;
+        const converted = convertLikeToQuery(searchCondition, []);
+        convertedCondition = converted.serchKeyword;
+    }
+    let result = await mariaDB.query("findAllPlanOrder", {searchCondition: convertedCondition}).catch((err) => console.error(err));
     return result;
 };
 

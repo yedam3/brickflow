@@ -6,17 +6,18 @@
 
         <CModalBody>
             <div class="ag-theme-alpine" style="height: 400px; width: 100%">
-                <!-- 생산계획 검색 -->
+                <!-- 생산 계획 검색 -->
                 <div class="d-flex justify-content-center me-5">
                     <div class="input-group mb-3 w-50">
-                        <select class="form-select" aria-label="Default select example">
-                            <option value="1" selected>계획명</option>
-                            <option value="2">주문명</option>
-                            <option value="2">제품명</option>
+                        <select class="form-select" v-model="searchType" aria-label="Default select example">
+                            <option value="plan_name" selected>계획명</option>
+                            <option value="order_name">주문명</option>
+                            <option value="prod_name">제품명</option>
+                            <option value="plan_code">계획코드</option>
                         </select>
-                        <input type="text" v-model="searchText" placeholder="검색어 입력" @keydown.enter="searchOrders"
+                        <input type="text" v-model="searchText" placeholder="검색어 입력" @keydown.enter="searchPlan"
                             class="form-control w-50" style="width: 30%" />
-                        <button @click="searchMaterials" class="btn btn-primary">
+                        <button @click="searchPlan" class="btn btn-primary">
                             <i class="pi pi-search"></i>
                         </button>
                     </div>
@@ -59,7 +60,7 @@ export default {
     data() {
         return {
             rowData: [],
-            searchType: "",
+            searchType: "plan_name",
             searchText: "",
 
             columnDefs: [
@@ -119,13 +120,25 @@ export default {
             this.$emit("close");
         },
 
-        // 주문 목록 조회 API
+        // 생산 계획 목록 조회 API
         planList() {
             axios.get('/api/work/plan/planList')
                 .then(res => {
                     this.rowData = res.data
                 })
                 .catch(error => { console.error(error) })
+        },
+
+        // 생산 계획 목록 검색
+        async searchPlan() {
+            await axios.get(`/api/work/plan/planList`, {
+                params: {
+                    type: this.searchType,
+                    keyword: this.searchText,
+                }
+            }).then(res => {
+                this.rowData = res.data;
+            }).catch((err) => console.error(err));
         },
 
         // 그리드 행 클릭 메소드
