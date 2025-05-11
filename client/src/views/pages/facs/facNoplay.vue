@@ -1,70 +1,79 @@
 <template>
-    <div>
-        <div class="card border-0" style=" height: 800px; background-color: white;">
-            <div class="d-flex justify-content-start">
-                <div class="input-group mb-5" style="width: 65%;">
-                    <!-- 검색 조건 선택 -->
-                    <select v-model="searchType" class="form-select" aria-label="Default select example">
-                        <option value="" selected style="color: gray;">전체</option>
-                        <option v-for="unFac in reasonFacAry" :key="unFac.unplay_reason_code"
-                            :value="unFac.unplay_reason_code">{{ unFac.sub_code_name }}</option>
-                    </select>
-                    <!-- 검색어 입력 -->
-                    <input type="text" v-model="searchText" placeholder="검색어 입력" class="form-control w-50"
-                        style="width: 100%" @keydown.enter="unFacList" />
-                    <!-- 검색 버튼 -->
-                    <button @click="unFacList" class="btn btn-primary">
-                        <i class="pi pi-search"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="ag-wrapper d-flex justify-content-center">
-                <ag-grid-vue class="ag-theme-alpine custom-grid-theme" style="width: 100%; height: 300px;" :columnDefs="columnDefs"
-                    :rowData="rowData2" :gridOptions="gridOptions" @cellClicked="comCellClicked" @rowClicked="clicked">
-                </ag-grid-vue>
-            </div>
-            <div>
-                <div class="d-flex flex-wrap gap-4">
-                    <div class="p-4 ">
-                        <h6>비가동코드 <input type="text" v-model="rowData.unplay_code" class="form-control"
-                                style="border: 1px solid black; width: 100px;"></h6>
-                        <h6>비가동사유코드 <select v-model="rowData.unplay_reason_code" class="form-select form-control"
-                                style="height: 34px; border: 1px solid black ; font-size: 12px; color: gray; width: 100px;">
-                                <option disabled value="">비가동사유</option>
-                                <option v-for="reFac in reasonFacAry" :key="reFac.unplay_reason_code"
-                                    :value="reFac.unplay_reason_code">
-                                    {{ reFac.sub_code_name }}
-                                </option>
-                            </select></h6>
-                        <h6>설비코드 <input type="text" v-model="rowData.fac_code" class="form-control"
-                                style="border: 1px solid black; width: 100px;" @click="facModalList" readonly></h6>
-                    </div>
-                    <div class="p-4 ">
-                        <h6>시작일시<input type="datetime-local" v-model="rowData.unplay_start_date" class="form-control"
-                                style="border: 1px solid black; width: 150px;"></h6>
-                        <h6>종료일시 <input type="datetime-local" v-model="rowData.unplay_end_date" class="form-control"
-                                style="border: 1px solid black; width: 150px;"></h6>
-                        <h6>담당자<input type="number" v-model="rowData.employee_code" class="form-control"
-                                style="border: 1px solid black; width: 100px;"></h6>
-                    </div>
-                    <div class="p-4">
-                        <h6>비고<textarea v-model="rowData.note" class="form-control"
-                                style="border: 1px solid black; width: 200px; height: 115px;"></textarea></h6>
-                        <div class="d-flex justify-content-end p-4">
-                            <Button label="등록" severity="info" class="me-2" @click="addUnFac" />
-                            <Button label="수정" severity="help" class="me-2" @click="modifyUnplay" />
-                            <Button label="가동처리" severity="danger" class="me-2" @click="updatePlay" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <div class="ag-theme-alpine p-4" style="background-color: white; min-height: 800px;">
+    <div class="d-flex justify-content-start mb-3">
+      <div class="input-group" style="width: 65%;">
+        <select v-model="searchType" class="form-select">
+          <option value="" selected style="color: gray;">전체</option>
+          <option v-for="unFac in reasonFacAry" :key="unFac.unplay_reason_code" :value="unFac.unplay_reason_code">
+            {{ unFac.sub_code_name }}
+          </option>
+        </select>
+        <input type="text" v-model="searchText" placeholder="검색어 입력" class="form-control" @keydown.enter="unFacList" />
+        <button @click="unFacList" class="btn btn-primary">
+          <i class="pi pi-search"></i>
+        </button>
+      </div>
     </div>
-    <!--설비모달창-->
-    <FacListModal :visible="showFacModal" rowSelection="multiple" @close="showFacModal = false"
-        @selectFac="facSelected">
-    </FacListModal>
+    <ag-grid-vue
+      class="ag-theme-alpine custom-grid-theme mb-4"
+      style="width: 100%; height: 300px;"
+      :columnDefs="columnDefs"
+      :rowData="rowData2"
+      :gridOptions="gridOptions"
+      @rowClicked="clicked"
+    />
+    <div class="card shadow-sm p-4">
+      <h5 class="mb-4">비가동 등록</h5>
+      <div class="row g-3">
+        <div class="col-md-3">
+          <label class="form-label">비가동코드</label>
+          <input type="text" class="form-control" v-model="rowData.unplay_code" readonly />
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">비가동사유</label>
+          <select v-model="rowData.unplay_reason_code" class="form-select">
+            <option disabled value="">비가동사유</option>
+            <option v-for="reFac in reasonFacAry" :key="reFac.unplay_reason_code" :value="reFac.unplay_reason_code">
+              {{ reFac.sub_code_name }}
+            </option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">설비코드</label>
+          <input type="text" class="form-control" v-model="rowData.fac_code" @click="facModalList" readonly />
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">담당자</label>
+          <input type="number" class="form-control" v-model="rowData.employee_code" />
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">시작일시</label>
+          <input type="datetime-local" class="form-control" v-model="rowData.unplay_start_date" />
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">종료일시</label>
+          <input type="datetime-local" class="form-control" v-model="rowData.unplay_end_date" />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">비고</label>
+          <textarea class="form-control" rows="3" v-model="rowData.note"></textarea>
+        </div>
+      </div>
+      <div class="d-flex justify-content-end mt-4 gap-3">
+        <Button label="등록" severity="info" @click="addUnFac" />
+        <Button label="수정" severity="help" @click="modifyUnplay" />
+        <Button label="가동처리" severity="danger" @click="updatePlay" />
+      </div>
+    </div>
+    <FacListModal
+      :visible="showFacModal"
+      rowSelection="multiple"
+      @close="showFacModal = false"
+      @selectFac="facSelected"
+    />
+  </div>
 </template>
+
 <script>
 
 import { AgGridVue } from "ag-grid-vue3";
@@ -72,6 +81,7 @@ import DatePickerEditor from "../../../components/DatePickerEditor.vue";
 import axios from "axios";
 import Swal from "sweetalert2";
 import FacListModal from "@/components/modal/FacListModal.vue";
+import moment from 'moment-timezone';
 export default {
     components: {
         AgGridVue,
@@ -104,15 +114,36 @@ export default {
                 }
             ],
             columnDefs: [
-                { field: "fac_code", headerName: "설비코드", flex: 3, },
-                { field: "unplay_code", headerName: "비가동설비코드", flex: 3, },
-                { field: "unplay_reason_code", headerName: "비가동사유코드", flex: 3, },
-                { field: "employee_code", headerName: "당담자", flex: 3, },
-                { field: "unplay_start_date", headerName: "비가동시작일시", flex: 3, },
-                { field: "unplay_end_date", headerName: "비가동종료일시", flex: 3, },
-                { field: "note", headerName: "비고", flex: 3,},
+                { field: "fac_code", headerName: "설비코드", flex: 3 },
+                { field: "unplay_code", headerName: "비가동설비코드", flex: 3 },
+                { field: "unplay_reason_code", headerName: "비가동사유코드", flex: 3 ,
+                    valueFormatter: (params) => {
+                        if (params.value == 'NR1') {
+                            return params.value = '사출 성형기';
+                        } else if (params.value == 'NR2') {
+                            return params.value = '자동 조립 장비';
+                        } else if (params.value == 'NR3') {
+                            return params.value = '도장';
+                        } else if (params.value == 'NR4') {
+                            return params.value = '포장 설비';
+                        } 
+                    }
+                },
+                { field: "employee_code", headerName: "담당자", flex: 3 },
+                {
+                    field: "unplay_start_date",
+                    headerName: "비가동시작일시",
+                    flex: 3,
+                    valueFormatter: this.dateFormatter
+                },
+                {
+                    field: "unplay_end_date",
+                    headerName: "비가동종료일시",
+                    flex: 3,
+                    valueFormatter: this.dateFormatter
+                },
+                { field: "note", headerName: "비고", flex: 3 },
             ],
-
             gridOptions: {
                 domLayout: "autoHeight",
                 singleClickEdit: true,
@@ -137,8 +168,34 @@ export default {
         this.autoUnCode();
         this.unFacList();
         this.reasonFac();
+
+        this.columnDefs = [
+        { field: "fac_code", headerName: "설비코드", flex: 3 },
+        { field: "unplay_code", headerName: "비가동설비코드", flex: 3 },
+        { field: "unplay_reason_code", headerName: "비가동사유코드", flex: 3 },
+        { field: "employee_code", headerName: "담당자", flex: 3 },
+        {
+            field: "unplay_start_date",
+            headerName: "비가동시작일시",
+            flex: 3,
+            valueFormatter: this.dateFormatter,
+        },
+        {
+            field: "unplay_end_date",
+            headerName: "비가동종료일시",
+            flex: 3,
+            valueFormatter: this.dateFormatter,
+        },
+        { field: "note", headerName: "비고", flex: 3 },
+    ];
     },
     methods: {
+        dateFormatter(params) {
+            if (!params || !params.value) return '';
+            return moment(params.value, moment.ISO_8601).isValid()
+                ? moment(params.value).format("YYYY-MM-DD HH:mm")
+                : '';
+        },
         async autoUnCode(){
             const result = await axios.get("/api/fac/autoUnCode");
             this.rowData.unplay_code = result.data[0].unplay_code;
@@ -147,13 +204,18 @@ export default {
             console.log(this.rowData);
             //등록
             axios.post('/api/fac/addUnFac', {
-                unplayFac: this.rowData,
+                unplayFac: {
+                    ...this.rowData,
+                    unplay_end_date: this.rowData.unplay_end_date || null,
+                }
             })
             .then(async res => {
                 if (res.data.affectedRows > 0) {
+                    // 종료일자가 없으면 비가동 상태, 있으면 가동 상태로 업데이트
+                    const facStatus = this.rowData.unplay_end_date ? 'FS1' : 'FS2';
                     await axios.put('/api/fac/updateList', {
                         facCode: this.rowData.fac_code,
-                        facStatus: "FS2"
+                        facStatus: facStatus
                     });
                         Swal.fire({
                             title: '등록성공',
@@ -163,14 +225,14 @@ export default {
                         }).then(() =>{
                             this.unFacList();
                         });
-                        this.rowData =      {
+                        this.rowData = {
                             unplay_reason_code: "",
                             employee_code: "",
                             unplay_start_date: "",
                             unplay_end_date: "",
                             note: "",
                             fac_code: '',
-                                 }
+                        };
                     } else {
                         Swal.fire({
                             title: '등록 실패',
@@ -198,8 +260,8 @@ export default {
                 params: {
                     unplayCode: this.rowData2[0].unplay_code
                 }
-            })
-                .catch((err) => console.log(err));
+            }).catch((err) => console.log(err));
+
             if (res.data[0].checkCount < 1) {
                 Swal.fire({
                     title: '수정 실패',
@@ -209,21 +271,23 @@ export default {
                 });
                 return;
             }
-            //설비수정
+
+            // 설비 수정
             await axios.put('/api/fac/modifyUnplay', {
-                unplayFac: this.rowData2[0]
+                unplayFac: this.rowData
             })
-                .then(res => {
+                .then(async res => {
                     if (res.data.affectedRows > 0) {
                         Swal.fire({
                             title: '수정 완료',
                             text: '수정이 완료되었습니다.',
                             icon: 'success',
                             confirmButtonText: '확인'
-                        }).then(() =>{
+                        }).then(() => {
                             this.unFacList();
                         });
-                        this.rowData =      {
+
+                        this.rowData = {
                             unplay_code: "",
                             unplay_reason_code: "",
                             employee_code: "",
@@ -231,8 +295,7 @@ export default {
                             unplay_end_date: "",
                             note: "",
                             fac_code: '',
-                }
-
+                        };
                     } else {
                         Swal.fire({
                             title: '수정 실패',
@@ -240,72 +303,78 @@ export default {
                             icon: 'error',
                             confirmButtonText: '확인'
                         });
-                        return;
                     }
-            })
-            .catch(err => {
-                console.error(err);
-                Swal.fire({
-                    title: '수정 실패',
-                    text: '알수 없는 에러.',
-                    icon: 'error',
-                    confirmButtonText: '확인'
+                })
+                .catch(err => {
+                    console.error(err);
+                    Swal.fire({
+                        title: '수정 실패',
+                        text: '알 수 없는 에러.',
+                        icon: 'error',
+                        confirmButtonText: '확인'
+                    });
                 });
-                return
-            });
+
             this.autoUnCode();
         },
         // 가동처리
         updatePlay() {
+            if (!this.rowData.unplay_end_date) {
+                Swal.fire({
+                    title: '오류',
+                    text: '종료일시가 입력되지 않았습니다.',
+                    icon: 'warning',
+                    confirmButtonText: '확인'
+                });
+                return;
+            }
             axios.put('/api/fac/updateList', {
-                params: {
                 facCode: this.rowData.fac_code,
                 facStatus: "FS1"
-                }
             })
-            .then(() => {
-                return axios.get('/api/fac/facStatus');
-            })
-            .then(res => {
-                if (res.data.affectedRows > 0) {
-                    Swal.fire({
-                        title: '가동처리 완료',
-                        text: '가동처리가 완료되었습니다.',
-                        icon: 'success',
-                        confirmButtonText: '확인'
-                    }).then(() => {
-                    this.unFacList();
-                });
-                this.rowData = {
-                    unplay_reason_code: "",
-                    employee_code: "",
-                    unplay_start_date: "",
-                    unplay_end_date: "",
-                    note: "",
-                    fac_code: '',
-                };
-                } else {
+                .then(res => {
+                    if (res.data.affectedRows > 0) {
+                        Swal.fire({
+                            title: '가동처리 완료',
+                            text: '가동처리가 완료되었습니다.',
+                            icon: 'success',
+                            confirmButtonText: '확인'
+                        }).then(() => {
+                            this.unFacList(); 
+                     
+                        });
+
+                        this.rowData = {
+                            unplay_reason_code: "",
+                            employee_code: "",
+                            unplay_start_date: "",
+                            unplay_end_date: "",
+                            note: "",
+                            fac_code: '',
+                        };
+                    } else {
+                        Swal.fire({
+                            title: '가동처리 실패',
+                            text: '가동처리를 실패하였습니다.',
+                            icon: 'error',
+                            confirmButtonText: '확인'
+                        });
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
                     Swal.fire({
                         title: '가동처리 실패',
-                        text: '가동처리를 실패하였습니다.',
+                        text: '알 수 없는 에러.',
                         icon: 'error',
                         confirmButtonText: '확인'
                     });
-                }
-            })
-            .catch(err => {
-                console.error(err);
-                Swal.fire({
-                    title: '가동처리 실패',
-                    text: '알 수 없는 에러.',
-                    icon: 'error',
-                    confirmButtonText: '확인'
+                })
+                .finally(() => {
+                    this.autoUnCode();
                 });
-            })
-            .finally(() => {
-            this.autoUnCode();
-            });
         },
+
 
 
         // //삭제
@@ -366,19 +435,36 @@ export default {
         //     //==========================
         // },
         //선택한 값 불러오기
-        clicked(event) {
-            console.log(event.data);
-            this.rowData = event.data;
+       clicked(event) {
+            const data = event.data;
+
+            this.rowData = {
+                unplay_code: data.unplay_code || '',
+                unplay_reason_code: data.unplay_reason_code || '',
+                employee_code: data.employee_code || '',
+                // 날짜 유효성 체크
+                unplay_start_date: data.unplay_start_date && moment(data.unplay_start_date).isValid()
+                    ? moment(data.unplay_start_date).format("YYYY-MM-DD HH:mm")
+                    : '',
+                unplay_end_date: data.unplay_end_date && moment(data.unplay_end_date).isValid()
+                    ? moment(data.unplay_end_date).format("YYYY-MM-DD HH:mm")
+                    : '',
+                fac_code: data.fac_code || '',
+            };
         },
         //조회
         async unFacList() {
             await axios.get('/api/fac/unFacList', {
-
+                params: {
+                    searchType: this.searchType,
+                    searchText: this.searchText
+                }
             })
                 .then(res => {
                     console.log(res.data)
                     this.rowData2 = res.data;
                 })
+                .catch(err => console.error(err));
         },
         //설비 모달창 띄우기
         facModalList(){

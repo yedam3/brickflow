@@ -24,20 +24,7 @@
         </ag-grid-vue>
       </div>
     </div>
-    <div class="col d-flex justify-content-end p-4" >
-                    <Button label="조회" severity="success" class="" @click="facStatus"></Button>
-                </div>
-  </div>
-
-  <br>
-  <div class="col" style="margin-right: 50px; ">
-            <div class="ag-wrapper d-flex justify-content-center">
-                <ag-grid-vue class="ag-theme-alpine custom-grid-theme" style="width: 100%; height:  500px;"
-                    :columnDefs="columnDefs" :rowData="rowData" :gridOptions="gridOptions"
-                    @cellClicked="comCellClicked">
-                </ag-grid-vue>
-            </div>
-        </div> 
+    </div>
 </template>
 
 <script>
@@ -48,10 +35,6 @@
     components: {
         AgGridVue,
         datePicker: DatePickerEditor,
-  },
-  mounted(){
-    this.facStatus();
-
   },
   data() {
     return{
@@ -111,14 +94,20 @@
           console.log(res.data)
           this.rowData = res.data;
         })
+         .catch(err => {
+            console.error("설비 상태 조회 실패", err);
+        });
     },
     async updateList(){
+      if (!this.rowData.length || !this.rowData[0]) {
+        console.warn("설비 상태 정보가 없습니다.");
+        return;
+      }
       await axios.put('/api/fac/updateList', {
-        params:{
           facCode: this.rowData[0].fac_code,
-          facStatus: this.rowData.fac_status}
+          facStatus: this.rowData[0].fac_status
     });
-      this.facStatus(); 
+       await this.facStatus(); 
     },
     async statusFac() {
       await axios.get('/api/fac/statusFac')
@@ -128,7 +117,8 @@
           this.statusFacAry = [...res.data];
         })
         .catch(err => console.log(err));
-    }
+    },
+
   }
 }
 </script>

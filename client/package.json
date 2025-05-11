@@ -15,6 +15,7 @@
     "axios": "^1.8.4",
     "chart.js": "3.3.2",
     "core-js": "^3.8.3",
+    "moment-timezone": "^0.5.48",
     "pinia": "^3.0.2",
     "primeicons": "^7.0.0",
     "primevue": "^4.3.1",

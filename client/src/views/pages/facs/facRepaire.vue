@@ -137,7 +137,12 @@ export default {
                     cellStyle: { textAlign: "center" },
                 },
             },
-            facResultAry:[],
+            facResultAry:[
+              {
+                fac_result: 'OR01',         
+                sub_code_name: '수리완료'
+              }
+            ],
     }
   },
   mounted() {
@@ -152,10 +157,16 @@ export default {
     //값 증가
     async autoReCode(){
       const result = await axios.get("/api/fac/autoReCode");
-      this.rowData2.repaire_code = result.data[0].repaire_code;
+      if (Array.isArray(result.data) && result.data.length > 0) {
+        this.rowData2.repaire_code = result.data[0].repaire_code;
+      } else {
+        console.warn("수리코드를 받아오지 못했습니다:", result.data);
+        this.rowData2.repaire_code = "코드없음"; // 또는 예외 처리
+  }
     },
     //수리처리
     async addRepaire(){
+      await this.autoReCode();
       axios.post('/api/fac/repaireFac', {
         repaireFac: this.rowData2
       })
@@ -200,7 +211,6 @@ export default {
           });
           return;
         });
-        this.autoReCode();
     },
      //조회
     async repaireList() {
@@ -211,10 +221,18 @@ export default {
                     this.rowData = res.data;
                 })
     },
-    clicked(event) {
-            console.log(event.data);
-            this.rowData2 = { ...event.data };
-            this.autoReCode();
+    async clicked(event) {
+      console.log(event.data);
+      this.rowData2 = {
+        ...event.data,
+        repaire_code: "", 
+        repaire_add_date: "",
+        repaire_finish_date: "",
+        fac_history: "",
+        break_status: "",
+        fac_result: ""
+      };
+      await this.autoReCode();
     },
     //수리결과
     async facResult(){

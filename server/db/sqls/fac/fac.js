@@ -82,6 +82,11 @@ VALUES (
     ?,?,?,
     (SELECT sub_code FROM sub_codes WHERE main_code = 'FS' AND sub_code = ?)    
 )`
+//이미지 경로만 저장
+const saveImagePath = `
+  INSERT INTO fac (image)
+  VALUES (?)
+`;
 //비가동
 const addNoFac =
 `INSERT INTO fac_none_play (
@@ -100,6 +105,11 @@ WHERE s.main_code = 'NR' AND s.sub_code = ?
 LIMIT 1`
 
 //수정
+//설비 수정
+const updateFac =
+`UPDATE fac
+SET ?
+WHERE fac_code = ?`
 //비가동수정
 const updateUnplay=
 `UPDATE fac_none_play
@@ -217,4 +227,6 @@ module.exports = {
   facStatus,
   addFac,
   facPattern,
+  updateFac,
+  saveImagePath,
 };
