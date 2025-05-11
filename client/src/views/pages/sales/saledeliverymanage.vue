@@ -397,7 +397,6 @@ export default {
                 delivery: this.rowData[0],
                 deliveryDetail: this.serowData
             })
-
             await axios.put('/api/sales/deliveryModify', {
                 delivery: this.rowData[0],
                 deliveryDetail: this.serowData
@@ -428,22 +427,31 @@ export default {
                         icon: 'error',
                         confirmButtonText: '확인'
                     })
-                })
-
+                    return
+                });
+                this.rowData = [{
+                delivery_code: '',
+                delivery_name: '',
+                orders_code: '',
+                order_name: '',
+                company_name: '',
+            }];
+            this.serowData = [
+                {
+                prod_code: '',
+                prod_name: '',
+                delivery_demand: '',
+                alreadydelivery: '',
+                proyetdeliveryd_code: '',
+                delivery_quantity: '',
+                }];
         },
         // 삭제
-        async deliveryDelete() {
+        async deliveryDelete() { 
             
-            await axios.delete('/api/sales/deliveryDelete')
+            await axios.delete(`/api/sales/deliveryDelete/${this.rowData[0].delivery_code}`)
             .then((res) => {
-                if (res.data.affectedRows < 1) {
-                    Swal.fire({
-                        title: '삭제 실패',
-                        text: '삭제 실패 하였습니다.',
-                        icon: 'error',
-                        confirmButtonText: '확인',
-                    });
-                } else {
+                if (res.data.affectedRows > 0) {
                     Swal.fire({
                         title: '삭제 완료',
                         text: '정상적으로 삭제가 완료되었습니다.',
@@ -456,11 +464,19 @@ export default {
                         orders_code: '',
                         order_name: '',
                         company_name: '',
-                    }]
+                    }];
                     this.serowData = [];
+                } else {
+                    Swal.fire({
+                        title: '삭제 실패',
+                        text: '삭제 실패 하였습니다.',
+                        icon: 'error',
+                        confirmButtonText: '확인',
+                    });
                 }
             })
-                .catch((err) => console.log(err));
+            .catch((err) => console.log(err));
+           
         }
     },
 };
