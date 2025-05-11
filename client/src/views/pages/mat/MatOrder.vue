@@ -7,6 +7,7 @@
       <Button label="등록" severity="info" class="me-3" @click="addOrder"/>
       <Button label="수정" severity="help" class="me-3" @click="modifyOrder"/>
       <Button label="삭제" severity="danger" class="me-5" @click="deleteOrder"/>
+      <Button label="발주서 다운로드" severity="warning" class="me-5" @click="pdfDown"/>
     </div>
 
     <!-- 메인그리드 -->
@@ -75,6 +76,7 @@ import MatModal from "@/components/modal/MatModal.vue";
 import ComModal from "@/components/modal/ComModal.vue";
 import MatOrderModal from "@/components/modal/MatOrderModal.vue";
 import Swal from 'sweetalert2';
+import { useUserStore } from '@/stores/user';
 export default {
   components: {
     AgGridVue,
@@ -95,7 +97,8 @@ export default {
           company_name: "",
           request_date: this.getToday(),
           delivery_date: "",
-          emp_code: "",
+          emp_name: useUserStore().empName,
+          emp_code:  useUserStore().id,
           note: "",
         },
       ],
@@ -107,7 +110,8 @@ export default {
       { field: "company_name", headerName: "업체명", flex: 2,},
       { field: "request_date", headerName: "발주일자", flex: 2 },
       { field: "delivery_date", headerName: "납기예정일", flex: 3, editable: true, cellEditor: "datePicker" },
-      { field: "emp_code", headerName: "등록자", flex: 3 },
+      { field: "emp_name", headerName: "사원명", flex: 3,},
+      { field: "emp_code", headerName: "등록자", flex: 3,hide:true },
       { field: "note", headerName: "비고", flex: 3, editable: true},
       ],
       //상세그리드
@@ -153,6 +157,7 @@ export default {
       selectedRowIndexes: [],
       //상세그리드 행 인덱스
       selectedSecondIndex: null,
+      orderExist : false
     };
   },
   mounted() {
@@ -377,6 +382,7 @@ export default {
         }
       })
       .then(res => {
+        this.orderExist = true;
         this.secondRowData = res.data;
       })
     },
@@ -495,7 +501,52 @@ export default {
           request_quantity: 0,
         }];
         this.autoMatCode();
+    },
+    async pdfDown() {
+      // 발주 목록이 없는 경우 다운로드 불가 메시지 표시
+      if (!this.orderExist) {
+        Swal.fire({
+          title: '실패',
+          text: '발주 목록은 조회후 다운로드가 가능합니다.',
+          icon: 'error',
+          confirmButtonText: '확인'
+        });
+        return; // 발주 목록이 없으면 다운로드를 중지하고 함수 종료
+      }
+
+      try {
+        // 서버에 POST 요청을 보내 PDF 파일을 요청
+        const response = await axios.post('/api/mat/pdfDownload', {
+          rowData: this.rowData,  // 발주 데이터
+          rowDataDetail: this.secondRowData  // 발주 세부 데이터
+        }, {
+          responseType: 'blob'  // 파일을 blob 형태로 응답받기
+        });
+
+        // Blob 형태로 받은 데이터를 Object URL로 변환
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+
+        // 다운로드를 위한 <a> 태그 동적으로 생성
+        const a = document.createElement('a');
+        a.href = url;  // Blob URL을 <a> 태그의 href에 설정
+        a.download = '발주서.pdf';  // 다운로드할 파일 이름 설정
+        a.click();  // 자동으로 <a> 태그를 클릭하여 다운로드 시작
+
+        // 다운로드 후 Object URL 해제
+        window.URL.revokeObjectURL(url);  // 메모리에서 Blob URL을 해제하여 메모리 누수 방지
+
+      } catch (err) {
+        // 오류가 발생한 경우 콘솔에 오류를 출력하고 사용자에게 알림
+        
+        Swal.fire({
+          title: '다운로드 실패',
+          text: 'PDF 다운로드 중 오류가 발생했습니다.',
+          icon: 'error',
+          confirmButtonText: '확인'
+        });
+      }
     }
+
 
   },        
 };

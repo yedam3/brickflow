@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body {
+      font-family: 'Malgun Gothic', sans-serif;
+      font-size: 12px;
+      padding: 30px;
+    }
+    .title {
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 30px;
+    }
+    .info-table, .detail-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+    th, td {
+      border: 1px solid black;
+      padding: 5px;
+      text-align: center;
+    }
+    .info-table td {
+      text-align: left;
+      padding-left: 10px;
+    }
+    .gray {
+      color: gray ;
+      font-size: 10px;
+      text-align: center;
+      margin-top: 30px;
+
+       -webkit-print-color-adjust: exact;
+       print-color-adjust: exact;
+    }
+    .memo {
+      padding: 10px;
+      font-weight: bold;
+      margin-top: 30px;
+
+      -webkit-print-color-adjust: exact;
+       print-color-adjust: exact;
+    }
+    .footer {
+      margin-top: 40px;
+      text-align: center;
+      font-size: 12px;
+    }
+    .footer .line {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .footer .line input {
+      width: 40px;
+      border: none;
+      border-bottom: 1px solid black;
+      text-align: center;
+    }
+    .footer .company {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+  .detail-table thead th {
+    background-color: #ccc;
+    -webkit-print-color-adjust: exact;
+       print-color-adjust: exact;
+  }
+  .backGray{
+    background-color: #ccc;
+    -webkit-print-color-adjust: exact;
+       print-color-adjust: exact;
+  }
+  </style>
+</head>
+<body>
+
+  <div class="title">발 주 서</div>
+
+  <table class="info-table">
+    <tr>
+      <td class="backGray"><strong>발주번호</strong></td>
+      <td><%= mat_order_code %></td>
+      <td class="backGray"><strong>발주명</strong></td>
+      <td><%= mat_order_name %></td>
+    </tr>
+    <tr>
+      <td class="backGray"><strong>거래처</strong></td>
+      <td><%= company_name %></td>
+      <td class="backGray"><strong>납기일자</strong></td>
+      <td><%= delivery_date %></td>
+    </tr>
+    <tr>
+      <td class="backGray"><strong>요청일자</strong></td>
+      <td colspan="3"><%= request_date %></td>
+    </tr>
+  </table>
+
+  <p>아래와 같이 발주합니다.</p>
+
+  <table class="detail-table">
+    <thead>
+      <tr>
+        <th>NO</th>
+        <th>자재명</th>
+        <th>요청 수량</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% detail.forEach((item, idx) => { %>
+        <tr>
+          <td><%= idx + 1 %></td>
+          <td><%= item.mat_name %></td>
+          <td><%= item.request_quantity %>개</td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+
+  <div class="memo">
+   비고 :  <%= note %>
+  </div>
+
+  <div class="footer">
+    위와 같이 ☐ 발주, ☐ 견적을 요청드립니다.
+    <div class="line">
+      <input type="text" placeholder="202"> 년
+      <input type="text" placeholder="  "> 월
+      <input type="text" placeholder="  "> 일
+    </div>
+    <div class="company">(주)BrickFlow  拜上</div>
+  </div>
+
+  <div class="gray">※ 본 문서는 시스템에서 자동 생성된 발주서입니다.</div>
+
+</body>
+</html>

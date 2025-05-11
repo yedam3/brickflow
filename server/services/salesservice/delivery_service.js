@@ -135,9 +135,8 @@ const modifydelivery = async (delivery,deliveryDetail) => {
     return result;
     }
     for(let detail of deliveryDetail){
-        
-        result = await mariaDB.query('deliveryDetailUpdate ', [detail.delivery_quantity,detail.delivery_code]
-            .catch((err)=> console.log(err)));
+        result = await mariaDB.query('deliveryDetailUpdate', [detail.delivery_quantity,detail.delivery_detail_code])
+            .catch((err)=> console.log(err));
         
     }
     return result;
@@ -149,7 +148,7 @@ const deliveryCheck = async (deliveryCode) => {
     return list;
 }
 
-// //삭제
+//삭제
 const removedelivery = async (delivery_code) => {
      await mariaDB.query("deliveryDelete", [delivery_code])
         .catch(err => console.log(err));

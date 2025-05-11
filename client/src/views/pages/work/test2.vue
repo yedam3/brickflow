@@ -6,21 +6,21 @@
 
         <div class="row mt-3 mb-3">
             <div class="col input-group mb-3 w-50">
-                <select class="form-select" aria-label="Default select example" v-model="searchType1" @change="searchSelect">
+                <select class="form-select" aria-label="Default select example">
                     <option value="1" selected>지시명</option>
                     <option value="2">주문명</option>
                     <option value="2">주문번호</option>
                 </select>
             </div>
             <div class="col input-group mb-3 w-50">
-                <select class="form-select" aria-label="Default select example" v-model="searchType2" @change="searchSelect">
+                <select class="form-select" aria-label="Default select example">
                     <option value="1" selected>공정명</option>
                     <option value="2">주문명</option>
                     <option value="2">주문번호</option>
                 </select>
             </div>
             <div class="col input-group mb-3 w-50">
-                <select class="form-select" aria-label="Default select example" v-model="searchType2" @change="searchSelect">
+                <select class="form-select" aria-label="Default select example">
                     <option value="1" selected>제품명</option>
                     <option value="2">주문명</option>
                     <option value="2">주문번호</option>
@@ -32,7 +32,7 @@
         <div class="mb-3">
             <div class="ag-wrapper justify-content-center" style="border: none;">
                 <ag-grid-vue class="ag-theme-alpine custom-grid-theme" :columnDefs="productOrderColDefs"
-                    :rowData="productOrderDataList" :gridOptions="productOrderGridOptions" @rowClicked="productOrderRowClicked">
+                    :rowData="productOrderDataList" :gridOptions="gridOptions" @rowClicked="productOrderRowClicked">
                 </ag-grid-vue>
             </div>
         </div>
@@ -43,7 +43,7 @@
                 <h4 class="text-start">작업자</h4>
                 <div class="ag-wrapper justify-content-center" style="border: none;">
                     <ag-grid-vue class="ag-theme-alpine custom-grid-theme" :columnDefs="employeeColDefs" :rowData="empDataList"
-                        :gridOptions="empGridOptions" @rowClicked="empRowClicked">
+                        :gridOptions="gridOptions" @rowClicked="empRowClicked">
                     </ag-grid-vue>
                 </div>
             </div>
@@ -53,7 +53,7 @@
                 <h4 class="text-start">설비</h4>
                 <div class="ag-wrapper justify-content-center" style="border: none;">
                     <ag-grid-vue class="ag-theme-alpine custom-grid-theme" :columnDefs="facColDefs" :rowData="facDataList"
-                        :gridOptions="facGridOptions" @rowClicked="facRowClicked">
+                        :gridOptions="gridOptions" @rowClicked="facRowClicked">
                     </ag-grid-vue>
                 </div>
             </div>
@@ -66,10 +66,9 @@
 </template>
 
 <script>
-import axios from "axios";
-
 import { AgGridVue } from "ag-grid-vue3";
-import Swal from 'sweetalert2';
+import DatePickerEditor from "../../../components/DatePickerEditor.vue";
+import axios from "axios";
 
 export default {
     components: {
@@ -113,22 +112,17 @@ export default {
                 // }
             ],
 
-            // 검색 조건 변수
-            searchType1: "1",
-            searchType2: "1",
-            searchType3: "1",
-
             // 공정 시작 데이터
             processData: {
 
             },
 
-            // 생산 지시 행 클릭 노드
-            selectedProductOrderRow: null,
-            // 사원 행 클릭 노드
-            selectedEmpRow: null,
-            // 설비 행 클릭 노드
-            selectedFacRow: null,
+            // 생산 지시 행 클릭 Index
+            productOrderSelectedIdx: null,
+            // 사원 행 클릭 Index
+            empSelectedIdx: null,
+            // 설비 행 클릭 Index
+            facSelectedIdx: null,
 
             // AG-GRID 정보
             productOrderColDefs: [
@@ -191,47 +185,14 @@ export default {
                     }
                 },
             ],
-            // 각 그리드별 옵션 분리
-            productOrderGridOptions: {
-                domLayout: "autoHeight",
-                singleClickEdit: true,
-                suppressRowClickSelection: false,  // 행 선택 활성화
-                rowSelection: 'single',            // 단일 행 선택
-                getRowClass: (params) => {
-                    return this.selectedProductOrderRow === params.node ? 'ag-row-selected-custom' : '';
-                },
+            gridOptions: {
+                domLayout: "autoHeight",                        // 행을 보고 자동으로 hight부여
+                singleClickEdit: true,                          // 한 번 클릭 했을 때 수정
+                suppressRowClickSelection: true,                // 행 클릭할 때 체크박스 선택 방지
                 defaultColDef: {
-                    suppressMovable: true,
-                    resizable: false,
-                    sortable: false,
-                },
-            },
-            empGridOptions: {
-                domLayout: "autoHeight",
-                singleClickEdit: true,
-                suppressRowClickSelection: false,  // 행 선택 활성화
-                rowSelection: 'single',            // 단일 행 선택
-                getRowClass: (params) => {
-                    return this.selectedEmpRow === params.node ? 'ag-row-selected-custom' : '';
-                },
-                defaultColDef: {
-                    suppressMovable: true,
-                    resizable: false,
-                    sortable: false,
-                },
-            },
-            facGridOptions: {
-                domLayout: "autoHeight",
-                singleClickEdit: true,
-                suppressRowClickSelection: false,  // 행 선택 활성화
-                rowSelection: 'single',            // 단일 행 선택
-                getRowClass: (params) => {
-                    return this.selectedFacRow === params.node ? 'ag-row-selected-custom' : '';
-                },
-                defaultColDef: {
-                    suppressMovable: true,
-                    resizable: false,
-                    sortable: false,
+                    suppressMovable: true,                      // 셀 이동 금지
+                    resizable: false,                           // 열 크기 조정 가능
+                    sortable: false,                            // 정렬 금지
                 },
             },
         };
@@ -244,22 +205,6 @@ export default {
         this.empList();
     },
     methods: {
-        // 검색 조건 변경 시
-        searchSelect() {
-            this.productOrderList();
-        },
-
-        // 검색 조건 초기화
-        serachReset() {
-            this.processData = {};
-            this.selectedProductOrderRow = null;
-            this.selectedEmpRow = null;
-            this.selectedFacRow = null;
-
-            // 설비 데이터 초기화
-            this.facDataList = [];
-        },
-
         // 생산 지시 조회
         async productOrderList() {
             await axios.get(`/api/work/process/productOrderList`).then(res => {
@@ -358,48 +303,6 @@ export default {
         
         // 공정 시작
         startProcess() {
-            // 필수 선택 항목 검증
-            // 생산
-            if (!this.processData.process) {
-                Swal.fire({
-                    title: '오류',
-                    text: '공정을 선택하세요.',
-                    icon: 'error',
-                    confirmButtonText: '확인',
-                });
-                return;
-            }
-            // 작업자
-            if (!this.processData.emp) {
-                Swal.fire({
-                    title: '오류',
-                    text: '작업자를 선택하세요.',
-                    icon: 'error',
-                    confirmButtonText: '확인',
-                });
-                return;
-            }
-            // 설비
-            if (!this.processData.fac) {
-                Swal.fire({
-                    title: '오류',
-                    text: '설비를 선택하세요.',
-                    icon: 'error',
-                    confirmButtonText: '확인',
-                });
-                return;
-            }
-            // 설비 상태 확인
-            if(process.processData.fac.fac_status === 'FS2') {
-                Swal.fire({
-                    title: '오류',
-                    text: '사용불가 상태의 설비입니다.',
-                    icon: 'error',
-                    confirmButtonText: '확인',
-                });
-                return;
-            }
-
             this.$router.push({ name: 'Control', query:{ work_lot: this.processData.process.work_lot, emp_code: this.processData.emp.emp_code, fac_code: this.processData.fac.fac_code}});
         },
     },
