@@ -166,9 +166,9 @@ export default {
                     let serverRowData = res.data;
                     for (let value of serverRowData) {
                         value.delivery_code = order.delivery_code;
-                        value.delivery_name = order.delivery_name // 빈값을 넣어주는거
-                        value.company_name = ''
-                        value.delivery_code = ''
+                        value.delivery_name = order.delivery_name; // 빈값을 넣어주는거
+                        value.company_name = value.company_name;
+                        value.company_code = value.company_code;                      
                         value.yetdelivery = value.yetdelivery + value.delivery_quantity
                         value.alreadydelivery = value.alreadydelivery - value.delivery_quantity
                     }
@@ -326,9 +326,10 @@ export default {
                 delivery_name: '',
                 orders_code: '',
                 order_name: '',
-                company_code: '',
+                company_name: '',
             }];
             this.serowData = [];
+            this.throwData = [];
         },
 
 
@@ -448,7 +449,6 @@ export default {
         },
         // 삭제
         async deliveryDelete() { 
-            
             await axios.delete(`/api/sales/deliveryDelete/${this.rowData[0].delivery_code}`)
             .then((res) => {
                 if (res.data.affectedRows > 0) {
