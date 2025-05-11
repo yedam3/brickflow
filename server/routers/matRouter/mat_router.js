@@ -1,7 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const matService = require("../../services/matService/mat_service.js");
-
+const fs = require("fs");
+const ejs = require("ejs");
+const path = require("path");
 
 //MatCode 자동증가
 router.get("/autoMatCode", async (req, res) => {
@@ -79,5 +81,41 @@ router.delete('/delete/:ocd',async(req,res)=>{
     let orderCdoe = req.params.ocd;
     let result = await matService.deleteOrder(orderCdoe)
     res.send(result);
+})
+// //pdf다운로드
+router.post('/pdfDownload',async(req,res) => {
+    const {rowData} = req.body;
+    const {rowDataDetail} = req.body;
+    const puppeteer = require("puppeteer");
+
+    const data = {
+        mat_order_code : rowData[0].mat_order_code,
+        mat_order_name : rowData[0].mat_order_name,
+        company_name : rowData[0].company_name,
+        request_date : rowData[0].request_date,
+        note : rowData[0].note,
+        delivery_date : rowData[0].delivery_date,
+        detail: rowDataDetail.map(info => ({
+            mat_name  : info.mat_name,
+            request_quantity : info.request_quantity
+        }))
+    }
+
+    const filePath  = path.join(__dirname,'/MatPdf.ejs');
+    const template = fs.readFileSync(filePath , 'utf-8');
+    const html = ejs.render(template,data);
+
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+    await page.setContent(html, { waitUntil: 'networkidle0' });
+
+    const pdfBuffer = await page.pdf({format : 'A4'});
+    await browser.close();
+
+    res.set({
+        "Content-Type": "application/pdf",
+        "Content-Disposition": `attachment; filename=order_${data.date}.pdf`,
+    });
+    res.send(pdfBuffer);
 })
 module.exports = router;
