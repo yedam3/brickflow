@@ -58,6 +58,23 @@ const processEnd = async (processEndData) => {
     return result;
 };
 
+// 지시 목록 조회
+const findAllPlanOrderName = async () => {
+    let result = await mariaDB.query('findAllPlanOrderName').catch((err) => console.error(err));
+    return result;
+};
+// 공정 목록 조회
+const findAllProcessName = async () => {
+    let result = await mariaDB.query('findAllProcessName').catch((err) => console.error(err));
+    return result;
+};
+
+// 제품 목록 조회
+const findAllProdName = async () => {
+    let result = await mariaDB.query('findAllProdName').catch((err) => console.error(err));
+    return result;
+};
+
 module.exports = {
     findAllProduct_order,               // 생산 지시 조회
     findAllEmployees,                   // 사원 목록 조회
@@ -69,5 +86,9 @@ module.exports = {
     findFacByFac_code,                  // 설비 정보 조회
 
     processStart,                       // 작업 시작
-    processEnd                          // 작업 종료
+    processEnd,                         // 작업 종료
+
+    findAllPlanOrderName,               // 지시 목록 조회
+    findAllProcessName,                 // 공정 목록 조회
+    findAllProdName,                    // 제품 목록 조회
 }

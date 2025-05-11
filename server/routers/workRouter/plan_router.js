@@ -10,7 +10,8 @@ router.get("/planAutoCode", async (req, res) => {
 
 // 주문 목록 조회
 router.get("/orderList", async (req, res) => {
-    let orderList = await planService.findAllOrders().catch((err) => console.log(err));
+    const { type, keyword } = req.query;
+    let orderList = await planService.findAllOrders(type, keyword).catch((err) => console.log(err));
     res.send(orderList);
 });
 
@@ -23,7 +24,8 @@ router.get("/plan", async (req, res) => {
 
 // 상산 계획 목록 조회
 router.get("/planList", async (req, res) => {
-    let planList = await planService.findAllPlan().catch((err) => console.error(err));
+    const { type, keyword } = req.query;
+    let planList = await planService.findAllPlan(type, keyword).catch((err) => console.error(err));
     res.send(planList);
 });
 
@@ -71,9 +73,8 @@ router.delete("/plan", async (req, res) => {
 
 // 제품 검색
 router.get("/prodList", async (req, res) => {
-    let prodList = await planService.findAllProd().catch((err) => {
-        console.error(err);
-    })
+    const { type, keyword } = req.query;
+    let prodList = await planService.findAllProd(type, keyword).catch((err) => console.error(err));
     res.send(prodList);
 });
 

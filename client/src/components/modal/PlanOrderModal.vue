@@ -9,14 +9,14 @@
                 <!-- 생산계획 검색 -->
                 <div class="d-flex justify-content-center me-5">
                     <div class="input-group mb-3 w-50">
-                        <select class="form-select" aria-label="Default select example">
-                            <option value="1" selected>지시명</option>
-                            <option value="2">주문명</option>
-                            <option value="2">제품명</option>
+                        <select class="form-select" v-model="searchType" aria-label="Default select example">
+                            <option value="product_order_name" selected>지시명</option>
+                            <option value="product_order_code">지시 코드</option>
+                            <option value="prod_name">제품명</option>
                         </select>
-                        <input type="text" v-model="searchText" placeholder="검색어 입력" @keydown.enter="searchOrders"
+                        <input type="text" v-model="searchText" placeholder="검색어 입력" @keydown.enter="searchProudctOrder"
                             class="form-control w-50" style="width: 30%" />
-                        <button @click="searchMaterials" class="btn btn-primary">
+                        <button @click="searchProudctOrder" class="btn btn-primary">
                             <i class="pi pi-search"></i>
                         </button>
                     </div>
@@ -61,7 +61,7 @@ export default {
             rowData: [
 
             ],
-            searchType: "",
+            searchType: "product_order_name",
             searchText: "",
 
             columnDefs: [
@@ -127,6 +127,18 @@ export default {
                     this.rowData = res.data
                 })
                 .catch(error => { console.error(error) })
+        },
+
+        // 계획 지시 목록 검색색
+        async searchProudctOrder() {
+            await axios.get(`/api/work/order/list`, {
+                params: {
+                    type: this.searchType,
+                    keyword: this.searchText,
+                }
+            }).then(res => {
+                this.rowData = res.data;
+            }).catch((err) => console.error(err));
         },
 
         // 그리드 행 클릭 메소드
