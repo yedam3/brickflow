@@ -44,7 +44,6 @@ SELECT fac.fac_code, fac.model_name, fac_status
 FROM fac fac
 	LEFT JOIN process pro ON pro.fac_pattern = fac.fac_pattern
     LEFT JOIN work_process wp ON wp.process_code = pro.process_code
-    LEFT OUTER JOIN fac_none_play fn ON fn.fac_code = fac.fac_code
 WHERE wp.work_lot = ?
 `;
 
@@ -57,12 +56,12 @@ SELECT wp.process_code,fc.fac_code AS 'fac_code', emp.emp_code AS 'emp_code', wp
     getEmpName(emp.emp_code) AS emp_name,
     IFNULL(dd.input_quantity, 0) AS processed_quantity,
     (
-        SELECT wp2.order_quantity
+        SELECT IFNULL(wp2.order_quantity, 0)
         FROM work_process wp2
-        WHERE wp2.work_lot = wp.work_lot AND wp2.process_sequence = 1
+        WHERE wp2.product_order_detail_code = wd.product_order_detail_code AND wp2.process_sequence = GREATEST(wp.process_sequence - 1, 1)
     ) -
     (
-        SELECT SUM(wp3.error_quantity + wp3.created_quantity)
+        SELECT SUM(IFNULL(wp3.error_quantity, 0) + IFNULL(wp3.created_quantity, 0))
         FROM work_process wp3
         WHERE wp3.work_lot = wp.work_lot
     ) AS 'unprocessed_quantity',
