@@ -53,11 +53,12 @@ WHERE doc_code = ?  `
 //삭제
 const deliveryDelete =
   `DELETE FROM delivery_manage
-WHERE delivery_code = ? `;
+WHERE delivery_code = ? `
+
 //상세삭제
 const deliveryDetailDelete =
   `DELETE FROM delivery_manage_detail
-WHERE delivery_code = ? `;
+WHERE delivery_detail_code = ? `
 
 //수정 및 등록 체크
 const addCheck = `
@@ -130,7 +131,7 @@ module.exports = {
   deliveryStatus,
   deliveryModal,
   deliveryDetailRender,
-storageDeliveryUpdate
+  storageDeliveryUpdate
 
   
 }
