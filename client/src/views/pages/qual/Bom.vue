@@ -2,29 +2,15 @@
   <div class="card border-0 h-100">
      <div class="font-semibold text-xl mb-4">BOM 관리</div>
      <div class="d-flex justify-content-start me-5">
-    
-           <div class="input-group mb-3 w-75">
-             <!-- 검색 조건 선택 -->
-             <select v-model="searchType" class="form-select" aria-label="Default select example">
-               <option value="mat_code" selected>제품명</option>
-               <option value="mat_name">제품코드</option>
-             </select>
-             <!-- 검색어 입력 -->
-             <input type="text" v-model="searchText" placeholder="검색어 입력" 
-            class="form-control w-50" style="width: 30%" @keydown.enter="searchMaterials" />
-             <!-- 검색 버튼 -->
-             <button @click="searchMaterials" class="btn btn-primary">
-               <i class="pi pi-search"></i>
-             </button>
-           </div>
+
          </div>
 
-     <div class="text-end mt-3 mb-3">
-     <Button label="초기화" severity="success" class="me-3" @click="resetList"/>
+     <div class="text-end mt-3 mb-3"style="padding-right: 4%;">
+     <Button label="초기화" severity="help" class="me-3" @click="resetList"/>
      <Button label="저장" severity="info" class="me-3" @click="bomSave"/>
    </div>
 
-   <div class="text-end mt-3 mb-3">
+   <div class="text-end mt-3 mb-3"style="padding-right: 4%;">
      <Button label="행추가" severity="success" class="me-3" @click="addRow"/>
      <Button label="행삭제" severity="danger" class="me-3" @click="deleteRow"/>  
    </div>
@@ -122,7 +108,7 @@ export default{
        domLayout: "autoHeight", //행을 보고 자동으로 hight부여
         suppressRowClickSelection: true, //	행 클릭할 때 체크박스 선택 방지
         overlayNoRowsTemplate: '표시할 값이 없습니다.',
-        defaultColDef2: {
+        defaultColDef: {
          suppressMovable: true, //컬럼 드래그로 순서바꾸기 못하게
            resizable: false, //컬럼 너비 마우스로 조절 못하게
            sortable: false, //정렬 기능 비활성화
