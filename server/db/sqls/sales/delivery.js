@@ -58,7 +58,7 @@ WHERE delivery_code = ? `
 //상세삭제
 const deliveryDetailDelete =
   `DELETE FROM delivery_manage_detail
-WHERE delivery_detail_code = ? `
+WHERE delivery_code = ? `
 
 //수정 및 등록 체크
 const addCheck = `
@@ -104,7 +104,8 @@ const deliveryModal = `
     employee_code,
     company_code,
     delivery_date
-  FROM delivery_manage m JOIN delivery_manage_detail d ON(m.delivery_code = d.delivery_code)
+  FROM delivery_manage m 
+  JOIN delivery_manage_detail d ON(m.delivery_code = d.delivery_code)
 GROUP BY delivery_code
   `
 const deliveryDetailRender = `
@@ -114,6 +115,7 @@ SELECT orders_detail_code, o.orders_code, quantity AS delivery_demand,delivery_q
 FROM order_detail o JOIN delivery_manage d ON(o.orders_code = d.orders_code)
 JOIN delivery_manage_detail de ON(de.delivery_code = d.delivery_code AND o.prod_code = de.prod_code)
 WHERE o.orders_code = ? AND de.delivery_code = ?;
+JOIN company c ON (m.company_code = c.company_code)  -- 조인 추가
 `
 module.exports = {
   deliveryAdd,
