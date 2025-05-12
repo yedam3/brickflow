@@ -35,6 +35,7 @@ let sessionSettion = session({
 // 라우팅 등록 영역
 const salesRouter = require("./routers/salesrouter/sales_router.js");
 const deliveryRouter = require("./routers/salesrouter/delivery_router.js");
+const returnRouter = require("./routers/salesrouter/return_router.js");
 
 const workRouters = require("./routers/workRouter/work_routers.js");
 const matRouter = require("./routers/matRouter/mat_router.js");
@@ -69,6 +70,7 @@ app.use(cors());
 // 라우터 모듈 등록
 app.use("/sales", salesRouter);
 app.use("/sales", deliveryRouter);
+app.use("/sales", returnRouter);
 
 app.use("/mat", matRouter);
 app.use("/work", workRouters);

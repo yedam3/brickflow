@@ -1,6 +1,4 @@
 
-
-
 //출고 가능 수량그리드에 조회
 const prodcheck = `
 SELECT SUM(inbound_quantity) - SUM(dispatch_quantity) as delivery_before_quantity,
@@ -93,20 +91,21 @@ WHERE orders_code = ? `
 
 //모달
 const deliveryModal = `
-  SELECT m.delivery_code,
-    delivery_name,
-    CONCAT(
-      getProdName(prod_code),
-      CASE WHEN COUNT(prod_code) > 1 THEN CONCAT(' 외 ', COUNT(DISTINCT prod_code) - 1, '건') ELSE ''
-      END
-    ) AS prod_name,
-    orders_code,
-    employee_code,
-    company_code,
-    delivery_date
-  FROM delivery_manage m 
-  JOIN delivery_manage_detail d ON(m.delivery_code = d.delivery_code)
-GROUP BY delivery_code
+   SELECT m.delivery_code,
+     delivery_name,
+     CONCAT(
+       getProdName(prod_code),
+       CASE WHEN COUNT(prod_code) > 1 THEN CONCAT(' 외 ', COUNT(DISTINCT prod_code) - 1, '건') ELSE ''
+       END
+     ) AS prod_name,
+     orders_code,
+     employee_code,
+     company_code,
+     getcomName(company_code) AS company_name,
+     delivery_date
+   FROM delivery_manage m
+   JOIN delivery_manage_detail d ON(m.delivery_code = d.delivery_code)
+   GROUP BY delivery_code
   `
 const deliveryDetailRender = `
 SELECT orders_detail_code, o.orders_code, quantity AS delivery_demand,delivery_quantity,
@@ -114,8 +113,9 @@ SELECT orders_detail_code, o.orders_code, quantity AS delivery_demand,delivery_q
   quantity - (SELECT IFNULL(SUM(delivery_quantity), 0) FROM delivery_manage_detail d JOIN delivery_manage m ON(d.delivery_code = m.delivery_code) WHERE orders_code = o.orders_code AND prod_code = o.prod_code) AS yetdelivery, price, note, o.prod_code, getProdName(o.prod_code) AS prod_name, finish_status, delivery_detail_code
 FROM order_detail o JOIN delivery_manage d ON(o.orders_code = d.orders_code)
 JOIN delivery_manage_detail de ON(de.delivery_code = d.delivery_code AND o.prod_code = de.prod_code)
-WHERE o.orders_code = ? AND de.delivery_code = ?;
-JOIN company c ON (m.company_code = c.company_code)  -- 조인 추가
+JOIN company c ON(d.company_code = c.company_code)
+WHERE o.orders_code = ? AND de.delivery_code = ?
+  -- 조인 추가
 `
 module.exports = {
   deliveryAdd,

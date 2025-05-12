@@ -62,7 +62,7 @@ export default {
         { field: "delivery_code", headerName: "출고번호", flex: 1 },
         { field: "delivery_name", headerName: "출고명", flex: 1 },
         { field: "delivery_date", headerName: "출고일자", flex: 1 },
-        { field: "company_code", headerName: "업체명", flex: 1 },
+        { field: "company_name", headerName: "업체명", flex: 1 },
         { field: "prod_name", headerName: "제품명", flex: 2 },
       ],
       gridOptions: {
