@@ -241,10 +241,10 @@ export default{
          return;
        });
        this.rowData2 = [{
-                         mat_code: "",
-                         prod_name: "",
-                         mat_name: "",
-                         quantity: "",
+                          prod_code: "",
+                          prod_name: "",
+                          process_code: "",
+                          process_name: "",
                        }];
        this.ProcData();
    },

@@ -31,7 +31,8 @@
       @cellValueChanged="testChange"
       rowSelection="multiple"
      :defaultColDef="defaultColDef2"
-     :pinnedBottomRowData="bottomRow">
+      @grid-ready="onSecondGridReady"
+      :pinnedBottomRowData="bottomRow">
    </ag-grid-vue>
    </div>
  </div>
@@ -129,14 +130,20 @@ export default{
         event.api.sizeColumnsToFit();
        },
      },
-     pinnedBottomRowData: [
-      {check_list: '합계', work_lot: null, prod_code: null, prod_name: null, check_list: null, pass_quantity: null, error_quantity: 0}
-     ]
+    
     },
     //상세그리드 행 인덱스
     selectedSecondIndex: null,
     prodIndex : null,
-    firstIndex : null
+    firstIndex : null,
+    bottomRow: [{
+                  work_lot: '합계',
+                  prod_code: null,
+                  prod_name: null,
+                  check_list: null,
+                  pass_quantity: null,
+                  error_quantity: null
+                }]
    };
  },
  mounted() {
@@ -144,11 +151,14 @@ export default{
  },
  
  methods: {
+  onSecondGridReady(params) {
+     this.gridOptions2.api = params.api;
+  },
    async prodcheckData() {
      try {
        const response = await axios.get('/api/qual/prodcheck');
        this.rowData = response.data;
-       console.log('값나와라',response.data);
+       this.rowData = [...this.rowData]
      } catch (err) {
        console.error('데이터 조회 실패:', err);
     }
@@ -180,7 +190,7 @@ export default{
       for(let value of this.rowData2){
         sum += Number(value.error_quantity);
       }
-      console.log(sum)
+
        if(sum > Number(this.rowData[this.firstIndex].quantity)){
         Swal.fire({
             title: '실패',
@@ -191,22 +201,98 @@ export default{
         this.rowData2[rowIndex].error_quantity = 0;
         this.rowData2 = [...this.rowData2]
       }
-      let bottomsum= [{
+      this.bottomRow= [{
                   work_lot: '합계',
                   prod_code: null,
                   prod_name: null,
                   check_list: null,
-                  pass_quantity: null,
-                  error_quantity: this.rowData2.reduce((prev, next) => {prev + Number(next.error_quantity)})
+                  error_quantity: this.rowData2.reduce((prev, next) => { return prev + Number(next.error_quantity)},0),
+                  pass_quantity: Number(this.rowData[this.firstIndex].quantity) -  this.rowData2.reduce((prev,next) => {return prev + Number(next.error_quantity)},0),
                 }]
             
-      console.log(bottomsum);
-
-    this.gridOptions.api.setpinnedBottomRowData(bottomsum);
     this.rowData2 = [...this.rowData2]
     } ,
 
-
+    //저장
+    async prodCheckSave(){
+  
+      for(let data of this.rowData2) {
+        if(data.work_lot == '' || data.prod_code == '' || data.prod_name == '' || data.check_list == ''  || data.error_quantity == ''){
+          Swal.fire({
+           title: '실패',
+           text: '값을 다 입력해주세요',
+           icon: 'error',
+           confirmButtonText: '확인'
+        });
+        return;
+       }
+      }
+      const res = await axios.post('/api/qual/prodchecksave', {
+        insertErrorCheck :this.bottomRow,
+        insertProdCheck: this.rowData2,
+      })
+        .then(res => {
+          if(res.data.affectedRows > 0) {
+            Swal.fire({
+             title: '등록 성공',
+             text: '정상적으로 등록이 완료되었습니다.',
+             icon: 'success',
+             confirmButtonText: '확인'
+            });
+          } else {
+            Swal.fire({
+             title: '등록 실패',
+             text: '등록이 실패하였습니다..',
+             icon: 'error',
+             confirmButtonText: '확인'
+           });
+           return;
+          }
+        })
+        .catch(error => {
+         console.error(error);
+         Swal.fire({
+           title: '등록 실패',
+           text: '알수 없는 오류가 발생하였습니다..',
+           icon: 'error',
+           confirmButtonText: '확인'
+         });
+         return;
+       });
+       this.rowData2 = [{
+                          work_lot: "",
+                          prod_check_code: "",
+                          prod_code: "",
+                          prod_name: "",
+                          check_list: "부품 누락",
+                          pass_quantity: "",
+                          error_quantity: "",
+                        },
+                        {
+                          work_lot: "",
+                          prod_check_code: "",
+                          prod_code: "",
+                          prod_name: "",
+                          check_list: "외관",
+                          pass_quantity: "",
+                          error_quantity: "",
+                        },
+                        {
+                          work_lot: "",
+                          prod_check_code: "",
+                          prod_code: "",
+                          prod_name: "",
+                          check_list: "포장상태",
+                          pass_quantity: "",
+                          error_quantity: "",
+                        }];
+     await this.prodcheckData();
+      this.rowData = [...this.rowData]
+    },
+    //초기화
+   resetList(){
+     this.rowData2 = [];
+   }
  },
 };
  

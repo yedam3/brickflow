@@ -73,67 +73,67 @@ const router = createRouter({
 //to  사용자가 이동하려는 페이지정보
 //from 사용자가 이동하기 전의 페이지 정보
 //next() 다음페이지로 이동하게하는 함수 
-router.beforeEach(async (to, from, next) => {
-    const store = useUserStore();
-    //로그인 없이 접근 가능한 URL 목록을 지정한 배열
-    const publicPages = ['/auth/login','/error'];
-    // 사용자가 이동하려는 URL가  비로그인 허용된 페이지인지 확인
-    const authRequired = !publicPages.includes(to.path);
-    // 새로고침했을 때 세션으로 복구
-    if (!store.id) {
-      try {
-        const res = await axios.get('/api/session');
-        if (res.data.isLogin) {
-          store.setUser({
-            id: res.data.id,
-            empName: res.data.empName,
-            dep: res.data.dep
-          });
-        }
-      } catch (e) {
-        console.log(e)
-      }
-    }
+// router.beforeEach(async (to, from, next) => {
+//     const store = useUserStore();
+//     //로그인 없이 접근 가능한 URL 목록을 지정한 배열
+//     const publicPages = ['/auth/login','/error'];
+//     // 사용자가 이동하려는 URL가  비로그인 허용된 페이지인지 확인
+//     const authRequired = !publicPages.includes(to.path);
+//     // 새로고침했을 때 세션으로 복구
+//     if (!store.id) {
+//       try {
+//         const res = await axios.get('/api/session');
+//         if (res.data.isLogin) {
+//           store.setUser({
+//             id: res.data.id,
+//             empName: res.data.empName,
+//             dep: res.data.dep
+//           });
+//         }
+//       } catch (e) {
+//         console.log(e)
+//       }
+//     }
   
-    //로그인 하지 않았는데 접속을 할려 하면 로그인 페이지로 이동
-    if (authRequired && !store.isLogin) {
-     return next('/auth/login');
-    }
-    //부서 권한 설정
-    //startWith /admin으로 시작하는 맞으면 TRUE 아니면 FALSE
-    if (to.path.startsWith('/admin') && store.dep !== '관리자') {
-      if(store.dep !== '관리자'){
-        return next('/error');
-       }
-      }
-      if (to.path.startsWith('/mat') && store.dep !== '자재') {
-        if(store.dep !== '관리자'){
-        return next('/error');
-       }
-      }
-      if(to.path.startsWith('/work') && store.dep !== '생산'){
-        if(store.dep !== '관리자'){
-          return next('/error');
-         }
-      }
-      if(to.path.startsWith('/qual') && store.dep !== '품질'){
-        if(store.dep !== '관리자'){
-          return next('/error');
-         }
-      }
-      if(to.path.startsWith('/fac') && store.dep !== '설비'){
-        if(store.dep !== '관리자'){
-          return next('/error');
-         }
-      }
-      if(to.path.startsWith('/seller') && store.dep !== '영업'){
-        if(store.dep !== '관리자'){
-          return next('/error');
-         }
-      }
+//     //로그인 하지 않았는데 접속을 할려 하면 로그인 페이지로 이동
+//     if (authRequired && !store.isLogin) {
+//      return next('/auth/login');
+//     }
+//     //부서 권한 설정
+//     //startWith /admin으로 시작하는 맞으면 TRUE 아니면 FALSE
+//     if (to.path.startsWith('/admin') && store.dep !== '관리자') {
+//       if(store.dep !== '관리자'){
+//         return next('/error');
+//        }
+//       }
+//       if (to.path.startsWith('/mat') && store.dep !== '자재') {
+//         if(store.dep !== '관리자'){
+//         return next('/error');
+//        }
+//       }
+//       if(to.path.startsWith('/work') && store.dep !== '생산'){
+//         if(store.dep !== '관리자'){
+//           return next('/error');
+//          }
+//       }
+//       if(to.path.startsWith('/qual') && store.dep !== '품질'){
+//         if(store.dep !== '관리자'){
+//           return next('/error');
+//          }
+//       }
+//       if(to.path.startsWith('/fac') && store.dep !== '설비'){
+//         if(store.dep !== '관리자'){
+//           return next('/error');
+//          }
+//       }
+//       if(to.path.startsWith('/seller') && store.dep !== '영업'){
+//         if(store.dep !== '관리자'){
+//           return next('/error');
+//          }
+//       }
     
-      // 모든 조건 통과 시 이동
-      next();
-  });
+//       // 모든 조건 통과 시 이동
+//       next();
+//   });
 
 export default router;
