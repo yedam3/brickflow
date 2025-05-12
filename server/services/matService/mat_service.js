@@ -94,7 +94,7 @@ const orderDetailRender = async (orderCode) => {
 }
 //값중복확인
 const orderCheck = async (orderCode) => {
-  let list = await mariaDB.query('addCheck',orderCode)
+  let list = await mariaDB.query('matAddCheck',orderCode)
   return list;
 }
 
