@@ -50,10 +50,6 @@
           <label class="form-label">시작일시</label>
           <input type="datetime-local" class="form-control" v-model="rowData.unplay_start_date" />
         </div>
-        <div class="col-md-3">
-          <label class="form-label">종료일시</label>
-          <input type="datetime-local" class="form-control" v-model="rowData.unplay_end_date" />
-        </div>
         <div class="col-md-6">
           <label class="form-label">비고</label>
           <textarea class="form-control" rows="3" v-model="rowData.note"></textarea>
@@ -125,7 +121,7 @@ export default {
                         } else if (params.value == 'NR3') {
                             return params.value = '도장';
                         } else if (params.value == 'NR4') {
-                            return params.value = '포장 설비';
+                            return params.value = '기기 사용중';
                         } 
                     }
                 },
@@ -169,25 +165,6 @@ export default {
         this.unFacList();
         this.reasonFac();
 
-        this.columnDefs = [
-        { field: "fac_code", headerName: "설비코드", flex: 3 },
-        { field: "unplay_code", headerName: "비가동설비코드", flex: 3 },
-        { field: "unplay_reason_code", headerName: "비가동사유코드", flex: 3 },
-        { field: "employee_code", headerName: "담당자", flex: 3 },
-        {
-            field: "unplay_start_date",
-            headerName: "비가동시작일시",
-            flex: 3,
-            valueFormatter: this.dateFormatter,
-        },
-        {
-            field: "unplay_end_date",
-            headerName: "비가동종료일시",
-            flex: 3,
-            valueFormatter: this.dateFormatter,
-        },
-        { field: "note", headerName: "비고", flex: 3 },
-    ];
     },
     methods: {
         dateFormatter(params) {
@@ -318,61 +295,37 @@ export default {
             this.autoUnCode();
         },
         // 가동처리
-        updatePlay() {
-            if (!this.rowData.unplay_end_date) {
-                Swal.fire({
-                    title: '오류',
-                    text: '종료일시가 입력되지 않았습니다.',
-                    icon: 'warning',
-                    confirmButtonText: '확인'
-                });
-                return;
-            }
-            axios.put('/api/fac/updateList', {
+        async updatePlay() {
+            const now = new Date();
+            const formatted = moment(now).format("YYYY-MM-DD HH:mm");
+
+            this.rowData.unplay_end_date = formatted;  // 화면용 표시
+
+            const res = await axios.put('/api/fac/updateList', {
                 facCode: this.rowData.fac_code,
                 facStatus: "FS1"
-            })
-                .then(res => {
-                    if (res.data.affectedRows > 0) {
-                        Swal.fire({
-                            title: '가동처리 완료',
-                            text: '가동처리가 완료되었습니다.',
-                            icon: 'success',
-                            confirmButtonText: '확인'
-                        }).then(() => {
-                            this.unFacList(); 
-                     
-                        });
+            }).catch(err => {
+                console.error(err);
+                Swal.fire("가동처리 실패", "알 수 없는 오류가 발생했습니다.", "error");
+                return null;
+            });
 
-                        this.rowData = {
-                            unplay_reason_code: "",
-                            employee_code: "",
-                            unplay_start_date: "",
-                            unplay_end_date: "",
-                            note: "",
-                            fac_code: '',
-                        };
-                    } else {
-                        Swal.fire({
-                            title: '가동처리 실패',
-                            text: '가동처리를 실패하였습니다.',
-                            icon: 'error',
-                            confirmButtonText: '확인'
-                        });
-                    }
-                })
-                .catch(err => {
-                    console.error(err);
-                    Swal.fire({
-                        title: '가동처리 실패',
-                        text: '알 수 없는 에러.',
-                        icon: 'error',
-                        confirmButtonText: '확인'
+            if (res && res.data.affectedRows > 0) {
+                Swal.fire("가동처리 완료", "가동처리가 완료되었습니다.", "success")
+                    .then(async () => {
+                        await this.unFacList();  // ✅ 반드시 갱신해서 최신 데이터 반영
                     });
-                })
-                .finally(() => {
-                    this.autoUnCode();
-                });
+
+                this.rowData = {
+                    unplay_code: "",
+                    unplay_reason_code: "",
+                    employee_code: "",
+                    unplay_start_date: "",
+                    unplay_end_date: formatted,
+                    note: "",
+                    fac_code: ''
+                };
+            }
         },
 
 
