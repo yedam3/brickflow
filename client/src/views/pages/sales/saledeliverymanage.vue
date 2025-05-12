@@ -112,7 +112,7 @@ export default {
                 { field: "delivery_demand", headerName: "요구량", flex: 2, cellStyle: { textAlign: "center" } },
                 { field: "alreadydelivery", headerName: "기납기량", flex: 2, cellStyle: { textAlign: "center" } },
                 { field: "yetdelivery", headerName: "미납기량", flex: 2, editable: true, cellStyle: { textAlign: "center" } },
-                { field: "delivery_quantity", headerName: "출고량", flex: 2, editable: true, cellStyle: { textAlign: "center" } },
+                { field: "delivery_quantity", headerName: "출고량", flex: 2, cellStyle: { textAlign: "center" } },
             ],
             throwData: [],
             thColumnDefs: [
@@ -152,7 +152,6 @@ export default {
             this.rowData[0].company_code = com.company_code;
             this.rowData[0].company_name = com.company_name;
             // 새 배열로 설정하여 AG Grid가 반영하게 만듬
-            this.rowData = [...this.rowData];
         },
 
         // 출고 모달창
@@ -234,6 +233,7 @@ export default {
                             delivery_demand: data.delivery_demand,
                             alreadydelivery: data.alreadydelivery,
                             yetdelivery: data.yetdelivery,
+                            delivery_quantity: 0,
                         })
                     }
                     this.throwData = [];
@@ -289,7 +289,8 @@ export default {
                 alert("ff");
                 return;
             }
-            //등록 
+            console.log(this.serowData)
+            // 등록 
             axios.post('/api/sales/deliveryAdd', {
                 delivery: this.rowData[0],
                 deliveryDetail: this.serowData
@@ -437,15 +438,8 @@ export default {
                 order_name: '',
                 company_name: '',
             }];
-            this.serowData = [
-                {
-                prod_code: '',
-                prod_name: '',
-                delivery_demand: '',
-                alreadydelivery: '',
-                proyetdeliveryd_code: '',
-                delivery_quantity: '',
-                }];
+            this.serowData = [];
+            this.throwData = [];
         },
         // 삭제
         async deliveryDelete() { 

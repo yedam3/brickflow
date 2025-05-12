@@ -59,14 +59,8 @@ router.delete('/deliveryDelete/:delivery_code', async (req, res) => {
 
 //출고 모달창
 router.get('/deliveryModal', async (req, res) => {
-   const {
-     type,
-     keyword
-   } = req.query; // comList?type=값&keyword=값
-   let deliveryList = await deliveryService.deliveryList({
-       type,
-       keyword
-     })
+   const {type,keyword} = req.query; // comList?type=값&keyword=값
+   let deliveryList = await deliveryService.deliveryList({type,keyword})
      .catch((err) => console.log(err));
    res.send(deliveryList);
 })

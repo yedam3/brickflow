@@ -27,7 +27,8 @@ const orderinfochoice =
         , orders_date
         , del_date
         , employee_code
-        , company_code, getComName(company_code) AS company_name
+        , company_code
+        , getComName(company_code) AS company_name
         , note
   FROM orders
   WHERE orders_code = ? `;

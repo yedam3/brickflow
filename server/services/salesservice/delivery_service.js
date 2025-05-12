@@ -73,20 +73,19 @@ const deliveryAdd = async (delivery, deliveryDetail) => {
     let result = await mariaDB.query('deliveryAdd', [
         delivery.delivery_code,
         delivery.orders_code,
-        delivery.company_name,
+        delivery.company_code,
         delivery.employee_code,
         delivery.delivery_name
        
     ])
         .catch((err) => console.log(err));
-    if (result.affectedRows < 1) {
-        return result;
-    }
-    
-    console.log(deliveryDetail);
+
 
     for (let detail of deliveryDetail) {
+        if (Number(detail.delivery_quantity) > 0) {
+            console.log('예담')
         for (let data of detail.lotList) {
+            
             delivery.delivery_detail_code = (await mariaDB.query('deliveryAutoDetailOrder'))[0].code; // 출고코드 자동생성
             console.log(data);
 
@@ -110,6 +109,7 @@ const deliveryAdd = async (delivery, deliveryDetail) => {
             ]
             result = await mariaDB.query('addStoreProd', info)
                                     .catch((err) => console.log(err));
+            }
         }
     }
    
@@ -129,20 +129,25 @@ const deliveryAdd = async (delivery, deliveryDetail) => {
     return result;
 }
 
+
 //수정
 const modifydelivery = async (delivery,deliveryDetail) => {
 
     let result = await mariaDB.query('deliveryUpdate', [delivery.delivery_name,delivery.company_code,delivery.delivery_code ])
     .catch((err) => console.log(err));
-    if (result.affectedRows < 1) { // affectedRows ; 행의 수를 반환
-    return result;
-    }
+    // if (result.affectedRows < 1) { // affectedRows ; 행의 수를 반환
+    // return result;
+    // }
     console.log(deliveryDetail)
-    for(let detail of deliveryDetail){
+    for (let detail of deliveryDetail) {
+        if (Number(detail.delivery_quantity) > 0) {
+            console.log('DD')
         result = await mariaDB.query('deliveryDetailUpdate', [detail.delivery_quantity,detail.delivery_detail_code])
-            .catch((err)=> console.log(err));
-
-        
+                .catch((err) => console.log(err));  
+               
+            result = await mariaDB.query('storageDeliveryUpdate', [detail.delivery_quantity, detail.prod_LOT, detail.delivery_detail_code])
+                .catch((err) => console.log(err));
+        }
     }
     //상태값 변경
     for (let value of deliveryDetail) { 
@@ -152,7 +157,7 @@ const modifydelivery = async (delivery,deliveryDetail) => {
     }
     if (deliveryDetail.every(info => Number(info.yetdelivery) == Number(info.delivery_quantity))) {
         await mariaDB.query('deliveryStatus', ['OS4', delivery.orders_code])
-    } else { 
+    } else {    
         await mariaDB.query('deliveryStatus', ['OS3', delivery.orders_code])
     }
     
@@ -181,6 +186,7 @@ const deliveryDetailRender = async (ordersCode,delivery_code) => {
         .catch(err => console.log(err));
     return result;
 }
+
 
 module.exports = {
     findMainOrders,
