@@ -100,6 +100,9 @@ const insertPlan = async (planData, planDetailData) => {
     newPlanData.start_date = dateFormat(new Date(newPlanData.start_date));
     newPlanData.end_date = dateFormat(new Date(newPlanData.end_date));
 
+    // 생산 필드
+    const plan_fields = ["plan_code", "orders_code", "plan_name", "employee_code", "start_date", "end_date", "note"]
+
     // 생산 계획 상세
     const planDetailFields = ["plan_code", "currentPlanQty", "prod_code"];
     let result;
@@ -108,8 +111,8 @@ const insertPlan = async (planData, planDetailData) => {
         await conn.beginTransaction();
 
         // 생산 계획 등록
-        let selectedQuery = mariaDB.selectedQuery("insertPlan", Object.values(newPlanData));
-        result = await conn.query(selectedQuery, Object.values(newPlanData));
+        let selectedQuery = mariaDB.selectedQuery("insertPlan", convertObjToAry(newPlanData, plan_fields));
+        result = await conn.query(selectedQuery, convertObjToAry(newPlanData, plan_fields));
         
         // 생산 계획 상세 등록
         for (let data of planDetailData) {
@@ -123,21 +126,24 @@ const insertPlan = async (planData, planDetailData) => {
             result = await conn.query(selectedQuery, Object.values(newPlanDetailData));
         }
 
-        // 주문 상태 변경 (생산중)
-        let data = ["OS2", newPlanData.orders_code];
-        selectedQuery = mariaDB.selectedQuery("updateOrdersByOrders_code", data);
-        result = await conn.query(selectedQuery, data);
+        if(newPlanData.orders_code) {
+            // 주문 상태 변경 (생산중)
+            let data = ["OS2", newPlanData.orders_code];
+            selectedQuery = mariaDB.selectedQuery("updateOrdersByOrders_code", data);
+            result = await conn.query(selectedQuery, data);
 
-        // 주문 상세 목록 조회 (orders_code)
-        selectedQuery = mariaDB.selectedQuery("findAllOrder_detailByOrders_code", newPlanData.orders_code);
-        result = await conn.query(selectedQuery, newPlanData.orders_code);
+            // 주문 상세 목록 조회 (orders_code)
+            selectedQuery = mariaDB.selectedQuery("findAllOrder_detailByOrders_code", newPlanData.orders_code);
+            result = await conn.query(selectedQuery, newPlanData.orders_code);
 
-        // 주문 상세 상태 변경
-        for(let orderDetailData of result) {
-            const orderDetailStatus = ["OS2" , orderDetailData.orders_detail_code]
-            selectedQuery = mariaDB.selectedQuery("updateOrderDetailByOrders_code", orderDetailStatus);
-            result = await conn.query(selectedQuery, orderDetailStatus);
+            // 주문 상세 상태 변경
+            for (let orderDetailData of result) {
+                const orderDetailStatus = ["OS2", orderDetailData.orders_detail_code]
+                selectedQuery = mariaDB.selectedQuery("updateOrderDetailByOrders_code", orderDetailStatus);
+                result = await conn.query(selectedQuery, orderDetailStatus);
+            }
         }
+        
         
         await conn.commit();    
     }catch(err){

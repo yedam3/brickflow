@@ -215,11 +215,38 @@ export default {
             ],
             prodListDefs: [
                 { checkboxSelection: true, width: 50 },
-                { field: "prod_code", headerName: "제품코드", flex: 1.5, cellStyle: { textAlign: "center" } },
-                { field: "prod_name", headerName: "제품명", flex: 2.5, cellStyle: { textAlign: "center" } },
+                { 
+                    field: "prod_code", headerName: "제품코드", flex: 1.5,
+                    cellStyle: params => {
+                        if (!params.data.prod_code) {
+                            return { textAlign: "center", backgroundColor: '#d9f2ff !important' };
+                        } else {
+                            return { textAlign: "center" };
+                        }
+                    }
+                },
+                { 
+                    field: "prod_name", headerName: "제품명", flex: 2.5,
+                    cellStyle: params => {
+                        if (!params.data.prod_code) {
+                            return { textAlign: "center", backgroundColor: '#d9f2ff !important' };
+                        } else {
+                            return { textAlign: "center" };
+                        }
+                    }
+                },
                 { field: "plan_quantity", headerName: "지시수량", flex: 1.5, cellStyle: { textAlign: "center" } },
                 { field: "priority", headerName: "우선순위", flex: 1.5, cellStyle: { textAlign: "center" } },
-                { field: "order_quantity", headerName: "주문량", flex: 1, editable: true, cellStyle: { textAlign: "center" } },
+                { 
+                    field: "order_quantity", headerName: "주문량", flex: 1, editable: true,
+                    cellStyle: params => {
+                        if ((params.data.prod_code)) {
+                            return { textAlign: "center", backgroundColor: '#d9f2ff !important' };
+                        } else {
+                            return { textAlign: "center" };
+                        }
+                    }
+                },
             ],
             matHoldListDefs: [
                 { field: "prod_code", headerName: "제품코드", flex: 2, cellStyle: { textAlign: "center" } },
@@ -498,7 +525,15 @@ export default {
                 orderData: orderData,
                 orderDetailDataList: this.rowData,
                 matHoldDataList: this.secondRowData,
-            }).catch((err) => console.error(err));
+            }).catch((err) => {
+                console.error(err);
+                Swal.fire({
+                    title: '실패',
+                    text: '생산 지시 등록 중 오류가 발생되었습니다.',
+                    icon: 'error',
+                    confirmButtonText: '확인'
+                });
+            });
             if (result.data.affectedRows > 0) {
                 Swal.fire({
                     title: '성공',
@@ -508,9 +543,9 @@ export default {
                 });
             } else {
                 Swal.fire({
-                    title: '실패',
-                    text: '생산 지시 등록 중 오류가 발생되었습니다.',
-                    icon: 'error',
+                    title: '경고',
+                    text: '생산 지시 등록 과정에서 오류가 발생했습니다.',
+                    icon: 'warning',
                     confirmButtonText: '확인'
                 });
             }
@@ -592,7 +627,7 @@ export default {
 
         // 제품 명 제품 코드 선택 시 모달창 열기
         prodCellClicked(params) {
-            if((params.colDef.field == "prod_code" || params.colDef.field == "prod_name")) {
+            if((params.colDef.field == "prod_code" || params.colDef.field == "prod_name") && (this.formData.plan_code === "")) {
                 this.selectedProdIndex = params.rowIndex;
                 this.showProdModal = true;
             }
@@ -639,9 +674,9 @@ export default {
 
         // Insert Vaildation
         insertVaildation() {
-            if( this.formData.product_order_name == '' || 
+            if (this.formData.product_order_name == '' ||
                 this.formData.start_date == '' ||
-                this.formData.end_date == '' ) {
+                this.formData.end_date == '') {
                 Swal.fire({
                     title: '실패',
                     text: '모든 항목을 입력해주세요',
@@ -649,9 +684,9 @@ export default {
                     confirmButtonText: '확인'
                 });
                 return 1;
-            }
-            for(let data of this.rowData) {
-                if(data.req_material_quantity < data.material_input_qunatity) {
+            };
+            for (let data of this.rowData) {
+                if (data.req_material_quantity < data.material_input_qunatity) {
                     Swal.fire({
                         title: '실패',
                         text: '투입량이 요구량보다 적습니다.',
@@ -660,6 +695,28 @@ export default {
                     });
                     return 1;
                 }
+            };
+            if(this.secondRowData.length > 0) {
+                for (let data of this.secondRowData) {
+                    console.log(data);
+                    if (!(Array.isArray(data.mat_LOTs))) {
+                        Swal.fire({
+                            title: '실패',
+                            text: '자재 홀드 수량이 올바르지 않습니다.',
+                            icon: 'error',
+                            confirmButtonText: '확인'
+                        });
+                        return 1;
+                    }
+                };
+            } else {
+                Swal.fire({
+                    title: '실패',
+                    text: '자재 홀드 데이터가 올바르지 않습니다.',
+                    icon: 'error',
+                    confirmButtonText: '확인'
+                });
+                return 1;
             }
         },
 

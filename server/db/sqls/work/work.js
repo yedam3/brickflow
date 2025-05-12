@@ -153,7 +153,7 @@ VALUES (?, ?, ?, ?, ?, ?, 'OC1', ?)
 const insertPlanDetail = `
 INSERT INTO plan_detail (plan_detail_code, plan_code, plan_quantity, prod_code)
 SELECT 
-  CONCAT('PD-', LPAD(SUBSTRING(IFNULL(MAX(plan_detail_code), 'PD-000'), 4) + 1, 3, '0')),
+  CONCAT('PD-',IFNULL(MAX(CAST(SUBSTR(plan_detail_code,4) AS SIGNED)),100)+1),
   ?, ?, ?
 FROM plan_detail
 `;
