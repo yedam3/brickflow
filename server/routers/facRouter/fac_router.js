@@ -2,7 +2,40 @@ const express = require("express");
 const router = express.Router();
 const facService = require("../../services/facService/fac_service.js");
 
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
+const { runInContext } = require("lodash");
 
+
+// 이미지 저장 경로
+const uploadDir = path.join(__dirname, "../../uploads/facImages");
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+// multer 설정
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, uploadDir),
+  filename: (req, file, cb) => {
+    const uniqueName = Date.now() + "-" + Math.round(Math.random() * 1e9) + path.extname(file.originalname);
+    cb(null, uniqueName);
+  }
+});
+const upload = multer({ storage });
+
+// 이미지 업로드 라우터
+router.post("/uploadImage", upload.single("image"), (req, res) => {
+    if (!req.file) {
+      return res.status(400).json({ message: "파일이 없습니다." });
+    }
+  
+    //파일명만 저장
+    const fileName = req.file.filename;
+  
+    // 클라이언트에 응답할 때는 파일명만 전달
+    res.status(200).json({ fileName });
+});
 //자동증가
 router.get("/autoUnCode", async (req, res) => {
     let autoUnCode = await facService.autoUnCode().catch((err)=> console.log(err));
@@ -50,7 +83,12 @@ router.post("/repaireFac", async (req,res)=>{
     res.send(result);
 
 });
-
+//설비 수정
+router.put("/updateFac", async(req, res)=> {
+    const {facCode} = req.body;
+    let result = await facService.updateFac(facCode).catch((err) => console.log(err));
+    res.send(result);
+})
 //비가동설비 수정
 router.put("/modifyUnplay", async(req, res)=>{
     const {unplayFac} = req.body;
@@ -101,6 +139,7 @@ router.get ('/repList', async (req,res)=>{
 router.get('/facStatus', async (req, res)=>{
     const { type, keyword} = req.query;
     let list = await facService.statuFac({ type, keyword}).catch((err) => console.log(err));
+
     res.send(list);
 })
 
@@ -129,6 +168,7 @@ router.get('/facPattern', async(req, res) => {
 router.get('/repaireList', async(req, res)=>{
     const { type, keyword} = req.query;
     let list = await facService.repaireList({type, keyword}).catch((err)=> console.log(err));
+
     res.send(list);
 })
 

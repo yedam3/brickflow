@@ -1,8 +1,8 @@
 const { keyword } = require("color-convert");
 const mariaDB = require("../../db/mapper.js");
-const { findAllWorkDetailByProduct_order_code } = require("../../db/sqlList.js");
 const { updateUnplay } = require("../../db/sqls/fac/fac.js");
 const { dateFormat,convertObjToAry } = require("../../utils/converts.js");
+
 
 // 자동 matcode 증가
 const autoUnCode = async() => {
@@ -45,6 +45,7 @@ const unplayAll = async (unplayCode) => {
 const facListAll = async (facCode) => {
   let list = await mariaDB.query("selectFacList", facCode);
   return list;
+
 }
 
 //설비상태확인
@@ -79,14 +80,51 @@ const addFac = async (facCode)=> {
 
   return resInfo;
 }
+const facService = {
+  // 이미지 경로 저장
+  saveImagePath: (filePath) => {
+    return db.query(facSql.saveImagePath, [filePath]);
+  },
+
+  // 또는 이미지 갱신 (fac_code로 업데이트)
+  updateImagePath: (filePath, facCode) => {
+    return db.query(facSql.updateImagePath, [filePath, facCode]);
+  },
+}
 
 //수리 처리
 const repaireFac = async (repaireFac) => {
-  let insertColumns = ['repaire_code', 'note','repaire_add_date','repaire_finish_date','employee_code','fac_code','fac_history','break_status','fac_result',];
-  let data = convertObjToAry(repaireFac, insertColumns);
-  let resInfo = await mariaDB.query("repaireFac", data).catch(err => console.log(err));
+  const result = await mariaDB.query("autoReCode", {});
+  const repaireCodeList = convertObjToAry(result);
 
-  return resInfo;
+  if (!repaireCodeList.length) {
+    throw new Error("수리코드 생성에 실패했습니다.");
+  }
+
+  const repaireCode = repaireCodeList[0].repaire_code;
+
+  const param = [
+    repaireCode,
+    repaireFacData.note,
+    repaireFacData.repaire_add_date,
+    repaireFacData.repaire_finish_date,
+    repaireFacData.employee_code,
+    repaireFacData.fac_code,
+    repaireFacData.fac_history,
+    repaireFacData.break_status,
+    repaireFacData.fac_result,
+  ];
+
+  return await mariaDB.query("repaireFac", param);
+}
+//설비수정
+const updateFac = async (Info)=> {
+  let updateFac = [Info, Info.fac_code]
+  let result = await mariaDB.query('updateFac', updateFac).catch((err)=> console.log(err))
+  if(result.affectedRows < 1){
+    return result;
+  }
+  return result;
 }
 //비가동 설비 수정
 const modifyUnplay = async (unplayInfo)=> {
@@ -118,6 +156,7 @@ const unFacCheck = async (unplayCode) => {
 //   }
 //   return result;
 // }
+
 //비가동사유
 const reason = async() =>{
   let list = await mariaDB.query('reasonFac');
@@ -196,4 +235,6 @@ module.exports = {
   facListAll,
   addFac,
   facPattern,
+  updateFac,
+  facService,
 }

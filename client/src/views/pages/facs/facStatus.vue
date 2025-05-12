@@ -24,7 +24,7 @@
         </ag-grid-vue>
       </div>
     </div>
-  </div>
+    </div>
 </template>
 
 <script>
@@ -61,7 +61,7 @@
               }
               return null;
             }},
-      ],
+    ],
       gridOptions: {
           domLayout: "autoHeight",
           singleClickEdit: true,
@@ -84,6 +84,7 @@
     await this.facStatus();
     await this.updateList();
     await this.statusFac();
+
   },
   methods:{
     //조회
@@ -93,14 +94,20 @@
           console.log(res.data)
           this.rowData = res.data;
         })
+         .catch(err => {
+            console.error("설비 상태 조회 실패", err);
+        });
     },
     async updateList(){
+      if (!this.rowData.length || !this.rowData[0]) {
+        console.warn("설비 상태 정보가 없습니다.");
+        return;
+      }
       await axios.put('/api/fac/updateList', {
-        params:{
           facCode: this.rowData[0].fac_code,
-          facStatus: this.rowData.fac_status}
+          facStatus: this.rowData[0].fac_status
     });
-      this.facStatus(); 
+       await this.facStatus(); 
     },
     async statusFac() {
       await axios.get('/api/fac/statusFac')
@@ -110,7 +117,8 @@
           this.statusFacAry = [...res.data];
         })
         .catch(err => console.log(err));
-    }
+    },
+
   }
 }
 </script>

@@ -5,9 +5,10 @@ const app = express();
 // 미들웨어 등록 영역
 // 1. body parser
 // content-type : application/x-www-form-urlencoded
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: false , limit: '20mb' }));
 // content-type : application/json
-app.use(express.json());
+app.use(express.json({ limit: '20mb' }));
+
 //세션 이용
 const session =require('express-session');
 //cors 이용
@@ -30,7 +31,7 @@ let sessionSettion = session({
         secure : false,
         //유효기간
         maxAge : 60000
-      }
+    }
 })
 // 라우팅 등록 영역
 const salesRouter = require("./routers/salesrouter/sales_router.js");
@@ -57,6 +58,10 @@ const mainPageRouter = require('./routers/mainRouter/main_router.js');
 
 const loginRoter = require('./routers/loginRouter/login_router.js');
 const prodCheckRouter = require('./routers/qualRouter/prodCheck_router.js');
+
+const path = require('path');
+
+
 
 // 기본 라우팅
 app.get("/", (req, res) => {
@@ -88,7 +93,7 @@ app.use('/label',labelRouter);
 app.use('/main',mainPageRouter);
 app.use('/',loginRoter);
 
-
+app.use('/uploads/facImages', express.static(path.join(__dirname, 'uploads/facImages')));
 
 
 
