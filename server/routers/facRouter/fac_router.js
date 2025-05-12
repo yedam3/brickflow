@@ -3,26 +3,48 @@ const router = express.Router();
 const facService = require("../../services/facService/fac_service.js");
 
 const multer = require("multer");
-const path = require("path");
 const fs = require("fs");
-const { runInContext } = require("lodash");
 
+const path = require("path");
 
-// 이미지 저장 경로
-const uploadDir = path.join(__dirname, "../../uploads/facImages");
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
+// 저장 경로 지정
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      const uploadPath = path.join(__dirname, '../../uploads/facImages');
+      // 폴더가 없으면 생성
+      if (!fs.existsSync(uploadPath)) {
+        fs.mkdirSync(uploadPath, { recursive: true });
+      }
+      cb(null, uploadPath);
+    },
+    filename: (req, file, cb) => {
+        const ext = path.extname(file.originalname);
+        const baseName = path.basename(file.originalname, ext);
+        const originalName = Buffer.from(baseName, 'latin1').toString('utf8');
+        const safeName = originalName.replace(/[^a-zA-Z0-9가-힣_]/g, '').slice(0, 30);
+        const uniqueName = Date.now() + '-' + safeName + ext;
+        cb(null, uniqueName);
+    }
+});
+  
+  
+  const upload = multer({ storage });
+
+// // 이미지 저장 경로
+// const uploadDir = path.join(__dirname, "../../uploads/facImages");
+// if (!fs.existsSync(uploadDir)) {
+//   fs.mkdirSync(uploadDir, { recursive: true });
+// }
 
 // multer 설정
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadDir),
-  filename: (req, file, cb) => {
-    const uniqueName = Date.now() + "-" + Math.round(Math.random() * 1e9) + path.extname(file.originalname);
-    cb(null, uniqueName);
-  }
-});
-const upload = multer({ storage });
+// const storage = multer.diskStorage({
+//   destination: (req, file, cb) => cb(null, uploadDir),
+//   filename: (req, file, cb) => {
+//     const uniqueName = Date.now() + "-" + Math.round(Math.random() * 1e9) + path.extname(file.originalname);
+//     cb(null, uniqueName);
+//   }
+// });
+// const upload = multer({ storage });
 
 // 이미지 업로드 라우터
 router.post("/uploadImage", upload.single("image"), (req, res) => {
@@ -30,12 +52,10 @@ router.post("/uploadImage", upload.single("image"), (req, res) => {
       return res.status(400).json({ message: "파일이 없습니다." });
     }
   
-    //파일명만 저장
     const fileName = req.file.filename;
-  
-    // 클라이언트에 응답할 때는 파일명만 전달
-    res.status(200).json({ fileName });
+    res.json({ fileName });  // 클라이언트는 fileName만 필요함
 });
+  
 //자동증가
 router.get("/autoUnCode", async (req, res) => {
     let autoUnCode = await facService.autoUnCode().catch((err)=> console.log(err));
@@ -98,7 +118,14 @@ router.put("/modifyUnplay", async(req, res)=>{
 //비가동 업뎃
 router.put('/updateList', async (req, res) => {
     const { facStatus, facCode } = req.body;
-    let result = await facService.updateList({facStatus, facCode}).catch((err)=> console.log(err));
+    // 현재 시각
+    const endTime = new Date();
+    // DB 업데이트 로직: 상태 + 종료일시 함께 저장
+    let result = await facService.updateList({ facStatus, facCode })
+      .catch((err) => {
+        console.log(err);
+        return res.status(500).json({ error: 'DB error' });
+      });
     res.send(result);
 })
 //값 체크

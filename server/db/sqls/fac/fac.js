@@ -110,11 +110,12 @@ const updateFac =
 `UPDATE fac
 SET ?
 WHERE fac_code = ?`
+
 //비가동수정
 const updateUnplay=
 `UPDATE fac_none_play
-SET ?
-WHERE unplay_code = ?`
+SET unplay_end_date = SYSDATE(), fac_status = ?
+WHERE fac_code = ?`
 
 //삭제
 //비가동설비 삭제

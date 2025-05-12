@@ -3,7 +3,6 @@ const mariaDB = require("../../db/mapper.js");
 const { updateUnplay } = require("../../db/sqls/fac/fac.js");
 const { dateFormat,convertObjToAry } = require("../../utils/converts.js");
 
-
 // 자동 matcode 증가
 const autoUnCode = async() => {
   let list = await mariaDB.query("autoUnCode").catch((err) => console.log(err));
