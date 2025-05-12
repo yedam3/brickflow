@@ -90,6 +90,11 @@ const model = ref([
                         to: '/work/process'
                     },
                     {
+                        label: '공정 실적 관리',
+                        icon: 'pi pi-fw pi-server',
+                        to: '/work/state'
+                    },
+                    {
                         label: '생산 전표 관리',
                         icon: 'pi pi-fw pi-barcode',
                         to: '/work/report'

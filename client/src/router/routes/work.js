@@ -20,14 +20,14 @@ export default[
         component: () => import('@/views/pages/work/Control.vue')
     },
     {
-        path: '/work/data',
-        name: 'Data',
-        component: () => import('@/views/pages/work/Data.vue')
-    },
-    {
         path: '/work/process',
         name: 'Process',
         component: () => import('@/views/pages/work/Process.vue')
+    },
+    {
+        path: '/work/state',
+        name: 'State',
+        component: () => import('@/views/pages/work/State.vue')
     },
     {
         path: '/work/report',

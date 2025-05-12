@@ -4,7 +4,8 @@ const processService = require("../../services/workService/processService.js");
 
 // 생산 지시 목록 조회
 router.get('/productOrderList', async (req, res) => {
-    let list = await processService.findAllProduct_order().catch((err) => console.error(err));
+    const { product_order_name, process_name, prod_name } = req.query;
+    let list = await processService.findAllProduct_order(product_order_name, process_name, prod_name).catch((err) => console.error(err));
     res.send(list);
 });
 
@@ -80,6 +81,16 @@ router.get('/processList', async(req, res) => {
 router.get('/prodList', async(req, res) => {
     let list = await processService.findAllProdName().catch((err) => console.error(err));
     res.send(list);
+});
+
+// 작업 시작 확인
+router.get('/startCheck', async (req, res) => {
+
+});
+
+// 작업 종료 확인
+router.get('/endCheck', async (req, res) => {
+
 });
 
 
