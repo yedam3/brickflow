@@ -211,6 +211,15 @@ export default {
     },
     //행추가
    addRow(){
+    if(this.orderExist){
+       Swal.fire({
+          title: '실패',
+          text: '수정중 행추가가 불가합니다.',
+          icon: 'error',
+          confirmButtonText: '확인'
+        });
+        return
+    }
     this.secondRowData.push({  mat_order_detailcode: "",
                                mat_code: "",
                                mat_name: "",
@@ -221,6 +230,15 @@ export default {
    },
    //행삭제
     deleteRow() {
+       if(this.orderExist){
+       Swal.fire({
+          title: '실패',
+          text: '수정중 행삭제가 불가합니다.',
+          icon: 'error',
+          confirmButtonText: '확인'
+        });
+        return
+    }
       const selectedNodes = this.$refs.secondGrid.api.getSelectedNodes();
       const selectedData = selectedNodes.map(node => node.data);
 
@@ -388,12 +406,14 @@ export default {
     },
     //수정
     async modifyOrder() {
+     
       const res = await axios.get('/api/mat/orderCheck', {
         params: {
           orderCode: this.rowData[0].mat_order_code
         }
       })
         .catch((err) => console.log(err));
+      console.log(res);
       if (res.data[0].checkCount < 1) {
         Swal.fire({
           title: '수정 실패',
@@ -546,6 +566,46 @@ export default {
         });
       }
     }
+
+    // async pdfDown() {
+    //   if (!this.orderExist) {
+    //     Swal.fire({
+    //       title: '실패',
+    //       text: '발주 목록은 조회후 다운로드가 가능합니다.',
+    //       icon: 'error',
+    //       confirmButtonText: '확인'
+    //     });
+    //     return;
+    //   }
+
+    //   try {
+    //     const response = await axios.post('/api/mat/pdfDownload', {
+    //       rowData: this.rowData,
+    //       rowDataDetail: this.secondRowData
+    //     }, {
+    //       responseType: 'blob'
+    //     });
+
+    //     const blob = new Blob([response.data], { type: 'application/pdf' });
+    //     const url = window.URL.createObjectURL(blob);
+
+    //     // window.open 방식으로 새 창에서 열기 (위험한 파일 차단 회피)
+    //     window.open(url);
+
+    //     // 필요 시 나중에 revoke 처리
+    //     setTimeout(() => {
+    //       window.URL.revokeObjectURL(url);
+    //     }, 1000);
+
+    //   } catch (err) {
+    //     Swal.fire({
+    //       title: '다운로드 실패',
+    //       text: 'PDF 다운로드 중 오류가 발생했습니다.',
+    //       icon: 'error',
+    //       confirmButtonText: '확인'
+    //     });
+    //   }
+    // }
 
 
   },        

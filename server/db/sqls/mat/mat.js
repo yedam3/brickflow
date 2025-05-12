@@ -114,7 +114,7 @@ const orderDetailRender =`
   WHERE mat_order_code = ? 
 `
 //수정 및 등록 체크
-const addCheck = `
+const matAddCheck = `
   SELECT COUNT(*) AS checkCount
   FROM matOrders
   WHERE mat_order_code = ?
@@ -150,7 +150,7 @@ module.exports = {
   matOrderList,
   orderRender,
   orderDetailRender,
-  addCheck,
+  matAddCheck,
   updateOrder,
   updateOrderDetail,
   delOrder,
