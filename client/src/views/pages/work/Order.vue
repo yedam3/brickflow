@@ -134,9 +134,11 @@
 </template>
 
 <script>
-import { AgGridVue } from "ag-grid-vue3";
 import axios from "axios";
 
+import { useUserStore } from '@/stores/user';
+
+import { AgGridVue } from "ag-grid-vue3";
 import Swal from 'sweetalert2';
 
 import PlanModal from "@/components/modal/PlanModal.vue";
@@ -182,14 +184,14 @@ export default {
             ],
             // FormData
             formData: {
-                product_order_code: "",     // 생산지시_코드
-                employee_code: "",               // 담당자명
-                product_order_name: "",     // 생산지시명
-                plan_code: "",              // 계획코드
-                plan_name: "",              // 계획명
-                start_date: "",             // 시작일자
-                end_date: "",               // 종료일자
-                note: "",                   // 비고
+                product_order_code: "",             // 생산지시_코드
+                employee_code: useUserStore().id,   // 담당자
+                product_order_name: "",             // 생산지시명
+                plan_code: "",                      // 계획코드
+                plan_name: "",                      // 계획명
+                start_date: "",                     // 시작일자
+                end_date: "",                       // 종료일자
+                note: "",                           // 비고
             },
 
             rowData: [
@@ -249,14 +251,14 @@ export default {
         // FormData 초기화
         clearForm() {
             this.formData = {
-                product_order_code: this.formData.product_order_code,     // 생산지시_코드
-                employee_code: "",          // 담당자명
-                product_order_name: "",     // 생산지시명
-                plan_code: "",              // 계획코드
-                plan_name: "",              // 계획명
-                start_date: "",             // 시작일자
-                end_date: "",               // 종료일자
-                note: "",                   // 비고
+                product_order_code: this.formData.product_order_code,       // 생산지시_코드
+                employee_code: useUserStore().id,                           // 담당자명
+                product_order_name: "",                                     // 생산지시명
+                plan_code: "",                                              // 계획코드
+                plan_name: "",                                              // 계획명
+                start_date: "",                                             // 시작일자
+                end_date: "",                                               // 종료일자
+                note: "",                                                   // 비고
             },
             this.rowData = [];
             this.secondRowData = [];

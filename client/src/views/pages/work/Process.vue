@@ -7,23 +7,26 @@
         <div class="row mt-3 mb-3">
             <div class="col input-group mb-3 w-50">
                 <select class="form-select" aria-label="Default select example" v-model="searchType1" @change="searchSelect">
-                    <option value="1" selected>지시명</option>
-                    <option value="2">주문명</option>
-                    <option value="2">주문번호</option>
+                    <option value="none" selected>지시명</option>
+                    <option v-for="planOrder in planOrderSelect" :key="planOrder" :value="planOrder">
+                        {{ planOrder }}
+                    </option>
                 </select>
             </div>
             <div class="col input-group mb-3 w-50">
                 <select class="form-select" aria-label="Default select example" v-model="searchType2" @change="searchSelect">
-                    <option value="1" selected>공정명</option>
-                    <option value="2">주문명</option>
-                    <option value="2">주문번호</option>
+                    <option value="none" selected>공정명</option>
+                    <option v-for="process in processSelect" :key="process" :value="process">
+                        {{ process }}
+                    </option>
                 </select>
             </div>
             <div class="col input-group mb-3 w-50">
                 <select class="form-select" aria-label="Default select example" v-model="searchType2" @change="searchSelect">
-                    <option value="1" selected>제품명</option>
-                    <option value="2">주문명</option>
-                    <option value="2">주문번호</option>
+                    <option value="none" selected>제품명</option>
+                    <option v-for="product in productSelect" :key="product" :value="product">
+                        {{ product }}
+                    </option>
                 </select>
             </div>
         </div>
@@ -114,9 +117,14 @@ export default {
             ],
 
             // 검색 조건 변수
-            searchType1: "1",
-            searchType2: "1",
-            searchType3: "1",
+            searchType1: "none",
+            searchType2: "none",
+            searchType3: "none",
+
+            // Select에 표시할 데이터
+            planOrderSelect: [],
+            processSelect: [],
+            productSelect: [],
 
             // 공정 시작 데이터
             processData: {
@@ -132,7 +140,7 @@ export default {
 
             // AG-GRID 정보
             productOrderColDefs: [
-                { field: "work_lot", headerName: "Work_LOT", flex: 2, cellStyle: { textAlign: "center" } },
+                { field: "work_lot", headerName: "WORK-LOT", flex: 2, cellStyle: { textAlign: "center" } },
                 { field: "product_order_name", headerName: "생산지시명", flex: 3, cellStyle: { textAlign: "center" } },
                 { field: "prod_name", headerName: "제품명", flex: 3, cellStyle: { textAlign: "center" } },
                 { field: "process_name", headerName: "공정명", flex: 3, cellStyle: { textAlign: "center" }, cellEditor: "datePicker" },
@@ -240,15 +248,13 @@ export default {
 
     },
     mounted() {
+        this.planOrderList();
+        this.processList();
+        this.prodList();
         this.productOrderList();
         this.empList();
     },
     methods: {
-        // 검색 조건 변경 시
-        searchSelect() {
-            this.productOrderList();
-        },
-
         // 검색 조건 초기화
         serachReset() {
             this.processData = {};
@@ -258,6 +264,38 @@ export default {
 
             // 설비 데이터 초기화
             this.facDataList = [];
+        },
+
+        async planOrderList() {
+            await axios.get(`/api/work/process/planOrderList`).then(res => {
+                const resData = res.data;
+                for(let data of resData) {
+                    this.planOrderSelect.push(data.plan_order_name);
+                }
+            }).catch((err) => console.error(err))
+        },
+
+        async processList() {
+            await axios.get(`/api/work/process/processList`).then(res => {
+                const resData = res.data;
+                for(let data of resData) {
+                    this.processSelect.push(data.process_name);
+                }
+            }).catch((err) => console.error(err))
+        },
+
+        async prodList() {
+            await axios.get(`/api/work/process/prodList`).then(res => {
+                const resData = res.data;
+                for(let data of resData) {
+                    this.productSelect.push(data.prod_name);
+                }
+            }).catch((err) => console.error(err))
+        },
+
+        // 검색 조건 변경 시
+        searchSelect() {
+            this.productOrderList();
         },
 
         // 생산 지시 조회

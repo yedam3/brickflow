@@ -64,5 +64,23 @@ router.post('/end', async(req, res) => {
     res.send(result);
 });
 
+// 지시 목록 조회
+router.get('/planOrderList', async(req, res) => {
+    let list = await processService.findAllPlanOrderName().catch((err) => console.error(err));
+    res.send(list);
+});
+
+// 공정 목록 조회
+router.get('/processList', async(req, res) => {
+    let list = await processService.findAllProcessName().catch((err) => console.error(err));
+    res.send(list);
+});
+
+// 제품 목록 조회
+router.get('/prodList', async(req, res) => {
+    let list = await processService.findAllProdName().catch((err) => console.error(err));
+    res.send(list);
+});
+
 
 module.exports = router;

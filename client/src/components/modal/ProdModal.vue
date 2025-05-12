@@ -6,16 +6,16 @@
 
         <CModalBody>
             <div class="ag-theme-alpine" style="height: 400px; width: 100%">
-                <!-- 상품 검색 -->
+                <!-- 제품 검색 -->
                 <div class="d-flex justify-content-center me-5">
                     <div class="input-group mb-3 w-50">
-                        <select class="form-select" aria-label="Default select example">
-                            <option value="1" selected>상품명</option>
-                            <option value="2">상품 코드</option>
+                        <select class="form-select" v-model="searchType" aria-label="Default select example">
+                            <option value="prod_name" selected>상품명</option>
+                            <option value="prod_code">상품 코드</option>
                         </select>
-                        <input type="text" v-model="searchText" placeholder="검색어 입력" @keydown.enter="searchOrders"
+                        <input type="text" v-model="searchText" placeholder="검색어 입력" @keydown.enter="searchProd"
                             class="form-control w-50" style="width: 30%" />
-                        <button @click="searchMaterials" class="btn btn-primary">
+                        <button @click="searchProd" class="btn btn-primary">
                             <i class="pi pi-search"></i>
                         </button>
                     </div>
@@ -58,7 +58,7 @@ export default {
     data() {
         return {
             rowData: [],
-            searchType: "",
+            searchType: "prod_name",
             searchText: "",
 
             columnDefs: [
@@ -102,6 +102,17 @@ export default {
                     this.rowData = res.data
                 })
                 .catch(error => { console.error(error) })
+        },
+        // 제품 목록 검색
+        async searchProd() {
+            await axios.get(`/api/work/plan/prodList`, {
+                params: {
+                    type: this.searchType,
+                    keyword: this.searchText,
+                }
+            }).then(res => {
+                this.rowData = res.data;
+            }).catch((err) => console.error(err));
         },
 
         // 그리드 행 클릭 메소드

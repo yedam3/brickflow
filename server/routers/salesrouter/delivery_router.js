@@ -50,12 +50,14 @@ router.post('/deliveryCheck', async (req, res) => {
 })
 
 //삭제
-router.delete('/deliveryDelete', async (req, res) => {
+router.delete('/deliveryDelete/:delivery_code', async (req, res) => {
+// router.delete('/deliveryDelete', async (req, res) => {
     let deliverycode = req.params.delivery_code;
     let resInfo = await deliveryService.removedelivery(deliverycode)
     res.send(resInfo);
 });
 
+//출고 모달창
 router.get('/deliveryModal', async (req, res) => {
    const {
      type,

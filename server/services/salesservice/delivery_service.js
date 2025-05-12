@@ -23,6 +23,7 @@ const comList = async ({
   return result;
 };
 
+//출고 조회
 const deliveryList = async ({
     type,
     keyword
@@ -38,6 +39,7 @@ const deliveryList = async ({
     }
 
     const result = await mariaDB.query('deliveryModal', {
+        
             searchcondition: convertedCondition
         })
         .catch((err) => console.log(err));
@@ -71,7 +73,7 @@ const deliveryAdd = async (delivery, deliveryDetail) => {
     let result = await mariaDB.query('deliveryAdd', [
         delivery.delivery_code,
         delivery.orders_code,
-        delivery.company_code,
+        delivery.company_name,
         delivery.employee_code,
         delivery.delivery_name
        
@@ -93,7 +95,8 @@ const deliveryAdd = async (delivery, deliveryDetail) => {
                 detail.prod_code,
                 detail.delivery_quantity,
                 data.prod_LOT,
-                delivery.delivery_code]
+                delivery.delivery_code
+            ]
             
             result = await mariaDB.query('deliveryDetailAdd', test)
                 .catch((err) => console.log(err));
@@ -131,14 +134,28 @@ const modifydelivery = async (delivery,deliveryDetail) => {
 
     let result = await mariaDB.query('deliveryUpdate', [delivery.delivery_name,delivery.company_code,delivery.delivery_code ])
     .catch((err) => console.log(err));
-    if (result.affectedRows > 0) {
+    if (result.affectedRows < 1) { // affectedRows ; 행의 수를 반환
     return result;
     }
+    console.log(deliveryDetail)
     for(let detail of deliveryDetail){
         result = await mariaDB.query('deliveryDetailUpdate', [detail.delivery_quantity,detail.delivery_detail_code])
             .catch((err)=> console.log(err));
+
         
     }
+    //상태값 변경
+    for (let value of deliveryDetail) { 
+        console.log('값조회')
+        console.log(value.yetdelivery)
+        console.log(value.delivery_quantity)
+    }
+    if (deliveryDetail.every(info => Number(info.yetdelivery) == Number(info.delivery_quantity))) {
+        await mariaDB.query('deliveryStatus', ['OS4', delivery.orders_code])
+    } else { 
+        await mariaDB.query('deliveryStatus', ['OS3', delivery.orders_code])
+    }
+    
     return result;
 }
 

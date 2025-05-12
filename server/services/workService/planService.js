@@ -1,5 +1,5 @@
 const mariaDB = require("../../db/mapper.js");
-const { convertObjToAry, dateFormat } = require("../../utils/converts.js");
+const { convertObjToAry, dateFormat, convertLikeToQuery } = require("../../utils/converts.js");
 
 // plan_code 증가 값
 const getPlan_code = async () => {
@@ -10,26 +10,66 @@ const getPlan_code = async () => {
 };
 
 // 주문 목록 조회
-const findAllOrders = async () => {
+const findAllOrders = async (type, keyword) => {
     // 변수 mariadb에 등록된 query 함수를 통해 서비스에서 필요한 SQL문을 실행하도록 요청
     // -> 비동기작업이므로 await/async를 활용해서 동기식으로 동작하도록 진행
-    let list = await mariaDB
-        .query("findAllOrders")
-        .catch((err) => console.error(err));
+    let searchCondition = {};
+    let convertedCondition = '';
+    switch (type) {
+        case "prod_name":
+            type = "prod.prod_name";
+            break;
+        case "order_name":
+            type = "o.order_name";
+            break;
+        case "orders_code":
+            type = "o.orders_code";
+            break;
+        default:
+            break;
+    }
+    if(type && keyword) {
+        searchCondition[type] = keyword;
+        const converted = convertLikeToQuery(searchCondition, []);
+        convertedCondition = converted.serchKeyword;
+    }
+
+    let list = await mariaDB.query("findAllOrders", {searchCondition: convertedCondition}).catch((err) => console.error(err));
     return list;
 };
 
 // 주문 상세 조회
 const findByOrders_code = async (orders_code) => {
-    let list = await mariaDB
-        .query("findByOrders_code", orders_code)
-        .catch((err) => console.error(err));
+    let list = await mariaDB.query("findByOrders_code", orders_code).catch((err) => console.error(err));
     return list;
 };
 
 // 생산 계획 목록 조회
-const findAllPlan = async () => {
-    let planList = await mariaDB.query("findAllPlan").catch((err) => console.error(err));
+const findAllPlan = async (type, keyword) => {
+    let searchCondition = {};
+    let convertedCondition = '';
+    switch (type) {
+        case "plan_name":
+            type = "p.plan_name";
+            break;
+        case "order_name":
+            type = "o.order_name";
+            break;
+        case "prod_name":
+            type = "prod.prod_name";
+            break;
+        case "plan_code":
+            type = "p.plan_code";
+            break;
+        default:
+            break;
+    }
+    if(type && keyword) {
+        searchCondition[type] = keyword;
+        const converted = convertLikeToQuery(searchCondition, []);
+        convertedCondition = converted.serchKeyword;
+    }
+    let planList = await mariaDB.query("findAllPlan", {searchCondition: convertedCondition}).catch((err) => console.error(err));
     return planList;
 };
 
@@ -301,11 +341,18 @@ const updateOrdersByOrders_code = async (orders_code, status_type) => {
     return result;
 }
 
-const findAllProd = async () => {
-    let prodList = await mariaDB.query("findAllProd").catch((err) => {
-        console.error(err);
-    })
+// 제품 목록 조회
+const findAllProd = async (type, keyword) => {
+    let searchCondition = {};
+    let convertedCondition = '';
 
+    if(type && keyword) {
+        searchCondition[type] = keyword;
+        const converted = convertLikeToQuery(searchCondition, []);
+        convertedCondition = converted.serchKeyword;
+    }
+
+    let prodList = await mariaDB.query("findAllProd", {searchCondition: convertedCondition}).catch((err) => console.error(err));
     return prodList;
 }
 
