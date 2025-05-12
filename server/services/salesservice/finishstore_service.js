@@ -17,12 +17,45 @@ const storageList = async ({ type, keyword })=>{
 }
 //창고리스트
 const storeList = async () => {
-  const result =await mariaDB.query('storeList');
+  const result =await mariaDB.query('storeProdList')
+                      .catch((err) => console.log(err));
+  return result;
+}
+//등록
+const finishAdd = async (finishedInfo) => {
+  let conn;
+  let result;
+  try{
+    conn = await mariaDB.getConnection();
+    await conn.beginTransaction();
+    //최고값 조회
+    let maxLot = await mariaDB.query('maxProdLot')
+                        .catch((err) => console.log(err));
+    maxLot = maxLot[0].code;
+    console.log(maxLot+'맥스')
+    //입고등록
+    let selectQuery = await mariaDB.selectedQuery('addFinshied',[finishedInfo.prod_code,finishedInfo.quantity,finishedInfo.store_date,finishedInfo.employee_code,finishedInfo.prod_check_code])
+
+    result = await conn.query(selectQuery,[finishedInfo.prod_code,finishedInfo.quantity,finishedInfo.store_date,finishedInfo.employee_code,finishedInfo.prod_check_code])
+
+    //창고 등록
+    selectQuery = await  mariaDB.selectedQuery('storeFinished',[maxLot,finishedInfo.prod_code,maxLot,finishedInfo.quantity,finishedInfo.storage_code]);
+
+    result = await conn.query(selectQuery,[maxLot,finishedInfo.prod_code,maxLot,finishedInfo.quantity,finishedInfo.storage_code])
+
+    await conn.commit();
+  }
+  catch{
+    if (conn) await conn.rollback();
+    return result;
+  }finally{
+    if(conn) conn.release();
+  }
   return result;
 }
 
 module.exports={
   storageList,
-  storeList
-  
+  storeList,
+  finishAdd
 }
