@@ -7,23 +7,23 @@
         <div class="row mt-3 mb-3">
             <div class="col input-group mb-3 w-50">
                 <select class="form-select" aria-label="Default select example" v-model="searchType1" @change="searchSelect">
-                    <option value="none" selected>지시명</option>
-                    <option v-for="planOrder in planOrderSelect" :key="planOrder" :value="planOrder">
-                        {{ planOrder }}
+                    <option value="none" selected>지시명:전체</option>
+                    <option v-for="productOrder in productOrderSelect" :key="productOrder" :value="productOrder">
+                        {{ productOrder }}
                     </option>
                 </select>
             </div>
             <div class="col input-group mb-3 w-50">
                 <select class="form-select" aria-label="Default select example" v-model="searchType2" @change="searchSelect">
-                    <option value="none" selected>공정명</option>
+                    <option value="none" selected>공정명:전체</option>
                     <option v-for="process in processSelect" :key="process" :value="process">
                         {{ process }}
                     </option>
                 </select>
             </div>
             <div class="col input-group mb-3 w-50">
-                <select class="form-select" aria-label="Default select example" v-model="searchType2" @change="searchSelect">
-                    <option value="none" selected>제품명</option>
+                <select class="form-select" aria-label="Default select example" v-model="searchType3" @change="searchSelect">
+                    <option value="none" selected>제품명:전체</option>
                     <option v-for="product in productSelect" :key="product" :value="product">
                         {{ product }}
                     </option>
@@ -122,7 +122,7 @@ export default {
             searchType3: "none",
 
             // Select에 표시할 데이터
-            planOrderSelect: [],
+            productOrderSelect: [],
             processSelect: [],
             productSelect: [],
 
@@ -266,11 +266,12 @@ export default {
             this.facDataList = [];
         },
 
+        // 
         async planOrderList() {
             await axios.get(`/api/work/process/planOrderList`).then(res => {
                 const resData = res.data;
                 for(let data of resData) {
-                    this.planOrderSelect.push(data.plan_order_name);
+                    this.productOrderSelect.push(data.product_order_name);
                 }
             }).catch((err) => console.error(err))
         },
@@ -294,8 +295,23 @@ export default {
         },
 
         // 검색 조건 변경 시
-        searchSelect() {
-            this.productOrderList();
+        async searchSelect() {
+            const params = {};
+            if(this.searchType1 && this.searchType1 !== 'none') {
+                params.product_order_name = this.searchType1;
+            }
+            if(this.searchType2 && this.searchType2 !== 'none') {
+                params.process_name = this.searchType2;
+            }
+            if(this.searchType3 && this.searchType3 !== 'none') {
+                params.prod_name = this.searchType3;
+            }
+            await axios.get(`/api/work/process/productOrderList`, {
+                params: params,
+            }).then(res => {
+                const list = res.data
+                this.productOrderDataList = [...list];
+            }).catch((err) => console.error(err));
         },
 
         // 생산 지시 조회
@@ -305,7 +321,7 @@ export default {
                 this.productOrderDataList = [...list];
                 // for(let data of list) {
                 //     this.productOrderData.push({
-                //         work_lot: data.work_lot,                                   // 공정 LOT
+                //         work_lot: data.work_lot,                        // 공정 LOT
                 //         product_order_code: data.product_order_code,    // 생산 지시 코드
                 //         product_order_name: data.product_order_name,    // 생산 지시명
                 //         prod_name: data.prod_name,                      // 제품명
@@ -398,45 +414,45 @@ export default {
         startProcess() {
             // 필수 선택 항목 검증
             // 생산
-            if (!this.processData.process) {
-                Swal.fire({
-                    title: '오류',
-                    text: '공정을 선택하세요.',
-                    icon: 'error',
-                    confirmButtonText: '확인',
-                });
-                return;
-            }
-            // 작업자
-            if (!this.processData.emp) {
-                Swal.fire({
-                    title: '오류',
-                    text: '작업자를 선택하세요.',
-                    icon: 'error',
-                    confirmButtonText: '확인',
-                });
-                return;
-            }
+            // if (!this.processData.process) {
+            //     Swal.fire({
+            //         title: '오류',
+            //         text: '공정을 선택하세요.',
+            //         icon: 'error',
+            //         confirmButtonText: '확인',
+            //     });
+            //     return;
+            // }
+            // // 작업자
+            // if (!this.processData.emp) {
+            //     Swal.fire({
+            //         title: '오류',
+            //         text: '작업자를 선택하세요.',
+            //         icon: 'error',
+            //         confirmButtonText: '확인',
+            //     });
+            //     return;
+            // }
             // 설비
-            if (!this.processData.fac) {
-                Swal.fire({
-                    title: '오류',
-                    text: '설비를 선택하세요.',
-                    icon: 'error',
-                    confirmButtonText: '확인',
-                });
-                return;
-            }
+            // if (!this.processData.fac) {
+            //     Swal.fire({
+            //         title: '오류',
+            //         text: '설비를 선택하세요.',
+            //         icon: 'error',
+            //         confirmButtonText: '확인',
+            //     });
+            //     return;
+            // }
             // 설비 상태 확인
-            if(process.processData.fac.fac_status === 'FS2') {
-                Swal.fire({
-                    title: '오류',
-                    text: '사용불가 상태의 설비입니다.',
-                    icon: 'error',
-                    confirmButtonText: '확인',
-                });
-                return;
-            }
+            // if(process.processData.fac.fac_status === 'FS2') {
+            //     Swal.fire({
+            //         title: '오류',
+            //         text: '사용불가 상태의 설비입니다.',
+            //         icon: 'error',
+            //         confirmButtonText: '확인',
+            //     });
+            //     return;
+            // }
 
             this.$router.push({ name: 'Control', query:{ work_lot: this.processData.process.work_lot, emp_code: this.processData.emp.emp_code, fac_code: this.processData.fac.fac_code}});
         },

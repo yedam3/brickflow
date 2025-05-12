@@ -93,9 +93,9 @@
 </template>
 
 <script>
-import { AgGridVue } from "ag-grid-vue3";
-import DatePickerEditor from "../../../components/DatePickerEditor.vue";
 import axios from "axios";
+
+import Swal from 'sweetalert2';
 
 export default {
     components: {
@@ -194,6 +194,15 @@ export default {
             if(this.focusedField) {
                 const numValue = parseInt(this.currentInput) || 0;
                 this.processInfo[this.focusedField] = numValue;
+                if(this.focusedField === 'input_quantity') {
+                    this.processInfo['created_quantity'] = this.processInfo.input_quantity;
+                }
+                if(this.focusedField === 'error_quantity') {
+                    this.processInfo['created_quantity'] = this.processInfo['input_quantity'] - this.processInfo[this.focusedField];
+                }
+                if(this.focusedField === 'created_quantity') {
+                    this.processInfo['error_quantity'] = this.processInfo['input_quantity'] - this.processInfo[this.focusedField];
+                }
                 this.focusedField = null;
                 this.currentInput = "";
             }
@@ -235,6 +244,9 @@ export default {
                 this.processInfo.error_quantity = 0;
                 this.processInfo.created_quantity = 0;
             }).catch((err) => console.error(err));
+
+            // 미작업량 = 투입량
+            this.processInfo.input_quantity = this.processInfo.unprocessed_quantity;
             // // 공정 정보 조회
             // await axios.get(`/api/work/process/workLot/${this.work_lot}`).then(res => {
             //     console.log(res.data);
@@ -253,18 +265,81 @@ export default {
 
         // 작업 시작
         async processStart() {
+            // 투입량
+            if (this.processInfo.input_quantity === 0) {
+                Swal.fire({
+                    title: '오류',
+                    text: '투입량을 기입하세요.',
+                    icon: 'error',
+                    confirmButtonText: '확인',
+                });
+                return;
+            }
+            if (this.processInfo.input_quantity > this.processInfo.unprocessed_quantity) {
+                Swal.fire({
+                    title: '오류',
+                    text: '투입량은 미작업량을 초과할 수 없습니다.',
+                    icon: 'error',
+                    confirmButtonText: '확인',
+                });
+                return;
+            }
+            if (this.processInfo.work_start_date) {
+                Swal.fire({
+                    title: '오류',
+                    text: '해당 작업은 이미 시작된 상태입니다.',
+                    icon: 'error',
+                    confirmButtonText: '확인',
+                });
+                return;
+            }
+            if(this.processInfo.input_quantity != this.processInfo.error_quantity + this.process)
             await axios.post(`/api/work/process/start`, {
                 work_lot: this.processInfo.work_lot,
                 fac_code: this.processInfo.fac_code,
                 employee_code: this.processInfo.emp_code,
                 input_quantity: this.processInfo.input_quantity,
             }).then(res => {
-                console.log(res);
+                const nowTime = new Date()
+                this.processInfo.work_start_date = this.formatDate(nowTime);
+                if(res.data[1][0].result_code === 0) {
+                    Swal.fire({
+                        title: '성공',
+                        text: '작업이 문제 없이 시작되었습니다.',
+                        icon: 'success',
+                        confirmButtonText: '확인',
+                    });
+                } else {
+                    Swal.fire({
+                        title: '오류',
+                        text: '작업 시작에 실패했습니다.',
+                        icon: 'error',
+                        confirmButtonText: '확인',
+                    });
+                }
             }).catch((err) => console.error(err));
         },
 
         // 작업 종료
         async processEnd() {
+            if (this.processInfo.input_quantity < this.processInfo.error_quantity + this.processInfo.created_quantity) {
+                Swal.fire({
+                    title: '오류',
+                    text: '불량 수량과 생산 수량의 합이 투입 수량을 초과하였습니다.',
+                    icon: 'error',
+                    confirmButtonText: '확인',
+                });
+                return;
+            }
+            if (!this.processInfo.work_start_date) {
+                Swal.fire({
+                    title: '오류',
+                    text: '작업이 시작되지 않은 상태에서는 종료가 불가능합니다.',
+                    icon: 'error',
+                    confirmButtonText: '확인',
+                });
+                return;
+            }
             await axios.post(`/api/work/process/end`, {
                 work_lot: this.processInfo.work_lot,
                 fac_code: this.processInfo.fac_code,
@@ -272,9 +347,38 @@ export default {
                 error_quantity: this.processInfo.error_quantity,
                 created_quantity: this.processInfo.created_quantity,
             }).then(res => {
-                console.log(res);
+                const nowTime = new Date()
+                this.processInfo.work_end_date = this.formatDate(nowTime);
+                if(res.data[1][0].result_code === 0) {
+                    Swal.fire({
+                        title: '성공',
+                        text: '작업이 문제 없이 종료되었습니다.',
+                        icon: 'success',
+                        confirmButtonText: '확인',
+                    });
+                } else {
+                    Swal.fire({
+                        title: '오류',
+                        text: '작업 종료에 실패했습니다.',
+                        icon: 'error',
+                        confirmButtonText: '확인',
+                    });
+                }
             }).catch((err) => console.error(err));
-        }
+        },
+
+        // 날짜 반영
+        formatDate(dateTime) {
+            const yyyy = dateTime.getFullYear()
+            const MM = String(dateTime.getMonth() + 1).padStart(2, '0')
+            const dd = String(dateTime.getDate()).padStart(2, '0')
+            const hh = String(dateTime.getHours()).padStart(2, '0')
+            const mm = String(dateTime.getMinutes()).padStart(2, '0')
+            const ss = String(dateTime.getSeconds()).padStart(2, '0')
+            return `${yyyy}-${MM}-${dd} ${hh}:${mm}:${ss}`
+        },
+
+        //
     },
 };
 </script>

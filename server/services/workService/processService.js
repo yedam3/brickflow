@@ -2,8 +2,28 @@ const mariaDB = require("../../db/mapper.js");
 const { convertObjToAry, dateFormat } = require("../../utils/converts.js");
 
 // 생산 지시 목록 조회
-const findAllProduct_order = async () => {
-    let result = await mariaDB.query('findAllProduct_order').catch((err) => console.error(err));
+const findAllProduct_order = async (product_order_name, process_name, prod_name) => {
+    let convertedCondition = '';
+    let insertQuery = "";
+    let conditions = [];
+
+    if (product_order_name) {
+        conditions.push(`po.product_order_name LIKE '%${product_order_name}%'`);
+    }
+    if (process_name) {
+        conditions.push(`pr.process_name LIKE '%${process_name}%'`);
+    }
+    if (prod_name) {
+        conditions.push(`prod.prod_name LIKE '%${prod_name}%'`);
+    }
+    if (conditions.length > 0) {
+        insertQuery = "AND " + conditions.join(" AND ");
+        convertedCondition = insertQuery;
+    }
+    console.log(",,,,,,,,,,,,,,,,,,,,,,,,,,,");
+    console.log(convertedCondition);
+
+    let result = await mariaDB.query('findAllProduct_order', { searchCondition: convertedCondition }).catch((err) => console.error(err));
     return result;
 };
 
@@ -75,6 +95,17 @@ const findAllProdName = async () => {
     return result;
 };
 
+// 작업 시작 확인
+const findProcessStart = async () => {
+    let result = await mariaDB.query('findProcessStart').catch((err) => console.error(err));
+    return result;
+};
+
+// 작업 종료 확인
+const findProcessEnd = async () => {
+    let result = await mariaDB.query('findProcessEnd').catch((err) => console.error(err));
+};
+
 module.exports = {
     findAllProduct_order,               // 생산 지시 조회
     findAllEmployees,                   // 사원 목록 조회
@@ -91,4 +122,7 @@ module.exports = {
     findAllPlanOrderName,               // 지시 목록 조회
     findAllProcessName,                 // 공정 목록 조회
     findAllProdName,                    // 제품 목록 조회
+
+    findProcessStart,                   // 작업 시작 확인
+    findProcessEnd,                     // 작업 종료 확인
 }
