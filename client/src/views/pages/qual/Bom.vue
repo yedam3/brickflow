@@ -179,7 +179,7 @@ export default{
    },
    //자재코드를 클릭했을때 모달창 열기
    bomCellClicked(parmas){
-     if (parmas.colDef.field == "mat_code") {
+     if (parmas.colDef.field == "mat_code" || parmas.colDef.field == "mat_name") {
        this.selectedSecondIndex = parmas.rowIndex;;
        this.showMatModal = true;
      }
