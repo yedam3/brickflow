@@ -283,7 +283,7 @@ export default {
       })
         .catch((err) => console.log(err));
         
-      if (res.data[0].checkCount < 1) {
+      if (res.data[0].checkCount > 0) {
         Swal.fire({
           title: '등록 실패',
           text: '이미 등록된 주문입니다.',

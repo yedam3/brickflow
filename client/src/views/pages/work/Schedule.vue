@@ -276,7 +276,7 @@ export default {
                 this.formData.employee_code == '' ||
                 this.formData.start_date == '' ||
                 this.formData.end_date == ''
-                || this.formData.finish_status == ''
+                // || this.formData.finish_status == ''
                 // this.formData.note == ''
             ) {
                 Swal.fire({
