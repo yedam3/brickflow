@@ -28,11 +28,11 @@ const procList = `SELECT process_flow_code,
 // 3.공정 저장
 // 일단 다 삭제
 const procDelete = `DELETE FROM process_flow
-                    WHERE prod_code = ?`
+                    WHERE prod_code = ?`;
 
 // 삭제 후 다시 등록
 const procSave = `INSERT INTO process_flow(process_flow_code, prod_code, process_code,process_date,process_sequence)
-                    VALUES(?, ?, ?,NOW(),?)`
+                    VALUES(?, ?, ?,NOW(),?)`;
 
 //3. 공정조회
 const procAllList = `  SELECT process_flow_code,
@@ -45,7 +45,7 @@ const procAllList = `  SELECT process_flow_code,
                          p.process_name
                   FROM process_flow pf 
                   RIGHT JOIN process p
-                    ON (pf.process_code = p.process_code)`
+                    ON (pf.process_code = p.process_code)`;
 
 
 module.exports
