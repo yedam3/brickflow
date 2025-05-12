@@ -24,6 +24,7 @@ const login = require('./sqls/login/login.js');
 
 const prodCheck = require('./sqls/qual/prodcheck.js');
 
+const prodFinished = require('./sqls/sales/finish.js')
 module.exports = {
     ...sales,
     ...mat,
@@ -44,4 +45,5 @@ module.exports = {
     ...delivery,
     ...login,
     ...prodCheck,
+    ...prodFinished,
 }

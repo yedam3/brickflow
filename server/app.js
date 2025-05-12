@@ -58,9 +58,9 @@ const mainPageRouter = require('./routers/mainRouter/main_router.js');
 
 const loginRoter = require('./routers/loginRouter/login_router.js');
 const prodCheckRouter = require('./routers/qualRouter/prodCheck_router.js');
+const salesFinishRouter = require('./routers/salesrouter/finish_router.js');
 
 const path = require('path');
-
 
 
 // 기본 라우팅
@@ -98,4 +98,7 @@ app.use('/uploads/facImages', express.static(path.join(__dirname, 'uploads/facIm
 
 
 
+
+app.use('/qual',prodCheckRouter);
+app.use('/sales',salesFinishRouter);
 app.use('/qual',prodCheckRouter);

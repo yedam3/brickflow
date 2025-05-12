@@ -60,7 +60,8 @@
             prod_code: item.prod_code,
             quantity: item.finish_quantity,
             prod_name: item.prod_name,
-            work_lot :item.work_lot
+            work_lot :item.work_lot,
+            prod_check_code : item.prod_check_code
           });
           const encodedData = encodeURIComponent(jsonData);
           return `http://localhost:8099/seller/finishstore?data=${encodedData}`;
