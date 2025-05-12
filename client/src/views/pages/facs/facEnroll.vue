@@ -275,7 +275,7 @@
       })
         .then(imgRes => {
           if (imgRes.data && imgRes.data.fileName) {
-            this.rowData.image = imgRes.data.fileName; // ✅ 파일명만 저장
+            this.rowData.image = imgRes.data.fileName; 
           }
           submitFac(); // 이미지 업로드 후 설비 등록
         })
