@@ -155,6 +155,33 @@ export default {
     methods: {
         // 개체 선택
         setFocus(field) {
+            if((this.processInfo.work_start_date === null || this.processInfo.work_start_date === "" ) && field == "error_quantity") {
+                Swal.fire({
+                    title: '오류',
+                    text: '작업 시작 이전에는 불량 수량을 입력할 수 없습니다.',
+                    icon: 'error',
+                    confirmButtonText: '확인',
+                });
+                return;
+            };
+            if((this.processInfo.work_start_date === null || this.processInfo.work_start_date === "") && field == "created_quantity") {
+                Swal.fire({
+                    title: '오류',
+                    text: '작업 시작 이전에는 생산 수량을 입력할 수 없습니다.',
+                    icon: 'error',
+                    confirmButtonText: '확인',
+                });
+                return;
+            };
+            if((this.processInfo.work_start_date !== null || this.processInfo.work_start_date !== "") && field == "input_quantity") {
+                Swal.fire({
+                    title: '오류',
+                    text: '작업 시작 이후에는 투입 수량을 입력할 수 없습니다.',
+                    icon: 'error',
+                    confirmButtonText: '확인',
+                });
+                return;
+            };
             this.focusedField = field;
             this.currentInput = this.processInfo[field].toString();
         },
@@ -275,6 +302,15 @@ export default {
                 });
                 return;
             }
+            if (this.processInfo.input_quantity < this.processInfo.unprocessed_quantity) {
+                Swal.fire({
+                    title: '오류',
+                    text: '투입량은 미작업량보다 미만이 될 수 없습니다.',
+                    icon: 'error',
+                    confirmButtonText: '확인',
+                });
+                return;
+            }
             if (this.processInfo.input_quantity > this.processInfo.unprocessed_quantity) {
                 Swal.fire({
                     title: '오류',
@@ -317,12 +353,29 @@ export default {
                         confirmButtonText: '확인',
                     });
                 }
-            }).catch((err) => console.error(err));
+            }).catch((err) => {
+                console.error(err);
+                Swal.fire({
+                        title: '오류',
+                        text: '작업 시작 과정에서 오류가 발생했습니다.',
+                        icon: 'error',
+                        confirmButtonText: '확인',
+                    });
+            });
         },
 
         // 작업 종료
         async processEnd() {
-            if (this.processInfo.input_quantity < this.processInfo.error_quantity + this.processInfo.created_quantity) {
+            if (!this.processInfo.work_start_date) {
+                Swal.fire({
+                    title: '오류',
+                    text: '작업이 시작되지 않은 상태에서는 종료가 불가능합니다.',
+                    icon: 'error',
+                    confirmButtonText: '확인',
+                });
+                return;
+            }
+            if (this.processInfo.input_quantity < (this.processInfo.error_quantity + this.processInfo.created_quantity)) {
                 Swal.fire({
                     title: '오류',
                     text: '불량 수량과 생산 수량의 합이 투입 수량을 초과하였습니다.',
@@ -331,10 +384,11 @@ export default {
                 });
                 return;
             }
-            if (!this.processInfo.work_start_date) {
+
+            if (this.processInfo.input_quantity < (this.processInfo.error_quantity + this.processInfo.created_quantity)) {
                 Swal.fire({
                     title: '오류',
-                    text: '작업이 시작되지 않은 상태에서는 종료가 불가능합니다.',
+                    text: '불량 수량과 생산 수량의 합이 투입 수량을 초과하였습니다.',
                     icon: 'error',
                     confirmButtonText: '확인',
                 });
@@ -364,7 +418,15 @@ export default {
                         confirmButtonText: '확인',
                     });
                 }
-            }).catch((err) => console.error(err));
+            }).catch((err) => {
+                console.error(err);
+                Swal.fire({
+                        title: '오류',
+                        text: '작업 종료 과정에서 오류가 발생했습니다.',
+                        icon: 'error',
+                        confirmButtonText: '확인',
+                    });
+            });
         },
 
         // 날짜 반영

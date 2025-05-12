@@ -28,7 +28,7 @@
                                 <InputGroupAddon>
                                     담당자
                                 </InputGroupAddon>
-                                <InputText v-model="formData.employee_code" size="large" placeholder="" />
+                                <InputText v-model="formData.emp_name" size="large" placeholder="" />
                             </InputGroup>
                         </div>
                     </div>
@@ -215,13 +215,40 @@ export default {
                 { field: "orders_code", headerName: "주문번호", flex: 2, editable: params => this.ag_grid_cols.orders_code, cellStyle: { textAlign: "center" } },
                 { field: "orders_date", headerName: "주문일자", flex: 2, editable: params => this.ag_grid_cols.orders_date, cellEditor: 'agDateCellEditor', cellStyle: { textAlign: "center" } },
                 { field: "del_date", headerName: "납기일자", flex: 2, editable: params => this.ag_grid_cols.del_date, cellEditor: 'agDateCellEditor', cellStyle: { textAlign: "center" } },
-                { field: "prod_code", headerName: "제품코드", flex: 3, editable: params => this.ag_grid_cols.prod_name, cellStyle: { textAlign: "center" } },
-                { field: "prod_name", headerName: "제품명", flex: 3, editable: params => this.ag_grid_cols.prod_name, cellStyle: { textAlign: "center" } },
+                { 
+                    field: "prod_code", headerName: "제품코드", flex: 3, editable: params => this.ag_grid_cols.prod_name,
+                    cellStyle: params => {
+                        if (!params.data.orders_code) {
+                            return { textAlign: "center", backgroundColor: '#d9f2ff !important' };
+                        } else {
+                            return { textAlign: "center" };
+                        }
+                    }
+                },
+                { 
+                    field: "prod_name", headerName: "제품명", flex: 3, editable: params => this.ag_grid_cols.prod_name,
+                    cellStyle: params => {
+                        if (!params.data.orders_code) {
+                            return { textAlign: "center", backgroundColor: '#d9f2ff !important' };
+                        } else {
+                            return { textAlign: "center" };
+                        }
+                    }
+                },
                 { field: "quantity", headerName: "주문량", flex: 3, editable: params => this.ag_grid_cols.quantity, cellStyle: { textAlign: "center" } },
                 { field: "unshippedQty", headerName: "미출고량", flex: 2, editable: params => this.ag_grid_cols.unshippedQty, cellStyle: { textAlign: "center" } },
                 { field: "prePlannedQty", headerName: "기계획량", flex: 2, editable: params => this.ag_grid_cols.prePlannedQty, cellStyle: { textAlign: "center" } },
                 { field: "unplannedQty", headerName: "미계획량", flex: 2, editable: params => this.ag_grid_cols.unplannedQty, cellStyle: { textAlign: "center" } },
-                { field: "currentPlanQty", headerName: "현계획량", flex: 2, editable: params => this.ag_grid_cols.currentPlanQty, cellStyle: { textAlign: "center" } },
+                {
+                    field: "currentPlanQty", headerName: "현계획량", flex: 2, editable: params => this.ag_grid_cols.currentPlanQty,
+                    cellStyle: params => {
+                        if (params.data.orders_code) {
+                            return { textAlign: "center", backgroundColor: '#d9f2ff !important' };
+                        } else {
+                            return { textAlign: "center" };
+                        }
+                    }
+                },
             ]
         }
     },
@@ -257,7 +284,8 @@ export default {
                 plan_code: this.formData.plan_code, // 생산계획_코드
                 orders_code: "",                    // 주문_코드
                 plan_name: "",                      // 생산계획명
-                employee_code: useUserStore().id,   // 담당자
+                employee_code: useUserStore().id,   // 담당자 코드
+                emp_name: useUserStore().empName,   // 담당자 이름
                 start_date: "",                     // 시작_일자
                 end_date: "",                       // 종료_일자
                 finish_status: "",                  // 처리_상태
@@ -414,17 +442,17 @@ export default {
                 });
                 return;
             }
-            if(this.formData.orders_code !== '') {
+            if (this.formData.orders_code !== '') {
                 const order_statusRes = await axios.get(`/api/work/plan/order_statusCheck/${this.formData.orders_code}`).catch((err) => console.error(err));
                 if (order_statusRes.data.check > 0) {
                     Swal.fire({
-                    title: '실패',
-                    text: '이미 출고가 완료된 건입니다.',
-                    icon: 'error',
-                    confirmButtonText: '확인'
-                });
-                return;
-            }
+                        title: '실패',
+                        text: '이미 출고가 완료된 건입니다.',
+                        icon: 'error',
+                        confirmButtonText: '확인'
+                    });
+                    return;
+                }
             }
             await axios.post("/api/work/plan/plan", {
                 planData: this.formData,
@@ -441,7 +469,7 @@ export default {
                 } else {
                     Swal.fire({
                     title: '정보',
-                    text: '생산 계획 등록이 정상적 등록되지지 않았습니다.',
+                    text: '생산 계획 등록이 정상적 등록되지 않았습니다.',
                     icon: 'info',
                     confirmButtonText: '확인'
                 });
@@ -558,7 +586,7 @@ export default {
 
         // 제품 명 제품 코드 선택 시 모달창 열기
         prodCellClicked(params) {
-            if((params.colDef.field == "prod_code" || params.colDef.field == "prod_name")) {
+            if((params.colDef.field == "prod_code" || params.colDef.field == "prod_name") && (this.formData.orders_code === "")) {
                 this.selectedSecondIndex = params.rowIndex;
                 this.showProdModal = true;
             }
