@@ -1,6 +1,6 @@
 // 생산 지시 목록 조회 - 생산 완료(WS3) 제외
 const findAllProduct_order = `
-SELECT wp.work_lot, po.product_order_name, wp.process_sequence, wp.order_quantity, wp.input_quantity, wp.created_quantity, wp.error_quantity,
+SELECT work.work_data_code, wp.work_lot, po.product_order_name, wp.process_sequence, wp.order_quantity, wp.input_quantity, wp.created_quantity, wp.error_quantity,
 	prod.prod_name,
 	pr.process_name,
     IFNULL(work.work_start_date,'') AS work_start_date,
@@ -56,31 +56,75 @@ SELECT wp.process_code, fc.fac_code AS 'fac_code', emp.emp_code AS 'emp_code', w
     getProcessName(wp.process_code) AS process_name, 
     getFacModelName(fc.fac_code) AS model_name,
     getEmpName(emp.emp_code) AS emp_name,
-    IFNULL(dd.input_quantity, 0) AS processed_quantity,
-    (
-        SELECT IFNULL(wp2.order_quantity, 0)
-        FROM work_process wp2
-        WHERE wp2.product_order_detail_code = wd.product_order_detail_code AND wp2.process_sequence = wp.process_sequence
-    ) -
-    (
-        SELECT SUM(IFNULL(wp3.error_quantity, 0) + IFNULL(wp3.created_quantity, 0))
-        FROM work_process wp3
-        WHERE wp3.work_lot = wp.work_lot
-    ) AS 'unprocessed_quantity',
-    CASE 
-        WHEN (wp.order_quantity - IFNULL(dd.input_quantity, 0)) > 0 THEN NULL
-        ELSE IFNULL(dd.work_start_date, '')
+    wp.input_quantity AS processed_quantity,
+    (wp.order_quantity - wp.input_quantity) AS 'unprocessed_quantity',
+    CASE
+        WHEN wp.order_quantity <= wp.created_quantity + wp.error_quantity THEN ''
+        WHEN EXISTS (
+            SELECT 1 FROM work_data 
+            WHERE work_lot = wp.work_lot AND process_code = wp.process_code 
+            AND work_end_date IS NULL
+        ) THEN (
+            SELECT work_start_date FROM work_data 
+            WHERE work_lot = wp.work_lot AND process_code = wp.process_code 
+            AND work_end_date IS NULL
+            ORDER BY work_data_code DESC LIMIT 1
+        )
+        ELSE ''
     END AS work_start_date,
-    CASE 
-        WHEN (wp.order_quantity - IFNULL(dd.input_quantity, 0)) > 0 THEN NULL
-        ELSE IFNULL(dd.work_end_date, '')
-    END AS work_end_date
+    CASE
+        WHEN (wp.order_quantity <= wp.error_quantity + wp.created_quantity) 
+        THEN (SELECT MAX(work_end_date) FROM work_data 
+              WHERE work_lot = wp.work_lot AND process_code = wp.process_code)
+        ELSE ''
+    END AS work_end_date,
+    CASE
+        WHEN wp.order_quantity <= wp.created_quantity + wp.error_quantity THEN 0
+        WHEN EXISTS (
+            SELECT 1 FROM work_data 
+            WHERE work_lot = wp.work_lot AND process_code = wp.process_code 
+            AND work_end_date IS NULL
+        ) THEN (
+            SELECT input_quantity FROM work_data 
+            WHERE work_lot = wp.work_lot AND process_code = wp.process_code 
+            AND work_end_date IS NULL
+            ORDER BY work_data_code DESC LIMIT 1
+        )
+        ELSE 0
+    END AS input_quantity,
+    CASE
+        WHEN wp.order_quantity <= wp.created_quantity + wp.error_quantity THEN 0
+        WHEN EXISTS (
+            SELECT 1 FROM work_data 
+            WHERE work_lot = wp.work_lot AND process_code = wp.process_code 
+            AND work_end_date IS NULL
+        ) THEN (
+            SELECT error_quantity FROM work_data 
+            WHERE work_lot = wp.work_lot AND process_code = wp.process_code 
+            AND work_end_date IS NULL
+            ORDER BY work_data_code DESC LIMIT 1
+        )
+        ELSE 0
+    END AS error_quantity,
+    CASE
+        WHEN wp.order_quantity <= wp.created_quantity + wp.error_quantity THEN 0
+        WHEN EXISTS (
+            SELECT 1 FROM work_data 
+            WHERE work_lot = wp.work_lot AND process_code = wp.process_code 
+            AND work_end_date IS NULL
+        ) THEN (
+            SELECT created_quantity FROM work_data 
+            WHERE work_lot = wp.work_lot AND process_code = wp.process_code 
+            AND work_end_date IS NULL
+            ORDER BY work_data_code DESC LIMIT 1
+        )
+        ELSE 0
+    END AS created_quantity
 FROM work_process wp
-LEFT JOIN work_data dd ON wp.work_lot = dd.work_lot
-LEFT JOIN work_detail wd ON wp.product_order_detail_code = wd.product_order_detail_code
-LEFT JOIN fac fc ON fc.fac_code = ?
-LEFT JOIN employees emp ON emp.emp_code = ?
+    LEFT JOIN fac fc ON fc.fac_code = ?
+    LEFT JOIN employees emp ON emp.emp_code = ?
 WHERE wp.work_lot = ?
+GROUP BY wp.process_code, fc.fac_code, emp.emp_code, wp.prod_code, wp.order_quantity, wp.process_sequence
 `;
 
 // 공정 정보 조회
@@ -204,17 +248,37 @@ WHERE NOT EXISTS (
 ) AND wp.order_quantity > 0
 `;
 
-// 작업 시작 확인
-const findProcessStart = `
-SELECT COUNT(*)
-FROM work_process
-WHERE work_lot = ?
+// 실적 목록 조회
+const findAllProcess = `
+SELECT wp.product_order_detail_code, getProductOrderName(wp.product_order_detail_code) AS 'product_order_name', getProcessName(wp.process_code) AS 'process_name', getProdName(wp.prod_code) AS 'prod_name', wp.order_quantity,
+    IFNULL(SUM(wd.input_quantity), 0) AS input_quantity,
+    IFNULL(SUM(wd.error_quantity), 0) AS error_quantity,
+    IFNULL(SUM(wd.created_quantity), 0) AS created_quantity,
+    IFNULL(MIN(wd.work_start_date), "") AS process_start_date,
+    IFNULL((
+        SELECT MAX(wd2.work_end_date)
+        FROM work_data wd2
+        WHERE wd2.work_lot = wp.work_lot
+          AND wd2.process_sequence = wp.process_sequence
+          AND (
+              SELECT SUM(wd3.created_quantity + wd3.error_quantity)
+              FROM work_data wd3
+              WHERE wd3.work_lot = wd2.work_lot
+                AND wd3.process_sequence = wd2.process_sequence
+                AND wd3.work_end_date <= wd2.work_end_date
+          ) >= wp.order_quantity
+    ), "") AS process_end_date,
+    IFNULL((
+		SELECT wp_first.order_quantity
+		FROM work_process wp_first
+		WHERE wp_first.product_order_detail_code = wp.product_order_detail_code
+			AND wp_first.process_sequence = 1
+	), 0) AS 'first_order_quantity'
+FROM work_process wp
+	LEFT JOIN work_data wd ON wp.work_lot = wd.work_lot AND wp.process_sequence = wd.process_sequence
+GROUP BY wp.work_lot, wp.product_order_detail_code, wp.process_code, wp.prod_code, wp.order_quantity
 `;
 
-// 작업 종료 확인
-const findProcessEnd = `
-
-`;
 
 module.exports = {
     findAllProduct_order,                           // 생산 지시 목록 조회 - 생산 완료(WS3) 제외
@@ -233,6 +297,5 @@ module.exports = {
     findAllProcessName,                             // 공정 목록 조회
     findAllProdName,                                // 제품 목록 조회
 
-    findProcessStart,                               // 작업 시작 확인
-    findProcessEnd,                                 // 작업 종료 확인
+    findAllProcess,                                 // 실적 조회
 }
