@@ -432,6 +432,8 @@ export default {
             if (this.inputCheck() > 0) {
                 return;
             }
+            if(this.rowData.length <= 0) {
+            }
             const plan_codeRes = await axios.get(`/api/work/plan/plan_codeCheck/${this.formData.plan_code}`).catch((err) => console.error(err));
             if (plan_codeRes.data.check > 0) {
                 Swal.fire({

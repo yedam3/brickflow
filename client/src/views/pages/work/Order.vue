@@ -253,7 +253,7 @@ export default {
                 { field: "mat_code", headerName: "자재코드", flex: 2, cellStyle: { textAlign: "center" } },
                 { field: "mat_name", headerName: "자재명", flex: 2.5, cellStyle: { textAlign: "center" } },
                 { field: "req_material_quantity", headerName: "요구량", flex: 1.5, cellStyle: { textAlign: "center" } },
-                { field: "mat_LOTs", headerName: "자재명", flex: 1, cellStyle: { textAlign: "center" } },
+                // { field: "mat_LOTs", headerName: "자재명", flex: 1, cellStyle: { textAlign: "center" } },
                 { field: "material_input_qunatity", headerName: "투입량", flex: 1, cellStyle: { textAlign: "center" } },
             ],
             gridOptions: {
