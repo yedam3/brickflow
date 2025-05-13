@@ -92,16 +92,11 @@ const facService = {
 }
 
 //수리 처리
-const repaireFac = async (repaireFac) => {
-  const result = await mariaDB.query("autoReCode", {});
-  const repaireCodeList = convertObjToAry(result);
+const repaireFac = async (repaireFacData) => {
+  let result = await mariaDB.query("autoReCode", {});
+  const repaireCode = result[0].repaire_code;
 
-  if (!repaireCodeList.length) {
-    throw new Error("수리코드 생성에 실패했습니다.");
-  }
-
-  const repaireCode = repaireCodeList[0].repaire_code;
-
+  console.log(repaireFacData);
   const param = [
     repaireCode,
     repaireFacData.note,
@@ -111,10 +106,12 @@ const repaireFac = async (repaireFac) => {
     repaireFacData.fac_code,
     repaireFacData.fac_history,
     repaireFacData.break_status,
-    repaireFacData.fac_result,
+    repaireFacData.fac_result
   ];
-
-  return await mariaDB.query("repaireFac", param);
+  console.log(param)
+ result =  await mariaDB.query("repaireFac", param)
+                    .catch((err) => console.log(err));
+  return result;
 }
 //설비수정
 const updateFac = async (Info)=> {

@@ -98,8 +98,8 @@ router.post("/addUnFac", async (req,res)=>{
 })
 //비가동수리 처리
 router.post("/repaireFac", async (req,res)=>{
-    const {unplayFac} = req.body;
-    const result = await facService.repaireFac(unplayFac).catch(err => console.log(err));
+    const {repaireFac} = req.body;
+    const result = await facService.repaireFac(repaireFac).catch(err => console.log(err));
     res.send(result);
 
 });
