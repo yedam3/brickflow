@@ -74,11 +74,11 @@ const model = ref([
                         icon: 'pi pi-fw pi-clipboard',
                         to: '/work/schedule'
                     },
-                    {
-                        label: '생산 계획 조회',
-                        icon: 'pi pi-fw pi-list-check',
-                        to: '/work/dispatch'
-                    },
+                    // {
+                    //     label: '생산 계획 조회',
+                    //     icon: 'pi pi-fw pi-list-check',
+                    //     to: '/work/dispatch'
+                    // },
                     {
                         label: '생산 지시 관리',
                         icon: 'pi pi-fw pi-check',
@@ -91,7 +91,7 @@ const model = ref([
                     },
                     {
                         label: '공정 실적 관리',
-                        icon: 'pi pi-fw pi-server',
+                        icon: 'pi pi-fw pi-list-check',
                         to: '/work/state'
                     },
                     {

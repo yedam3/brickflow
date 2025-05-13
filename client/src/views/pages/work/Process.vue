@@ -144,11 +144,11 @@ export default {
                 { field: "product_order_name", headerName: "생산지시명", flex: 3, cellStyle: { textAlign: "center" } },
                 { field: "prod_name", headerName: "제품명", flex: 3, cellStyle: { textAlign: "center" } },
                 { field: "process_name", headerName: "공정명", flex: 3, cellStyle: { textAlign: "center" }, cellEditor: "datePicker" },
-                { field: "process_sequence", headerName: "공정순서", flex: 1.5, cellStyle: { textAlign: "center" }, cellEditor: "datePicker" },
+                { field: "process_sequence", headerName: "공정순서", flex: 2, cellStyle: { textAlign: "center" }, cellEditor: "datePicker" },
                 { field: "order_quantity", headerName: "지시량", flex: 1.5, cellStyle: { textAlign: "center" } },
                 { field: "input_quantity", headerName: "투입량", flex: 1.5, cellStyle: { textAlign: "center" } },
-                { field: "created_quantity", headerName: "생산량", flex: 1.5, cellStyle: { textAlign: "center" } },
                 { field: "error_quantity", headerName: "불량량", flex: 1.5, cellStyle: { textAlign: "center" } },
+                { field: "created_quantity", headerName: "생산량", flex: 1.5, cellStyle: { textAlign: "center" } },
                 { field: "work_start_date", headerName: "시작시간", flex: 3, cellStyle: { textAlign: "center" } },
                 { field: "work_end_date", headerName: "종료시간", flex: 3, cellStyle: { textAlign: "center" } },
                 {
@@ -453,7 +453,6 @@ export default {
                 });
                 return;
             }
-
             this.$router.push({ name: 'Control', query:{ work_lot: this.processData.process.work_lot, emp_code: this.processData.emp.emp_code, fac_code: this.processData.fac.fac_code}});
         },
     },

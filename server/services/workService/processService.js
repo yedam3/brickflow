@@ -20,8 +20,6 @@ const findAllProduct_order = async (product_order_name, process_name, prod_name)
         insertQuery = "AND " + conditions.join(" AND ");
         convertedCondition = insertQuery;
     }
-    console.log(",,,,,,,,,,,,,,,,,,,,,,,,,,,");
-    console.log(convertedCondition);
 
     let result = await mariaDB.query('findAllProduct_order', { searchCondition: convertedCondition }).catch((err) => console.error(err));
     return result;
@@ -106,6 +104,12 @@ const findProcessEnd = async () => {
     let result = await mariaDB.query('findProcessEnd').catch((err) => console.error(err));
 };
 
+// 실적 목록 조회
+const findAllProcess = async () => {
+    let result = await mariaDB.query('findAllProcess').catch((err) => console.error((err)));
+    return result;
+};
+
 module.exports = {
     findAllProduct_order,               // 생산 지시 조회
     findAllEmployees,                   // 사원 목록 조회
@@ -125,4 +129,6 @@ module.exports = {
 
     findProcessStart,                   // 작업 시작 확인
     findProcessEnd,                     // 작업 종료 확인
+
+    findAllProcess,                     // 실적 목록 조회
 }
