@@ -62,12 +62,7 @@ export default{
  },
  data() {
    return {
-     rowData: [
-       {
-         prod_code: "",
-         prod_name: "",
-       }
-     ],
+     rowData: [],
      columnDefs: [
        { field: 'prod_code', headerName: '제품코드',flex:1,editable:true},
        { field: 'prod_name', headerName: '제품명' ,flex:1},
@@ -122,6 +117,7 @@ export default{
     selectedSecondIndex: null,
     prodIndex : null,
    };
+  
  },
  mounted() {
    this.BomData();
@@ -205,6 +201,7 @@ export default{
    //저장
    async bomSave(){
 
+    //값체크 validation
      for(let data of this.rowData2) {
        console.log(data);
        if(data.mat_code == '' || data.prod_code == '' || data.prod_name == '' || data.mat_name ==''|| data.quantity ==0){
@@ -217,9 +214,11 @@ export default{
          return;
      }
      }
+     console.log(this.rowData[this.prodIndex])
+     //등록시작
      const res = axios.post('/api/admin/bomsave', {
-       insertbom: this.rowData2,
-       
+       insertBom: this.rowData2,
+       prodBom : this.rowData[this.prodIndex].prod_code
      })
        .then(res => {
          if (res.data.affectedRows > 0) {

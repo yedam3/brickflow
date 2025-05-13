@@ -26,13 +26,16 @@ const allProc = async() => {
 
 
 //3. 저장
-const saveProc = async(procsave) => {
+const saveProc = async(procsave,prodFlow) => {
   //삭제
 
-  let result = await mariaDB.query('procDelete',[procsave[0].prod_code])
+  let result = await mariaDB.query('procDelete',[prodFlow])
                                           .catch((err)=>console.log(err));
 
-for (let value of procsave){
+if(procsave.lenght<1){
+  return result;
+}
+
   // 등록 => 여러건을 등록
   for(let index in procsave){
     
@@ -52,8 +55,9 @@ for (let value of procsave){
 
   result = await mariaDB.query('procSave', addProc);
   }
+
   return result;
-  }                                        
+                                       
 }
 
 module.exports 

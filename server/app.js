@@ -63,6 +63,7 @@ const salesFinishRouter = require('./routers/salesrouter/finish_router.js');
 
 const path = require('path');
 
+const employeesRouter = require('./routers/adminRouter/employees_router.js');
 
 // 기본 라우팅
 app.get("/", (req, res) => {
@@ -97,7 +98,7 @@ app.use('/',loginRoter);
 
 app.use('/uploads/facImages', express.static(path.join(__dirname, 'uploads/facImages')));
 
-
+app.use('/admin',employeesRouter);
 
 
 

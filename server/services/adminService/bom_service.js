@@ -15,14 +15,16 @@ const findBom = async (prno)=>{
   return list;
 }
 //3. 저장
-const saveBom = async(bomsave)=>{
+const saveBom = async(bomsave,prodBom)=>{
     //삭제
-    console.log('wer'+bomsave);
-    console.log(bomsave);
-    let result = await mariaDB.query('bomDelete',[bomsave[0].prod_code])             
+console.log(prodBom)
+    let result = await mariaDB.query('bomDelete',[prodBom])             
                                             .catch((err)=>console.log(err));   
-  for(let value of bomsave){
-    console.log(value)
+
+  //삭제만 해 등록 하지 말고 나가
+  if(bomsave.length <1){
+      return result;
+  }
                                                   
   // 등록 => 여러건을 등록
   for(let value of bomsave){
@@ -36,13 +38,15 @@ const saveBom = async(bomsave)=>{
   let newBomCode = resList[0].BOM_code;
   // addBom에 첫번째 값으로 추가
   addBom.unshift(newBomCode); 
+  
+  result = await mariaDB.query('bomSave', addBom)
+                        .catch((err) => console.log);
 
-  result = await mariaDB.query('bomSave', addBom);
-}
+   }
   return result;
   // =======
  }
-}
+
 
 module.exports 
 = {

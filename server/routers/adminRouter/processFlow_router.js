@@ -31,8 +31,8 @@ router.delete('/processflow/:procno', async (req, res) => {
 });
 //3. 공정 저장 - 삭제 후 등록
 router.post('/procSave', async(req, res) => {
-    let {insertProc} = req.body;
-    let result = await processFlowService.saveProc(insertProc);
+    let {insertProc,prodFlow} = req.body;
+    let result = await processFlowService.saveProc(insertProc,prodFlow);
     res.send(result);
 });
 

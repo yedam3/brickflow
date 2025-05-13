@@ -1,4 +1,3 @@
-// db/sqls/qual.js
 // Table : b_admin_bom
 
 // bom_code 자동 생성
