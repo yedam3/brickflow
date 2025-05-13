@@ -1,7 +1,8 @@
 ![wave](https://capsule-render.vercel.app/api?type=wave&color=auto&height=200&text=BrickFlow)
 
-
+<div align="center"
  <a href="https://git.io/typing-svg"><img src="https://readme-typing-svg.demolab.com?font=%ED%94%BC%EB%9D%BC+%EC%BD%94%EB%93%9C&letterSpacing=%EC%A0%95%EC%83%81&pause=1000&color=4229F7&background=3A63FF00&random=true&width=435&lines=Welcome+to+BrickFlow" alt="Typing SVG" /></a>
+</div>
 
 
 </p>
