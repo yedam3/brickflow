@@ -98,7 +98,7 @@ const addNoFac =
   note, 
   fac_code
 )
-SELECT ?, s.sub_code_name, ?, ?, ?, ?, ?
+SELECT ?, s.sub_code, ?, ?, ?, ?, ?
 FROM main_codes m
   JOIN sub_codes s ON m.main_code = s.main_code
 WHERE s.main_code = 'NR' AND s.sub_code = ?
@@ -109,7 +109,7 @@ LIMIT 1`
 const updateFac =
 `UPDATE fac
 SET ?
-WHERE fac_code = ?`
+WHERE fac_code = ?;`
 
 //비가동수정
 const updateUnplay=
@@ -117,7 +117,18 @@ const updateUnplay=
 SET unplay_end_date = SYSDATE(), fac_status = ?
 WHERE fac_code = ?`
 
+//수리
+const updateReFac = `
+UPDATE fac_none_play
+SET unplay_end_date = ?
+WHERE unplay_code = ?`
+
 //삭제
+//설비 삭제
+const delFac =`
+DELETE FROM fac
+WHERE fac_code = ?`
+
 //비가동설비 삭제
 // const delUnplay =
 // `DELETE FROM fac_none_play
@@ -158,16 +169,20 @@ const facPattern =
 //비가동고장리스트
 const repaireList = 
 `SELECT unplay_code,
-        unplay_reason_code,
-        employee_code,
-        unplay_start_date,
-        unplay_end_date,
-        note,
-        fac_code
+       unplay_reason_code,
+       employee_code,
+       unplay_start_date,
+       unplay_end_date,
+       note,
+       fac_code
 FROM fac_none_play
-WHERE unplay_reason_code IN (SELECT s.sub_code_name
-                            FROM main_codes m join sub_codes s on(m.main_code = s.main_code)
-                            WHERE s.sub_code_name = '고장')`
+WHERE unplay_reason_code IN (
+    SELECT s.sub_code
+    FROM main_codes m 
+    JOIN sub_codes s ON m.main_code = s.main_code
+    WHERE s.sub_code_name = '고장'
+)
+AND unplay_end_date IS NULL`
 
 //비가동 수리처리 등록
 const repaireFac =
@@ -212,7 +227,6 @@ module.exports = {
   unplayList,
   updateUnplay,
   facCheck,
-  // delUnplay,
   reasonFac,
   facModal,
   statusList,
@@ -227,4 +241,6 @@ module.exports = {
   facPattern,
   updateFac,
   saveImagePath,
+  updateReFac,
+  delFac,
 };

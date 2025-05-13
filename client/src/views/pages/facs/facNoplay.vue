@@ -44,7 +44,7 @@
         </div>
         <div class="col-md-3">
           <label class="form-label">담당자</label>
-          <input type="number" class="form-control" v-model="rowData.employee_code" />
+          <input type="text" class="form-control" v-model="rowData.employee_code" readonly/>
         </div>
         <div class="col-md-3">
           <label class="form-label">시작일시</label>
@@ -78,6 +78,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import FacListModal from "@/components/modal/FacListModal.vue";
 import moment from 'moment-timezone';
+import { useUserStore } from '@/stores/user';
 export default {
     components: {
         AgGridVue,
@@ -91,7 +92,8 @@ export default {
                 {
                     unplay_code: "",
                     unplay_reason_code: "",
-                    employee_code: "",
+                    employee_code: useUserStore().empName,
+                    employee_name: useUserStore().id,
                     unplay_start_date: "",
                     unplay_end_date: "",
                     note: "",
@@ -102,7 +104,8 @@ export default {
                 {
                     unplay_code: "",
                     unplay_reason_code: "",
-                    employee_code: "",
+                    employee_name: useUserStore().id,
+                    employee_code: useUserStore().empName,
                     unplay_start_date: "",
                     unplay_end_date: "",
                     note: "",
@@ -114,18 +117,17 @@ export default {
                 { field: "unplay_code", headerName: "비가동설비코드", flex: 3 },
                 { field: "unplay_reason_code", headerName: "비가동사유코드", flex: 3 ,
                     valueFormatter: (params) => {
-                        if (params.value == 'NR1') {
-                            return params.value = '사출 성형기';
-                        } else if (params.value == 'NR2') {
-                            return params.value = '자동 조립 장비';
-                        } else if (params.value == 'NR3') {
-                            return params.value = '도장';
-                        } else if (params.value == 'NR4') {
-                            return params.value = '기기 사용중';
-                        } 
+                        const reason = this.reasonFacAry.find(
+                            item => item.unplay_reason_code === params.value
+                        );
+                        return reason ? reason.sub_code_name : params.value;
+                }
+                },
+                { field: "employee_code", headerName: "담당자", flex: 3 ,
+                    valueFormatter: (params) => {
+                        return params.data?.employee_name || params.value;
                     }
                 },
-                { field: "employee_code", headerName: "담당자", flex: 3 },
                 {
                     field: "unplay_start_date",
                     headerName: "비가동시작일시",
@@ -168,9 +170,10 @@ export default {
     },
     methods: {
         dateFormatter(params) {
-            if (!params || !params.value) return '';
-            return moment(params.value, moment.ISO_8601).isValid()
-                ? moment(params.value).format("YYYY-MM-DD HH:mm")
+            const value = params?.value;
+            if (!value) return '';
+            return moment(value).isValid()
+                ? moment(value).format("YYYY-MM-DD HH:mm")
                 : '';
         },
         async autoUnCode(){
@@ -179,32 +182,34 @@ export default {
         },
         async addUnFac() {
             console.log(this.rowData);
-            //등록
+            // 등록
             axios.post('/api/fac/addUnFac', {
                 unplayFac: {
                     ...this.rowData,
                     unplay_end_date: this.rowData.unplay_end_date || null,
+                    employee_code: useUserStore().id, // 코드로 DB에 저장
                 }
             })
-            .then(async res => {
-                if (res.data.affectedRows > 0) {
-                    // 종료일자가 없으면 비가동 상태, 있으면 가동 상태로 업데이트
-                    const facStatus = this.rowData.unplay_end_date ? 'FS1' : 'FS2';
-                    await axios.put('/api/fac/updateList', {
-                        facCode: this.rowData.fac_code,
-                        facStatus: facStatus
-                    });
+                .then(async res => {
+                    if (res.data.affectedRows > 0) {
+                        // 종료일자가 없으면 비가동 상태, 있으면 가동 상태로 업데이트
+                        const facStatus = this.rowData.unplay_end_date ? 'FS1' : 'FS2';
+                        await axios.put('/api/fac/updateList', {
+                            facCode: this.rowData.fac_code,
+                            facStatus: facStatus
+                        });
                         Swal.fire({
                             title: '등록성공',
                             text: '정상적으로 등록이 완료되었습니다.',
                             icon: 'success',
                             confirmButtonText: '확인'
-                        }).then(() =>{
+                        }).then(() => {
                             this.unFacList();
                         });
                         this.rowData = {
                             unplay_reason_code: "",
-                            employee_code: "",
+                            employee_code: useUserStore().id, // 코드 그대로 유지
+                            employee_name: useUserStore().empName, // 이름 그대로 유지
                             unplay_start_date: "",
                             unplay_end_date: "",
                             note: "",
@@ -263,11 +268,11 @@ export default {
                         }).then(() => {
                             this.unFacList();
                         });
-
                         this.rowData = {
                             unplay_code: "",
                             unplay_reason_code: "",
-                            employee_code: "",
+                            employee_code: useUserStore().id,
+                            employee_name: useUserStore().empName,
                             unplay_start_date: "",
                             unplay_end_date: "",
                             note: "",
@@ -296,10 +301,9 @@ export default {
         },
         // 가동처리
         async updatePlay() {
-            const now = new Date();
-            const formatted = moment(now).format("YYYY-MM-DD HH:mm");
-
-            this.rowData.unplay_end_date = formatted;  // 화면용 표시
+            const formatted = moment().format("YYYY-MM-DD HH:mm");
+            const now = moment().format("YYYY-MM-DD HH:mm");
+            this.rowData.unplay_end_date = now;
 
             const res = await axios.put('/api/fac/updateList', {
                 facCode: this.rowData.fac_code,
@@ -309,13 +313,16 @@ export default {
                 Swal.fire("가동처리 실패", "알 수 없는 오류가 발생했습니다.", "error");
                 return null;
             });
-
             if (res && res.data.affectedRows > 0) {
+                await axios.put('/api/fac/updateUnplayEndDate', {
+                    unplay_code: this.rowData.unplay_code,
+                    unplay_end_date: formatted
+                });
+
                 Swal.fire("가동처리 완료", "가동처리가 완료되었습니다.", "success")
                     .then(async () => {
-                        await this.unFacList();  // ✅ 반드시 갱신해서 최신 데이터 반영
+                        await this.unFacList();
                     });
-
                 this.rowData = {
                     unplay_code: "",
                     unplay_reason_code: "",
@@ -327,75 +334,14 @@ export default {
                 };
             }
         },
-
-
-
-        // //삭제
-        // async deleteUnplay() {
-        //     if (!this.rowData2 || this.rowData2.length === 0 || !this.rowData2[0].unplay_code) {
-        //         Swal.fire({
-        //             title: '삭제 실패',
-        //             text: '삭제할 항목이 선택되지 않았습니다.',
-        //             icon: 'warning',
-        //             confirmButtonText: '확인'
-        //         });
-        //         return;
-        //     }
-        //     const unplayCode = this.rowData2[0].unplay_code;
-
-        //     await axios.delete(`/api/fac/delUnplay/${unplayCode}`)
-        //         .then((res) => {
-        //             console.log("삭제 요청 코드:", unplayCode);
-        //             if (res.data.affectedRows < 1) {
-        //                 Swal.fire({
-        //                     title: '삭제 실패',
-        //                     text: '삭제 실패 하였습니다.',
-        //                     icon: 'error',
-        //                     confirmButtonText: '확인'
-        //                 });
-        //             } else {
-        //                 Swal.fire({
-        //                     title: '삭제 완료',
-        //                     text: '정상적으로 삭제가 완료되었습니다.',
-        //                     icon: 'success',
-        //                     confirmButtonText: '확인'
-        //                 })
-        //                     .then(() => {
-        //                         this.unFacList();
-        //                     });
-        //                 this.rowData = {
-        //                     unplay_reason_code: "",
-        //                     employee_code: "",
-        //                     unplay_start_date: "",
-        //                     unplay_end_date: "",
-        //                     note: "",
-        //                     fac_code: ''
-        //                 };
-        //                 this.rowData2 = [];
-        //             }
-        //         })
-        //         .catch((err) => {
-        //             console.log("삭제 중 오류:", err);
-        //             Swal.fire({
-        //                 title: '오류 발생',
-        //                 text: '서버 요청 중 문제가 발생했습니다.',
-        //                 icon: 'error',
-        //                 confirmButtonText: '확인'
-        //             });
-        //         });
-        //         //====================== 코드 갱신
-        //     this.autoUnCode();
-        //     //==========================
-        // },
         //선택한 값 불러오기
-       clicked(event) {
+        clicked(event) {
             const data = event.data;
-
             this.rowData = {
                 unplay_code: data.unplay_code || '',
                 unplay_reason_code: data.unplay_reason_code || '',
                 employee_code: data.employee_code || '',
-                // 날짜 유효성 체크
+                employee_name: data.employee_name || '', 
                 unplay_start_date: data.unplay_start_date && moment(data.unplay_start_date).isValid()
                     ? moment(data.unplay_start_date).format("YYYY-MM-DD HH:mm")
                     : '',
@@ -403,6 +349,7 @@ export default {
                     ? moment(data.unplay_end_date).format("YYYY-MM-DD HH:mm")
                     : '',
                 fac_code: data.fac_code || '',
+                note: data.note || ''
             };
         },
         //조회

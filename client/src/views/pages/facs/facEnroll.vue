@@ -60,7 +60,7 @@
         <Button label="초기화" severity="secondary" @click="clearForm" />
         <Button label="등록" severity="info" @click="addFac" />
         <Button label="수정" severity="warning" @click="updateFac "/>
-        <Button label="삭제" severity="danger" />
+        <Button label="삭제" severity="danger" @click="deleteFac" />
       </div>
     </div>
     <!-- 그리드 -->
@@ -315,60 +315,93 @@
       },
       //수정
       async updateFac() {
+        if (!this.rowData.fac_code) {
+          Swal.fire("수정 불가", "수정할 설비를 선택하세요.", "warning");
+          return;
+        }
+
+        if ( !this.rowData.fac_pattern || !this.rowData.fac_status) {
+          Swal.fire("입력 오류", "필수 항목을 모두 입력해주세요.", "warning");
+          return;
+        }
+
         const fileName = await this.uploadImage();
         if (fileName) {
           this.rowData.image = fileName;
         }
 
-        const res = await axios.put('/api/fac/updateFac', {
-          facCode: this.rowData
-        }).catch(error => {
-          console.error("수정 실패:", error);
-          Swal.fire("수정 실패", "설비 수정 중 오류가 발생했습니다.", "error");
-          return null;
-        });
-
-        if (res && res.data && res.data.affectedRows > 0) {
-          Swal.fire("수정 완료", "수정이 완료되었습니다.", "success")
-            .then(() => {
-              this.facList();
-              this.autoFacCode();
-            });
-
-          this.rowData = {
-            fac_code: "",
-            model_name: "",
-            fac_location: "",
-            employee_code: "",
-            fac_pattern: "",
-            install_date: "",
-            inspection_cycle: "",
-            image: "",
-            fac_status: "",
-            imagePreview: ""
-          };
-          this.imageFile = null;
-        } else if (res) {
-          Swal.fire("수정 실패", "수정이 실패하였습니다.", "error");
-        }
+        axios.put('/api/fac/updateFac', this.rowData)
+          .then(res => {
+          if (res && res.data && res.data.result == true ) {
+              Swal.fire("수정 완료", "설비 정보가 수정되었습니다.", "success")
+                .then(() => {
+                  this.facList();
+                  this.autoFacCode();
+                  this.clearForm();
+                });
+            } else {
+              Swal.fire("수정 실패", "설비 수정에 실패했습니다.", "error");
+            }
+          })
+          .catch(error => {
+            console.error("수정 실패:", error);
+            Swal.fire("오류 발생", "설비 수정 중 오류가 발생했습니다.", "error");
+          });
       },
       // 이미지
-      getImageUrl(fileName) {
-        if (!fileName) return '';
-        if (fileName.startsWith("data:image")) return fileName;
-          return `http://localhost:3000/uploads/facImages/${fileName}`; // 또는 환경 변수 사용
-        },
-      onImageChange(event) {
-        const file = event.target.files[0];
-        if (!file) return;
+    getImageUrl(fileName) {
+      if (!fileName) return '';
+      if (fileName.startsWith("data:image")) return fileName;
+      return `http://localhost:3000/uploads/facImages/${fileName}`; // 또는 환경 변수 사용
+    },
+    onImageChange(event) {
+      const file = event.target.files[0];
+      if (!file) return;
 
-        this.imageFile = file;
+      this.imageFile = file;
 
-        const reader = new FileReader();
-        reader.onload = e => {
-          this.rowData.imagePreview = e.target.result;
-        };
-        reader.readAsDataURL(file);
+      const reader = new FileReader();
+      reader.onload = e => {
+        this.rowData.imagePreview = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    },
+      //삭제
+      async deleteFac() {
+        if (!this.rowData.fac_code) {
+          Swal.fire("삭제 불가", "삭제할 설비를 선택하세요.", "warning");
+          return;
+        }
+
+        Swal.fire({
+          title: "정말 삭제하시겠습니까?",
+          text: `설비 코드: ${this.rowData.fac_code}`,
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#d33",
+          cancelButtonColor: "#3085d6",
+          confirmButtonText: "삭제",
+          cancelButtonText: "취소"
+        }).then((confirm) => {
+          if (confirm.isConfirmed) {
+            axios.delete(`/api/fac/delFac/${this.rowData.fac_code}`)
+              .then((res) => {
+                if (res && res.data && res.data.affectedRows > 0) {
+                  Swal.fire("삭제 완료", "설비 정보가 삭제되었습니다.", "success")
+                    .then(() => {
+                      this.facList();
+                      this.clearForm();
+                    });
+                } else {
+                  Swal.fire("삭제 실패", "설비 삭제에 실패했습니다.", "error");
+                }
+              })
+              .catch((error) => {
+                console.error("삭제 오류:", error);
+                Swal.fire("오류 발생", "삭제 중 오류가 발생했습니다.", "error");
+              });
+          }
+        });
       }
   },
 

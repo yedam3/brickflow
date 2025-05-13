@@ -114,21 +114,28 @@ const repaireFac = async (repaireFacData) => {
   return result;
 }
 //설비수정
-const updateFac = async (Info)=> {
-  let updateFac = [Info, Info.fac_code]
-  let result = await mariaDB.query('updateFac', updateFac).catch((err)=> console.log(err))
-  if(result.affectedRows < 1){
-    return result;
-  }
+const updateFac = async (facInfo) => {
+  const { imagePreview, ...data } = facInfo;
+  const updateParams = [data, data.fac_code];
+  const result = await mariaDB.query('updateFac', updateParams);
   return result;
 }
 //비가동 설비 수정
 const modifyUnplay = async (unplayInfo)=> {
   let updateUnplay = [unplayInfo, unplayInfo.unplay_code]
-  let result = await mariaDB.query('updateUnplay', updateUnplay).catch((err)=> console.log(err))
+  let result = await mariaDB.updateUnplay('updateUnplay', updateUnplay).catch((err)=> console.log(err))
   if(result.affectedRows < 1){
     return result;
   }
+  return result;
+}
+//수리 처리
+const updateUnplayEndDate = async ({ unplay_code, unplay_end_date }) => {
+  const params = [unplay_end_date, unplay_code];
+  const result = await mariaDB.query('updateReFac', params).catch((err) => {
+    console.log('updateUnplayEndDate 오류:', err);
+    return null; // 실패 시 null 반환
+  });
   return result;
 }
 //가동업뎃
@@ -143,16 +150,14 @@ const unFacCheck = async (unplayCode) => {
   let list = await mariaDB.query('facCheck', unplayCode)
   return list;
 }
-
-//비가동 설비 삭제
-// const deleteUnplay = async(unplayCode) =>{
-//   let result = await mariaDB.query('delUnplay', unplayCode).catch((err)=> console.log(err))
-//   if (result.affectedRows < 1) {
-//     return result;
-//   }
-//   return result;
-// }
-
+//설비삭제
+const delFac = async (facCode) => {
+  let result = await mariaDB.query('delFac', facCode).catch((err)=> console.log(err))
+  if (result.affectedRows < 1) {
+    return result;
+  }
+  return result;
+}
 //비가동사유
 const reason = async() =>{
   let list = await mariaDB.query('reasonFac');
@@ -219,7 +224,6 @@ module.exports = {
   repaireFac,
   modifyUnplay,
   unFacCheck,
-  // deleteUnplay,
   reason,
   facModal,
   statuFac,
@@ -232,5 +236,6 @@ module.exports = {
   addFac,
   facPattern,
   updateFac,
-  facService,
+  updateUnplayEndDate,
+  delFac,
 }

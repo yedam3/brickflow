@@ -6,6 +6,7 @@ const multer = require("multer");
 const fs = require("fs");
 
 const path = require("path");
+const { lowerCase } = require("lodash");
 
 // 저장 경로 지정
 const storage = multer.diskStorage({
@@ -104,17 +105,30 @@ router.post("/repaireFac", async (req,res)=>{
 
 });
 //설비 수정
-router.put("/updateFac", async(req, res)=> {
-    const {facCode} = req.body;
-    let result = await facService.updateFac(facCode).catch((err) => console.log(err));
-    res.send(result);
-})
+router.put("/updateFac", async (req, res) => {
+    const { imagePreview, ...updateData } = req.body;
+    if (!updateData.fac_code) {
+      return res.status(400).send({ error: "fac_code 누락" });
+    }
+    const result = await facService.updateFac(updateData);
+    if (result?.affectedRows > 0) {
+        res.json({ result: true });
+      } else {
+        res.status(500).json({ result: false, message: "DB 수정 실패" });
+      }
+  });
 //비가동설비 수정
 router.put("/modifyUnplay", async(req, res)=>{
     const {unplayFac} = req.body;
     let result = await facService.modifyUnplay(unplayFac).catch((err) => console.log(err));
     res.send(result);
 })
+// 수리 완료 후 종료일시만 업데이트하는 라우터
+router.put("/updateUnplayEndDate", async (req, res) => {
+    const { unplay_code, unplay_end_date } = req.body;
+    const result = await facService.updateUnplayEndDate({ unplay_code, unplay_end_date }).catch(err => console.log(err));
+    res.send(result);
+})  
 //비가동 업뎃
 router.put('/updateList', async (req, res) => {
     const { facStatus, facCode } = req.body;
@@ -135,12 +149,12 @@ router.get('/unFacCheck', async (req, res)=> {
     res.send(list);
 })
 
-//비가동 설비 삭제
-// router.delete('/delUnplay/:ucd', async(req,res)=>{
-//     let unplayCode = req.params.ucd;
-//     let result = await facService.deleteUnplay(unplayCode)
-//     res.send(result);
-// })
+//설비삭제
+router.delete('/delFac/:fcd', async(req, res) => {
+    let facCode = req.params.fcd;
+    let result = await facService.delFac(facCode)
+    res.send(result);
+})
 
 //설비 모달리스트
 router.get('/facModal', async (req, res) => {

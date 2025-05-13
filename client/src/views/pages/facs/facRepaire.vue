@@ -80,10 +80,12 @@
 </template>
 
 <script>
+import moment from 'moment';
 import { AgGridVue } from "ag-grid-vue3";
 import DatePickerEditor from "../../../components/DatePickerEditor.vue";
 import axios from "axios";
 import Swal from "sweetalert2";
+import { useUserStore } from '@/stores/user';
 export default {
   components:{
     AgGridVue,
@@ -95,7 +97,8 @@ export default {
         {
           unplay_code: "",
           unplay_reason_code: "",
-          employee_code: "",
+          employee_code: useUserStore().empName,
+          employee_name: useUserStore().id,
           unplay_start_date: "",
           note: "",
           fac_code: '',
@@ -110,15 +113,26 @@ export default {
           break_status:"",
           fac_result:"",
           unplay_code: "",
-          employee_code: "",
+          employee_code: useUserStore().empName,
+          employee_name: useUserStore().id,
           note: "",
           fac_code: '',
         },
       columnDefs: [
         { field: "fac_code", headerName: "설비코드", flex: 3, },
         { field: "unplay_code", headerName: "비가동설비코드", flex: 3, },
-        { field: "unplay_reason_code", headerName: "비가동사유코드", flex: 3, },
-        { field: "employee_code", headerName: "당담자", flex: 3, },
+        { field: "unplay_reason_code", headerName: "비가동사유코드", flex: 3, 
+          valueFormatter: (params) => {
+            if (Array.isArray(this.reasonFacAry)) {
+              const reason = this.reasonFacAry.find(
+                item => item.unplay_reason_code === params.value
+              );
+              return reason ? reason.sub_code_name : params.value;
+            }
+            return params.value;
+          }
+        },
+        { field: "employee_name", headerName: "당담자", flex: 3, },
         { field: "unplay_start_date", headerName: "비가동시작일시", flex: 3, },
         { field: "note", headerName: "비고", flex: 3, },
       ],
@@ -139,8 +153,8 @@ export default {
             },
             facResultAry:[
               {
-                fac_result: 'OR01',         
-                sub_code_name: '수리완료'
+                fac_result: '수리완료',         
+                sub_code: 'OH1'
               }
             ],
     }
@@ -149,6 +163,7 @@ export default {
     this.autoReCode();
     this.repaireList();
     this.facResult();
+    this.reasonFac();
   },
   methods: {
     comCellClicked(event) {
@@ -165,60 +180,82 @@ export default {
   }
     },
     //수리처리
-    async addRepaire(){
+    async addRepaire() {
+      const {
+        repaire_add_date,
+        fac_history,
+        break_status,
+        fac_result,
+        fac_code,
+        unplay_code,
+        employee_code
+      } = this.rowData2;
+
+      if (
+        !repaire_add_date ||
+        !fac_history ||
+        !break_status ||
+        !fac_result ||
+        !fac_code ||
+        !unplay_code ||
+        !employee_code
+      ) {
+        Swal.fire("입력 오류", "모든 필수 항목을 입력해주세요.", "warning");
+        return;
+      }
+      const now = moment().format("YYYY-MM-DD HH:mm");
+      this.rowData2.repaire_finish_date = now;
+
       await this.autoReCode();
+
       axios.post('/api/fac/repaireFac', {
         repaireFac: this.rowData2
-      })
-      .then(res => {
+      }).then(async res => {
         if (res.data.affectedRows > 0) {
+          const finishDate = this.rowData2.repaire_finish_date;
+
+          // 수리결과에 따라 상태 분기 처리
+          if (this.rowData2.fac_result === 'OH1') { // 수리완료
+            await axios.put('/api/fac/updateList', {
+              facStatus: 'FS1', // 가동
+              facCode: this.rowData2.fac_code
+            });
+
+            await axios.put('/api/fac/updateUnplayEndDate', {
+              unplay_code: this.rowData2.unplay_code,
+              unplay_end_date: finishDate
+            });
+          }
+          // 수리불가면 아무것도 안함 (비가동 상태 유지)
+
           Swal.fire({
-            title: '처리성공',
-            text: '정상적으로 처리가 완료되었습니다.',
+            title: '처리 완료',
+            text: '수리 등록이 완료되었습니다.',
             icon: 'success',
             confirmButtonText: '확인'
-          }).then(() => {
-            this.repaireList();
           });
+
+          this.repaireList();
           this.rowData2 = {
-          repaire_code:"",
-          repaire_add_date:"",
-          repaire_finish_date:"",
-          fac_history:"",
-          break_status:"",
-          fac_result:"",
-          unplay_code: "",
-          employee_code: "",
-          note: "",
-          fac_code: '',
-        };
+            repaire_code: "", repaire_add_date: "", repaire_finish_date: "",
+            fac_history: "", break_status: "", fac_result: "",
+            unplay_code: "", employee_code: "", note: "", fac_code: ''
+          };
+
         } else {
-          Swal.fire({
-            title: '처리 실패',
-            text: '처리를 실패하였습니다..',
-            icon: 'error',
-            confirmButtonText: '확인'
-          });
+          Swal.fire("실패", "수리 등록 실패", "error");
         }
-      })
-        .catch(error => {
-          console.error(error);
-          Swal.fire({
-            title: '처리 실패',
-            text: '알수 없는 오류가 발생하였습니다..',
-            icon: 'error',
-            confirmButtonText: '확인'
-          });
-          return;
-        });
+      });
     },
      //조회
     async repaireList() {
             await axios.get('/api/fac/repaireList', {
             })
                 .then(res => {
+                  console.log('API 응답 데이터:', res.data);
                     console.log(res.data)
-                    this.rowData = res.data;
+                    // 수리완료인 경우 제외하고 보여주기
+                    this.rowData = res.data.filter(item => item.fac_result !== 'OH1');
                 })
     },
     async clicked(event) {
@@ -241,8 +278,19 @@ export default {
         this.facResultAry = res.data;
       })
       .catch(err => console.error(err));
+    },
+    //비가동 사유
+    async reasonFac() {
+      await axios.get('/api/fac/reasonFac')
+        .then(res => {
+          console.log(res.data);
+          this.reasonFacAry = res.data;
+
+          this.reasonFacAry = [...res.data];
+        })
+        .catch(err => console.error(err));
     }
-  },
+  }
 }
 </script>
 
