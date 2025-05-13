@@ -1,26 +1,24 @@
 <template>
   <!-- 주문관리-->
   <div class="card border-0 h-100">
-    <div class="font-semibold text-xl mb-4">주문 관리</div>
-    <div class="text-end mt-3 mb-3">
-      <Button label="조회" severity="success" class="me-3" @click="orderList" />
+        <div class="font-semibold text-xl mb-4">주문 관리</div>
+        <div class="text-end mt-3 mb-3">
+          <Button label="조회" severity="success" class="me-3" @click="orderList" />
       <Button label="등록" severity="info" class="me-3" @click="addOrder" />
       <Button label="수정" severity="help" class="me-3" @click="modifyOrder" />
       <Button label="삭제" severity="danger" class="me-5" @click="orderDelete" />
-    
 
-    <!--메인 그리드-->
-    <ag-grid-vue class="ag-theme-alpine" style="width: 100%; 
+        </div>
+        <!-- 메인 그리드 -->
+        <ag-grid-vue class="ag-theme-alpine" style="width: 100%; 
     height: 150px;" :columnDefs="columnDefs" :rowData="rowData" :gridOptions="gridOptions"
-      :defaultColDef="defaultColDef" @cellClicked="comCellClicked">
-    </ag-grid-vue>
-  </div>
-</div>
+            :defaultColDef="defaultColDef" @cellClicked="comCellClicked">
+        </ag-grid-vue>
+    </div>
+
   <!-- 주문 상세 그리드-->
   <div class="card border-0 h-100">
-    <div class="font-semibold text-xl mb-4">
       <h4 class="text-start">주문 상세</h4>
-    </div>
     <div class="text-end mt-3 mb-3 ">
       <Button label="행추가" severity="success" class="me-3" @click="addRow" />
       <Button label="행삭제" severity="danger" class="me-5" @click="deleteRow" />

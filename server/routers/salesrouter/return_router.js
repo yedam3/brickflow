@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const returnService = require("../../services/salesservice/return_service.js");
 
-router.get("/returnOrders/:orderCode", async (req, res) => {
+router.get("/returnOrders/:deliveryCode", async (req, res) => {
   
   const { orders_code } = req.params.orderCode;
   console.log('오더코드',orders_code)
