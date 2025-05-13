@@ -56,6 +56,10 @@ export default {
         mat_req_qty: {
             type: Number,
             required: false,
+        },
+        mat_temp_data: {
+            type: Array,
+            required: false,
         }
     },
     
@@ -71,8 +75,6 @@ export default {
             rowData: [],
 
             mat_data: [],
-
-            mat_hold_data: [],
 
             columnDefs: [
                 { field: "mat_LOT", headerName: "LOT번호", flex: 1 },
@@ -121,24 +123,40 @@ export default {
             }).catch(error => { console.error(error) });
 
             let matList = result.data;
+            console.log(matList);
             for(let data of matList) {
                 this.rowData.push({
                     mat_LOT: data.mat_LOT,
                     mat_code: data.mat_code,
                     mat_name: data.mat_name,
                     store_date: data.store_date,
-                    available_qty: data.available_qty,
+                    available_qty: parseInt(data.available_qty),
                 });
             }
 
-            this.rowData = [...this.rowData];
+                
+            for(let temp of this.mat_temp_data) {
+                let matchIndex = this.rowData.findIndex(item => {
+                    return item.mat_code == temp.mat_code && item.mat_LOT == temp.mat_LOT
+                });
+                if(matchIndex !== -1) {
+                    this.rowData[matchIndex].available_qty = parseInt(this.rowData[matchIndex].available_qty) - parseInt(temp.hold_quantity);
+                }
+            }
+
+            let temp2 = [];
+            for(let data of this.rowData) {
+                if(data.available_qty > 0) {
+                    temp2.push(data);
+                }
+            }
+            this.rowData = [...temp2];
 
             this.setMatHoldData(); 
         },
         autoHold() {
             let mat_list = [];
-
-            this.rowData.sort((a, b) => new Date(a.store_date) - new Date(b.store_date));
+            // this.rowData.sort((a, b) => new Date(a.store_date) - new Date(b.store_date));
 
             let remainingQty = this.mat_req_qty;
 
@@ -150,7 +168,6 @@ export default {
                 row.mat_hold_qty = holdQty;
                 remainingQty -= holdQty;
             }
-            console.log(this.rowData);
         },
 
         // 자재 확보 버튼
@@ -161,6 +178,7 @@ export default {
                 totalQty += parseInt(row.mat_hold_qty);
                 if(row.mat_hold_qty != '' && row.mat_hold_qty > 0) {
                     this.mat_data.push({
+                        prod_code: this.prod_code,
                         mat_code: row.mat_code,
                         mat_LOT: row.mat_LOT,
                         mat_hold_qty: row.mat_hold_qty

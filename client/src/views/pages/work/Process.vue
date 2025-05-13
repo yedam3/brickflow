@@ -272,6 +272,10 @@ export default {
                 const resData = res.data;
                 for(let data of resData) {
                     this.productOrderSelect.push(data.product_order_name);
+            
+                    this.processData = {
+
+                    }
                 }
             }).catch((err) => console.error(err))
         },
@@ -369,10 +373,6 @@ export default {
                     });
                 };
             }).catch((err) => console.error);
-            
-            this.processData = {
-                
-            }
 
             this.processData.process = {
                 work_lot: params.data.work_lot,                         // 공정 LOT
@@ -414,45 +414,45 @@ export default {
         startProcess() {
             // 필수 선택 항목 검증
             // 생산
-            // if (!this.processData.process) {
-            //     Swal.fire({
-            //         title: '오류',
-            //         text: '공정을 선택하세요.',
-            //         icon: 'error',
-            //         confirmButtonText: '확인',
-            //     });
-            //     return;
-            // }
-            // // 작업자
-            // if (!this.processData.emp) {
-            //     Swal.fire({
-            //         title: '오류',
-            //         text: '작업자를 선택하세요.',
-            //         icon: 'error',
-            //         confirmButtonText: '확인',
-            //     });
-            //     return;
-            // }
+            if (!this.processData.process) {
+                Swal.fire({
+                    title: '오류',
+                    text: '공정을 선택하세요.',
+                    icon: 'error',
+                    confirmButtonText: '확인',
+                });
+                return;
+            }
+            // 작업자
+            if (!this.processData.emp) {
+                Swal.fire({
+                    title: '오류',
+                    text: '작업자를 선택하세요.',
+                    icon: 'error',
+                    confirmButtonText: '확인',
+                });
+                return;
+            }
             // 설비
-            // if (!this.processData.fac) {
-            //     Swal.fire({
-            //         title: '오류',
-            //         text: '설비를 선택하세요.',
-            //         icon: 'error',
-            //         confirmButtonText: '확인',
-            //     });
-            //     return;
-            // }
+            if (!this.processData.fac) {
+                Swal.fire({
+                    title: '오류',
+                    text: '설비를 선택하세요.',
+                    icon: 'error',
+                    confirmButtonText: '확인',
+                });
+                return;
+            }
             // 설비 상태 확인
-            // if(process.processData.fac.fac_status === 'FS2') {
-            //     Swal.fire({
-            //         title: '오류',
-            //         text: '사용불가 상태의 설비입니다.',
-            //         icon: 'error',
-            //         confirmButtonText: '확인',
-            //     });
-            //     return;
-            // }
+            if(!this.processData.fac.fac_status === 'FS2') {
+                Swal.fire({
+                    title: '오류',
+                    text: '사용불가 상태의 설비입니다.',
+                    icon: 'error',
+                    confirmButtonText: '확인',
+                });
+                return;
+            }
 
             this.$router.push({ name: 'Control', query:{ work_lot: this.processData.process.work_lot, emp_code: this.processData.emp.emp_code, fac_code: this.processData.fac.fac_code}});
         },

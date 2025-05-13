@@ -128,7 +128,7 @@ import ProdModal from "@/components/modal/ProdModal.vue";
 export default {
     components: {
         AgGridVue,
-        datePicker: DatePickerEditor,
+        DatePicker: DatePickerEditor,
         OrderModal,
         PlanModal,
         ProdModal,
@@ -299,6 +299,7 @@ export default {
 
         // input 유효성 검사
         inputCheck() {
+            console.log(this.formData.employee_code);
             if (this.formData.plan_code == '' ||
                 this.formData.plan_name == '' ||
                 this.formData.employee_code == '' ||
@@ -433,6 +434,13 @@ export default {
                 return;
             }
             if(this.rowData.length <= 0) {
+                Swal.fire({
+                    title: '실패',
+                    text: '주문 상품이 존재 하지 않습니다.',
+                    icon: 'error',
+                    confirmButtonText: '확인'
+                });
+                return;
             }
             const plan_codeRes = await axios.get(`/api/work/plan/plan_codeCheck/${this.formData.plan_code}`).catch((err) => console.error(err));
             if (plan_codeRes.data.check > 0) {
