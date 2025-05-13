@@ -30,10 +30,54 @@ SELECT CONCAT('STR-', IFNULL(MAX(CAST(SUBSTR(store_code, 5) AS SIGNED)), 100) + 
   FROM store
 ` 
 
+const finishCheck = ` 
+ SELECT COUNT(*) AS COUNT
+FROM finishStore f JOIN prod_check c ON(f.prod_check_code = c.prod_check_code)
+WHERE c.prod_check_code = ?
+`
+const finishList = `
+SELECT prod_lot,
+	   prod_code,
+       getProdName(prod_code) AS prod_name,
+       quantity,
+       prod_check_code,
+       store_date,
+       storage_code
+FROM finishStore f JOIN store s ON (f.prod_lot = s.doc_code)
+`
 
+const possibleProdQuantity = `
+SELECT c.prod_check_code,
+	    getProdName(c.prod_code) AS prod_name,
+	    work_lot,
+	    c.prod_code,
+        pass_quantity - sum(IFNULL(quantity,0)) + ? AS pass_quantity
+FROM prod_check c  LEFT JOIN finishStore f
+                  ON(c.prod_check_code = f.prod_check_code)
+WHERE c.prod_code = ? 
+GROUP BY c.prod_check_code
+HAVING pass_quantity > 0
+`
+
+const finishUpdate = `
+    UPDATE finishStore
+    SET quantity = ?
+    WHERE PROD_lot= ?
+`
+const finishStoreUpdate = `
+   UPDATE store
+SET inbound_quantity= ?,
+    storage_code = ? 
+WHERE doc_code = ?
+`
 module.exports = {
   storeProdList,
   maxProdLot,
   addFinshied,
-  storeFinished
+  storeFinished,
+  finishCheck,
+  finishList,
+  possibleProdQuantity,
+  finishUpdate,
+  finishStoreUpdate
 }

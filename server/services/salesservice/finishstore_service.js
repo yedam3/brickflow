@@ -54,8 +54,55 @@ const finishAdd = async (finishedInfo) => {
   return result;
 }
 
+//값체크
+const countCheck = async(checkCode) => {
+  let result = await mariaDB.query('finishCheck',checkCode)
+  return result
+}
+
+//완제품 입고 항목 조회
+const finishList = async() => {
+  let result = await mariaDB.query('finishList')
+  return result;
+}
+//제고 가능 수량 조회
+const possibleQuantity = async(prodcode,quantity) => {
+
+  let result = await mariaDB.query('possibleProdQuantity',[quantity,prodcode])
+  return result ; 
+}
+
+//수정
+const finishUpdate = async (finishInfo) => {
+  let conn;
+  let result;
+
+  try{
+    conn = await mariaDB.getConnection();
+    await conn.beginTransaction();
+     //수정
+     let selectQuery =await mariaDB.selectedQuery('finishUpdate',[finishInfo.quantity,finishInfo.prod_lot])
+     result = await conn.query(selectQuery,[finishInfo.quantity,finishInfo.prod_lot])
+                        .catch((err) => console.log(err));
+     //창고수정
+     let selectedQuery = await mariaDB.selectedQuery('finishStoreUpdate',[finishInfo.quantity,finishInfo.storage_code,finishInfo.prod_lot])
+     result = await conn.query(selectedQuery,[finishInfo.quantity,finishInfo.storage_code,finishInfo.prod_lot])
+                                        .catch((err) => console.log(err));
+        await conn.commit();                
+  }catch{
+    if (conn) await conn.rollback();
+    return result;
+  }finally{
+    if(conn) conn.release();
+  }
+  return result;
+}
 module.exports={
   storageList,
   storeList,
-  finishAdd
+  finishAdd,
+  countCheck,
+  finishList,
+  possibleQuantity,
+  finishUpdate
 }
