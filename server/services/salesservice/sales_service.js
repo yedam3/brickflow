@@ -2,16 +2,13 @@ const {inRange} = require("lodash");
 const mariaDB = require("../../db/mapper.js");
 const {convertObjToAry} = require("../../utils/converts.js");
 
-const findAll = async () => {
-  let list = await mariaDB.query("testList").catch(err => console.log(err));
-  return list;
-};
+// const findAll = async () => {
+//   let list = await mariaDB.query("testList").catch(err => console.log(err));
+//   return list;
+// };
 
 //업체리스트 조회
-const comList = async ({
-  type,
-  keyword
-}) => {
+const comList = async ({type,keyword}) => {
   let searchCondition = {};
   let convertedCondition = ''; // 기본값
 
@@ -41,8 +38,8 @@ const salesOrderAdd = async (salesOrder, salesOrderDetail) => {
       salesOrder.del_date,
       salesOrder.employee_code,
       salesOrder.note,
-      salesOrder.finish_status,
       salesOrder.company_code,
+      salesOrder.company_name,
     ])
     .catch((err) => console.log(err));
   if (result.affectedRows < 1) {
@@ -51,18 +48,18 @@ const salesOrderAdd = async (salesOrder, salesOrderDetail) => {
   for (let detail of salesOrderDetail) {
     detail.orders_detail_code = (await mariaDB.query('salesAutoOrderDetail'))[0].code;
     result = await mariaDB.query('salesOrderDetailAdd', [
-        detail.orders_detail_code, salesOrder.orders_code, detail.quantity, detail.price, detail.note, detail.prod_code, detail.finish_status
+        detail.orders_detail_code, salesOrder.orders_code, detail.delivery_demand, detail.price, detail.note, detail.prod_code, detail.finish_status
       ])
       .catch((err) => console.log(err));
   }
   return result;
 }
 
-//메인 그리드 디스플레이
-const findOrderAll = async (orderCode) => {
-  let list = await mariaDB.query('orderschoice', orderCode)
-  return list;
-}
+// //메인 그리드 디스플레이
+// const findOrderAll = async (orderCode) => {
+//   let list = await mariaDB.query('orderschoice', orderCode)
+//   return list;
+// }
 
 // 메인조회
 const findMainOrders = async (orders_code) => {
@@ -97,7 +94,7 @@ const modifyoders = async (orders, ordersDetail) => {
         }
   for (let detail of ordersDetail) {                // [ 객체 ,            주문번호값       ]
     let upDetailInfo = {
-      quantity: detail.quantity,
+      quantity: detail.delivery_demand,
       price: detail.price,
       note: detail.note,
       prod_code: detail.prod_code,
@@ -129,8 +126,8 @@ const modifyoders = async (orders, ordersDetail) => {
       }
 
       module.exports = {
-        findAll,
-        findOrderAll,
+        // findAll,
+        // findOrderAll,
         comList,
         salesOrderAdd,
         orderCheck,

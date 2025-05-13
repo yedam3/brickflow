@@ -18,15 +18,15 @@
                 <InputGroupAddon>
                   업체명
                 </InputGroupAddon>
-                <InputText v-model="formData.company_name" size="large" placeholder="" />
+                <InputText v-model="rowData.company_name" size="large" placeholder="" />
               </InputGroup>
             </div>
             <div class="col-4">
               <InputGroup>
                 <InputGroupAddon>
-                  제품명
+                  출고명
                 </InputGroupAddon>
-                <InputText v-model="formData.prod_name" size="large" placeholder="" readonly />
+                <InputText v-model="rowData.delivery_name" size="large" placeholder="" readonly />
               </InputGroup>
             </div>
             <div class="col-4">
@@ -34,7 +34,7 @@
                 <InputGroupAddon>
                   주문번호
                 </InputGroupAddon>
-                <InputText v-model="formData.orders_code" size="large" placeholder="" readonly />
+                <InputText v-model="rowData.orders_code" size="large" placeholder="" readonly />
               </InputGroup>
             </div>
           </div>
@@ -44,7 +44,7 @@
 
     <!--메인 그리드-->
     <ag-grid-vue class="ag-theme-alpine custom-grid-theme" :columnDefs="columnDefs" :rowData="formData"
-      :gridOptions="gridOptions">
+      :gridOptions="gridOptions" @rowClicked = "gridselect" >
     </ag-grid-vue>
   </div>
 
@@ -59,7 +59,7 @@
                 <InputGroupAddon>
                   제품명
                 </InputGroupAddon>
-                <InputText v-model="formData.prod_name" size="large" placeholder="" />
+                <InputText v-model="serowData.prod_name" size="large" placeholder="" />
               </InputGroup>
             </div>
             <div class="col-4">
@@ -67,7 +67,7 @@
                 <InputGroupAddon>
                   업체명
                 </InputGroupAddon>
-                <InputText v-model="formData.company_name" size="large" placeholder="" readonly />
+                <InputText v-model="serowData.company_name" size="large" placeholder="" readonly />
               </InputGroup>
             </div>
             <div class="col-4">
@@ -75,7 +75,7 @@
                 <InputGroupAddon>
                   LOT번호
                 </InputGroupAddon>
-                <InputText v-model="formData.prod_LOT" size="large" placeholder="" readonly />
+                <InputText v-model="serowData.prod_LOT" size="large" placeholder="" readonly />
               </InputGroup>
             </div>
           </div>
@@ -85,7 +85,7 @@
                 <InputGroupAddon>
                   수량
                 </InputGroupAddon>
-                <InputText v-model="formData.delivery_quantity" size="large" placeholder="" readonly />
+                <InputText v-model="serowData.delivery_quantity" size="large" placeholder="" readonly />
               </InputGroup>
             </div>
             <div class="col-4">
@@ -93,7 +93,7 @@
                 <InputGroupAddon>
                   판매일자
                 </InputGroupAddon>
-                <DatePicker v-model="formData.start_date" size="large" dateFormat="yy/mm/dd" placeholder="(입력)" showIcon
+                <DatePicker v-model="serowData.start_date" size="large" dateFormat="yy/mm/dd" placeholder="(입력)" showIcon
                   iconDisplay="input" />
               </InputGroup>
             </div>
@@ -122,6 +122,13 @@ export default {
   },
   data() {
     return {
+      rowData: [
+        {
+          // company_name: "",
+          // delivery_name: "",
+          // orders_code:"",
+        }
+      ],
       // 메인 그리드
       formData: [
         // {
@@ -129,18 +136,28 @@ export default {
         // prod_name: "",          // 제품명
         // company_name: "",       // 업체명
         // delivery_quantity: "",  // 수량
-        // delivery_date: "",      // 판매일자  
+        // del_date: "",      // 판매일자  
         // prod_LOT: "",           // LOT번호
         // note: "",               // 비고
         // }
       ],
+      serowData: [
+        // {
+        //   prod_name: "",
+        //   company_name: "",
+        //   prod_LOT: "",
+        //   delivery_quantity: "",
+        //   del_date: "",  
+        //   }
+        ],
+
       columnDefs: [
         { field: "orders_code", headerName: "주문번호", flex: 1, cellStyle: { textAlign: "center" } },
         { field: "prod_name", headerName: "제품명", flex: 1, cellStyle: { textAlign: "center" } },
         { field: "company_name", headerName: "업체명", flex: 1, cellStyle: { textAlign: "center" } },
-        { field: "delivery_quantity", headerName: "수량", flex: 1, cellStyle: { textAlign: "center" } },
-        { field: "del_date", headerName: "판매일자", flex: 1, editable: true, cellStyle: { textAlign: "center" } },
-        { field: "prod_LOT", headerName: "LOT번호", flex: 1, editable: true, cellStyle: { textAlign: "center" } },
+        { field: "delivery_quantity", headerName: "출고수량", flex: 1, cellStyle: { textAlign: "center" } },
+        { field: "del_date", headerName: "판매일자", flex: 1, editable: false, cellStyle: { textAlign: "center" } },
+        { field: "prod_LOT", headerName: "LOT번호", flex: 1, editable: false, cellStyle: { textAlign: "center" } },
         { field: "note", headerName: "비고", flex: 1, editable: true, cellStyle: { textAlign: "center" } },
       ],
       gridOptions: {
@@ -157,35 +174,45 @@ export default {
       selectedRowIndexes: [], //메인그리드 행 인덱스 ary
     };
   },
-  mounted() { },
+  mounted() {},
 
   methods: {
-
-
     // 출고 모달창
     deliverytList() {
       this.showDeliveryModal = true;
     },
     //출고 모달창 값 전달
     async deliveryOrderSelected(order) {
-      await axios.get(`/api/sales/orders/${order.orders_code}`)
-        .then(res => {
+      //Input 값 넣기
+      this.rowData.company_name = order.company_name;
+      this.rowData.delivery_name = order.delivery_name;
+      this.rowData.orders_code = order.orders_code;
+      await axios.get(`/api/sales/returnOrders/${order.orders_code}`)
+      .then(res => {
+          console.log(res.data)
+          //메인 그리드
+          let ary = []
           for (let data of res.data) {
-            this.formData.push({
-              orders_code: data.orders_code,                                //주문 코드
-              prod_name: data.prod_name,                                    //제품명
-              company_name: data.company_name,                              //업체명  
+            ary.push({
+              orders_code: order.orders_code,                                //주문 코드
+              prod_name: order.prod_name,                                    //제품명
+              company_name: order.company_name,                              //업체명  
               delivery_quantity: data.delivery_quantity,                    //수량
               del_date: data.del_date,                                      //출고 일자  
               prod_LOT: data.prod_LOT,                                      //LOT
               note: data.note,                                              //비고
             })
           }
-          this.formData = [...this.formData];
+          this.formData = [...ary];
           console.log(this.formData);
         })
         .catch((err) => console.log(err));
     },
+
+    //메인 그리드 값 -> 아래로 넘겨주기
+    async gridselect(event) {
+    
+    }
   }
 }
 

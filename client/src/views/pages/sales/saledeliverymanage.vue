@@ -158,22 +158,23 @@ export default {
         deliverytList() {
             this.showDeliveryModal = true;
         },
+        //메인 그리드로 값 전달
         async deliveryOrderSelected(order) {
             // await axios.get(`/api/sales/orders/:orders_code`, {
             await axios.get(`/api/sales/orders/${order.orders_code}`)
                 .then(res => {
+                    console.log(res.data)
                     let serverRowData = res.data;
                     for (let value of serverRowData) {
                         value.delivery_code = order.delivery_code;
                         value.delivery_name = order.delivery_name; // 빈값을 넣어주는거
-                        value.company_name = value.company_name;
-                        value.company_code = value.company_code;                      
+                        value.company_name = order.company_name;
+                        value.company_code = order.company_code;                      
                         value.yetdelivery = value.yetdelivery + value.delivery_quantity
                         value.alreadydelivery = value.alreadydelivery - value.delivery_quantity
                     }
-                    //this.rowData[0].orders_code = res.orders_code;
                     this.rowData = [...serverRowData];
-
+                    
                 })
                 .catch((err) => console.log(err));
 

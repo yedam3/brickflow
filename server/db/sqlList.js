@@ -1,6 +1,7 @@
 //sqlList.js
 const sales = require('./sqls/sales/sales.js');
 const delivery = require('./sqls/sales/delivery.js');
+const returns = require('./sqls/sales/return.js');
 const mat = require('./sqls/mat/mat.js');
 const fac = require('./sqls/fac/fac.js');
 const prodcheck = require('./sqls/qual/prodcheck.js');
@@ -46,4 +47,5 @@ module.exports = {
     ...login,
     ...employees,
     ...prodFinished,
+    ...returns
 }

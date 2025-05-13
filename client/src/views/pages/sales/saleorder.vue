@@ -90,9 +90,9 @@ export default {
         orders_code: '',
         prod_code: '',
         prod_name: '',
-        quantity: '',
-        price: '',
-        totalprice: '',
+        delivery_demand: 0,
+        price: 0,
+        totalprice: 0,
         note: '',
       }
       ],
@@ -100,11 +100,11 @@ export default {
         //체크박스 
         { headerCheckboxSelection: true, checkboxSelection: true, width: 50 },
         { field: 'orders_code', headerName: '주문번호', flex: 2, },
-        { field: 'prod_code', headerName: '제품코드', flex: 2, editable: true },
+        { field: 'prod_code', headerName: '제품코드', flex: 2, editable: false },
         { field: 'prod_name', headerName: '제품명', flex: 2, editable: false },
-        {field: 'quantity', headerName: '수량', flex: 2, editable: true, valueFormatter: (params) => {return params.value != null ? `${params.value}` : '';}},
+        { field: 'delivery_demand', headerName: '수량', flex: 2, editable: true, valueFormatter: (params) => {return params.value != null ? `${params.value}` : '';}},
         { field: 'price', headerName: '단가', flex: 2, editable: true },
-        { field: 'totalprice', headerName: '총주문 금액', valueGetter: 'Number(data.quantity) * Number(data.price)', flex: 3 },
+        { field: 'totalprice', headerName: '총주문 금액', valueGetter: 'Number(data.delivery_demand) * Number(data.price)', flex: 3 },
         { field: 'note', headerName: '비고', flex: 3 },
       ],
       gridOptions: {
@@ -126,6 +126,7 @@ export default {
       selectedRowIndexes: [],
       //상세그리드 행 인덱스
       selectedSecondIndex: [],
+      orderStop:false, // 행추가 막기
       
     };
   },
@@ -189,19 +190,38 @@ export default {
     },
     //행추가
     addRow() {
+      if (this.orderStop) {
+        Swal.fire({
+          title: '실패',
+          text: '수정중 행추가가 불가합니다.',
+          icon: 'error',
+          confirmButtonText: '확인'
+        });
+        return
+      }
       this.secondRowData.push({
-        orders_code: "",
-        prod_code: "",
-        prod_name: "",
-        quantity: 0,
-        price: 0,
-        note: "",
+                                orders_code: "",
+                                prod_code: "",
+                                prod_name: "",
+                                delivery_demand: 0,
+                                price: 0,
+                                totalprice:0,
+                                note: "",
       })
       // 새 배열로 설정하여 AG Grid가 반영하게 만듬
       this.secondRowData = [...this.secondRowData];
     },
     //행삭제
     deleteRow() {
+      if (this.orderStop) {
+        Swal.fire({
+          title: '실패',
+          text: '수정중 행추가가 불가합니다.',
+          icon: 'error',
+          confirmButtonText: '확인'
+        });
+        return
+      }
       const selectedNodes = this.$refs.secondGrid.api.getSelectedNodes();
       const selectedData = selectedNodes.map(node => node.data);
 
@@ -235,17 +255,18 @@ export default {
       //상세 그리드로 전달
       await axios.get(`/api/sales/detail/${order.orders_code}`)
         .then(res => {
-          console.log(res.data)
           this.secondRowData = res.data; // 응답받은 데이터를 상세 그리드 데이터로 설정
           console.log(res.data);
           this.secondRowData = [...this.secondRowData]
+          this.orderStop = true;
       })
     },
 
     fullCheck() {
       //메인그리드 값 다들어 갔는지 체크
-      if (this.rowData[0].company_code == '' || this.rowData[0].company_name == '',
-        this.rowData[0].delivery_date == '' || this.rowData[0].request_date == '',
+      console.log(this.rowData[0])
+      if (this.rowData[0].company_code == '' || this.rowData[0].company_name == '' ||
+        this.rowData[0].delivery_date == '' || this.rowData[0].request_date == '' ||
         this.rowData[0].order_name == '') {
         Swal.fire({
           title: '실패',
@@ -261,7 +282,7 @@ export default {
           icon: 'error',
           confirmButtonText: '확인'
         });
-        return 2;
+        return 1;
       }
       //상세그리드 값 다들어 갔는지 체크
       for (let rowInclude of this.secondRowData) {
@@ -283,7 +304,7 @@ export default {
       })
         .catch((err) => console.log(err));
         
-      if (res.data[0].checkCount < 1) {
+      if (res.data[0].checkCount > 1) {
         Swal.fire({
           title: '등록 실패',
           text: '이미 등록된 주문입니다.',
@@ -293,8 +314,6 @@ export default {
         return;
       }
       if (this.fullCheck() == 1) {
-        return;
-      } else if (this.fullCheck() == 2) {
         return;
       }
       //등록
@@ -359,8 +378,7 @@ export default {
               confirmButtonText: '확인'
             });
 
-            this.orderSelected({ orders_code: this.rowData[0].orders_code });
-
+            this.orderSelected({ orders_code: this.rowData[0].orders_code }); // 수정된 주문코드를 다시 선택하여 상세 정보 재조회
           } else {
             Swal.fire({
               title: '수정 실패',

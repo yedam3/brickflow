@@ -49,7 +49,7 @@ const deliveryList = async ({
 // 메인조회
 const findMainOrders = async (orders_code) => {
     let list = await mariaDB.query("orderinfochoice", orders_code)
-    return list[0];
+    return list;
 }
 // 상세그리드 조회
 const findorders = async (orders_code) => {
@@ -180,7 +180,7 @@ const removedelivery = async (delivery_code) => {
 
     return result;
 };
-//두번쨰 그리드 값전달
+//두번쨰 그리드 값전달(상세 값 전달)
 const deliveryDetailRender = async (ordersCode,delivery_code) => { 
     const result = await mariaDB.query('deliveryDetailRender',[ordersCode,delivery_code])
         .catch(err => console.log(err));

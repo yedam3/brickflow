@@ -2,8 +2,10 @@ const express = require("express");
 const router = express.Router();
 const returnService = require("../../services/salesservice/return_service.js");
 
-router.get("`/api/sales/orders/", async (req, res) => {
-  const {orders_code} = req.params;
+router.get("/returnOrders/:orderCode", async (req, res) => {
+  
+  const { orders_code } = req.params.orderCode;
+  console.log('오더코드',orders_code)
   let orderList = await returnService.findMainretrun(orders_code).catch((err) => console.log(err));
   res.send(orderList);
 })
