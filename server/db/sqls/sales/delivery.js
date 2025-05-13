@@ -107,6 +107,21 @@ const deliveryModal = `
    JOIN delivery_manage_detail d ON(m.delivery_code = d.delivery_code)
    GROUP BY delivery_code
   `
+// // 메인한건 조회
+// const deliveryRender =
+//   `SELECT  orders_code
+//         , order_name
+//         , orders_date
+//         , del_date
+//         , employee_code
+//         , company_code
+//         , getComName(company_code) AS company_name
+//         , note
+//   FROM orders
+//   WHERE orders_code = ? `;
+
+
+  //출고 상세 
 const deliveryDetailRender = `
 SELECT orders_detail_code, o.orders_code, quantity AS delivery_demand,delivery_quantity,
   (SELECT IFNULL(SUM(delivery_quantity), 0) FROM delivery_manage_detail d JOIN delivery_manage m ON(d.delivery_code = m.delivery_code) WHERE orders_code = o.orders_code AND prod_code = o.prod_code) AS alreadydelivery,
@@ -115,7 +130,6 @@ FROM order_detail o JOIN delivery_manage d ON(o.orders_code = d.orders_code)
 JOIN delivery_manage_detail de ON(de.delivery_code = d.delivery_code AND o.prod_code = de.prod_code)
 JOIN company c ON(d.company_code = c.company_code)
 WHERE o.orders_code = ? AND de.delivery_code = ?
-  -- 조인 추가
 `
 module.exports = {
   deliveryAdd,
@@ -133,7 +147,8 @@ module.exports = {
   deliveryStatus,
   deliveryModal,
   deliveryDetailRender,
-  storageDeliveryUpdate
+  storageDeliveryUpdate,
+  // deliveryRender
 
   
 }

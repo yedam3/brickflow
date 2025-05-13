@@ -65,6 +65,14 @@ router.get('/deliveryModal', async (req, res) => {
    res.send(deliveryList);
 })
 
+// //조회 
+// router.get('/delveryfind/:order_code/:delivery_code', async (req, res) => {
+//   const { orderCode } = req.params;
+//   let Finddelivery = await deliveryService.findMainOrders(orderCode).catch((err) => console.log(err));
+//   res.send(Finddelivery);
+// })
+
+//상세 조회
 router.get('/deldetail/:orders_code/:delivery_code', async (req, res) => { 
   const orderCode = req.params.orders_code;
   const delivery_code = req.params.delivery_code;
