@@ -97,6 +97,18 @@ const finishUpdate = async (finishInfo) => {
   }
   return result;
 }
+//출거건 있는지확인
+ const deliveryCount = async(prodLot) => {
+   let result = await mariaDB.query('deliveryFinishCheck',prodLot)
+   return result;
+ } 
+ //삭제
+ const deleteFinish = async(prodLot) => {
+  let result = await mariaDB.query('deleteFinish',prodLot);
+  result = await mariaDB.query('deleteStore',prodLot);
+  return result;
+ }
+
 module.exports={
   storageList,
   storeList,
@@ -104,5 +116,7 @@ module.exports={
   countCheck,
   finishList,
   possibleQuantity,
-  finishUpdate
+  finishUpdate,
+  deliveryCount,
+  deleteFinish
 }
