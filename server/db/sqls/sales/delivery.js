@@ -1,14 +1,14 @@
 
 //출고 가능 수량그리드에 조회
 const prodcheck = `
-SELECT SUM(inbound_quantity) - SUM(dispatch_quantity) as delivery_before_quantity,
+SELECT SUM(IFNULL(inbound_quantity,0)) - SUM(IFNULL(dispatch_quantity,0)) as delivery_before_quantity,
         item_code as prod_code,
          getProdName(item_code) AS prod_name,
           lot as prod_LOT
 FROM store
 WHERE item_code =?
 GROUP BY item_code, lot
-HAVING SUM(inbound_quantity) - SUM(dispatch_quantity) > 0;`
+HAVING SUM(IFNULL(inbound_quantity,0)) - SUM(IFNULL(dispatch_quantity,0)) > 0;`
 
 // 출고코드 자동 부여
 const deliveryAutoOrder =
