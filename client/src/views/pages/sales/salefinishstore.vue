@@ -1,15 +1,15 @@
 <template>
-  <div class="card border-0 h-100">
+  <div class="card border-0 mt-5" style="background-color: #f8f9fa;height: 800px;">
     <div class="font-semibold text-xl mb-4">완제품 관리</div>
     <div class="font-semibold text-l mb-4">완제품 입고</div>
     <div class="text-end mt-3 mb-3">
       <Button label="조회" severity="success" class="me-3" @click="orderList" />
       <Button label="등록" severity="info" class="me-3" @click="addFunc" />
       <Button label="수정" severity="help" class="me-3" @click="modifyFunc" />
-      <Button label="삭제" severity="danger" class="me-5" @click="" />
+      <Button label="삭제" severity="danger" class="me-5" @click="deleteFunc" />
     </div>
     <div class="mb-3">
-      <Card style="overflow: hidden; background-color: #f8f9fa;">
+      <Card style="overflow: hidden; ">
         <template #content>
           <div class="mb-5 row">
             <div class="col-4">
@@ -94,7 +94,7 @@
         </template>
       </Card>
     </div>
-  </div>
+  
   <div class="row">
     <div class="col-6">
       <div class="row">
@@ -124,6 +124,7 @@
 
       </div>
     </div>
+  </div>
   </div>
   <CheckSuccess
         :visible="showOrderModal"
@@ -162,12 +163,12 @@ export default{
       },
       rowData : [],
       columnDefs: [
-        { field: 'prod_lot', headerName: 'LOT', flex: 3, },
-        { field: 'prod_code', headerName: '제품코드', flex: 2, },
-        { field: 'prod_name', headerName: '제품명', flex: 3, },
-        { field: 'quantity', headerName: '수량', flex: 3, },
-        { field: 'store_date', headerName: '입고일자', flex: 3, },
-        { field: 'prod_check_code', headerName: '검수코드', flex: 2,},
+        { field: 'prod_lot', headerName: 'LOT', flex: 1, },
+        { field: 'prod_code', headerName: '제품코드', flex: 1, },
+        { field: 'prod_name', headerName: '제품명', flex: 1, },
+        { field: 'quantity', headerName: '수량', flex: 1, },
+        { field: 'store_date', headerName: '입고일자', hide:true },
+        { field: 'prod_check_code', headerName: '검수코드', hide:true},
         { field : 'storage_code' , headerName : '창고코드' , hide: true}
       ],
       secondRowData : [],
@@ -353,7 +354,10 @@ export default{
       this.secondRowData[this.secondIndex].quantity = event.data.quantity;
 
       let totalQuantity = this.secondRowData.reduce((sum,info,idx) => {
-        return sum += info.quantity
+        if(info.quantity > 0){
+        sum += Number(info.quantity)
+        }
+        return sum
       },0);
 
       this.formData.quantity = Number(totalQuantity);
@@ -367,6 +371,19 @@ export default{
                     icon: 'error',
                     confirmButtonText: '확인'
                 });
+          return;
+      }
+      //출고건이 있는 지확인
+      let delCount = await axios.get(`/api/sales/deliveryCount/${this.formData.prod_lot}`)
+                                .catch((err) => console.log(err));
+      
+      if (delCount.data[0].count > 0) {
+          Swal.fire({
+            title: '정보',
+            text: '이미 출고가 진행된 LOT입니다.',
+            icon: 'info',
+            confirmButtonText: '확인'
+          });
           return;
       }
       //값을 다입력했는지 체크
@@ -421,11 +438,78 @@ export default{
                 });
                   console.log(err)
                  });
+    },
+    //삭제
+    async deleteFunc() {
+        if(this.formData.prod_lot == ''){
+        Swal.fire({
+                    title: '실패',
+                    text: '입고가 진행된 계획코드가 아닙니다.',
+                    icon: 'error',
+                    confirmButtonText: '확인'
+                });
+          return;
+      }
+      //출고건이 있는 지확인
+      let delCount = await axios.get(`/api/sales/deliveryCount/${this.formData.prod_lot}`)
+                                .catch((err) => console.log(err));
+      
+      if (delCount.data[0].count > 0) {
+          Swal.fire({
+            title: '정보',
+            text: '이미 출고가 진행된 LOT입니다.',
+            icon: 'info',
+            confirmButtonText: '확인'
+          });
+          return;
+      }
+      let res = await axios.get('/api/sales/checkCount/'+this.formData.prod_check_code)
+           .catch((err) => console.log(err));
+
+      if (Number(res.data[0].COUNT) < 1) {
+        Swal.fire({
+          title: '정보',
+          text: '입고가 진행된 계획코드가 아닙니다.',
+          icon: 'info',
+          confirmButtonText: '확인'
+        });
+        return
+      }
+      await axios.delete(`/api/sales/finishDelete/${this.formData.prod_lot}`)
+                   .then(res => {
+                  if(res.data.affectedRows > 0) {
+                    Swal.fire({
+                        title: '성공',
+                        text: '제품 입고가 정상적으로 등록되었습니다.',
+                        icon: 'success',
+                        confirmButtonText: '확인'
+                    });
+                    this.clearForm();
+                } else {
+                    Swal.fire({
+                    title: '정보',
+                    text: '제품입고가 이 정상적 등록되지지 않았습니다.',
+                    icon: 'info',
+                    confirmButtonText: '확인'
+                });
+                return;
+                }
+                 })
+                 .catch((err) => {
+                  Swal.fire({
+                    title: '실패',
+                    text: '제품 입고 수정중 오류가 발생했습니다.',
+                    icon: 'error',
+                    confirmButtonText: '확인'
+                });
+                  console.log(err)
+                 });
+                  
     }
   }
 }
 </script>
-<style>
+<style scoped>
 .input-group-text {
   background-color: #FFCC80;
   border-color: #FFCC80;

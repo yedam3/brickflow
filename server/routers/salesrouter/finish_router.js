@@ -47,4 +47,19 @@ router.put('/finishUpdate',async(req,res) => {
                                 .catch((err) => console.log(err));
   res.send(result);
 })
+//출고건이 있는지 체크
+router.get('/deliveryCount/:prodLot',async(req,res) => {
+  let prodLot = req.params.prodLot;
+  let result = await finishStore.deliveryCount(prodLot)
+                                .catch((err) => console.log(err));
+  res.send(result);
+})
+
+//삭제
+router.delete('/finishDelete/:prodLot',async(req,res) => {
+  let prodLot = req.params.prodLot;
+  let result = await finishStore.deleteFinish(prodLot)
+                                .catch((err) => console.log(err));
+  res.send(result);
+})
 module.exports = router;

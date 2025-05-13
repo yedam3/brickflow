@@ -44,6 +44,7 @@ SELECT prod_lot,
        store_date,
        storage_code
 FROM finishStore f JOIN store s ON (f.prod_lot = s.doc_code)
+ORDER BY prod_lot DESC
 `
 
 const possibleProdQuantity = `
@@ -70,6 +71,23 @@ SET inbound_quantity= ?,
     storage_code = ? 
 WHERE doc_code = ?
 `
+//출고값 있는지 체크
+const deliveryFinishCheck = `
+  SELECT COUNT(*) AS count
+FROM delivery_manage_detail d JOIN finishStore s 
+                               ON(d.prod_lot = s.prod_lot)
+WHERE s.prod_lot = ? 
+`
+
+const deleteFinish = `
+  DELETE FROM finishStore
+  WHERE prod_lot = ? 
+`
+
+const deleteStore = `
+   DELETE FROM store
+   WHERE doc_code = ? 
+`
 module.exports = {
   storeProdList,
   maxProdLot,
@@ -79,5 +97,8 @@ module.exports = {
   finishList,
   possibleProdQuantity,
   finishUpdate,
-  finishStoreUpdate
+  finishStoreUpdate,
+  deliveryFinishCheck,
+  deleteFinish,
+  deleteStore
 }
