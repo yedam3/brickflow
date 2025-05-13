@@ -2,66 +2,65 @@
   <div class="card border-0 h-100">
       <div class="font-semibold text-xl mb-4">사원 관리</div>
   
-  <div class="ag-theme-alpine col me-5" style="height: 400px; width: 50%">
-      </div>
+  
       <div class="text-end mt-3 mb-3"style="padding-right: 4%;">
-     <Button label="초기화" severity="help" class="me-3" @click="resetList"/>
-     <Button label="저장" severity="info" class="me-3" @click="bomSave"/>
-     <Button label="저장" severity="help" class="me-3" @click="bomSave"/>
-     <Button label="저장" severity="danger" class="me-3" @click="bomSave"/>
+     <Button label="초기화" severity="success" class="me-3" @click="empReset"/>
+     <Button label="등록" severity="info" class="me-3" @click="empSave"/>
+     <Button label="수정" severity="help" class="me-3" @click="empModify"/>
+     <Button label="삭제" severity="danger" class="me-3" @click="empDelete"/>
    </div>
-   <div class="emp-grid">
+   <div class="row">
+   <div class="emp-grid col">
      <ag-grid-vue style="width: 700px; height: 500px;"
        class="ag-theme-alpine"
        :columnDefs="columnDefs"
        :rowData="rowData"
        :gridOptions="gridOptions"
        :defaultColDef="defaultColDef"
-       @cellClicked="prodCellClicked">
+       @cellClicked="empCellClicked">
    </ag-grid-vue>
   </div>
-  <div class="empList-grid">
-  <div class="card border-0 col" style="height: 650px; background-color: #F5F5F5;">
+  <div class="card border-0 col" style="width: 700px; height: 500px; background-color: #F5F5F5;">
                 <h5>사원목록</h5>
                 <div class="row">
                     <div class="input-group mb-5 col">
                         <span class="input-group-text" id="basic-addon1">사원번호</span>
                         <input type="text" class="form-control" placeholder="사원번호" aria-label="Username"
-                            aria-describedby="basic-addon1" v-model="info.mat_lot" readonly>
+                            aria-describedby="basic-addon1" v-model="info.emp_code" readonly>
                     </div>
                     <div class="input-group mb-5 col">
                         <span class="input-group-text" id="basic-addon1">이름</span>
                         <input type="text" class="form-control" placeholder="이름" aria-label="Username"
-                            aria-describedby="basic-addon1" v-model="info.emp_code" readonly>
+                            aria-describedby="basic-addon1" v-model="info.emp_name" readonly>
                     </div>
                 </div>
                 <div class="row">
                     <div class="input-group mb-5 col">
                         <span class="input-group-text" id="basic-addon1">부서</span>
                         <input type="text" class="form-control" placeholder="부서" aria-label="Username"
-                            aria-describedby="basic-addon1" v-model="info.mat_code" readonly>
+                            aria-describedby="basic-addon1" v-model="info.department" readonly>
                     </div>
                     <div class="input-group mb-5 col">
                         <span class="input-group-text" id="basic-addon1">입사일</span>
                         <input type="text" class="form-control" placeholder="입사일" aria-label="Username"
-                            aria-describedby="basic-addon1" v-model="info.mat_name" readonly>
+                            aria-describedby="basic-addon1" v-model="info.hire_date" readonly>
                     </div>
                 </div>
                 <div class="row">
                     <div class="input-group mb-5 col">
                         <span class="input-group-text" id="basic-addon1">전화번호</span>
                         <input type="text" class="form-control" placeholder="전화번호" aria-label="Username"
-                            aria-describedby="basic-addon1" :value="formatAleady" readonly>
+                            aria-describedby="basic-addon1" v-model="info.tel" readonly>
                     </div>
                     <div class="input-group mb-5 col">
                         <span class="input-group-text" id="basic-addon1">비밀번호</span>
-                        <input type="text" class="form-control" placeholder="비밀번호" aria-label="Username"
+                        <input type="password" class="form-control" placeholder="비밀번호" aria-label="Username"
                             aria-describedby="basic-addon1" v-model="info.store_quantity">
                     </div>
                 </div>
         </div>
+      </div>
     </div>
-</div>
 </template>
 
 <script>
@@ -79,20 +78,34 @@ export default{
        {
          emp_code: "",
          prod_name: "",
-         emp_name: "",
          department: "",
          hire_date: "",
          tel: "",
-         pwd: "",
+         pwd: ''
        }
      ],
      columnDefs: [
        { field: 'emp_code', headerName: '사원번호',flex:1,editable:true},
        { field: 'emp_name', headerName: '이름' ,flex:1},
-       { field: 'department', headerName: '부서' ,flex:1},
+       { field: 'department', headerName: '부서' ,flex:1,
+            valueFormatter: (params) => {
+                if (params.value == 'DP1') {
+                    return params.value = '관리자';
+                } else if (params.value == 'DP2') {
+                    return params.value = '영업';
+                } else if (params.value == 'DP3') {
+                    return params.value = '생산';
+                } else if (params.value == 'DP4') {
+                    return params.value = '품질';
+                } else if (params.value == 'DP5') {
+                    return params.value = '자재';
+                } else if (params.value == 'DP6') {
+                    return params.value = '설비';
+                } 
+              }
+       },
        { field: 'hire_date', headerName: '입사일' ,flex:1},
-       { field: 'tel', headerName: '전화번호' ,flex:1},
-       { field: 'pwd', headerName: '비밀번호' ,flex:1},
+       { field: 'tel', headerName: '전화번호' ,flex:1,}        
      ],
      gridOptions:{
          pagination: true,
@@ -133,6 +146,20 @@ export default{
        console.error('데이터 조회 실패:', err);
      }
    },
+   empCellClicked(event){
+     let emp = event.data.emp_code;
+     this.prodIndex = event.rowIndex
+     axios.get('/api/admin/employees/' + emp)
+                .then(res => {
+                  console.log(res)
+                      this.info = res.data[0];
+                      
+                }).catch(error => {
+                 console.error(error);
+                });
+                console.log(event);
+       },
+   
   }
 };
 </script>
@@ -152,7 +179,7 @@ export default{
  margin-right: 30px;
  
 }
-.empList-grid {
+.card border-0 col {
  display: inline-block;
  
 }

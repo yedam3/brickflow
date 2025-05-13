@@ -215,7 +215,6 @@ export default{
 
     //저장
     async prodCheckSave(){
-  
       for(let data of this.rowData2) {
         if(data.work_lot == '' || data.prod_code == '' || data.prod_name == '' || data.check_list == ''  || data.error_quantity == ''){
           Swal.fire({

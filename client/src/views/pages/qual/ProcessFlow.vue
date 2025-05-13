@@ -195,7 +195,7 @@ export default{
    },
    //저장
    async proSave(){
-
+    //값체크 validation
      for(let data of this.rowData2) {
        console.log(data);
        if(data.prod_code == '' || data.prod_name == '' || data.process_code == '' || data.process_name ==''){
@@ -210,7 +210,7 @@ export default{
      }
      const res = axios.post('/api/admin/procsave', {
       insertProc: this.rowData2,
-       
+      prodFlow: this.rowData[this.prodIndex].prod_code
      })
        .then(res => {
          if (res.data.affectedRows > 0) {

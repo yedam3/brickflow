@@ -26,8 +26,9 @@ router.delete('/bom/:bno', async (req, res) => {
 
 //3.BOM 저장 - 삭제 후 등록
 router.post('/bomsave', async(req, res)=>{
-    let {insertbom} = req.body;
-    let result = await bomService.saveBom(insertbom);
+    let {insertBom,prodBom} = req.body;
+    console.log('라우터',insertBom)
+    let result = await bomService.saveBom(insertBom,prodBom);
     res.send(result);
     });
 
