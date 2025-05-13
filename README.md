@@ -1,22 +1,13 @@
 ![wave](https://capsule-render.vercel.app/api?type=wave&color=auto&height=200&text=BrickFlow)
 
-<p align="center"> 
-  <a href="README.md">English</a> 
-  ·
-  <a href="/docs/README_kr.md">한국어</a> 
-  .
-  <a href="/docs/README_fr.md">Français</a>
-  .
-  <a href="/docs/README_de.md">Deutsch</a>
-  .
-  <a href="/docs/README_zh-cn.md">简体中文</a>  
-  .
-  <a href="/docs/README_zh-tw.md">繁體中文</a>
-  .
-  <a href="/docs/README_zh-hk.md">繁體粤语</a>
-  . 
-  <a href="/docs/README_pt-br.md">Português (Brasileiro)</a>
+<p align="center">
+  <img src="https://readme-typing-svg.demolab.com/?lines=Welcome;Type+messages+everywhere!;Welcome;&font=Fira%20Code&center=true&width=380&height=50&duration=4000&pause=1000" alt="Example Usage - README Typing SVG">
 </p>
+
+</p>
+<img src="https://img.shields.io/badge/vue.js-%234FC08D.svg?&style=for-the-badge&logo=vue.js&logoColor=white" />
+
+
 
 # PROJECT: BrickFlow 
 
