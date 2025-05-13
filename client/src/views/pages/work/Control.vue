@@ -173,7 +173,7 @@ export default {
                 });
                 return;
             };
-            if((this.processInfo.work_start_date !== null || this.processInfo.work_start_date !== "") && field == "input_quantity") {
+            if((this.processInfo.work_start_date !== null && this.processInfo.work_start_date !== "") && field == "input_quantity") {
                 Swal.fire({
                     title: '오류',
                     text: '작업 시작 이후에는 투입 수량을 입력할 수 없습니다.',
@@ -302,10 +302,10 @@ export default {
                 });
                 return;
             }
-            if (this.processInfo.input_quantity < this.processInfo.unprocessed_quantity) {
+            if (this.processInfo.input_quantity <= 0) {
                 Swal.fire({
                     title: '오류',
-                    text: '투입량은 미작업량보다 미만이 될 수 없습니다.',
+                    text: '투입량은 0 또는 1가 될 수 없습니다.',
                     icon: 'error',
                     confirmButtonText: '확인',
                 });
@@ -356,11 +356,11 @@ export default {
             }).catch((err) => {
                 console.error(err);
                 Swal.fire({
-                        title: '오류',
-                        text: '작업 시작 과정에서 오류가 발생했습니다.',
-                        icon: 'error',
-                        confirmButtonText: '확인',
-                    });
+                    title: '오류',
+                    text: '작업 시작 과정에서 오류가 발생했습니다.',
+                    icon: 'error',
+                    confirmButtonText: '확인',
+                });
             });
         },
 
@@ -378,17 +378,17 @@ export default {
             if (this.processInfo.input_quantity < (this.processInfo.error_quantity + this.processInfo.created_quantity)) {
                 Swal.fire({
                     title: '오류',
-                    text: '불량 수량과 생산 수량의 합이 투입 수량을 초과하였습니다.',
+                    text: '불량 수량과 생산 수량의 합계가 투입 수량보다 많습니다.',
                     icon: 'error',
                     confirmButtonText: '확인',
                 });
                 return;
             }
 
-            if (this.processInfo.input_quantity < (this.processInfo.error_quantity + this.processInfo.created_quantity)) {
+            if (this.processInfo.input_quantity > (this.processInfo.error_quantity + this.processInfo.created_quantity)) {
                 Swal.fire({
                     title: '오류',
-                    text: '불량 수량과 생산 수량의 합이 투입 수량을 초과하였습니다.',
+                    text: '불량 수량과 생산 수량의 합이 투입 수량보다 적습니다.',
                     icon: 'error',
                     confirmButtonText: '확인',
                 });
@@ -410,6 +410,7 @@ export default {
                         icon: 'success',
                         confirmButtonText: '확인',
                     });
+                    this.$router.push({ name: 'Process'});
                 } else {
                     Swal.fire({
                         title: '오류',

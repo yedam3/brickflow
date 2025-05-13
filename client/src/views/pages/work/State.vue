@@ -4,9 +4,6 @@
 
         <h4>생산 실적 조회</h4>
 
-        <div class="text-end mt-3 mb-3">
-            <Button label="조회" severity="success" class="me-3" @click="orderList" />
-        </div>
         <div class="mb-3">
             <Card style="overflow: hidden; background-color: #f8f9fa;">
                 <template #content>
@@ -80,7 +77,10 @@
                             </InputGroup>
                         </div>
                     </div>
-                    <Button label="초기화" severity="danger" class="me-5" @click="clearForm" />
+                    <div class="d-flex justify-content-center">
+                        <Button label="조회" severity="success" size="large" class="me-2" @click="searchWork" />
+                        <Button label="초기화" severity="danger" size="large" class="" @click="clearForm" />
+                    </div>
                 </template>
             </Card>
         </div>
@@ -99,6 +99,7 @@ import axios from "axios";
 
 export default {
     components: {
+        DatePicker: DatePickerEditor,
     },
     data() {
         return {
