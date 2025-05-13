@@ -17,6 +17,7 @@
        :rowData="rowData"
        :gridOptions="gridOptions"
        :defaultColDef="defaultColDef"
+
        @cellClicked="empCellClicked">
    </ag-grid-vue>
   </div>
@@ -37,8 +38,13 @@
                 <div class="row">
                     <div class="input-group mb-5 col">
                         <span class="input-group-text" id="basic-addon1">부서</span>
-                        <input type="text" class="form-control" placeholder="부서" aria-label="Username"
-                            aria-describedby="basic-addon1" v-model="info.department" readonly>
+                        <select class="form-select col" aria-label="Default select example" v-model="info.department">
+                            <option disabled selected value="">부서</option>
+                            <option v-for=" dep in departmentListAry" :key="dep.department" :value="dep.department">
+                                {{ dep.department }}
+                            </option>
+                        </select>
+                        
                     </div>
                     <div class="input-group mb-5 col">
                         <span class="input-group-text" id="basic-addon1">입사일</span>
@@ -121,6 +127,10 @@ export default{
        },  
      }
     },
+    selectedSecondIndex: null,
+    //상세그리드 행 인덱스
+    prodIndex : null,
+
     info: {
       emp_code: "",
       prod_name: "",
@@ -130,6 +140,7 @@ export default{
       tel: "",
       pwd: "",
     },
+    departmentListAry : [],
     selectedSecondIndex: null,
     prodIndex : null,
    }
@@ -159,13 +170,78 @@ export default{
                 });
                 console.log(event);
        },
-   
+
+    //부서리스트 조회
+    async departmentList(){
+      await axios.get('/api/admin/departmentList')
+                 .then(res => {
+                  console.log(res.data)
+                  this.departmentListAry = res.data;
+                 })
+    },
+   //등록
+   async empSave(){
+    //값체크 validation
+      for(let data of this.rowData) {
+        console.log(data);
+        if(data.emp_code == '' || data.emp_name == '' || data.department == '' || hire_date == '' || tel == '' || pwd == '') {
+          Swal.fire({
+           title: '실패',
+           text: '값을 다 입력해주세요',
+           icon: 'error',
+           confirmButtonText: '확인'
+         });
+         return;
+        }
+      }
+    console.log(this.rowData[this.prodIndex])
+    //등록시작
+    const res = axios.post('/api/admin/empSave', {
+      empList: this.rowData,
+      empInfo: this.rowData[this.prodIndex].emp_code
+     })
+       .then(res => {
+         if (res.data.affectedRows > 0) {
+           Swal.fire({
+             title: '등록 성공',
+             text: '정상적으로 등록이 완료되었습니다.',
+             icon: 'success',
+             confirmButtonText: '확인'
+           });
+         } else {
+           Swal.fire({
+             title: '등록 실패',
+             text: '등록이 실패하였습니다..',
+             icon: 'error',
+             confirmButtonText: '확인'
+             
+           });
+         }
+       })
+       .catch(error => {
+         console.error(error);
+         Swal.fire({
+           title: '등록 실패',
+           text: '알수 없는 오류가 발생하였습니다..',
+           icon: 'error',
+           confirmButtonText: '확인'
+         });
+         return;
+       });
+       this.rowData2 = [{
+                          prod_code: "",
+                          prod_name: "",
+                          process_code: "",
+                          process_name: "",
+                       }];
+       this.ProcData();
+      },
   }
 };
 </script>
 <style>
  .ag-theme-alpine .ag-header {
- background-color: #FF9900; 
+ background-color: #65625e; 
  color: white;
  
  }
