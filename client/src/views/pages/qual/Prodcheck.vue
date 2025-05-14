@@ -60,10 +60,10 @@ export default{
        }
      ],
      columnDefs: [
-       { field: 'prod_code', headerName: '제품코드',flex:3,editable:true},
-       { field: 'prod_name', headerName: '제품명' ,flex:4,editable:true},
+       { field: 'prod_code', headerName: '제품코드',flex:3},
+       { field: 'prod_name', headerName: '제품명' ,flex:4},
        { field: 'work_lot', headerName: '공정LOT' ,flex:3},
-       { field: 'quantity', headerName: '생산량 ' ,flex:2,editable:true},
+       { field: 'quantity', headerName: '생산량 ' ,flex:2},
        
      ],
      gridOptions:{
@@ -112,10 +112,10 @@ export default{
     ],
     columnDefs2: [
        { field: 'work_lot', headerName: '공정LOT' ,flex:3},
-       { field: 'prod_code', headerName: '제품코드',flex:3,editable:true},
-       { field: 'prod_name', headerName: '제품명',flex:4,editable:true},
-       { field: 'check_list', headerName: '검수항목',flex:3,editable:true},
-       { field: 'pass_quantity', headerName: '합격량' ,flex:2,editable:true},
+       { field: 'prod_code', headerName: '제품코드',flex:3},
+       { field: 'prod_name', headerName: '제품명',flex:4},
+       { field: 'check_list', headerName: '검수항목',flex:3},
+       { field: 'pass_quantity', headerName: '합격량' ,flex:2},
        { field: 'error_quantity', headerName: '불량량' ,flex:2,editable:true},
      ],
      gridOptions2:{
