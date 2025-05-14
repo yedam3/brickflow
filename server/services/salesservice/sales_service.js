@@ -121,7 +121,7 @@ const modifyoders = async (orders, ordersDetail) => {
 
       //값중복확인
       const orderCheck = async (orderCode) => {
-        let list = await mariaDB.query('addCheck', orderCode)
+        let list = await mariaDB.query('orderAddCheck', orderCode).catch((err) => console.log(err));
         return list;
       }
 

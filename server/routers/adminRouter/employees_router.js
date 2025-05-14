@@ -19,17 +19,25 @@ router.get('/employees/:empno', async (req, res) => {
 
 // 사원등록
 router.post('/empsave', async(req,res) => {
-    let {empList, empInfo} = req.body;
-    let result = await employeesService.empSave(empList,empInfo)
+    let empInfo = req.body;
+    let result = await employeesService.saveEmp(empInfo)
                                         .catch((err) => console.log(err));
     res.send(result);
 });
 
 // 부서리스트
 router.get('/departmentList',async(req,res) => {
-    let result = await employeesService.departmentList()
+    let result = await employeesService.empCodeList()
                                        .catch((err) => console.log(err));
     res.send(result);
-})
+});
+
+// 수정
+router.put('/empmodify', async(req,res) => {
+    let result = await employeesService.empModify()
+                                        .catch((err) => console.log(err));
+    res.send(result);
+});
+
 
 module.exports = router;

@@ -63,7 +63,7 @@ router.delete('/salesOrderDelete/:orders_code', async (req, res) => {
 router.post('/orderCheck',async (req,res)=>{
     const {orderCode} = req.body;
     let list = await salesService.orderCheck(orderCode)
-                               .catch((err)=> console.log(err));
+        .catch((err) => console.log(err));
     res.send(list);
 })
 

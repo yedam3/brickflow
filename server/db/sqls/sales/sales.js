@@ -18,6 +18,7 @@ const orderschoice =
         , employee_code
         , company_code, getComName(company_code) AS company_name
         , note
+        , employee_code, getEmpName(employee_code) AS emp_name
   FROM orders `
 
 // 메인한건 조회
@@ -27,6 +28,7 @@ const orderinfochoice =
         , orders_date
         , del_date
         , employee_code
+        , getEmpName(employee_code) AS emp_name
         , company_code
         , getComName(company_code) AS company_name
         , note
@@ -65,7 +67,7 @@ const salesAutoOrder =
 
 //등록
 const salesOrderAdd =
-  `INSERT INTO orders(orders_code, order_name, orders_date, del_date, employee_code, note, finish_status, company_code)
+  `INSERT INTO orders(orders_code, order_name, orders_date, del_date, employee_code, note, finish_status, company_code )
 VALUES( ? , ? , ? , ? , ? , ? , 'OS1' , ? )`;
 
 // orders_detail_code  자동부여
@@ -100,7 +102,7 @@ WHERE orders_code = ? `;
 
 
 //수정 및 등록 체크
-const addCheck = `
+const orderAddCheck = `
   SELECT COUNT(*) AS checkCount
   FROM orders
   WHERE orders_code = ?
@@ -110,7 +112,7 @@ module.exports = {
   orderschoice,
   salesOrderDetailAdd,
   salesOrderAdd,
-  addCheck,
+  orderAddCheck,
   selectorders,
   ordersUpdate,
   orderDelete,
