@@ -12,6 +12,7 @@
 
  <div class="par-grid">
    <div class="prod-grid">
+    <h5>제품목록</h5>
      <ag-grid-vue style="width: 650px; height: 500px;"
        class="ag-theme-alpine"
        :columnDefs="columnDefs"
@@ -22,6 +23,7 @@
    </ag-grid-vue>
   </div>
   <div class="prodcheck-grid">
+    <h5>제품검수</h5>
  <ag-grid-vue style="width: 780px; height: 500px;"
      ref="secondGrid"
      class="ag-theme-alpine"
@@ -159,6 +161,7 @@ export default{
        const response = await axios.get('/api/qual/prodcheck');
        this.rowData = response.data;
        this.rowData = [...this.rowData]
+       console.log('제품?' , response.data);
      } catch (err) {
        console.error('데이터 조회 실패:', err);
     }
@@ -238,6 +241,7 @@ export default{
              icon: 'success',
              confirmButtonText: '확인'
             });
+            this.bottomRow = [];
           } else {
             Swal.fire({
              title: '등록 실패',

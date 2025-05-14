@@ -11,6 +11,7 @@
    </div>
    <div class="row">
    <div class="emp-grid col">
+    <h5>사원목록</h5>
      <ag-grid-vue style="width: 700px; height: 500px;"
        class="ag-theme-alpine"
        :columnDefs="columnDefs"
@@ -22,7 +23,7 @@
    </ag-grid-vue>
   </div>
   <div class="card border-0 col" style="width: 700px; height: 500px; background-color: #F5F5F5;">
-                <h5>사원목록</h5>
+                <h5>사원상세</h5>
                 <div class="row">
                     <div class="input-group mb-5 col">
                         <span class="input-group-text" id="basic-addon1">사원번호</span>
@@ -180,7 +181,7 @@ export default{
 
     //값체크 validation
     checkValue(){
-      if(this.info.emp_name == '' || this.info.department == '' || this.info.hire_date == '' || this.info.tel == '' || this.info.pwd == '') {
+      if(this.info.emp_name == '' || this.info.department == '' || this.info.hire_date == '' || this.info.tel == '') {
           Swal.fire({
            title: '실패',
            text: '값을 다 입력해주세요',
@@ -198,6 +199,24 @@ export default{
     let validation = this.checkValue();
     if(validation==1){
       return;
+    }
+    if(this.info.emp_code != ''){
+      Swal.fire({
+            title: '등록 불가',
+            text: '이미 사원번호가 등록된 건입니다.',
+            icon: 'error',
+            confirmButtonText: '확인'
+          });
+          return;
+    }
+    if(this.info.pwd == ''){
+      Swal.fire({
+            title: '등록 불가',
+            text: '비밀번호를 입력해주세요.',
+            icon: 'error',
+            confirmButtonText: '확인'
+          });
+          return;
     }
     console.log(this.rowData[this.prodIndex])
     //등록시작
@@ -242,58 +261,133 @@ export default{
                     } 
       },
       
-      //초기화
-      resetValue(){
-        this.info.emp_code = '';
-        this.info.emp_name = '';
-        this.info.department = '';
-        this.hire_date = '';
-        this.tel = '';
-        this.pwd = '';
-      },
+
 
       // 수정
-      //값 다 넣었는지 조회
+      //값 다 넣었는지 체크
       async empModify(){
         let validation = this.checkValue();
         if(validation==1){
-        return;
-      }else if (validation==2){
-            return;
-          }
-        //이미등록건인지 조회
-        let count = await this.empSave();
-            if(count<1){
-                Swal.fire({
-                    title:'실패',
-                    text:'등록이 되지 않은 건입니다.',
-                    icon: "error",
-                    confirmButtonText : '확인'
-                })
-                return;
-            }
-            await axios.put('/api/admin/empModify',this.info)
-                        .then(res => {
-                            if(res.data.affectedRows > 0){
-                                Swal.fire({
-                                    title: '수정',
-                                    text: '수정이 완료되었습니다.',
-                                    icon: "success",
-                                    confirmButtonText: '확인'
-                                })
-                                //초기화
-                                this.resetValue();
-                            }else{
-                                Swal.fire({
-                                    title: '수정실패',
-                                    text: '수정이 실패하였습니다',
-                                    icon: "error",
-                                    confirmButtonText: '확인'
-                                })
-                            }
-                        })
-                        .catch((err) => console.log(err));
-          },
+      return;
+    }
+    if(this.info.emp_code == ''){
+      Swal.fire({
+            title: '수정 불가',
+            text: '사원번호가 필요합니다.',
+            icon: 'error',
+            confirmButtonText: '확인'
+          });
+          return;
+    }
+
+      //수정시작
+      await axios.put('/api/admin/empModify',this.info,)
+     .then(res => {
+        if(res.data.affectedRows >0) {
+          Swal.fire({
+            title: '수정 완료',
+            text: '수정이 완료되었습니다.',
+            icon: 'success',
+            confirmButtonText: '확인'
+          });
+          this.EmployeesData();
+       this.info =  {
+                      emp_code: "",
+                      emp_name: "",
+                      department: "",
+                      hire_date: "",
+                      tel: "",
+                      pwd: "",
+                    } 
+          
+        }else{
+          Swal.fire({
+            title: '수정 실패',
+            text: '수정을 실패하였습니다.',
+            icon: 'error',
+            confirmButtonText: '확인'
+          });
+          return;
+        }
+     })
+     .catch(err =>{
+       console.error(err);
+       Swal.fire({
+         title: '수정 실패',
+         text: '알수 없는 에러.',
+         icon: 'error',
+         confirmButtonText: '확인'
+       });
+       return
+     });
+     this.info = [{
+      emp_code: "",
+      emp_name: "",
+      department: "",
+      hire_date: "",
+      tel: "",
+      pwd: "",
+    }]
+  },
+  //삭제
+  async empDelete(){
+    if(this.info.emp_code == ''){
+      Swal.fire({
+            title: '삭제 실패',
+            text: '사원번호가 필요합니다.',
+            icon: 'error',
+            confirmButtonText: '확인'
+          });
+          return;
+    }
+    await axios.delete('/api/admin/empDelete/'+ this.info.emp_code)
+    .then(res => {
+        if(res.data.affectedRows >0) {
+          Swal.fire({
+            title: '삭제 성공',
+            text: '정상적으로 삭제되었습니다.',
+            icon: 'success',
+            confirmButtonText: '확인'
+          });
+          this.EmployeesData();
+       this.info =  {
+                      emp_code: "",
+                      emp_name: "",
+                      department: "",
+                      hire_date: "",
+                      tel: "",
+                      pwd: "",
+                    } 
+          
+        }else{
+          Swal.fire({
+            title: '삭제 실패',
+            text: '삭제를 실패하였습니다.',
+            icon: 'error',
+            confirmButtonText: '확인'
+          });
+          return;
+        }
+     })
+     .catch(err =>{
+       console.error(err);
+       Swal.fire({
+         title: '삭제 실패',
+         text: '알수 없는 에러.',
+         icon: 'error',
+         confirmButtonText: '확인'
+       });
+       return
+     });
+     this.info = [{
+      emp_code: "",
+      emp_name: "",
+      department: "",
+      hire_date: "",
+      tel: "",
+      pwd: "",
+    }]
+  }
   }
 };
 </script>

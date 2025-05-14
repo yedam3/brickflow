@@ -40,5 +40,11 @@ router.put('/empmodify', async(req,res) => {
     res.send(result);
 });
 
-
+//삭제
+router.delete('/empDelete/:empCode', async(req,res) => {
+    let empCode = req.params.empCode;
+    let result = await employeesService.empDelete(empCode)
+                                       .catch((err) => console.log(err));
+    res.send(result);
+})
 module.exports = router;
