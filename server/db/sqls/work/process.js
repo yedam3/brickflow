@@ -17,7 +17,7 @@ FROM work_process wp
     LEFT JOIN process pr ON (wp.process_code = pr.process_code)
     LEFT JOIN prod prod ON wp.prod_code = prod.prod_code
 WHERE wp.order_quantity > 0	
-	AND wp.order_quantity > wp.input_quantity
+	AND wp.order_quantity > wp.error_quantity + wp.created_quantity
     AND pr.process_type = 'PT1'
     AND IFNULL(work.work_data_code,'') = (SELECT IFNULL(MAX(wd.work_data_code),'')
                                   FROM work_data wd
