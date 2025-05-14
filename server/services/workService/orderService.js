@@ -100,7 +100,7 @@ const findStatusByPlan_code = async (plan_code) => {
     let result = await mariaDB.query("findStatusByPlan_code", plan_code).catch((err) => {
         console.err(err);
     });
-    return result;
+    return result[0];
 };
 
 // 자재홀드량
@@ -110,6 +110,12 @@ const findPlanDetailByPlan_code = async () => {
     let planDetailList = await mariaDB.query("findPlanDetailByPlan_code").catch((err) => console.error(err));
     return planDetailList;
 };
+
+// 생산 지시 코드 중복 확인
+const findProduct_orderByProduct_order_code = async (product_order_code) => {
+    let result = await mariaDB.query("findProduct_orderByProduct_order_code", product_order_code).catch((err) => console.error(err));
+    return result[0];
+}
 
 // 생산지시 등록
 const insertProduct_order = async (orderData, orderDetailDataList, matHoldDataList) => {
@@ -371,6 +377,8 @@ module.exports = {
     findAllProdMatQtyByMat_code,
     findAllMatHoldByProduct_order_detail_code,              // 생산 상품 자재 홀드 조회
     findAllMat_HoldByProduct_order_detail_codeAndMat_code,  // 생산 상품 자재 LOT 조회
+
+    findProduct_orderByProduct_order_code,                  // 생산 지시 코드 중복 확인
     insertProduct_order,                                    // 생산 지시 등록
     updateProduct_order,                                    // 생산 지시 수정
     deleteProduct_order,                                    // 생산 지시 삭제
