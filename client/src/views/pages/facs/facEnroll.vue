@@ -429,6 +429,23 @@
 </script>
 
 <style scoped>
+/* 헤더 텍스트 가운데 정렬 */
+::v-deep(.ag-theme-alpine .ag-header-cell-label) {
+    justify-content: center;
+}
+
+/* headerClass로 설정한 header-center 클래스에 적용 */
+::v-deep(.header-center .ag-header-cell-label) {
+    justify-content: center;
+}
+.btn-primary {
+      background-color: rgb(230, 171, 98);
+      border-color: rgb(230, 171, 98);
+  }
+  
+::v-deep(.ag-theme-alpine .ag-header-cell-label) {
+      justify-content: center;
+  }
 .img-thumbnail {
   border-radius: 8px;
   object-fit: cover;
