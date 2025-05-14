@@ -39,10 +39,11 @@ const empCodeList = async () => {
 
 //수정
 const empModify = async (empModify) => {
-  console.log('에러'+empModify);
+  console.log('에러야'+empModify);
+  console.log(empModify);
   let result = await mariaDB.query('empModify',empModify)
                               .catch((err) => console.log(err));
-  return result;
+  return result;         
 }
 module.exports 
 = {
