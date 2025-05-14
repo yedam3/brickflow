@@ -123,7 +123,11 @@ const matAddCheck = `
 //메인 업데이트
 const updateOrder = `
   UPDATE matOrders
-  SET ?
+  SET company_code = ?,
+      emp_code = ?,
+      note = ?,
+      delivery_date = ?,
+      mat_order_name =?
   WHERE mat_order_code = ?
 `
 //디테일 업데이트

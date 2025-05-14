@@ -69,7 +69,7 @@
                   제품수량
                 </InputGroupAddon>
                 <select class="form-select col" aria-label="Default select example" v-model="formData.storage_code">
-                            <option disabled selected value="">창고</option>
+                            <option disabled selected value="">창고(선택)</option>
                             <option v-for="store in storeListAry" :key="store.storage_code" :value="store.storage_code">
                                 {{ store.store_name }}
                             </option>
@@ -114,7 +114,7 @@
       </div>
     </div>
     <div class="col-6">
-      <div class="font-semibold text-xl mb-4">출고 가능 수량</div>
+      <div class="font-semibold text-xl mb-4">입고 가능 수량</div>
       <div class="ag-wrapper justify-content-center" style="border: none;">
 
         <ag-grid-vue class="ag-theme-alpine" style="width: 100%; 

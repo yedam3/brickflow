@@ -304,13 +304,13 @@ export default {
       //
       const newNodes = this.rowData2.map((item, index) => ({
         //다이어그램 ID
-        id: item.process_code || `node-${index}`,
+        id: `${item.process_code || 'node'}-${index}`,
         //다이어그램이름
         data: { label: item.process_name?.slice(0, 10) || `공정 ${index + 1}` },
         //다이어그램 위치
         position: { x: 20+ 150 * index, y: 10 +100*index},
 
-        type: index === 0 ? 'input' : (index === this.rowData2.length - 1 ? 'output' : 'default'),
+        type: index == 0 ? 'input' : (index === this.rowData2.length - 1 ? 'output' : 'default'),
         class: 'my-custom-node-class',
         //스타일
         style: {
@@ -326,8 +326,8 @@ export default {
       // 연결선 만들기: 앞 노드와 다음 노드를 연결
       const newEdges = this.rowData2.slice(1).map((item, index) => ({
         id: `edge-${index}`,
-        source: this.rowData2[index].process_code || `node-${index}`,
-        target: item.process_code || `node-${index + 1}`,
+        source: `${this.rowData2[index].process_code || 'node'}-${index}`,
+        target: `${item.process_code || 'node'}-${index + 1}`,
         //선타입
         type: 'step',
         //움직이는 선 적용
