@@ -38,12 +38,29 @@ const empCodeList = async () => {
 }
 
 //수정
-const empModify = async (empModify) => {
-  console.log('에러야'+empModify);
-  console.log(empModify);
-  let result = await mariaDB.query('empModify',empModify)
-                              .catch((err) => console.log(err));
+const empModify = async (empInfo) => {
+  console.log(empInfo);
+  let hashedPwd = null;
+  let result = null;
+  if(empInfo.pwd){
+    const saltRounds = 10;
+    hashedPwd = await bcrypt.hash(empInfo.pwd, saltRounds);
+    result = await mariaDB.query('empModify',[empInfo.emp_name, empInfo.department,empInfo.hire_date,empInfo.tel,hashedPwd,empInfo.emp_code])
+    .catch((err) => console.log(err));
+    return result;
+  }
+ 
+  result = await mariaDB.query('empUpdate',[empInfo.emp_name, empInfo.department,empInfo.hire_date,empInfo.tel,empInfo.emp_code])
+  .catch((err) => console.log(err));
+
   return result;         
+}
+
+//삭제
+const empDelete = async(emp_code) => {
+  let result = await mariaDB.query('empDel',emp_code)
+  .catch((err) => console.log(err));
+  return result;
 }
 module.exports 
 = {
@@ -52,4 +69,5 @@ module.exports
   saveEmp,
   empCodeList,
   empModify,
+  empDelete,
 }

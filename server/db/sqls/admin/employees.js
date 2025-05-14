@@ -39,7 +39,15 @@ const empModify = `UPDATE employees
                           pwd =? 
                     WHERE emp_code =?`;
 
-
+const empUpdate = `UPDATE employees
+                      SET emp_name=?,
+                          department =?,
+                          hire_date =?,
+                          tel =?
+                    WHERE emp_code =?`
+//삭제
+const empDel = `DELETE FROM employees
+                    WHERE emp_code=?`
 module.exports 
 = {
   autoEmpCode,
@@ -48,4 +56,6 @@ module.exports
   empSave,
   departmentList,
   empModify,
+  empUpdate,
+  empDel,
 }

@@ -11,6 +11,7 @@
 
     <div class="row mt-3">
       <div class="col-6">
+        <h5>제품목록</h5>
         <ag-grid-vue
           class="ag-theme-alpine"
           :columnDefs="columnDefs"
@@ -21,6 +22,7 @@
         </ag-grid-vue>
       </div>
       <div class="col-6">
+        <h5>공정흐름도</h5>
         <div class="flow-container">
           <VueFlow
             :nodes="nodes"
@@ -38,6 +40,7 @@
           <Button label="행추가" severity="success" class="me-3" @click="addRow"/>
           <Button label="행삭제" severity="danger" class="me-3" @click="deleteRow"/>  
         </div>
+        <h5>상세공정조회</h5>
         <ag-grid-vue 
           ref="secondGrid"
           class="ag-theme-alpine"

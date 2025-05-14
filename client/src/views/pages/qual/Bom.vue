@@ -16,6 +16,7 @@
    </div>
  <div class="par-grid">
    <div class="prod-grid">
+    <h5>제품목록</h5>
      <ag-grid-vue style="width: 700px; height: 500px;"
        class="ag-theme-alpine"
        :columnDefs="columnDefs"
@@ -26,6 +27,7 @@
    </ag-grid-vue>
   </div>
   <div class="bom-grid">
+    <h5>BOM목록</h5>
  <ag-grid-vue style="width: 700px; height: 500px;"
      ref="secondGrid"
      class="ag-theme-alpine"
