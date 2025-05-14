@@ -85,6 +85,13 @@ router.get("/orderStatus/:plan_code", async (req, res) => {
     res.send(result);
 });
 
+// 생산 지시 코드 중복 확인
+router.get("/orderCheck/:product_order_code", async (req, res) => {
+    let product_order_code = req.params.product_order_code;
+    let result = await orderService.findProduct_orderByProduct_order_code(product_order_code).catch((err) => console.error(err));
+    res.send(result);
+});
+
 // 생산 지시 등록
 router.post("/insert", async (req, res) => {
     let { orderData, orderDetailDataList, matHoldDataList } = req.body;

@@ -203,10 +203,9 @@ export default {
         };
     },
     created() {
-        this.clearForm();
     },
     mounted() {
-        this.autoPlan_code();
+        this.clearForm();
     },
     computed: {
         columnDefs() {
@@ -242,7 +241,7 @@ export default {
                 {
                     field: "currentPlanQty", headerName: "현계획량", flex: 2, editable: params => this.ag_grid_cols.currentPlanQty,
                     cellStyle: params => {
-                        if (params.data.orders_code) {
+                        if (params.data.prod_code) {
                             return { textAlign: "center", backgroundColor: '#d9f2ff !important' };
                         } else {
                             return { textAlign: "center" };
@@ -295,11 +294,11 @@ export default {
             this.ag_grid_cols.prod_name = false;
             this.ag_grid_cols.quantity = false;
             this.editMode = false;
+            this.autoPlan_code();
         },
 
         // input 유효성 검사
         inputCheck() {
-            console.log(this.formData.employee_code);
             if (this.formData.plan_code == '' ||
                 this.formData.plan_name == '' ||
                 this.formData.employee_code == '' ||
@@ -517,6 +516,7 @@ export default {
                         icon: 'success',
                         confirmButtonText: '확인'
                     });
+                    this.clearForm();
                 } else {
                     Swal.fire({
                         title: '정보',

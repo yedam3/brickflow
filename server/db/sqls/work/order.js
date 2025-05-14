@@ -157,6 +157,13 @@ const findProcess_flowByProd_code = `
 
 `;
 
+// 생산 지시 코드 중복 확인
+const findProduct_orderByProduct_order_code = `
+SELECT COUNT(*) AS 'check'
+FROM product_order
+WHERE product_order_code = ?
+`;
+
 // 생산 지시 등록
 const insertProduct_order = `
 INSERT INTO product_order(product_order_code, plan_code, product_order_name, employee_code, start_date, end_date, finish_status, note)
@@ -310,6 +317,7 @@ module.exports = {
     findAllMat_HoldByProduct_order_detail_codeAndMat_code,  // 생산 상품 자재 LOT 조회
     findAllProdMatQtyByMat_code,                            // 생산 상품 자재 재고 조회
 
+    findProduct_orderByProduct_order_code,                  // 생산 지시 코드 중복 확인
     insertProduct_order,                                    // 생산 지시 등록
     findProduct_order_detail_codeLast,                      // 생산 지시 상세 코드 조회(자동증가)
     insertProduct_order_detail,                             // 생산 지시 상세 등록
