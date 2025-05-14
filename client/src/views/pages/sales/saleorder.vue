@@ -49,6 +49,7 @@ import ProdComModal from "@/components/modal/ProdComModal.vue";
 import Swal from 'sweetalert2'; 
 import OrderModal from '@/components/modal/OrderModal.vue';
 import ProdModal from "@/components/modal/ProdModal.vue";
+import { useUserStore } from '@/stores/user';
 
 export default {
   components: {
@@ -68,7 +69,8 @@ export default {
         order_name: '',
         orders_date: this.getToday(),
         sdel_date: '',
-        employee_code:'EMP-101',
+        employee_code: useUserStore().id,
+        emp_name: useUserStore().empName,
         company_name: '',
         note: '',
       }
@@ -79,7 +81,8 @@ export default {
         { field: 'order_name', headerName: '주문명', flex: 2, editable: true },
         { field: 'orders_date', headerName: '주문일자', flex: 3, editable: true },
         { field: 'del_date', headerName: '납기일자', flex: 3, editable: true, cellEditor: "datePicker" },
-        { field: 'employee_code', headerName: '등록자', flex: 2, editable: true },
+        { field: 'employee_code', headerName: '사원코드', flex: 2, editable: false, hide:true },
+        { field: 'emp_name', headerName: '담당자', flex: 2, editable: false },
         { field: 'company_name', headerName: '업체명', flex: 2 },
         { field: 'note', headerName: '비고', flex: 2, editable: true },
       ],
@@ -302,7 +305,7 @@ export default {
       })
         .catch((err) => console.log(err));
         
-      if (res.data[0].checkCount > 1) {
+      if (res.data[0].checkCount > 0) {
         Swal.fire({
           title: '등록 실패',
           text: '이미 등록된 주문입니다.',

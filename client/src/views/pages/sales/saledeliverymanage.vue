@@ -62,7 +62,7 @@ import OrderModal from '@/components/modal/OrderModal.vue'; // 주문 모달
 import ProdComModal from "@/components/modal/ProdComModal.vue"; //업체 모달
 import Swal from 'sweetalert2';
 import DeliveryModal from '@/components/modal/DeliveryModal.vue';
-
+import { useUserStore } from '@/stores/user';
 
 export default {
     components: {
@@ -82,6 +82,8 @@ export default {
                 orders_code: '',
                 order_name: '',
                 company_name: '',
+                employee_code: useUserStore().id,
+                emp_name: useUserStore().empName,
             }],
             columnDefs: [
                 { field: 'delivery_code', headerName: '출고코드', hide: true },
@@ -89,7 +91,8 @@ export default {
                 { field: 'orders_code', headerName: '주문코드', flex: 3, },
                 { field: 'order_name', headerName: '주문명', flex: 3, editable: false },
                 { field: 'company_name', headerName: '업체명', flex: 3 },
-                { field: 'employee_code', headerName: '담당자', flex: 3 },
+                { field: 'employee_code', headerName: '사원코드', flex: 3, hide:true },
+                { field: 'emp_name', headerName: '담당자', flex: 3 },
             ],
 
             //주문요구 수량 그리드
@@ -107,8 +110,8 @@ export default {
             // 주문 요구수량 선택 행 번호
             selectedSerowIndex: null,
             seColumnDefs: [
-                { field: "prod_code", headerName: "제품코드", flex: 2, cellStyle: { textAlign: "center" } },
-                { field: "prod_name", headerName: "제품명", flex: 2, editable: true, cellStyle: { textAlign: "center" } },
+             { field: "prod_code", headerName: "제품코드", flex: 2, cellStyle: { textAlign: "center" } },
+                { field: "prod_name", headerName: "제품명", flex: 2, editable: false, cellStyle: { textAlign: "center" } },
                 { field: "delivery_demand", headerName: "요구량", flex: 2, cellStyle: { textAlign: "center" } },
                 { field: "alreadydelivery", headerName: "기납기량", flex: 2, cellStyle: { textAlign: "center" } },
                 { field: "yetdelivery", headerName: "미납기량", flex: 2, editable: false, cellStyle: { textAlign: "center" } },
@@ -143,7 +146,6 @@ export default {
         //업체명을 클릭했을때 모달창 열기 comCellClicked
         comCellClicked(params) {
             if (params.colDef.field == "company_name") {
-                this.selectedSecondIndex = params.rowIndex;
                 this.showComModal = true;
             }
         },
@@ -189,7 +191,7 @@ export default {
                             prod_code: data.prod_code,
                             prod_name: data.prod_name,
                             delivery_demand: data.delivery_demand,
-                            alreadydelivery: data.alreadydelivery - data.delivery_quantity,
+                            alreadydelivery: Number(data.alreadydelivery) - Number(data.delivery_quantity),
                             yetdelivery: Number(data.yetdelivery) + Number(data.delivery_quantity),
                             delivery_detail_code: data.delivery_detail_code
                         })
@@ -215,6 +217,7 @@ export default {
                         value.delivery_name = '' // 빈값을 넣어주는거
                         value.company_name = ''
                         value.delivery_code = ''
+                        value.employee_code = ''
                     }
                     //this.rowData[0].orders_code = res.orders_code;
                     this.rowData = [...serverRowData];
