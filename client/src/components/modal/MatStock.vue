@@ -1,7 +1,7 @@
 <template>
     <CModal :visible="visible" @close="close" backdrop="static" alignment="center" size="xl" style="min-width: 1000px">
         <CModalHeader>
-            <slot name="header">주문 목록</slot>
+            <slot name="header">재고 품목</slot>
         </CModalHeader>
 
         <CModalBody>
@@ -32,7 +32,7 @@ import axios from "axios";
 import Swal from 'sweetalert2';
 
 export default {
-    name: "OrderModal",
+    name: "MatStockModal",
     components: {
         AgGridVue,
     },
@@ -69,10 +69,18 @@ export default {
                 this.matStockList();
             }
         },
+        rowData : {
+            handler(newVal) {
+
+            },
+            deep: true
+        },
     },
     data() {
         return {
             rowData: [],
+
+            original_rowData: [],
 
             mat_data: [],
 
@@ -123,7 +131,6 @@ export default {
             }).catch(error => { console.error(error) });
 
             let matList = result.data;
-            console.log(matList);
             for(let data of matList) {
                 this.rowData.push({
                     mat_LOT: data.mat_LOT,
@@ -131,9 +138,11 @@ export default {
                     mat_name: data.mat_name,
                     store_date: data.store_date,
                     available_qty: parseInt(data.available_qty),
+                    mat_hold_qty: 0,
                 });
             }
 
+            this.original_rowData = [...this.rowData];
                 
             for(let temp of this.mat_temp_data) {
                 let matchIndex = this.rowData.findIndex(item => {
@@ -146,7 +155,7 @@ export default {
 
             let temp2 = [];
             for(let data of this.rowData) {
-                if(data.available_qty > 0) {
+                if(data.available_qty >= 0) {
                     temp2.push(data);
                 }
             }
@@ -154,20 +163,26 @@ export default {
 
             this.setMatHoldData(); 
         },
+
+        updateAvailableQty(row) {
+        },
+
+        // 자동 확보
         autoHold() {
             let mat_list = [];
             // this.rowData.sort((a, b) => new Date(a.store_date) - new Date(b.store_date));
 
             let remainingQty = this.mat_req_qty;
-
             for (let row of this.rowData) {
-                const availableQty = parseInt(row.available_qty || "0", 10);
+                const availableQty = parseInt(row.available_qty);
                 if (remainingQty <= 0) break;
 
                 const holdQty = Math.min(availableQty, remainingQty);
                 row.mat_hold_qty = holdQty;
                 remainingQty -= holdQty;
             }
+            
+            this.rowData = [...this.rowData];
         },
 
         // 자재 확보 버튼
@@ -176,13 +191,31 @@ export default {
             let totalQty = 0;
             for(let row of this.rowData) {
                 totalQty += parseInt(row.mat_hold_qty);
-                if(row.mat_hold_qty != '' && row.mat_hold_qty > 0) {
+                if(row.mat_hold_qty != '' && parseInt(row.mat_hold_qty) > 0) {
+                    if (parseInt(row.available_qty) < parseInt(row.mat_hold_qty)) {
+                        Swal.fire({
+                            title: '실패',
+                            text: '자재 출고 가능수량보다 자재출고 수량이 더 많습니다.',
+                            icon: 'error',
+                            confirmButtonText: '확인'
+                        });
+                        return;
+                    }
+                    if ((parseInt(row.available_qty) > parseInt(row.mat_hold_qty)) && (this.mat_req_qty != parseInt(row.mat_hold_qty))) {
+                        Swal.fire({
+                            title: '실패',
+                            text: '자재출고 수량보다 자재출고 자재 출고 가능수량이 더 많습니다.',
+                            icon: 'error',
+                            confirmButtonText: '확인'
+                        });
+                        return;
+                    }
                     this.mat_data.push({
                         prod_code: this.prod_code,
                         mat_code: row.mat_code,
                         mat_LOT: row.mat_LOT,
                         mat_hold_qty: row.mat_hold_qty
-                    })
+                    });
                 }
             }
             if(this.mat_req_qty > totalQty) {
@@ -208,6 +241,17 @@ export default {
             if (this.mat_list && this.mat_list.length > 0) {
                 this.rowData = this.rowData.map(row => {
                     const match = this.mat_list.find(item => {
+                        return (item.mat_LOT.toLowerCase() == row.mat_LOT.toLowerCase() && item.mat_code.toLowerCase() == row.mat_code.toLowerCase())
+                    });
+                    if (match) {
+                        return { ...row, mat_hold_qty: match.hold_quantity };
+                    }
+                    return row;
+                });
+            }
+            if (this.mat_temp_data && this.mat_temp_data.length > 0) {
+                this.rowData = this.rowData.map(row => {
+                    const match = this.mat_temp_data.find(item => {
                         return (item.mat_LOT.toLowerCase() == row.mat_LOT.toLowerCase() && item.mat_code.toLowerCase() == row.mat_code.toLowerCase())
                     });
                     if (match) {
