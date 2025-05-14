@@ -40,7 +40,7 @@ const facModal =
 `SELECT fac_code,
         model_name,
         fac_location,
-        employee_code,
+        getEmpName(employee_code) AS employee_code,
         fac_status
 FROM fac
 WHERE fac_code = ?`

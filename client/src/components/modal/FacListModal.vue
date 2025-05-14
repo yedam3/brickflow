@@ -55,7 +55,7 @@
   import { AgGridVue } from "ag-grid-vue3";
   import axios from "axios";
   import Swal from 'sweetalert2';
-
+  import { useUserStore } from '@/stores/user';
   export default {
     components: {
       AgGridVue,
@@ -74,7 +74,8 @@
             fac_code:"",
             model_name:"",
             fac_location:"",
-            employee_code:"",
+            employee_code: useUserStore().empName,
+            employee_name: useUserStore().id,
             fac_status:"",
           },
         ],
@@ -84,7 +85,11 @@
           { field: "fac_code", header: "설비코드", flex: 1},
           { field: "model_name", header: "설비이름", flex: 1},
           { field: "fac_location", header: "설비위치", flex: 1},
-          { field: "employee_code", header: "담당자", flex: 1},
+          { field: "employee_code", header: "담당자", flex: 1,
+            valueFormatter: (params) => {
+              return params.data?.employee_name || params.value;
+            }
+          },
           { field: "fac_status", header: "설비상태", flex: 1,
           valueFormatter:(params) => {
           if(params.value == 'FS1'){
