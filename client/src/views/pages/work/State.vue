@@ -112,11 +112,13 @@ import axios from "axios";
 import { AgGridVue } from "ag-grid-vue3";
 import DatePickerEditor from "../../../components/DatePickerEditor.vue";
 import Swal from 'sweetalert2';
+import ProgressCell from "@/components/ProgressCell.vue";
 
 export default {
     components: {
         AgGridVue,
         DatePicker: DatePickerEditor,
+        ProgressCell,
     },
     data() {
         return {
@@ -172,7 +174,9 @@ export default {
                 { field: "input_quantity", headerName: "투입량", flex: 1.5, cellStyle: { textAlign: "center" } },
                 { field: "error_quantity", headerName: "불량량", flex: 1.5, cellStyle: { textAlign: "center" } },
                 { field: "created_quantity", headerName: "생산량", flex: 1.5, cellStyle: { textAlign: "center" } },
-                { field: "process_progress", headerName: "공정 진행도", flex: 3, cellStyle: { textAlign: "center" } },
+                {
+                    field: "process_progress", headerName: "공정 진행도", flex: 3, cellRenderer: 'ProgressCell'
+                },
             ]
         }
     },
@@ -182,6 +186,7 @@ export default {
             await axios.get(`/api/work/process/data`).then(res => {
                 const processDataList = res.data;
                 for(let data of processDataList) {
+                    let process_pct = Number(data.order_quantity) > 0 ? Number((Number(data.error_quantity) + Number(data.created_quantity)) / Number(data.order_quantity) * 100) : 0;
                     this.processList.push({
                         product_order_code: data.product_order_code,
                         product_order_name: data.product_order_name,
@@ -193,7 +198,7 @@ export default {
                         input_quantity: data.input_quantity,
                         error_quantity: data.error_quantity,
                         created_quantity: data.created_quantity,
-                        process_progress: ((Number(data.error_quantity) + Number(data.created_quantity)) / Number(data.first_order_quantity) * 100).toFixed(1),
+                        process_progress: process_pct,
                     });
                 };
 
