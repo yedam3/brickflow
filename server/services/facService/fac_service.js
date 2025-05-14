@@ -99,17 +99,18 @@ const repaireFac = async (repaireFacData) => {
   console.log(repaireFacData);
   const param = [
     repaireCode,
-    repaireFacData.note,
+    repaireFacData.employee_code,
     repaireFacData.repaire_add_date,
     repaireFacData.repaire_finish_date,
-    repaireFacData.employee_code,
     repaireFacData.fac_code,
-    repaireFacData.fac_history,
+    repaireFacData.fac_result,
     repaireFacData.break_status,
-    repaireFacData.fac_result
+    repaireFacData.unplay_code,
+    repaireFacData.note,
+    repaireFacData.fac_history,
   ];
   console.log(param)
- result =  await mariaDB.query("repaireFac", param)
+ result = await mariaDB.query("repaireFac", param)
                     .catch((err) => console.log(err));
   return result;
 }

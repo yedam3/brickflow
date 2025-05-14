@@ -107,16 +107,16 @@ export default {
       rowData2:
         {
           repaire_code:"",
-          repaire_add_date:"",
-          repaire_finish_date:"",
-          fac_history:"",
-          break_status:"",
-          fac_result:"",
-          unplay_code: "",
           employee_code: useUserStore().empName,
           employee_name: useUserStore().id,
-          note: "",
+          repaire_add_date:"",
+          repaire_finish_date:"",
           fac_code: '',
+          fac_result:"",
+          break_status:"",
+          unplay_code: "",
+          note: "",
+          fac_history:"",
         },
       columnDefs: [
         { field: "fac_code", headerName: "설비코드", flex: 3, },
@@ -132,7 +132,11 @@ export default {
             return params.value;
           }
         },
-        { field: "employee_name", headerName: "당담자", flex: 3, },
+        { field: "employee_code", headerName: "당담자", flex: 3, 
+          valueFormatter: (params) => {
+            return params.data?.employee_name || params.value;
+          }
+        },
         { field: "unplay_start_date", headerName: "비가동시작일시", flex: 3, },
         { field: "note", headerName: "비고", flex: 3, },
       ],
@@ -181,38 +185,57 @@ export default {
     },
     //수리처리
     async addRepaire() {
+      if (!this.rowData2.repaire_add_date) {
+        this.rowData2.repaire_add_date = moment().format("YYYY-MM-DD");
+      }
+
+      if (!this.rowData2.repaire_finish_date) {
+        this.rowData2.repaire_finish_date = moment().format("YYYY-MM-DD");
+      }
       const {
+        employee_code,
         repaire_add_date,
-        fac_history,
         break_status,
-        fac_result,
         fac_code,
+        fac_result,
         unplay_code,
-        employee_code
+        fac_history,
       } = this.rowData2;
 
       if (
+        !employee_code ||
         !repaire_add_date ||
-        !fac_history ||
         !break_status ||
-        !fac_result ||
         !fac_code ||
+        !fac_result ||
         !unplay_code ||
-        !employee_code
+        !fac_history 
       ) {
         Swal.fire("입력 오류", "모든 필수 항목을 입력해주세요.", "warning");
         return;
       }
-      const now = moment().format("YYYY-MM-DD HH:mm");
-      this.rowData2.repaire_finish_date = now;
+      
+      this.rowData2.repaire_finish_date = moment().format("YYYY-MM-DD");
+      const fullFinishDateTime = moment().format("YYYY-MM-DD HH:mm");
 
       await this.autoReCode();
 
+      console.log("전송될 데이터:", this.rowData2);
       axios.post('/api/fac/repaireFac', {
-        repaireFac: this.rowData2
+        repaireFac: {
+          repaire_code: this.rowData2.repaire_code,
+          employee_code: useUserStore().id,
+          repaire_add_date: this.rowData2.repaire_add_date,
+          repaire_finish_date: this.rowData2.repaire_finish_date,
+          fac_code: this.rowData2.fac_code,
+          fac_result: this.rowData2.fac_result,
+          break_status: this.rowData2.break_status,
+          unplay_code: this.rowData2.unplay_code,
+          note: this.rowData2.note,
+          fac_history: this.rowData2.fac_history,
+        } 
       }).then(async res => {
         if (res.data.affectedRows > 0) {
-          const finishDate = this.rowData2.repaire_finish_date;
 
           // 수리결과에 따라 상태 분기 처리
           if (this.rowData2.fac_result === 'OH1') { // 수리완료
@@ -223,7 +246,7 @@ export default {
 
             await axios.put('/api/fac/updateUnplayEndDate', {
               unplay_code: this.rowData2.unplay_code,
-              unplay_end_date: finishDate
+              unplay_end_date: fullFinishDateTime
             });
           }
           // 수리불가면 아무것도 안함 (비가동 상태 유지)
@@ -237,9 +260,16 @@ export default {
 
           this.repaireList();
           this.rowData2 = {
-            repaire_code: "", repaire_add_date: "", repaire_finish_date: "",
-            fac_history: "", break_status: "", fac_result: "",
-            unplay_code: "", employee_code: "", note: "", fac_code: ''
+            repaire_code: "", 
+            repaire_add_date: "", 
+            repaire_finish_date: "",
+            employee_code: "", 
+            fac_code: '',
+            break_status: "", 
+            fac_result: "",
+            unplay_code: "", 
+            note: "", 
+            fac_history: "", 
           };
 
         } else {
@@ -252,7 +282,7 @@ export default {
             await axios.get('/api/fac/repaireList', {
             })
                 .then(res => {
-                  console.log('API 응답 데이터:', res.data);
+                  console.log('API 응답 데이터:', res.data); 
                     console.log(res.data)
                     // 수리완료인 경우 제외하고 보여주기
                     this.rowData = res.data.filter(item => item.fac_result !== 'OH1');
@@ -260,14 +290,15 @@ export default {
     },
     async clicked(event) {
       console.log(event.data);
+      const clickedData = event.data;
       this.rowData2 = {
-        ...event.data,
+        ...clickedData,
         repaire_code: "", 
         repaire_add_date: "",
         repaire_finish_date: "",
         fac_history: "",
         break_status: "",
-        fac_result: ""
+        fac_result: "",
       };
       await this.autoReCode();
     },
