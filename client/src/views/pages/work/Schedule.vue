@@ -346,7 +346,22 @@ export default {
 
         // 행추가
         addRow() {
-            if (this.formData.orders_code != '') {
+            if (this.formData.orders_code === null || this.formData.orders_code === "") {
+                this.rowData.push({
+                    plan_detail_code: "",   // 생산계획_상세_코드
+                    orders_code: "",        // 주문번호
+                    orders_date: "",        // 시작_일자
+                    del_date: "",           // 종료_일자
+                    prod_name: "",          // 제품명
+                    quantity: "",           // 수량(주문상세)
+                    unshippedQty: "",       // 미출고량
+                    prePlannedQty: "",      // 기계획량
+                    unplannedQty: "",       // 미계획량
+                    currentPlanQty: "",     // 현계획량
+                });
+                // 새 배열로 설정하여 AG Grid가 반영하게 만듦
+                this.rowData = [...this.rowData];
+            } else {
                 Swal.fire({
                     title: '실패',
                     text: '주문번호 존재 시 행추가를 할 수 없습니다.',
@@ -355,25 +370,16 @@ export default {
                 });
                 return;
             }
-            this.rowData.push({
-                plan_detail_code: "",   // 생산계획_상세_코드
-                orders_code: "",        // 주문번호
-                orders_date: "",        // 시작_일자
-                del_date: "",           // 종료_일자
-                prod_name: "",          // 제품명
-                quantity: "",           // 수량(주문상세)
-                unshippedQty: "",       // 미출고량
-                prePlannedQty: "",      // 기계획량
-                unplannedQty: "",       // 미계획량
-                currentPlanQty: "",     // 현계획량
-            });
-            // 새 배열로 설정하여 AG Grid가 반영하게 만듦
-            this.rowData = [...this.rowData];
         },
 
         //행삭제
         deleteRow() {
-            if (this.formData.orders_code != '') {
+            if (this.formData.orders_code === null || this.formData.orders_code === "") {
+                const selectedNodes = this.$refs.mainGrid.api.getSelectedNodes();
+                const selectedData = selectedNodes.map(node => node.data);
+
+                this.rowData = this.rowData.filter(row => !selectedData.includes(row));
+            } else {
                 Swal.fire({
                     title: '실패',
                     text: '주문번호 존재 시 행삭제를를 할 수 없습니다.',
@@ -382,10 +388,6 @@ export default {
                 });
                 return;
             }
-            const selectedNodes = this.$refs.mainGrid.api.getSelectedNodes();
-            const selectedData = selectedNodes.map(node => node.data);
-
-            this.rowData = this.rowData.filter(row => !selectedData.includes(row));
         },
 
         // 주문 모달창 값 전달
@@ -496,7 +498,7 @@ export default {
 
         // 생산 계획 수정
         async updatePlan() {
-            if (!this.planOrderStatusCheck(this.formData.plan_code)) {
+            if (this.planOrderStatusCheck(this.formData.plan_code)) {
                 Swal.fire({
                     title: '실패',
                     text: '이미 생산이 진행되고 있는 계획코드입니다.',
@@ -539,7 +541,7 @@ export default {
 
         // 생산 계획 삭제
         async deletePlan() {
-            if (!this.planOrderStatusCheck(this.formData.plan_code)) {
+            if (this.planOrderStatusCheck(this.formData.plan_code)) {
                 Swal.fire({
                     title: '실패',
                     text: '이미 생산이 진행되고 있는 계획코드입니다.',
@@ -587,16 +589,15 @@ export default {
             }).catch((err) => {
                 console.error(err);
             })
-
-            if(res.data.finish_status === 'WS1') {
-                return false;
+            if(res.data.status === 'WS1') {
+                return true;
             }
-            return true;
+            return false;
         },
 
         // 제품 명 제품 코드 선택 시 모달창 열기
         prodCellClicked(params) {
-            if((params.colDef.field == "prod_code" || params.colDef.field == "prod_name") && (this.formData.orders_code === "")) {
+            if((params.colDef.field == "prod_code" || params.colDef.field == "prod_name") && (this.formData.orders_code === "" || this.formData.orders_code === null)) {
                 this.selectedSecondIndex = params.rowIndex;
                 this.showProdModal = true;
             }

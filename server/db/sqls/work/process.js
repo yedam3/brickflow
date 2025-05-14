@@ -1,8 +1,9 @@
 // 생산 지시 목록 조회 - 생산 완료(WS3) 제외
 const findAllProduct_order = `
-SELECT work.work_data_code, wp.work_lot, po.product_order_name, wp.process_sequence, wp.order_quantity, wp.input_quantity, wp.created_quantity, wp.error_quantity,
+SELECT work.work_data_code, wp.work_lot, po.product_order_name, wp.process_sequence, wp.order_quantity, wp.input_quantity, wp.error_quantity, wp.created_quantity,
 	prod.prod_name,
 	pr.process_name,
+    work.fac_code,
     IFNULL(work.work_start_date,'') AS work_start_date,
     IFNULL(work.work_end_date,'') AS work_end_date,
 	CASE

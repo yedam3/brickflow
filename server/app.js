@@ -30,7 +30,7 @@ let sessionSettion = session({
         httpOnly : true,
         secure : false,
         //유효기간
-        maxAge : 60000
+        maxAge : 600000000
     }
 })
 // 라우팅 등록 영역

@@ -114,4 +114,8 @@ router.delete("/delete/:product_order_code", async (req, res) => {
     res.send(result);
 });
 
+router.get("/productOrderStatus/:product_order_code", async (req, res) => {
+
+});
+
 module.exports = router;

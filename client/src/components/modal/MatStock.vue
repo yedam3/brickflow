@@ -201,15 +201,6 @@ export default {
                         });
                         return;
                     }
-                    if ((parseInt(row.available_qty) > parseInt(row.mat_hold_qty)) && (this.mat_req_qty != parseInt(row.mat_hold_qty))) {
-                        Swal.fire({
-                            title: '실패',
-                            text: '자재출고 수량보다 자재출고 자재 출고 가능수량이 더 많습니다.',
-                            icon: 'error',
-                            confirmButtonText: '확인'
-                        });
-                        return;
-                    }
                     this.mat_data.push({
                         prod_code: this.prod_code,
                         mat_code: row.mat_code,
