@@ -100,9 +100,14 @@ const orderCheck = async (orderCode) => {
 
 //발주수정
 const modifyOrder = async (orderInfo,detailInfo) =>{
-  delete orderInfo.company_name;
-  let updateOrder = [orderInfo,orderInfo.mat_order_code]
-  let result = await mariaDB.query('updateOrder',updateOrder)
+  
+  let result = await mariaDB.query('updateOrder',[orderInfo.company_code,
+                                                  orderInfo.emp_code,
+                                                  orderInfo.note,
+                                                  orderInfo.delivery_date,
+                                                  orderInfo.mat_order_name,
+                                                  orderInfo.mat_order_code
+                                                  ])
                             .catch((err) => console.log(err))
   if(result.affectedRows<1){
     return result;

@@ -324,6 +324,7 @@ export default {
               icon: 'success',
               confirmButtonText: '확인'
             });
+            this.orderExist = false
           } else {
             Swal.fire({
               title: '등록 실패',
@@ -350,7 +351,8 @@ export default {
           company_name: "",
           request_date: this.getToday(),
           delivery_date: "",
-          emp_code: "",
+          emp_name: useUserStore().empName,
+          emp_code:  useUserStore().id,
           note: "",
         }];
         this.secondRowData = [{
@@ -442,7 +444,7 @@ export default {
             icon: 'success',
             confirmButtonText: '확인'
           });
-          
+          this.orderExist = false
         }else{
           Swal.fire({
             title: '수정 실패',
@@ -470,7 +472,8 @@ export default {
           company_name: "",
           request_date: this.getToday(),
           delivery_date: "",
-          emp_code: "",
+          emp_name: useUserStore().empName,
+          emp_code:  useUserStore().id,
           note: "",
         }];
         this.secondRowData = [{
@@ -493,6 +496,7 @@ export default {
             icon: 'error',
             confirmButtonText: '확인'
           });
+          this.orderExist = false
         }else{
           Swal.fire({
             title: '삭제 완료',
@@ -510,7 +514,8 @@ export default {
           company_name: "",
           request_date: this.getToday(),
           delivery_date: "",
-          emp_code: "",
+          emp_name: useUserStore().empName,
+          emp_code:  useUserStore().id,
           note: "",
         }];
         this.secondRowData = [{

@@ -79,7 +79,7 @@
                     <div class="input-group mb-5 col">
                         <span class="input-group-text" id="basic-addon1">창고</span>
                         <select class="form-select col" aria-label="Default select example" v-model="info.storage_code">
-                            <option disabled selected value="">창고</option>
+                            <option disabled selected value="">창고(선택)</option>
                             <option v-for="store in storeListAry" :key="store.storage_code" :value="store.storage_code">
                                 {{ store.store_name }}
                             </option>

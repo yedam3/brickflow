@@ -151,8 +151,11 @@ const errQuantity = `
 //검수 변경
 const checkUpdate = `
   UPDATE mat_check
-  SET ?
-  WHERE check_code = ?   
+  SET mat_code = ?,
+      check_quantity=?,
+      mat_check_pass=? ,
+      mat_check_error=?
+  WHERE check_code=?   
 `
 //불량테이블 삭제
 const errorDelete = `

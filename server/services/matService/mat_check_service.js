@@ -33,7 +33,6 @@ const checkRender = async(matDetailCode) => {
   }
   //에러인 상품이 없을시 
   if(!errExist){
-    console.log('맷코드'+check.check_history)
   result = await mariaDB.query('successCheckAdd',[check.mat_code,
                                                       check.check_quantity,
                                                       check.check_history,
@@ -81,26 +80,18 @@ const checkRender = async(matDetailCode) => {
     }
     const result = await mariaDB.query('errCheckList', { searchcondition: convertedCondition })
                                     .catch((err) => console.log(err));
-        return result;
+    return result;
   }
 //체크하면 기검수 미검수 조회
 const matErrorQuantity = async(checkcode) => {
   const result = await mariaDB.query('errQuantity',checkcode)
                                .catch((err)=> console.log(err));
      return result;
-
-   
 }
 //검수 수정
 const checkUpdate = async (check,error) => {
   let orderCode = check.mat_order_code;
-  //필요없는 컬럼 삭제
-  delete check.already_check_quantity;
-  delete check.not_check_quantity;
-  delete check.mat_name;
-  delete check.request_quantity;
-  delete check.mat_order_code;
-  delete check.emp_code;
+  
   //초기화
   let result = null;
   let errExist= false;
@@ -111,18 +102,11 @@ const checkUpdate = async (check,error) => {
     }
   }
   console.log('에러'+errExist)
+  console.log(check)
   //에러 값이 없으면 등록
   if(!errExist){
-  check.mat_check_pass = check.check_quantity;
-  check.mat_check_error = 0;
-  
-     console.log('값')
-     console.log(check.check_quantity);
- 
-
-  let updateCheck = [check,check.check_code]
-  result = await mariaDB.query('checkUpdate',updateCheck)
-                              .catch((err)=> console.log(err))
+  result = await mariaDB.query('checkUpdate',[check.mat_code,check.check_quantity,check.check_quantity,0,check.check_code])
+                              .catch((err)=> console.log(err));
    //불량량 삭제
    result = await mariaDB.query('errorDelete',check.check_code)
    .catch((err) => console.log(err))
@@ -130,11 +114,8 @@ const checkUpdate = async (check,error) => {
   result = await mariaDB.query('updateClear',['OG1',check.check_code])
                                 .catch((err) => console.log(err));
   }else{
-    check.mat_check_pass = 0;
-    check.mat_check_error = check.check_quantity;
-    let updateCheck = [check,check.check_code]
-    result = await mariaDB.query('checkUpdate',updateCheck)
-                              .catch((err)=> console.log(err))
+    result = await mariaDB.query('checkUpdate',[check.mat_code,check.check_quantity,0,check.check_quantity,check.check_code])
+                              .catch((err)=> console.log(err));
     
     //불량량 삭제
     result = await mariaDB.query('errorDelete',check.check_code)
@@ -179,7 +160,7 @@ const updateFinished = async(checkCode) =>{
 const deleteChekc = async(checkCode,matOrderCode) => {
   let result = await mariaDB.query('deleteCheck',checkCode);
   result = await mariaDB.query('errorDelete',checkCode);
-console.log('맷'+matOrderCode)
+
   //상태값 확인
   let statusCheck = await mariaDB.query('statusCheck', [matOrderCode, matOrderCode, matOrderCode, matOrderCode])
     .catch((err) => console.log(err));
