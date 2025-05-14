@@ -1,4 +1,3 @@
-
 //출고 가능 수량그리드에 조회
 const prodcheck = `
 SELECT SUM(IFNULL(inbound_quantity,0)) - SUM(IFNULL(dispatch_quantity,0)) as delivery_before_quantity,
@@ -121,7 +120,7 @@ const deliveryModal = `
 //   WHERE orders_code = ? `;
 
 
-  //출고 상세 
+//출고 상세 
 const deliveryDetailRender = `
 SELECT orders_detail_code, o.orders_code, quantity AS delivery_demand,delivery_quantity,
   (SELECT IFNULL(SUM(delivery_quantity), 0) FROM delivery_manage_detail d JOIN delivery_manage m ON(d.delivery_code = m.delivery_code) WHERE orders_code = o.orders_code AND prod_code = o.prod_code) AS alreadydelivery,
@@ -150,5 +149,5 @@ module.exports = {
   storageDeliveryUpdate,
   // deliveryRender
 
-  
+
 }
