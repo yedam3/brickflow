@@ -100,7 +100,7 @@ const findStatusByPlan_code = async (plan_code) => {
     let result = await mariaDB.query("findStatusByPlan_code", plan_code).catch((err) => {
         console.err(err);
     });
-    return result;
+    return result[0];
 };
 
 // 자재홀드량

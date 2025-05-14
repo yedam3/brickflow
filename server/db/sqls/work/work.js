@@ -76,18 +76,18 @@ SELECT p.plan_code, o.order_name, p.plan_name, p.employee_code,
 		CONCAT(
         prod.prod_name,
         CASE 
-            WHEN COUNT(od.prod_code) > 1 THEN CONCAT(' 외 ', COUNT(DISTINCT od.prod_code) - 1, '건')
+            WHEN COUNT(pd.prod_code) > 1 THEN CONCAT(' 외 ', COUNT(DISTINCT pd.prod_code) - 1, '건')
             ELSE ''
         END
     ) AS prod_name,
     p.finish_status, od.orders_code, p.note
 FROM plan p
 	JOIN plan_detail pd ON p.plan_code = pd.plan_code
-	JOIN ( SELECT DISTINCT orders_code, prod_code 
+	LEFT JOIN ( SELECT DISTINCT orders_code, prod_code 
 			FROM order_detail
 	) od ON p.orders_code = od.orders_code
-    JOIN orders o ON od.orders_code = o.orders_code
-    JOIN prod prod ON od.prod_code = prod.prod_code
+    LEFT JOIN orders o ON od.orders_code = o.orders_code
+    JOIN prod prod ON pd.prod_code = prod.prod_code
 WHERE 1=1
     :searchCondition
 GROUP BY p.plan_code, o.order_name, p.plan_name, p.start_date, p.end_date, p.finish_status, od.orders_code
@@ -95,38 +95,35 @@ GROUP BY p.plan_code, o.order_name, p.plan_name, p.start_date, p.end_date, p.fin
 
 // 생산 계획 상세 조회
 const findPlanDetailByPlan_code = `
-SELECT pd.plan_detail_code, o.orders_code, od.prod_code,
+SELECT pd.plan_detail_code, o.orders_code, pd.prod_code,
     DATE_FORMAT(o.orders_date, '%Y-%m-%d') AS orders_date,
     DATE_FORMAT(o.del_date, '%Y-%m-%d') AS del_date,
-    getProdName(od.prod_code) AS prod_name, od.quantity,
+    getProdName(pd.prod_code) AS prod_name, od.quantity,
 		od.quantity - COALESCE((
         SELECT SUM(dmd.delivery_quantity)
         FROM delivery_manage dm
         JOIN delivery_manage_detail dmd ON dm.delivery_code = dmd.delivery_code
         WHERE dm.orders_code = od.orders_code AND dmd.prod_code = od.prod_code
     ), 0) AS unshippedQty,
-
     COALESCE((
         SELECT SUM(pd.plan_quantity)
         FROM plan p
         JOIN plan_detail pd ON p.plan_code = pd.plan_code
         WHERE p.orders_code = od.orders_code AND pd.prod_code = od.prod_code
     ), 0) AS prePlannedQty,
-    
     GREATEST(od.quantity - COALESCE((
         SELECT SUM(pd.plan_quantity)
         FROM plan p
         JOIN plan_detail pd ON p.plan_code = pd.plan_code
         WHERE p.orders_code = od.orders_code AND pd.prod_code = od.prod_code
     ), 0), 0) AS unplannedQty,
-
     pd.plan_quantity AS currentPlanQty,
     p.note
 FROM plan_detail pd
 	JOIN plan p ON pd.plan_code = p.plan_code
-    JOIN orders o ON p.orders_code = o.orders_code
-    JOIN order_detail od ON o.orders_code = od.orders_code AND pd.prod_code = od.prod_code
-WHERE pd.plan_code = ?;
+    LEFT JOIN orders o ON p.orders_code = o.orders_code
+    LEFT JOIN order_detail od ON o.orders_code = od.orders_code AND pd.prod_code = od.prod_code
+WHERE pd.plan_code = ?
 `;
 
 // 생산 번호 체크
@@ -172,7 +169,9 @@ WHERE plan_code = ? AND finish_status = 'OC1';
 // 생산 계획 상세 수정
 const updatePlanDetailByPlan_code = `
 UPDATE plan_detail
-SET plan_quantity = ?
+SET
+    prod_code = ?,
+    plan_quantity = ?
 WHERE plan_detail_code = ? AND plan_code IN (SELECT
                                                 plan_code
                                                 FROM plan
@@ -229,7 +228,7 @@ module.exports = {
     findByOrders_code,
     findAllOrder_detailByOrders_code,   // 주문 상세 조회 (orders_code)
     findAllPlan,
-    findPlanDetailByPlan_code,
+    findPlanDetailByPlan_code,          // 생산 계획 상세 조회
     existsByPlan_code,
     findOrder_statusByOrders_code,
     insertPlan,

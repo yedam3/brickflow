@@ -198,6 +198,9 @@ export default {
                         }
                     }
                 },
+                {
+                    field: "using", headerName: "WORK-LOT", flex: 2, cellStyle: { textAlign: "center" }
+                },
             ],
             // 각 그리드별 옵션 분리
             productOrderGridOptions: {
@@ -266,7 +269,7 @@ export default {
             this.facDataList = [];
         },
 
-        // 
+        // 생산 지시 목록 조회
         async planOrderList() {
             await axios.get(`/api/work/process/planOrderList`).then(res => {
                 const resData = res.data;
@@ -280,6 +283,7 @@ export default {
             }).catch((err) => console.error(err))
         },
 
+        // 공정 목록 조회
         async processList() {
             await axios.get(`/api/work/process/processList`).then(res => {
                 const resData = res.data;
@@ -289,6 +293,7 @@ export default {
             }).catch((err) => console.error(err))
         },
 
+        // 제품 목록 조회
         async prodList() {
             await axios.get(`/api/work/process/prodList`).then(res => {
                 const resData = res.data;
@@ -322,25 +327,26 @@ export default {
         async productOrderList() {
             await axios.get(`/api/work/process/productOrderList`).then(res => {
                 const list = res.data
-                this.productOrderDataList = [...list];
-                // for(let data of list) {
-                //     this.productOrderData.push({
-                //         work_lot: data.work_lot,                        // 공정 LOT
-                //         product_order_code: data.product_order_code,    // 생산 지시 코드
-                //         product_order_name: data.product_order_name,    // 생산 지시명
-                //         prod_name: data.prod_name,                      // 제품명
-                //         process_code: data.process_code,                // 공정 코드
-                //         process_name: data.process_name,                // 공정명
-                //         process_sequence: data.process_sequence,        // 공정 순서
-                //         order_quantity: data.order_quantity,            // 지시량
-                //         input_quantity: data.input_quantity,            // 투입량
-                //         created_quantity: data.created_quantity,        // 생산량
-                //         error_quantity: data.error_quantity,            // 불량량
-                //         work_start_date: data.work_start_date,          // 시작 시간
-                //         work_end_date: data.work_end_date,              // 종료 시간
-                //         finish_status: data.finish_status,              // 상태
-                //     });
-                // }
+                // this.productOrderDataList = [...list];
+                for(let data of list) {
+                    this.productOrderDataList.push({
+                        work_lot: data.work_lot,                        // 공정 LOT
+                        product_order_code: data.product_order_code,    // 생산 지시 코드
+                        product_order_name: data.product_order_name,    // 생산 지시명
+                        prod_name: data.prod_name,                      // 제품명
+                        process_code: data.process_code,                // 공정 코드
+                        process_name: data.process_name,                // 공정명
+                        process_sequence: data.process_sequence,        // 공정 순서
+                        order_quantity: data.order_quantity,            // 지시량
+                        input_quantity: data.input_quantity,            // 투입량
+                        created_quantity: data.created_quantity,        // 생산량
+                        error_quantity: data.error_quantity,            // 불량량
+                        work_start_date: data.work_start_date,          // 시작 시간
+                        work_end_date: data.work_end_date,              // 종료 시간
+                        finish_status: data.finish_status,              // 상태
+                        fac_code: data.fac_code,                        // 사용중인 설비 코드
+                    });
+                }
             }).catch((err) => console.error(err));
         },
 
@@ -363,15 +369,24 @@ export default {
         async productOrderRowClicked(params) {
             await axios.get(`/api/work/process/facList/${params.data.work_lot}`).then(res => {
                 const list = res.data;
-                this.facDataList = [...list];
-                
-                for (let data of list) {
-                    this.productOrderData.push({
-                        fac_code: data.fac_code,                            // 설비 코드
-                        model_name: data.model_name,                        // 설비명
-                        fac_status: data.fac_status,                        // 설비 상태
+
+                this.facDataList = [];
+                for(let data of list) {
+                    this.facDataList.push({
+                        fac_code: data.fac_code,
+                        model_name: data.model_name,
+                        fac_status: data.fac_status,
+                        using: ((params.data.fac_code === data.fac_code) ? params.data.work_lot : ""),
                     });
-                };
+                }
+                this.facDataList = [...this.facDataList];
+                // for (let data of list) {
+                //     this.productOrderData.push({
+                //         fac_code: data.fac_code,                            // 설비 코드
+                //         model_name: data.model_name,                        // 설비명
+                //         fac_status: data.fac_status,                        // 설비 상태
+                //     });
+                // };
             }).catch((err) => console.error);
 
             this.processData.process = {
@@ -388,7 +403,6 @@ export default {
                 work_start_date: params.data.work_start_date,           // 시작 시간
                 work_end_date: params.data.work_end_date,               // 종료 시간
                 finish_status: params.data.finish_status,               // 상태
-
             };
         },
 
@@ -444,7 +458,18 @@ export default {
                 return;
             }
             // 설비 상태 확인
-            if(!this.processData.fac.fac_status === 'FS2') {
+            if(this.processData.fac.fac_status === 'FS2') {
+                // 설비 확인
+                console.log((this.processData.process.work_lot === this.processData.fac.using));
+                if (!(this.processData.process.work_lot === this.processData.fac.using)) {
+                    Swal.fire({
+                        title: '오류',
+                        text: '기존 설비와 서로 다릅니다.',
+                        icon: 'error',
+                        confirmButtonText: '확인',
+                    });
+                    return;
+                }
                 Swal.fire({
                     title: '오류',
                     text: '사용불가 상태의 설비입니다.',

@@ -634,7 +634,7 @@ export default {
                     icon: 'success',
                     confirmButtonText: '확인'
                 });
-                
+
                 this.clearForm();
             } else {
                 Swal.fire({
@@ -795,16 +795,16 @@ export default {
 
         // Vaildation
         async anotherVaildation() {
-            let result = await axios.get(`/api/work/order/productOrderStatus/${this.formData.product_order_code}`).catch((err) => console.error(err));
-            if(result.data.check != 'WS1') {
-                Swal.fire({
-                    title: '실패',
-                    text: '이미 진행중이거나 생산이 완료된 지시입니다.',
-                    icon: 'error',
-                    confirmButtonText: '확인'
-                });
-                return 1;
-            }
+            // let result = await axios.get(`/api/work/order/productOrderStatus/${this.formData.product_order_code}`).catch((err) => console.error(err));
+            // if(result.data.check != 'WS1') {
+            //     Swal.fire({
+            //         title: '실패',
+            //         text: '이미 진행중이거나 생산이 완료된 지시입니다.',
+            //         icon: 'error',
+            //         confirmButtonText: '확인'
+            //     });
+            //     return 1;
+            // }
         },
     },
 };
