@@ -8,7 +8,7 @@ SELECT SUM(IFNULL(inbound_quantity,0)) - SUM(IFNULL(dispatch_quantity,0)) as del
 FROM store
 WHERE item_code =?
 GROUP BY item_code, lot
-HAVING SUM(IFNULL(inbound_quantity,0)) - SUM(IFNULL(dispatch_quantity,0)) > 0;`
+ HAVING SUM(IFNULL(inbound_quantity,0)) - SUM(IFNULL(dispatch_quantity,0)) > 0;`
 
 // 출고코드 자동 부여
 const deliveryAutoOrder =
