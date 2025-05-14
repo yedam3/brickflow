@@ -87,7 +87,7 @@ export default {
                         return params.value != null ? `${params.value}개` : '';
                     }
                 },
-                { field: "store_name", headerName: "창고", flex: 1, editable: true,},
+                { field: "store_name", headerName: "창고", flex: 1,},
             ],
             gridOptions: {
                 domLayout: "autoHeight",

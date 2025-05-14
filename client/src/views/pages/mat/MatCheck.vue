@@ -92,7 +92,7 @@
                     <div class="input-group mb-5 col">
                         <span class="input-group-text" id="basic-addon1">등록자</span>
                         <input type="text" class="form-control" placeholder="등록자" aria-label="Username"
-                            aria-describedby="basic-addon1" v-model="info.emp_code" readonly>
+                            aria-describedby="basic-addon1" v-model="info.emp_name" readonly>
                     </div>
                 </div>
                 <div v-if="info.check_quantity > 0 " >
@@ -121,6 +121,7 @@ import Swal from 'sweetalert2';
 import axios from "axios";
 import { AgGridVue } from "ag-grid-vue3";
 import MatResult from '@/components/modal/MatResult.vue';
+import { useUserStore } from '@/stores/user';
 export default {
     name: "MatOrderModal",
     components: {
@@ -188,7 +189,8 @@ export default {
                 check_quantity : 0,
                 check_history : '',
                 mat_order_code : '',
-                emp_code : '',
+                emp_name: useUserStore().empName,
+                emp_code:  useUserStore().id,
                 check_code : '',
                
             },
@@ -266,6 +268,8 @@ export default {
                           .then(res => {
                                 res.data.check_quantity=0;
                                 this.info = res.data;
+                                this.info.emp_name = useUserStore().empName;
+                                this.info.emp_code = useUserStore().id;
                           }).catch(error => {
                                 console.error(error);
                          });
@@ -346,7 +350,8 @@ export default {
                 check_history : '',
                 mat_order_code : '',
                 check_code : '',
-                emp_code : '',
+                emp_name: useUserStore().empName,
+                emp_code:  useUserStore().id,
             }
             for(let errorCheck of this.error_check_ary){
                 errorCheck.mat_check_error = 0;
@@ -373,7 +378,7 @@ export default {
             await axios.get('/api/mat/checkList/' + detail)
                           .then(res => {
                                 this.info = res.data;
-                                console.log(this.info)
+                                
                                 //기검수량 이미한만큼은 제외하고 다시 렌더링
                                 this.info.already_check_quantity=this.info.already_check_quantity-check.check_quantity;
                                 //미검수량은 이미 검수한량 플러스하고 다시 렌더링
@@ -382,6 +387,11 @@ export default {
                                 this.info.check_quantity = check.check_quantity;
                                 //체크코드 가져오기
                                 this.info.check_code = check.check_code
+                                this.info.emp_name = useUserStore().empName;
+                                this.info.emp_code = useUserStore().id;
+                               
+                                this.info = [...this.info];
+                                console.log(this.info)
                           }).catch(error => {
                                 console.error(error);
                          });
@@ -448,6 +458,7 @@ export default {
                             mat_order_code: '',
                             check_code: '',
                             emp_code: '',
+                            emp_name : '',
                         }
                         for (let errorCheck of this.error_check_ary) {
                             errorCheck.mat_check_error = 0;
@@ -507,6 +518,7 @@ export default {
                                  mat_order_code: '',
                                  check_code: '',
                                  emp_code: '',
+                                 emp_name : '',
                              }
                              for (let errorCheck of this.error_check_ary) {
                                  errorCheck.mat_check_error = 0;
@@ -535,6 +547,7 @@ export default {
                 mat_order_code : '',
                 check_code : '',
                 emp_code : '',
+                emp_name : '',
             }
             for(let errorCheck of this.error_check_ary){
                 errorCheck.mat_check_error = 0;

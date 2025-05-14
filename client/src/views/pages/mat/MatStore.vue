@@ -43,7 +43,7 @@
                     <div class="input-group mb-5 col">
                         <span class="input-group-text" id="basic-addon1">담당자</span>
                         <input type="text" class="form-control" placeholder="담당자" aria-label="Username"
-                            aria-describedby="basic-addon1" v-model="info.emp_code" readonly>
+                            aria-describedby="basic-addon1" v-model="info.emp_name" readonly>
                     </div>
                 </div>
                 <div class="row">
@@ -102,7 +102,7 @@
   import axios from "axios";
   import { AgGridVue } from "ag-grid-vue3";
   import StoreList from '@/components/modal/StoreList.vue';
-  
+  import { useUserStore } from '@/stores/user';
   export default{
     components:{
          AgGridVue,
@@ -144,7 +144,8 @@
         },
         info: {
           mat_lot: '',
-          emp_code: '',
+          emp_name: useUserStore().empName,
+          emp_code:  useUserStore().id,
           mat_code: '', 
           mat_name: '',  
           mat_check_pass: '',
@@ -232,6 +233,8 @@
               this.info.mat_code = event.data.mat_code;
               this.info.mat_check_pass = event.data.mat_check_pass;
               this.info.check_code = event.data.check_code;
+              this.info.emp_code = useUserStore().id;
+              this.info.emp_name =   useUserStore().empName;
           },
           //창고리스트 조회
           async storeList(){
