@@ -31,6 +31,7 @@
   import { AgGridVue } from "ag-grid-vue3";
   import DatePickerEditor from "../../../components/DatePickerEditor.vue";
   import axios from "axios";
+  import { useUserStore } from '@/stores/user';
   export default {
     components: {
       AgGridVue,
@@ -38,10 +39,28 @@
     },
     data(){
       return{ 
-        rowData:[],
+        rowData:[
+          {
+            repaire_code: "",
+            employee_code: useUserStore().empName,
+            employee_name: useUserStore().id,
+            repaire_add_date:"",
+            repaire_finish_date:"",
+            fac_code:"",
+            fac_result:"",
+            break_status:"",
+            unplay_code:"",
+            note:"",
+            fac_history:""
+          }
+        ],
         columnDefs:[
         { field:"repaire_code", headerName: "설비수리코드", flex: 2,  },
-        { field:"employee_code", headerName: "담당자", flex: 2,  },
+        { field:"employee_code", headerName: "담당자", flex: 2, 
+          valueFormatter: (params) => {
+            return params.data?.employee_name || params.value;
+          }
+        },
         { field:"repaire_add_date", headerName: "수리등록일자", flex: 2,  },
         { field:"repaire_finish_date", headerName: "수리처리일자", flex: 2,  },
         { field:"fac_code", headerName: "설비코드", flex: 2,  },
@@ -60,7 +79,11 @@
               return null;
           }},
         { field:"break_status", headerName: "고장증상", flex: 2,  },
-        { field:"unplay_code", headerName: "비가동코드", flex: 2,  },
+        { field:"unplay_code", headerName: "비가동코드", flex: 2,  
+        valueFormatter: (params) => {
+    return params.value || '[없음]';
+  }
+        },
         { field:"note", headerName: "비고", flex: 2,  },
         { field:"fac_history", headerName: "수리내역", flex: 2,  },
         ],
@@ -95,7 +118,8 @@
         };
         await axios.get('/api/fac/repList', { params })
           .then(res => {
-            this.rowData = res.data;
+            console.log(res.data);
+            this.rowData = Array.isArray(res.data) ? res.data : [res.data];
           })
           .catch(err => console.error(err));
       },

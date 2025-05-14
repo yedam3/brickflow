@@ -31,6 +31,7 @@
   import { AgGridVue } from "ag-grid-vue3";
   import DatePickerEditor from "../../../components/DatePickerEditor.vue";
   import axios from "axios";
+  import { useUserStore } from '@/stores/user';
   export default {
     components: {
         AgGridVue,
@@ -38,13 +39,27 @@
   },
   data() {
     return{
-      rowData:[],
+      rowData:[
+        {
+          fac_code: "",
+          model_name:"",
+          fac_location:"",
+          fac_pattern:"",
+          employee_code: useUserStore().id,
+          employee_name: useUserStore().empName,
+          fac_status:"",
+        }
+      ],
       columnDefs:[
         { field:"fac_code", headerName: "설비코드", flex: 2,  },
         { field:"model_name", headerName: "설비이름", flex: 2 },
         { field:"fac_location", headerName: "설비위치", flex: 2 },
         { field:"fac_pattern", headerName: "설비유형", flex: 2 },
-        { field:"employee_code", headerName: "담당자", flex: 2 },
+        { field:"employee_code", headerName: "담당자", flex: 2 ,
+          valueFormatter: (params) => {
+            return params.data?.employee_name || params.value;
+          }
+        },
         { field:"fac_status", headerName: "설비상태", flex: 2,
         valueFormatter:(params) => {
           if(params.value == 'FS2'){
