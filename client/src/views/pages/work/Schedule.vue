@@ -297,53 +297,6 @@ export default {
             this.autoPlan_code();
         },
 
-        // input 유효성 검사
-        inputCheck() {
-            if (this.formData.plan_code == '' ||
-                this.formData.plan_name == '' ||
-                this.formData.employee_code == '' ||
-                this.formData.start_date == '' ||
-                this.formData.end_date == ''
-                // || this.formData.finish_status == ''
-                // this.formData.note == ''
-            ) {
-                Swal.fire({
-                    title: '실패',
-                    text: '값을 입력해주세요.',
-                    icon: 'error',
-                    confirmButtonText: '확인',
-                });
-                return 1;
-            } else if (this.formData.start_date > this.formData.end_date) {
-                Swal.fire({
-                    title: '실패',
-                    text: '종료일자가 시작일자보다 빠릅니다.',
-                    icon: 'error',
-                    confirmButtonText: '확인',
-                });
-                return 1;
-            } else if (this.editMode == true) {
-                Swal.fire({
-                    title: '등록 실패',
-                    text: '수정 중인 건은 등록이 불가능합니다. 초기화 후 다시 시도해주세요.',
-                    icon: 'error',
-                    confirmButtonText: '확인'
-                });
-                return;
-            }
-            for (let data of this.rowData) {
-                if (data.currentPlanQty == '') {
-                    Swal.fire({
-                        title: '실패',
-                        text: '현기획량을 입력하세요.',
-                        icon: 'error',
-                        confirmButtonText: '확인'
-                    });
-                    return 1;
-                }
-            }
-        },
-
         // 행추가
         addRow() {
             if (this.formData.orders_code === null || this.formData.orders_code === "") {
@@ -382,7 +335,7 @@ export default {
             } else {
                 Swal.fire({
                     title: '실패',
-                    text: '주문번호 존재 시 행삭제를를 할 수 없습니다.',
+                    text: '주문번호 존재 시 행삭제를 할 수 없습니다.',
                     icon: 'error',
                     confirmButtonText: '확인'
                 });
@@ -432,15 +385,6 @@ export default {
         // 생산 계획 등록
         async addPlan() {
             if (this.inputCheck() > 0) {
-                return;
-            }
-            if(this.rowData.length <= 0) {
-                Swal.fire({
-                    title: '실패',
-                    text: '주문 상품이 존재 하지 않습니다.',
-                    icon: 'error',
-                    confirmButtonText: '확인'
-                });
                 return;
             }
             const plan_codeRes = await axios.get(`/api/work/plan/plan_codeCheck/${this.formData.plan_code}`).catch((err) => console.error(err));
@@ -498,7 +442,7 @@ export default {
 
         // 생산 계획 수정
         async updatePlan() {
-            if (this.planOrderStatusCheck(this.formData.plan_code)) {
+            if (await this.planOrderStatusCheck(this.formData.plan_code)) {
                 Swal.fire({
                     title: '실패',
                     text: '이미 생산이 진행되고 있는 계획코드입니다.',
@@ -522,12 +466,11 @@ export default {
                 } else {
                     Swal.fire({
                         title: '정보',
-                        text: '수정정하려는 값이 존재 하지 않습니다.',
+                        text: '수정이 반영되지 않았습니다.',
                         icon: 'info',
                         confirmButtonText: '확인'
                     });
                 }
-                this.clearForm();
             }).catch(err => {
                 console.error(err)
                 Swal.fire({
@@ -541,7 +484,7 @@ export default {
 
         // 생산 계획 삭제
         async deletePlan() {
-            if (this.planOrderStatusCheck(this.formData.plan_code)) {
+            if (await this.planOrderStatusCheck(this.formData.plan_code)) {
                 Swal.fire({
                     title: '실패',
                     text: '이미 생산이 진행되고 있는 계획코드입니다.',
@@ -583,16 +526,92 @@ export default {
             });
         },
 
+        // input 유효성 검사
+        inputCheck() {
+            if (this.formData.plan_code == '' ||
+                this.formData.plan_name == '' ||
+                this.formData.employee_code == '' ||
+                this.formData.start_date == '' ||
+                this.formData.end_date == ''
+                // || this.formData.finish_status == ''
+                // this.formData.note == ''
+            ) {
+                Swal.fire({
+                    title: '실패',
+                    text: '값을 입력해주세요.',
+                    icon: 'error',
+                    confirmButtonText: '확인',
+                });
+                return 1;
+            } else if (this.formData.start_date > this.formData.end_date) {
+                Swal.fire({
+                    title: '실패',
+                    text: '종료일자가 시작일자보다 빠릅니다.',
+                    icon: 'error',
+                    confirmButtonText: '확인',
+                });
+                return 1;
+            } else if (this.editMode == true) {
+                Swal.fire({
+                    title: '실패',
+                    text: '수정 중인 건은 등록이 불가능합니다. 초기화 후 다시 시도해주세요.',
+                    icon: 'error',
+                    confirmButtonText: '확인'
+                });
+                return 1;
+            }
+        
+            if(this.rowData.length <= 0) {
+                Swal.fire({
+                        title: '실패',
+                        text: '주문 상품이 존재 하지 않습니다.',
+                        icon: 'error',
+                        confirmButtonText: '확인'
+                    });
+                return 1;
+            }
+
+            for(let data of this.rowData) {
+                if((data.prod_code === '') || (data.prod_name === '')) {
+                    Swal.fire({
+                        title: '실패',
+                        text: '주문 상품이 존재 하지 않습니다.',
+                        icon: 'error',
+                        confirmButtonText: '확인'
+                    });
+                    return 1;
+                }
+            }
+
+            let tempList = [...this.rowData];
+            this.rowData = this.rowData.filter(data => {
+                return data.currentPlanQty !== '' &&
+                    data.currentPlanQty !== null &&
+                    parseInt(data.currentPlanQty) > 0;
+            });
+
+            if(this.rowData.length <= 0) {
+                Swal.fire({
+                    title: '실패',
+                    text: '모든 상품의 현 기획량 0 입니다.',
+                    icon: 'error',
+                    confirmButtonText: '확인'
+                });
+                this.rowData = [...tempList];
+                return 1;
+            }
+        },
+
         // 생산지시 상태 확인
         async planOrderStatusCheck(plan_code) {
             let res = await axios.get(`/api/work/order/orderStatus/${plan_code}`, {
             }).catch((err) => {
                 console.error(err);
             })
-            if(res.data.status === 'WS1') {
-                return true;
+            if(res.data.status === '' || res.data.status == 'WS1') {
+                return false;
             }
-            return false;
+            return true;
         },
 
         // 제품 명 제품 코드 선택 시 모달창 열기

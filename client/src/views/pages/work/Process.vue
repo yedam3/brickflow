@@ -387,7 +387,7 @@ export default {
                 //         fac_status: data.fac_status,                        // 설비 상태
                 //     });
                 // };
-            }).catch((err) => console.error);
+            }).catch((err) => console.error(err));
 
             this.processData.process = {
                 work_lot: params.data.work_lot,                         // 공정 LOT
@@ -421,6 +421,7 @@ export default {
                 fac_code: params.data.fac_code,             // 설비 코드
                 model_name: params.data.model_name,         // 설비명
                 fac_status: params.data.fac_status,         // 설비 상태
+                using: params.data.using,                   // 사용중인 공정 LOT
             }
         },
         
@@ -458,18 +459,7 @@ export default {
                 return;
             }
             // 설비 상태 확인
-            if(this.processData.fac.fac_status === 'FS2') {
-                // 설비 확인
-                console.log((this.processData.process.work_lot === this.processData.fac.using));
-                if (!(this.processData.process.work_lot === this.processData.fac.using)) {
-                    Swal.fire({
-                        title: '오류',
-                        text: '기존 설비와 서로 다릅니다.',
-                        icon: 'error',
-                        confirmButtonText: '확인',
-                    });
-                    return;
-                }
+            if((this.processData.fac.fac_status === 'FS2') && !(this.processData.process.work_lot != this.processData.fac.fac_code)) {
                 Swal.fire({
                     title: '오류',
                     text: '사용불가 상태의 설비입니다.',

@@ -138,9 +138,10 @@ ORDER BY ms.mat_LOT ASC
 
 // 생산지시 상태 확인
 const findStatusByPlan_code = `
-SELECT finish_status AS 'status'
-FROM product_order
-WHERE plan_code = ?;
+SELECT IFNULL(
+    (SELECT finish_status FROM product_order WHERE plan_code = ? LIMIT 1),
+    ""
+) AS 'status'
 `;
 
 // 생산계획 조회 (생산 지시)

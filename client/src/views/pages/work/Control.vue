@@ -78,7 +78,17 @@
         <div class="container d-flex justify-content-center mt-5">
             <div class="card p-3" style="width: 600px;">
                 <div class="row row-cols-3 g-2 text-center">
-                    <div class="col border py-3" v-for="key in ['1','2','3','4','5','6','7','8','9','<','0','✓']" :key="key" :style="getKeyStyle(key)" @click="handleKey(key)">{{ key }}
+                    <div class="col border py-3 keypad" v-for="key in ['1','2','3','4','5','6','7','8','9']" :key="key" @click="handleKey(key)">{{ key }}
+                        
+                    </div>
+                    <div class="col border py-3 keypad-backspace" @click="handleKey('<')">
+                        <
+                    </div>
+                    <div class="col border py-3 keypad-zero" @click="handleKey('0')">
+                        0
+                    </div>
+                    <div class="col border py-3 keypad-enter" @click="handleKey('✓')">
+                        ✓
                     </div>
                 </div>
             </div>
@@ -182,8 +192,12 @@ export default {
                 });
                 return;
             };
-            this.focusedField = field;
-            this.currentInput = this.processInfo[field].toString();
+            if(this.focusedField == field) {
+                this.focusedField = null;
+            } else {
+                this.focusedField = field;
+                this.currentInput = this.processInfo[field] === 0 ? "" :  this.processInfo[field].toString();
+            }
         },
 
         // 키 이벤트
@@ -221,15 +235,6 @@ export default {
             if(this.focusedField) {
                 const numValue = parseInt(this.currentInput) || 0;
                 this.processInfo[this.focusedField] = numValue;
-                if(this.focusedField === 'input_quantity') {
-                    this.processInfo['created_quantity'] = this.processInfo.input_quantity;
-                }
-                if(this.focusedField === 'error_quantity') {
-                    this.processInfo['created_quantity'] = this.processInfo['input_quantity'] - this.processInfo[this.focusedField];
-                }
-                if(this.focusedField === 'created_quantity') {
-                    this.processInfo['error_quantity'] = this.processInfo['input_quantity'] - this.processInfo[this.focusedField];
-                }
                 this.focusedField = null;
                 this.currentInput = "";
             }
@@ -239,7 +244,8 @@ export default {
         getKeyStyle(key) {
             if (this.pressedKey === key.toString()) {
                 return {
-                    backgroundColor: '#0d6efd', // Bootstrap primary
+                    cursor: 'pointer',
+                    backgroundColor: '#0d6efd', 
                     color: 'white',
                     fontWeight: 'bold',
                     border: '3px solid #0d6efd',
@@ -264,16 +270,14 @@ export default {
                     fac_code: this.processInfo.fac_code,
                 }
             }).then(res => {
+                console.log(res.data);
+                console.log(this.processInfo);
                 this.processInfo = res.data;
                 this.processInfo.work_lot = work_lot;
-                
-                this.processInfo.input_quantity = 0;
-                this.processInfo.error_quantity = 0;
-                this.processInfo.created_quantity = 0;
             }).catch((err) => console.error(err));
 
             // 미작업량 = 투입량
-            this.processInfo.input_quantity = this.processInfo.unprocessed_quantity;
+            // this.processInfo.input_quantity = this.processInfo.unprocessed_quantity;
             // // 공정 정보 조회
             // await axios.get(`/api/work/process/workLot/${this.work_lot}`).then(res => {
             //     console.log(res.data);
@@ -305,7 +309,7 @@ export default {
             if (this.processInfo.input_quantity <= 0) {
                 Swal.fire({
                     title: '오류',
-                    text: '투입량은 0 또는 1가 될 수 없습니다.',
+                    text: '투입량은 0이 될 수 없습니다.',
                     icon: 'error',
                     confirmButtonText: '확인',
                 });
@@ -329,7 +333,6 @@ export default {
                 });
                 return;
             }
-            if(this.processInfo.input_quantity != this.processInfo.error_quantity + this.process)
             await axios.post(`/api/work/process/start`, {
                 work_lot: this.processInfo.work_lot,
                 fac_code: this.processInfo.fac_code,
@@ -345,6 +348,7 @@ export default {
                         icon: 'success',
                         confirmButtonText: '확인',
                     });
+                    this.processInfo['created_quantity'] = this.processInfo['input_quantity'] - this.processInfo[['error_quantity']];
                 } else {
                     Swal.fire({
                         title: '오류',
@@ -449,5 +453,57 @@ export default {
 <style>
 .ag-theme-alpine .ag-header-cell-label {
     justify-content: center;
+}
+.keypad {
+  transition: background-color 0.2s ease;
+}
+
+.keypad:hover {
+    cursor: pointer;
+    background-color: #0d6efd;
+    color: white;
+    font-weight: bold;
+    border: 3px solid #0d6efd;
+    box-shadow: 0 0 10px rgba(13, 110, 253, 0.5);
+    transition: all 0.1s ease-in-out;
+}
+.keypad-backspace {
+    background-color: gray;
+    color: white;
+}
+.keypad-backspace:hover {
+    cursor: pointer;
+    background-color: #0d6efd;
+    color: white;
+    font-weight: bold;
+    border: 3px solid #0d6efd;
+    box-shadow: 0 0 10px rgba(13, 110, 253, 0.5);
+    transition: all 0.1s ease-in-out;
+}
+.keypad-zero {
+    background-color: #212529;
+    color: white;
+}
+.keypad-zero:hover {
+    cursor: pointer;
+    background-color: #0d6efd;
+    color: white;
+    font-weight: bold;
+    border: 3px solid #0d6efd;
+    box-shadow: 0 0 10px rgba(13, 110, 253, 0.5);
+    transition: all 0.1s ease-in-out;
+}
+.keypad-enter {
+    background-color: gray;
+    color: white;
+}
+.keypad-enter:hover {
+    cursor: pointer;
+    background-color: #0d6efd;
+    color: white;
+    font-weight: bold;
+    border: 3px solid #0d6efd;
+    box-shadow: 0 0 10px rgba(13, 110, 253, 0.5);
+    transition: all 0.1s ease-in-out;
 }
 </style>
