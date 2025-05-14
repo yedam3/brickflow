@@ -3,7 +3,8 @@ const mariaDB = require("../../db/mapper.js");
 const { convertObjToAry } = require("../../utils/converts.js");
 const { retry } = require("rxjs");
 const { empSave } = require("../../db/sqlList.js");
-
+//암호화 가능 require
+const bcrypt = require("bcrypt"); 
 //사원조회
 const empList = async () => {
   let list = await mariaDB.query('empList')
@@ -18,35 +19,36 @@ const empInfo = async (empno) => {
 }
 
 //사원등록
-const saveEmp = async(empList,empInfo)=>{
-
-for(let value of empSave){
-  let addColumn = ['emp_code', 'emp_name', 'department', 'hire_date', 'pwd'];
-  let addEmp = convertObjToAry(value,addColumn);
-
-// emp_code증가
-//emp_code 자동생성 SELECT문 조회
-let empList = await mariaDB.query('empSave', addEmp);
-// 그결과를 newEmpCode라는 변수에 담고
-let newEmpCode = resList[0].emp_code;
-// addBom에 첫번째 값으로 추가
-addEmp.unshift(newEmpCode);
-
-let resList = await mariaDB.query('empSave', addEmp)
-                                  .catch((err) => console.log(err));
-}
+const saveEmp = async(empInfo)=>{
+  let resList = await mariaDB.query('autoEmpCode')
+                              .catch((err) => console.log(err));
+  //  // 1. 비밀번호 해시
+    const saltRounds = 10;
+    const hashedPwd = await bcrypt.hash(empInfo.pwd, saltRounds);
+  let result = await mariaDB.query('empSave',[resList[0].emp_code, empInfo.emp_name, empInfo.department,empInfo.hire_date, empInfo.tel, hashedPwd])
+                            .catch((err) => console.log(err));
+  
 return result;
 }
 //부서리스트
-const EmpCodeList = async () => {
-  const result = await mariaDB.query('departmentList');
+const empCodeList = async () => {
+  const result = await mariaDB.query('departmentList')
+                               .catch((err) => console.log(err));
   return result;
 }
 
+//수정
+const empModify = async (empModify) => {
+  console.log('에러'+empModify);
+  let result = await mariaDB.query('empModify',empModify)
+                              .catch((err) => console.log(err));
+  return result;
+}
 module.exports 
 = {
   empList,
   empInfo,
   saveEmp,
-  EmpCodeList,
+  empCodeList,
+  empModify,
 }

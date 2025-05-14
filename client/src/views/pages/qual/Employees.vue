@@ -32,7 +32,7 @@
                     <div class="input-group mb-5 col">
                         <span class="input-group-text" id="basic-addon1">이름</span>
                         <input type="text" class="form-control" placeholder="이름" aria-label="Username"
-                            aria-describedby="basic-addon1" v-model="info.emp_name" readonly>
+                            aria-describedby="basic-addon1" v-model="info.emp_name" >
                     </div>
                 </div>
                 <div class="row">
@@ -40,28 +40,27 @@
                         <span class="input-group-text" id="basic-addon1">부서</span>
                         <select class="form-select col" aria-label="Default select example" v-model="info.department">
                             <option disabled selected value="">부서</option>
-                            <option v-for=" dep in departmentListAry" :key="dep.department" :value="dep.department">
-                                {{ dep.department }}
+                            <option v-for=" dep in departmentListAry" :key="dep.sub_code" :value="dep.sub_code">
+                                {{ dep.sub_code_name }}
                             </option>
                         </select>
-                        
                     </div>
                     <div class="input-group mb-5 col">
                         <span class="input-group-text" id="basic-addon1">입사일</span>
-                        <input type="text" class="form-control" placeholder="입사일" aria-label="Username"
-                            aria-describedby="basic-addon1" v-model="info.hire_date" readonly>
+                        <input type="date" class="form-control" placeholder="입사일" aria-label="Username"
+                            aria-describedby="basic-addon1" v-model="info.hire_date" >
                     </div>
                 </div>
                 <div class="row">
                     <div class="input-group mb-5 col">
                         <span class="input-group-text" id="basic-addon1">전화번호</span>
                         <input type="text" class="form-control" placeholder="전화번호" aria-label="Username"
-                            aria-describedby="basic-addon1" v-model="info.tel" readonly>
+                            aria-describedby="basic-addon1" v-model="info.tel" >
                     </div>
                     <div class="input-group mb-5 col">
                         <span class="input-group-text" id="basic-addon1">비밀번호</span>
                         <input type="password" class="form-control" placeholder="비밀번호" aria-label="Username"
-                            aria-describedby="basic-addon1" v-model="info.store_quantity">
+                            aria-describedby="basic-addon1" v-model="info.pwd">
                     </div>
                 </div>
         </div>
@@ -83,7 +82,6 @@ export default{
      rowData: [
        {
          emp_code: "",
-         prod_name: "",
          department: "",
          hire_date: "",
          tel: "",
@@ -91,7 +89,7 @@ export default{
        }
      ],
      columnDefs: [
-       { field: 'emp_code', headerName: '사원번호',flex:1,editable:true},
+       { field: 'emp_code', headerName: '사원번호',flex:1},
        { field: 'emp_name', headerName: '이름' ,flex:1},
        { field: 'department', headerName: '부서' ,flex:1,
             valueFormatter: (params) => {
@@ -115,7 +113,7 @@ export default{
      ],
      gridOptions:{
          pagination: true,
-         paginationPageSize: 5,
+         paginationPageSize: 10,
          paginationPageSizeSelector: [5, 10, 20, 50],
          overlayNoRowsTemplate: '표시할 값이 없습니다.',
          defaultColDef: {
@@ -133,7 +131,6 @@ export default{
 
     info: {
       emp_code: "",
-      prod_name: "",
       emp_name: "",
       department: "",
       hire_date: "",
@@ -145,8 +142,9 @@ export default{
     prodIndex : null,
    }
  },
- mounted() {
-   this.EmployeesData();
+ async mounted() {
+   await this.EmployeesData();
+   await this.departmentList();
  },
  methods: {
    async EmployeesData() {
@@ -175,31 +173,36 @@ export default{
     async departmentList(){
       await axios.get('/api/admin/departmentList')
                  .then(res => {
-                  console.log(res.data)
+                  console.log(res.data);
                   this.departmentListAry = res.data;
                  })
     },
-   //등록
-   async empSave(){
+
     //값체크 validation
-      for(let data of this.rowData) {
-        console.log(data);
-        if(data.emp_code == '' || data.emp_name == '' || data.department == '' || hire_date == '' || tel == '' || pwd == '') {
+    checkValue(){
+      if(this.info.emp_name == '' || this.info.department == '' || this.info.hire_date == '' || this.info.tel == '' || this.info.pwd == '') {
           Swal.fire({
            title: '실패',
            text: '값을 다 입력해주세요',
            icon: 'error',
            confirmButtonText: '확인'
          });
-         return;
+         return ;
         }
-      }
+    },
+    
+   //등록
+   async empSave(){
+    console.log(this.info)
+    //값체크 validation
+    let validation = this.checkValue();
+    if(validation==1){
+      return;
+    }
     console.log(this.rowData[this.prodIndex])
     //등록시작
-    const res = axios.post('/api/admin/empSave', {
-      empList: this.rowData,
-      empInfo: this.rowData[this.prodIndex].emp_code
-     })
+
+    const res =  await axios.post('/api/admin/empSave', this.info)
        .then(res => {
          if (res.data.affectedRows > 0) {
            Swal.fire({
@@ -228,14 +231,69 @@ export default{
          });
          return;
        });
-       this.rowData2 = [{
-                          prod_code: "",
-                          prod_name: "",
-                          process_code: "",
-                          process_name: "",
-                       }];
-       this.ProcData();
+       await this.EmployeesData();
+       this.info =  {
+                      emp_code: "",
+                      emp_name: "",
+                      department: "",
+                      hire_date: "",
+                      tel: "",
+                      pwd: "",
+                    } 
       },
+      
+      //초기화
+      resetValue(){
+        this.info.emp_code = '';
+        this.info.emp_name = '';
+        this.info.department = '';
+        this.hire_date = '';
+        this.tel = '';
+        this.pwd = '';
+      },
+
+      // 수정
+      //값 다 넣었는지 조회
+      async empModify(){
+        let validation = this.checkValue();
+        if(validation==1){
+        return;
+      }else if (validation==2){
+            return;
+          }
+        //이미등록건인지 조회
+        let count = await this.empSave();
+            if(count<1){
+                Swal.fire({
+                    title:'실패',
+                    text:'등록이 되지 않은 건입니다.',
+                    icon: "error",
+                    confirmButtonText : '확인'
+                })
+                return;
+            }
+            await axios.put('/api/admin/empModify',this.info)
+                        .then(res => {
+                            if(res.data.affectedRows > 0){
+                                Swal.fire({
+                                    title: '수정',
+                                    text: '수정이 완료되었습니다.',
+                                    icon: "success",
+                                    confirmButtonText: '확인'
+                                })
+                                //초기화
+                                this.resetValue();
+                            }else{
+                                Swal.fire({
+                                    title: '수정실패',
+                                    text: '수정이 실패하였습니다',
+                                    icon: "error",
+                                    confirmButtonText: '확인'
+                                })
+                            }
+                        })
+                        .catch((err) => console.log(err));
+          },
   }
 };
 </script>

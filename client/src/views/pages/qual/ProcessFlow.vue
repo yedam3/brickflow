@@ -97,7 +97,7 @@ export default {
         }
       ],
       columnDefs: [
-        { field: 'prod_code', headerName: '제품코드', flex: 1, editable: true },
+        { field: 'prod_code', headerName: '제품코드', flex: 1},
         { field: 'prod_name', headerName: '제품명', flex: 1 },
       ],
       gridOptions1: {
@@ -127,10 +127,10 @@ export default {
       columnDefs2: [
         { field: 'drag', headerName: '', flex: 1, rowDrag: true },
         { headerCheckboxSelection: true, checkboxSelection: true, width: 50, },
-        { field: 'prod_code', headerName: '제품코드', flex: 3, editable: true },
-        { field: 'prod_name', headerName: '제품명', flex: 4, editable: true },
-        { field: 'process_code', headerName: '공정코드', flex: 3, editable: true },
-        { field: 'process_name', headerName: '공정명', flex: 4, editable: true },
+        { field: 'prod_code', headerName: '제품코드', flex: 3},
+        { field: 'prod_name', headerName: '제품명', flex: 4 },
+        { field: 'process_code', headerName: '공정코드', flex: 3},
+        { field: 'process_name', headerName: '공정명', flex: 4},
       ],
       gridOptions2: {
         rowDragManaged: true, //드래그 행 드롭을 자동으로 관리해주는 기능

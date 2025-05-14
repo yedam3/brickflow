@@ -22,13 +22,24 @@ const empInfo = `SELECT emp_code,
 
 // 사원 등록
 const empSave = `INSERT INTO employees(emp_code, emp_name, department, hire_date, tel, pwd)
-                    VALUES(?, ?, ?, NOW(), ?, ?)`
+                    VALUES(?, ?, ?, ?, ?, ?)`;
 
 // 부서리스트 조회
-const departmentList = `SELECT main_code,
-	                             main_code_name
-                        FROM main_codes
-	                      WHERE main_code = 'dp'`
+const departmentList = `SELECT sub_code,
+		                            sub_code_name
+                                FROM sub_codes
+                              WHERE main_code = 'dp'`;
+
+// 수정
+const empModify = `UPDATE employees
+                      SET emp_name=?,
+                          department =?,
+                          hire_date =?,
+                          tel =?,
+                          pwd =? 
+                    WHERE emp_code =?`;
+
+
 module.exports 
 = {
   autoEmpCode,
@@ -36,4 +47,5 @@ module.exports
   empInfo,
   empSave,
   departmentList,
+  empModify,
 }
