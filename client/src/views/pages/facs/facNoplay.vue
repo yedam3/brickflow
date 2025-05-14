@@ -56,6 +56,7 @@
         </div>
       </div>
       <div class="d-flex justify-content-end mt-4 gap-3">
+        <Button label="초기화" severity="secondary" @click="clearForm" />
         <Button label="등록" severity="info" @click="addUnFac" />
         <Button label="수정" severity="help" @click="modifyUnplay" />
         <Button label="가동처리" severity="danger" @click="updatePlay" />
@@ -384,7 +385,19 @@ export default {
                     this.reasonFacAry = [...res.data];
                 })
                 .catch(err => console.error(err));
-        }
+        },
+        clearForm() {
+            this.rowData = {
+                unplay_code: "",
+                unplay_reason_code: "",
+                employee_code: useUserStore().id,
+                employee_name: useUserStore().empName,
+                unplay_start_date: "",
+                unplay_end_date: "",
+                note: "",
+                fac_code: '',
+            };
+    },
     }
 }
 </script>

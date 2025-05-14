@@ -141,7 +141,7 @@ const modifydelivery = async (delivery,deliveryDetail) => {
     console.log(deliveryDetail)
     for (let detail of deliveryDetail) {
         if (Number(detail.delivery_quantity) > 0) {
-            console.log('DD')
+            
         result = await mariaDB.query('deliveryDetailUpdate', [detail.delivery_quantity,detail.delivery_detail_code])
                 .catch((err) => console.log(err));  
                
@@ -177,6 +177,31 @@ const removedelivery = async (delivery_code) => {
 
     const result = await mariaDB.query("deliveryDetailDelete", [delivery_code])
         .catch(err => console.log(err));
+    
+    let test = [
+        delivery.delivery_detail_code,
+        detail.prod_code,
+        detail.delivery_quantity,
+        data.prod_LOT,
+        delivery.delivery_code
+    ]
+    // 창고 값 수정
+    result = await mariaDB.query('addStoreProd', test)
+        .catch((err) => console.log(err));
+    let findStore = (await mariaDB.query('findProdStroage', data.prod_LOT))[0].storage_code; // 출고코드 자동생성
+    let info = [
+        delivery.delivery_detail_code,
+        detail.prod_code,
+        data.prod_LOT,
+        detail.delivery_quantity,
+        findStore
+    ]
+    result = await mariaDB.query('addStoreProd', info)
+        .catch((err) => console.log(err));
+    
+    // 재고 값 수정
+    result = await mariaDB.query('storageDeliveryUpdate', [detail.delivery_quantity, detail.prod_LOT, detail.delivery_detail_code])
+        .catch((err) => console.log(err));
 
     return result;
 };

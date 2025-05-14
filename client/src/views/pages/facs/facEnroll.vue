@@ -18,7 +18,7 @@
 
         <div class="col-md-4">
           <label class="form-label">담당자</label>
-          <input type="text" class="form-control" v-model="rowData.employee_code" />
+          <input type="text" class="form-control" v-model="rowData.employee_name" readonly/>
         </div>
         <div class="col-md-4">
           <label class="form-label">설치일자</label>
@@ -80,6 +80,7 @@
   import DatePickerEditor from "../../../components/DatePickerEditor.vue";
   import axios from "axios";
   import Swal from "sweetalert2";
+  import { useUserStore } from '@/stores/user';
   export default {
     components:{
       AgGridVue,
@@ -91,7 +92,8 @@
           fac_code: "",
           model_name:"",
           fac_location:"",
-          employee_code:"",
+          employee_code: useUserStore().id,
+          employee_name: useUserStore().empName,
           fac_pattern:"",
           install_date:"",
           inspection_cycle:"",
@@ -105,7 +107,8 @@
           fac_code: "",
           model_name:"",
           fac_location:"",
-          employee_code:"",
+          employee_code: useUserStore().id,
+          employee_name: useUserStore().empName,
           fac_pattern:"",
           install_date:"",
           inspection_cycle:"",
@@ -116,7 +119,11 @@
           { field: "fac_code", headerName: "설비코드", flex:3 ,},
           { field: "model_name", headerName: "설비이름", flex:3 ,},
           { field: "fac_location", headerName: "설비 위치", flex:3 ,},
-          { field: "employee_code", headerName: "담당자", flex:3 ,},
+          { field: "employee_code", headerName: "담당자", flex:3 ,
+            valueFormatter: (params) => {
+            return params.data?.employee_name || params.value;
+          }
+          },
           { field: "fac_pattern", headerName: "설비유형", flex:3 , 
             valueFormatter: (params) => {
               if (params.value == 'FC1') {
@@ -194,7 +201,8 @@
           fac_code: "",
           model_name: "",
           fac_location: "",
-          employee_code: "",
+          employee_code: useUserStore().id,
+          employee_name: useUserStore().empName,
           fac_pattern: "",
           install_date: "",
           inspection_cycle: "",
@@ -259,7 +267,12 @@
         }
 
         const res = await axios.post('/api/fac/addFac', {
-          facCode: this.rowData
+          facCode: {
+            ...this.rowData,
+            employee_code: useUserStore().id, // 코드로 DB에 저장
+            
+          }
+          
         }).catch(error => {
           console.error("등록 실패:", error);
           Swal.fire("등록 실패", "설비 등록 중 오류가 발생했습니다.", "error");
@@ -276,7 +289,8 @@
             fac_code: "",
             model_name: "",
             fac_location: "",
-            employee_code: "",
+            employee_code: useUserStore().id,
+            employee_name: useUserStore().empName,
             fac_pattern: "",
             install_date: "",
             inspection_cycle: "",
@@ -355,17 +369,22 @@
       return `http://localhost:3000/uploads/facImages/${fileName}`; // 또는 환경 변수 사용
     },
     onImageChange(event) {
-      const file = event.target.files[0];
-      if (!file) return;
+        const file = event.target.files[0];
+        if (!file) return;
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/svg+xml', 'image/jpg'];
 
-      this.imageFile = file;
-
-      const reader = new FileReader();
-      reader.onload = e => {
-        this.rowData.imagePreview = e.target.result;
-      };
-      reader.readAsDataURL(file);
-    },
+        if (!allowedTypes.includes(file.type)) {
+          Swal.fire("업로드 불가", "이미지 파일만 등록 가능합니다. (jpg, png, svg)", "warning");
+          this.$refs.fileInput.value = ''; 
+          return;
+        }
+        this.imageFile = file;
+        const reader = new FileReader();
+        reader.onload = e => {
+          this.rowData.imagePreview = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      },
       //삭제
       async deleteFac() {
         if (!this.rowData.fac_code) {

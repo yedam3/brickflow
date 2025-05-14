@@ -17,7 +17,7 @@ const selectFacList =
 `SELECT fac_code,
         model_name,
         fac_location,
-        employee_code,
+        getEmpName(employee_code) AS employee_code,
         fac_pattern,
         install_date,
         inspection_cycle,
@@ -30,7 +30,7 @@ const statusList =
 `SELECT fac_code,
         model_name,
         fac_location,
-        employee_code,
+        getEmpName(employee_code) AS employee_code,
         fac_pattern,
         fac_status
 FROM fac`;
@@ -49,7 +49,7 @@ WHERE fac_code = ?`
 const unplayList =
 `SELECT unplay_code,
         unplay_reason_code,
-        employee_code,
+        getEmpName(employee_code) AS employee_code,
         unplay_start_date,
         unplay_end_date,
         note,
@@ -170,7 +170,7 @@ const facPattern =
 const repaireList = 
 `SELECT unplay_code,
        unplay_reason_code,
-       employee_code,
+       getEmpName(employee_code) AS employee_code,
        unplay_start_date,
        unplay_end_date,
        note,
@@ -188,22 +188,23 @@ AND unplay_end_date IS NULL`
 const repaireFac =
 `INSERT INTO repaire (
   repaire_code, 
-  note, 
+  employee_code, 
   repaire_add_date, 
   repaire_finish_date, 
-  employee_code, 
   fac_code, 
-  fac_history,
+  fac_result,
   break_status,
-  fac_result
+  unplay_code,
+  note, 
+  fac_history
 )
-VALUES(?,?,?,?,?,?,?,?,?)`
+VALUES(?,?,?,?,?,?,?,?,?,?)`
 
 
 //수리설비 조회
 const repList =
 `SELECT repaire_code,
-        employee_code,
+        getEmpName(employee_code) AS employee_code,
         repaire_add_date,
         repaire_finish_date,
         fac_code,

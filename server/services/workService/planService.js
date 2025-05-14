@@ -252,6 +252,8 @@ const insertPlanDetail = async (plan_code, planDetailData, orders_code) => {
 // 생산 계획 상세 수정
 const updatePlanByPlan_code = async (planData, planDetailData) => {
     const plan_fields = ["plan_name", "start_date", "end_date", "note", "plan_code"];
+    const plan_detail_fields = ["prod_code", "currentPlanQty", "plan_detail_code"];
+
     const newPlan = plan_fields.reduce((obj, key) => {
         if(planData[key] !== undefined) {
             obj[key] = planData[key];
@@ -261,8 +263,6 @@ const updatePlanByPlan_code = async (planData, planDetailData) => {
     delete newPlan.finish_status;
     newPlan.start_date = dateFormat(new Date(newPlan.start_date));
     newPlan.end_date = dateFormat(new Date(newPlan.end_date));
-
-    const plan_detail_fields = ["currentPlanQty", "plan_detail_code"];
 
     let conn ;
     let result;

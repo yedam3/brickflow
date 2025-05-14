@@ -145,7 +145,6 @@ import PlanModal from "@/components/modal/PlanModal.vue";
 import PlanOrderModal from "@/components/modal/PlanOrderModal.vue"
 import MatStock from "@/components/modal/MatStock.vue";
 import ProdModal from "@/components/modal/ProdModal.vue";
-import mat from "@/router/routes/mat";
 
 export default {
     components: {
@@ -279,7 +278,7 @@ export default {
 
     },
     mounted() {
-        this.autoOrder_Code();
+        this.clearForm();
     },
     methods: {
         // FormData 초기화
@@ -297,6 +296,10 @@ export default {
             },
             this.rowData = [];
             this.secondRowData = [];
+            this.matTempHoldDataList = [];
+            this.matHoldDataList = [];
+            
+            this.autoOrder_Code();
         },
 
         // 생산 계획 모달창
@@ -486,7 +489,6 @@ export default {
                 );
             });
             this.matTempHoldDataList = this.matTempHoldDataList.concat(temp);
-            console.log(this.matTempHoldDataList);
 
             this.secondRowData[this.selectedSecondIndex].material_input_qunatity = totalQty;
             this.secondRowData = [...this.secondRowData];
@@ -534,6 +536,27 @@ export default {
 
         // 생산 지시 등록
         async addPlanOrder() {
+            let check = await axios.get(`/api/work/order/orderCheck/${this.formData.product_order_code}`)
+            .catch((err) => {
+                console.error(err)
+                Swal.fire({
+                    title: '실패',
+                    text: '생산 계획 코드 조회 중 오류가 발생했습니다.',
+                    icon: 'error',
+                    confirmButtonText: '확인'
+                });
+                return 1;
+            });
+            if(check.data.check > 0) {
+                Swal.fire({
+                    title: '실패',
+                    text: '이미 등록된 생산 계획 코드입니다.',
+                    icon: 'error',
+                    confirmButtonText: '확인'
+                });
+                return;
+            }
+
             if(this.insertVaildation() > 0) {
                 return;
             }
@@ -567,6 +590,8 @@ export default {
                     icon: 'success',
                     confirmButtonText: '확인'
                 });
+                
+                this.clearForm();
             } else {
                 Swal.fire({
                     title: '경고',
@@ -609,6 +634,8 @@ export default {
                     icon: 'success',
                     confirmButtonText: '확인'
                 });
+
+                this.clearForm();
             } else {
                 Swal.fire({
                     title: '실패',
@@ -641,6 +668,8 @@ export default {
                     icon: 'success',
                     confirmButtonText: '확인'
                 });
+
+                this.clearForm();
             } else {
                 Swal.fire({
                     title: '실패',
@@ -712,6 +741,15 @@ export default {
                 });
                 return 1;
             };
+            if (new Date(this.formData.start_date) > new Date(this.formData.end_date)) {
+                Swal.fire({
+                    title: '실패',
+                    text: '종료일자가 시작일자보다 이릅니다.',
+                    icon: 'error',
+                    confirmButtonText: '확인'
+                });
+                return 1;
+            }
             if(this.rowData.length <= 0) {
                 Swal.fire({
                     title: '실패',
@@ -734,7 +772,6 @@ export default {
             };
             if(this.secondRowData.length > 0) {
                 for (let data of this.secondRowData) {
-                    console.log(data);
                     if (!(Array.isArray(data.mat_LOTs))) {
                         Swal.fire({
                             title: '실패',
@@ -753,21 +790,21 @@ export default {
                     confirmButtonText: '확인'
                 });
                 return 1;
-            }
+            };
         },
 
         // Vaildation
         async anotherVaildation() {
-            let result = await axios.get(`/api/work/order/productOrderStatus/${this.formData.product_order_code}`).catch((err) => console.error(err));
-            if(result.data.check != 'WS1') {
-                Swal.fire({
-                    title: '실패',
-                    text: '이미 진행중이거나 생산이 완료된 지시입니다.',
-                    icon: 'error',
-                    confirmButtonText: '확인'
-                });
-                return 1;
-            }
+            // let result = await axios.get(`/api/work/order/productOrderStatus/${this.formData.product_order_code}`).catch((err) => console.error(err));
+            // if(result.data.check != 'WS1') {
+            //     Swal.fire({
+            //         title: '실패',
+            //         text: '이미 진행중이거나 생산이 완료된 지시입니다.',
+            //         icon: 'error',
+            //         confirmButtonText: '확인'
+            //     });
+            //     return 1;
+            // }
         },
     },
 };
