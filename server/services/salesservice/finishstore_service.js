@@ -34,9 +34,9 @@ const finishAdd = async (finishedInfo) => {
     maxLot = maxLot[0].code;
     console.log(maxLot+'맥스')
     //입고등록
-    let selectQuery = await mariaDB.selectedQuery('addFinshied',[finishedInfo.prod_code,finishedInfo.quantity,finishedInfo.store_date,finishedInfo.employee_code,finishedInfo.prod_check_code])
+    let selectQuery = await mariaDB.selectedQuery('addFinshied',[finishedInfo.prod_code,finishedInfo.quantity,finishedInfo.store_date,finishedInfo.emp_code,finishedInfo.prod_check_code])
 
-    result = await conn.query(selectQuery,[finishedInfo.prod_code,finishedInfo.quantity,finishedInfo.store_date,finishedInfo.employee_code,finishedInfo.prod_check_code])
+    result = await conn.query(selectQuery,[finishedInfo.prod_code,finishedInfo.quantity,finishedInfo.store_date,finishedInfo.emp_code,finishedInfo.prod_check_code])
 
     //창고 등록
     selectQuery = await  mariaDB.selectedQuery('storeFinished',[maxLot,finishedInfo.prod_code,maxLot,finishedInfo.quantity,finishedInfo.storage_code]);

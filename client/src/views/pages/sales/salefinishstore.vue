@@ -3,7 +3,7 @@
     <div class="font-semibold text-xl mb-4">완제품 관리</div>
     <div class="font-semibold text-l mb-4">완제품 입고</div>
     <div class="text-end mt-3 mb-3">
-      <Button label="조회" severity="success" class="me-3" @click="orderList" />
+      <Button label="입고 가능 재고조회" severity="success" class="me-3" @click="orderList" />
       <Button label="등록" severity="info" class="me-3" @click="addFunc" />
       <Button label="수정" severity="help" class="me-3" @click="modifyFunc" />
       <Button label="삭제" severity="danger" class="me-5" @click="deleteFunc" />
@@ -303,6 +303,7 @@ export default{
         return
       }
       //등록 진행
+      console.log(this.formData)
       await axios.post('/api/sales/addFinished',this.formData)
            .then(res => {
             if(res.data.affectedRows > 0) {
@@ -312,7 +313,8 @@ export default{
                         icon: 'success',
                         confirmButtonText: '확인'
                     });
-                    this.clearForm();
+                   this.clearForm();
+                   this.finishedList();
                 } else {
                     Swal.fire({
                     title: '정보',
@@ -419,6 +421,7 @@ export default{
                         confirmButtonText: '확인'
                     });
                     this.clearForm();
+                   this.finishedList();
                 } else {
                     Swal.fire({
                     title: '정보',
@@ -485,6 +488,7 @@ export default{
                         confirmButtonText: '확인'
                     });
                     this.clearForm();
+                   this.finishedList();
                 } else {
                     Swal.fire({
                     title: '정보',

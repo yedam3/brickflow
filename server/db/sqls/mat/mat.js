@@ -97,6 +97,7 @@ const orderRender =`
           request_date,
           delivery_date,
           emp_code,
+          getEmpName(emp_code) AS emp_name,
           note
 
   FROM matOrders

@@ -81,8 +81,10 @@ router.beforeEach(async (to, from, next) => {
     const authRequired = !publicPages.includes(to.path);
     // 새로고침했을 때 세션으로 복구
     if (!store.id) {
+
       try {
         const res = await axios.get('/api/session');
+        console.log(res);
         if (res.data.isLogin) {
           store.setUser({
             id: res.data.id,
