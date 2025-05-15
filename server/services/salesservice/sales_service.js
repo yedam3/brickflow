@@ -94,7 +94,7 @@ const modifyoders = async (orders, ordersDetail) => {
         }
   for (let detail of ordersDetail) {                // [ 객체 ,            주문번호값       ]
     let upDetailInfo = {
-      quantity: detail.delivery_demand,
+      // quantity: detail.delivery_demand,
       price: detail.price,
       note: detail.note,
       prod_code: detail.prod_code,

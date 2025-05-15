@@ -26,8 +26,8 @@ VALUES( ? , ? , ? , ?,?,now())`;
 
 //상세등록
 const deliveryDetailAdd =
-  `INSERT INTO delivery_manage_detail(delivery_detail_code, prod_code, delivery_quantity, prod_LOT, delivery_code)
-VALUES( ? , ? , ? , ? , ?)`;
+  `INSERT INTO delivery_manage_detail(delivery_detail_code, prod_code, delivery_quantity, delivery_code)
+VALUES( ? , ? , ? , ?)`;
 
 //수정
 const deliveryUpdate = `
@@ -44,18 +44,11 @@ WHERE delivery_detail_code = ?`
 //재고수정
 const storageDeliveryUpdate = `
 UPDATE store
-SET dispatch_quantity = ? , LOT = ? 
-WHERE doc_code = ?  `
+SET dispatch_quantity = ?
+WHERE doc_code = ?
+AND LOT = ?   `
 
-//삭제
-const deliveryDelete =
-  `DELETE FROM delivery_manage
-WHERE delivery_code = ? `
 
-//상세삭제
-const deliveryDetailDelete =
-  `DELETE FROM delivery_manage_detail
-WHERE delivery_code = ? `
 
 //수정 및 등록 체크
 const addCheck = `
@@ -130,6 +123,23 @@ JOIN delivery_manage_detail de ON(de.delivery_code = d.delivery_code AND o.prod_
 JOIN company c ON(d.company_code = c.company_code)
 WHERE o.orders_code = ? AND de.delivery_code = ?
 `
+//삭제
+const deliveryDelete =
+  `DELETE FROM delivery_manage
+WHERE delivery_code = ? `
+
+//상세삭제
+const deliveryDetailDelete =
+  `DELETE FROM delivery_manage_detail
+WHERE delivery_code = ? `
+
+//창고에서 삭제
+const storeDeliveryDelete = `
+   DELETE FROM store
+   WHERE doc_code = ? 
+`
+
+
 module.exports = {
   deliveryAdd,
   deliveryAutoOrder,
@@ -147,7 +157,7 @@ module.exports = {
   deliveryModal,
   deliveryDetailRender,
   storageDeliveryUpdate,
-  // deliveryRender
+  storeDeliveryDelete,
 
 
 }

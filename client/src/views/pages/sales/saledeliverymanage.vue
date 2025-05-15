@@ -96,16 +96,7 @@ export default {
             ],
 
             //주문요구 수량 그리드
-            serowData: [
-                // {
-                // prod_code: '',
-                // prod_name: '',
-                // delivery_demand: '',
-                // alreadydelivery: '',
-                // proyetdeliveryd_code: '',
-                // delivery_quantity: '',
-                // }
-            ],
+            serowData: [],
 
             // 주문 요구수량 선택 행 번호
             selectedSerowIndex: null,
@@ -113,6 +104,7 @@ export default {
              { field: "prod_code", headerName: "제품코드", flex: 2, cellStyle: { textAlign: "center" } },
                 { field: "prod_name", headerName: "제품명", flex: 2, editable: false, cellStyle: { textAlign: "center" } },
                 { field: "delivery_demand", headerName: "요구량", flex: 2, cellStyle: { textAlign: "center" } },
+                { field: "delivery_detail_code", headerName: "상세코드", flex: 2, cellStyle: { textAlign: "center" } },
                 { field: "alreadydelivery", headerName: "기납기량", flex: 2, cellStyle: { textAlign: "center" } },
                 { field: "yetdelivery", headerName: "미납기량", flex: 2, editable: false, cellStyle: { textAlign: "center" } },
                 { field: "delivery_quantity", headerName: "출고량", flex: 2, cellStyle: { textAlign: "center" } },
@@ -215,7 +207,7 @@ export default {
                     let serverRowData = res.data;
                     for (let value of serverRowData) { 
                         value.delivery_name = '' // 빈값을 넣어주는거
-                        value.company_name = ''
+                       
                         value.delivery_code = ''
                         value.employee_code = ''
                     }
@@ -245,7 +237,7 @@ export default {
                 });
         },
         fullCheck() {
-            console.log('ㅇㅇㅇ' + this.rowData[0].delivery_name)
+         
             //메인그리드 값 다들어 갔는지 체크
             if ( this.rowData[0].orders_code == '' || this.rowData[0].delivery_name == ''|| this.rowData[0].company_name == '') {
                 console.log('ddd' + this.rowData[0].delivery_name)
@@ -290,7 +282,12 @@ export default {
 
             }
             if(this.serowData[0].delivery_detail_code){
-                alert("ff");
+                Swal.fire({
+                    title: '실패',
+                    text: '수정 버튼을 클릭하세요',
+                    icon: 'error',
+                    confirmButtonText: '확인'
+                });
                 return;
             }
             console.log(this.serowData)
@@ -300,6 +297,7 @@ export default {
                 deliveryDetail: this.serowData
             })
                 .then(res => {
+             
                     if (res.data.affectedRows > 0 ) {
                         Swal.fire({
                             title: '등록 성공',
@@ -307,6 +305,15 @@ export default {
                             icon: 'success',
                             confirmButtonText: '확인'
                         });
+                        this.rowData = [{
+                            delivery_code: '',
+                            delivery_name: '',
+                            orders_code: '',
+                            order_name: '',
+                            company_name: '',
+                        }];
+                        this.serowData = [];
+                        this.throwData = [];
                     } else {
                         Swal.fire({
                             title: '등록 실패',
@@ -326,15 +333,7 @@ export default {
                     });
                     return;
                 });
-            this.rowData = [{
-                delivery_code: '',
-                delivery_name: '',
-                orders_code: '',
-                order_name: '',
-                company_name: '',
-            }];
-            this.serowData = [];
-            this.throwData = [];
+       
         },
 
 
@@ -395,7 +394,12 @@ export default {
                 return;
             }
             if(!this.serowData[0].delivery_detail_code){
-                alert("ff");
+                Swal.fire({
+                    title: '실패',
+                    text: '수정 버튼을 클릭하세요',
+                    icon: 'error',
+                    confirmButtonText: '확인'
+                });
                 return;
             }
             //수정 시작
@@ -447,7 +451,14 @@ export default {
         },
         // 삭제
         async deliveryDelete() { 
-            await axios.delete(`/api/sales/deliveryDelete/${this.rowData[0].delivery_code}`)
+            console.log('세로우')
+            console.log(this.serowData)
+            await axios.post(`/api/sales/deliveryDelete/`, {
+               
+                    deliverycode: this.rowData[0].delivery_code,
+                    deliveryDetail: this.serowData
+                
+            })
             .then((res) => {
                 if (res.data.affectedRows > 0) {
                     Swal.fire({

@@ -1,3 +1,4 @@
+const { values } = require("lodash");
 const mariaDB = require("../../db/mapper.js");
 const { convertObjToAry } = require("../../utils/converts.js");
 
@@ -69,7 +70,6 @@ const prodcheck = async (prod_LOT) => {
 //등록
 const deliveryAdd = async (delivery, deliveryDetail) => {
     delivery.delivery_code = (await mariaDB.query('deliveryAutoOrder'))[0].code; // 출고코드 자동생성
-    console.log(delivery);
     let result = await mariaDB.query('deliveryAdd', [
         delivery.delivery_code,
         delivery.orders_code,
@@ -80,45 +80,40 @@ const deliveryAdd = async (delivery, deliveryDetail) => {
     ])
         .catch((err) => console.log(err));
 
-
     for (let detail of deliveryDetail) {
         if (Number(detail.delivery_quantity) > 0) {
-            console.log('예담')
-        for (let data of detail.lotList) {
-            
-            delivery.delivery_detail_code = (await mariaDB.query('deliveryAutoDetailOrder'))[0].code; // 출고코드 자동생성
-            console.log(data);
 
-            let test = [
-                delivery.delivery_detail_code,
-                detail.prod_code,
-                detail.delivery_quantity,
-                data.prod_LOT,
-                delivery.delivery_code
-            ]
+             delivery.delivery_detail_code = (await mariaDB.query('deliveryAutoDetailOrder'))[0].code; // 출고코드 자동생성
+             
+             let test = [
+                 delivery.delivery_detail_code,
+                 detail.prod_code,
+                 detail.delivery_quantity,
+                 delivery.delivery_code
+             ]
+             result = await mariaDB.query('deliveryDetailAdd', test)
+                 .catch((err) => console.log(err));
+            for (let data of detail.lotList) {
+                if (data.delivery_quantity > 0) {
             
-            result = await mariaDB.query('deliveryDetailAdd', test)
-                .catch((err) => console.log(err));
-            let findStore = (await mariaDB.query('findProdStroage',data.prod_LOT))[0].storage_code; // 출고코드 자동생성
+            let findStore = (await mariaDB.query('findProdStroage',data.prod_LOT))[0].storage_code; // 창고 찾기
             let info = [
                 delivery.delivery_detail_code,
                 detail.prod_code,
                 data.prod_LOT,
-                detail.delivery_quantity,
+                data.delivery_quantity,
                findStore
             ]
+            
             result = await mariaDB.query('addStoreProd', info)
-                                    .catch((err) => console.log(err));
+                                            .catch((err) => console.log(err));
+               }
             }
         }
     }
    
     //상태값 변경
-    for (let value of deliveryDetail) { 
-        console.log('값조회')
-        console.log(value.yetdelivery)
-        console.log(value.delivery_quantity)
-    }
+    
     if (deliveryDetail.every(info => Number(info.yetdelivery) == Number(info.delivery_quantity))) {
         await mariaDB.query('deliveryStatus', ['OS4', delivery.orders_code])
     } else { 
@@ -138,23 +133,32 @@ const modifydelivery = async (delivery,deliveryDetail) => {
     // if (result.affectedRows < 1) { // affectedRows ; 행의 수를 반환
     // return result;
     // }
-    console.log(deliveryDetail)
+    
     for (let detail of deliveryDetail) {
         if (Number(detail.delivery_quantity) > 0) {
-            
-        result = await mariaDB.query('deliveryDetailUpdate', [detail.delivery_quantity,detail.delivery_detail_code])
-                .catch((err) => console.log(err));  
-               
-            result = await mariaDB.query('storageDeliveryUpdate', [detail.delivery_quantity, detail.prod_LOT, detail.delivery_detail_code])
+            let test = [
+                detail.delivery_quantity,
+                detail.delivery_detail_code,
+            ]
+            result = await mariaDB.query('deliveryDetailUpdate', test)
                 .catch((err) => console.log(err));
+            
+            for (let data of detail.lotList) {
+                if (data.delivery_quantity > 0) {
+                    let info = [
+                        data.delivery_quantity,
+                        detail.delivery_detail_code,
+                        data.prod_LOT,
+                    ]
+                    
+                    result = await mariaDB.query('storageDeliveryUpdate', info)
+                        .catch((err) => console.log(err));
+                }
+            }
         }
     }
-    //상태값 변경
-    for (let value of deliveryDetail) { 
-        console.log('값조회')
-        console.log(value.yetdelivery)
-        console.log(value.delivery_quantity)
-    }
+
+    
     if (deliveryDetail.every(info => Number(info.yetdelivery) == Number(info.delivery_quantity))) {
         await mariaDB.query('deliveryStatus', ['OS4', delivery.orders_code])
     } else {    
@@ -171,37 +175,21 @@ const deliveryCheck = async (deliveryCode) => {
 }
 
 //삭제
-const removedelivery = async (delivery_code) => {
+const removedelivery = async (delivery_code,deliveryDetail) => {
      await mariaDB.query("deliveryDelete", [delivery_code])
         .catch(err => console.log(err));
 
-    const result = await mariaDB.query("deliveryDetailDelete", [delivery_code])
+    let result = await mariaDB.query("deliveryDetailDelete", [delivery_code])
         .catch(err => console.log(err));
     
-    let test = [
-        delivery.delivery_detail_code,
-        detail.prod_code,
-        detail.delivery_quantity,
-        data.prod_LOT,
-        delivery.delivery_code
-    ]
-    // 창고 값 수정
-    result = await mariaDB.query('addStoreProd', test)
-        .catch((err) => console.log(err));
-    let findStore = (await mariaDB.query('findProdStroage', data.prod_LOT))[0].storage_code; // 출고코드 자동생성
-    let info = [
-        delivery.delivery_detail_code,
-        detail.prod_code,
-        data.prod_LOT,
-        detail.delivery_quantity,
-        findStore
-    ]
-    result = await mariaDB.query('addStoreProd', info)
-        .catch((err) => console.log(err));
-    
-    // 재고 값 수정
-    result = await mariaDB.query('storageDeliveryUpdate', [detail.delivery_quantity, detail.prod_LOT, detail.delivery_detail_code])
-        .catch((err) => console.log(err));
+   
+    console.log(deliveryDetail);
+    //반복문 돌려서 삭제기능 구현 
+    for (let value of deliveryDetail) { 
+        console.log(value)
+         result = await mariaDB.query("storeDeliveryDelete", [value.delivery_detail_code])
+                                                             .catch(err => console.log(err));
+    }
 
     return result;
 };
