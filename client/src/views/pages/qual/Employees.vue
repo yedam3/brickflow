@@ -188,7 +188,7 @@ export default{
            icon: 'error',
            confirmButtonText: '확인'
          });
-         return ;
+         return;
         }
     },
     
@@ -209,18 +209,9 @@ export default{
           });
           return;
     }
-    if(this.info.pwd == ''){
-      Swal.fire({
-            title: '등록 불가',
-            text: '비밀번호를 입력해주세요.',
-            icon: 'error',
-            confirmButtonText: '확인'
-          });
-          return;
-    }
-    console.log(this.rowData[this.prodIndex])
-    //등록시작
 
+    console.log(this.rowData[this.prodIndex])
+//등록시작
     const res =  await axios.post('/api/admin/empSave', this.info)
        .then(res => {
          if (res.data.affectedRows > 0) {
