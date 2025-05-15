@@ -1,4 +1,4 @@
-// prod_check_code 자동 생성
+// emp_code 자동 생성
 const autoEmpCode = 
 `SELECT CONCAT('emp-',IFNULL(MAX(CAST(SUBSTR(emp_code,5) AS SIGNED)),100)+1) AS emp_code
 FROM employees`;
@@ -31,13 +31,6 @@ const departmentList = `SELECT sub_code,
                               WHERE main_code = 'dp'`;
 
 // 수정
-const empModify = `UPDATE employees
-                      SET emp_name=?,
-                          department =?,
-                          hire_date =?,
-                          tel =?,
-                          pwd =? 
-                    WHERE emp_code =?`;
 
 const empUpdate = `UPDATE employees
                       SET emp_name=?,
@@ -55,7 +48,6 @@ module.exports
   empInfo,
   empSave,
   departmentList,
-  empModify,
   empUpdate,
   empDel,
 }
