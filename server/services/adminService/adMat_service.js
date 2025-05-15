@@ -5,7 +5,7 @@ const { comList } = require("../../db/sqlList.js");
 
 //자재코드
 const autoMatCode = async()=>{
-  let list = await mariaDB.query("autoMatCode").catch((err) => console.log(err));
+  let list = await mariaDB.query("autoCountMatCode").catch((err) => console.log(err));
   return list;
 }
 
@@ -17,7 +17,7 @@ const findAll = async ()=>{
 
 //자재 등록
 const addMat = async (matCode)=> {
-  let insertColumns = ['']
+  let insertColumns = ['mat_code', 'mat_name', 'unit', 'size', 'color', 'texture', 'shape', 'safe_inventory'];
   let data = convertObjToAry(matCode,insertColumns);
   let resInfo = await mariaDB.query("addMat", data).catch(err => console.log(err));
 

@@ -154,11 +154,8 @@
       },
       //등록
       async addMat() {
-        const res = await axios.post('/api/admin/mat', {
-          matCode: {
-            ...this.rowData
-          }
-        }).catch(error => {
+        const res = await axios.post('/api/admin/mat', this.rowData)
+        .catch(error => {
           console.error("등록 실패:", error);
           Swal.fire("등록 실패", "자재 등록 중 오류가 발생했습니다.", "error");
           return null;
@@ -182,7 +179,7 @@
               Swal.fire("수정 완료", "자재정보가 수정되었습니다.", "success")
                 .then(() => {
                   this.matList();
-                  this.autoFacCode();
+                  this.autoMatCode();
                   this.clearForm();
                 });
             } else {
@@ -195,6 +192,62 @@
           });
       },
       //삭제
+      async deleteMat() {
+        if (!this.rowData.mat_code) {
+          Swal.fire("삭제 불가", "삭제할 자재를 선택하세요.", "warning");
+          return;
+        }
+        Swal.fire({
+          title: "정말 삭제하시겠습니까?",
+          text: `자재 코드: ${this.rowData.mat_code}`,
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#d33",
+          cancelButtonColor: "#3085d6",
+          confirmButtonText: "삭제",
+          cancelButtonText: "취소"
+        }).then((confirm) => {
+          if (confirm.isConfirmed) {
+            axios.delete(`/api/admin/delMat/${this.rowData.mat_code}`)
+            .then((res) => {
+              if (res && res.data && res.data.affectedRows > 0) {
+                  Swal.fire("삭제 완료", "자재정보가 삭제되었습니다.", "success")
+                    .then(() => {
+                      this.facList();
+                      this.clearForm();
+                    });
+                } else {
+                  Swal.fire("삭제 실패", "자재 삭제에 실패했습니다.", "error");
+                }
+            })
+            .catch((error) => {
+                console.error("삭제 오류:", error);
+                Swal.fire("오류 발생", "삭제 중 오류가 발생했습니다.", "error");
+              });
+          }
+        })
+      },
     }
   }
 </script>
+
+<style scoped>
+/* 헤더 텍스트 가운데 정렬 */
+::v-deep(.ag-theme-alpine .ag-header-cell-label) {
+    justify-content: center;
+}
+
+/* headerClass로 설정한 header-center 클래스에 적용 */
+::v-deep(.header-center .ag-header-cell-label) {
+    justify-content: center;
+}
+.btn-primary {
+      background-color: rgb(230, 171, 98);
+      border-color: rgb(230, 171, 98);
+  }
+  
+::v-deep(.ag-theme-alpine .ag-header-cell-label) {
+      justify-content: center;
+  }
+
+</style>

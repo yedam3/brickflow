@@ -26,4 +26,11 @@ router.put('/updateMat', async (req, res) => {
   res.send(result);
 })
 
+//자재삭제
+router.delete('/delMat/:mcd', async (req, res) => {
+  let matCode = req.params.mcd;
+  let result = await adMatService.delMat(matCode)
+  res.send(result);
+})
+
 module.exports = router;
