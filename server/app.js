@@ -30,7 +30,7 @@ let sessionSettion = session({
         httpOnly : true,
         secure : false,
         //유효기간
-        maxAge : 60000000000000
+        maxAge : 1000 * 60 * 60 * 24,
 
     }
 })

@@ -32,7 +32,7 @@ const finishAdd = async (finishedInfo) => {
     let maxLot = await mariaDB.query('maxProdLot')
                         .catch((err) => console.log(err));
     maxLot = maxLot[0].code;
-    console.log(maxLot+'맥스')
+    console.log(finishedInfo.code)
     //입고등록
     let selectQuery = await mariaDB.selectedQuery('addFinshied',[finishedInfo.prod_code,finishedInfo.quantity,finishedInfo.store_date,finishedInfo.emp_code,finishedInfo.prod_check_code])
 
@@ -108,7 +108,26 @@ const finishUpdate = async (finishInfo) => {
   result = await mariaDB.query('deleteStore',prodLot);
   return result;
  }
-
+ //재고 조회
+ const prodList = async({type,keyword}) => {
+  let searchCondition = {};
+    let convertedCondition = ''; // 기본값
+    if (type && keyword) {
+      searchCondition[type] = keyword;
+      // selected 배열을 넣어줘야 작동
+      const converted = convertLikeToQuery(searchCondition, []); 
+      convertedCondition = converted.serchKeyword;
+    }
+    const result = await mariaDB.query('prodStoreList', { searchcondition: convertedCondition })
+                                    .catch((err) => console.log(err));
+        return result;
+ }
+//LOT별 재고 조회
+const prodLotList = async(prodCode) => {
+  const result = await mariaDB.query('prodLotList',prodCode)
+                              .catch((err) => console.log(err));
+  return result;
+}
 module.exports={
   storageList,
   storeList,
@@ -118,5 +137,7 @@ module.exports={
   possibleQuantity,
   finishUpdate,
   deliveryCount,
-  deleteFinish
+  deleteFinish,
+  prodList,
+  prodLotList
 }

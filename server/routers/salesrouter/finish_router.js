@@ -62,4 +62,18 @@ router.delete('/finishDelete/:prodLot',async(req,res) => {
                                 .catch((err) => console.log(err));
   res.send(result);
 })
+// 재고 조회
+router.get("/prodStoreList" ,async (req,res) => {
+  const {type,keyword} = req.query;
+  let result = await finishStore.prodList({type,keyword})
+                                .catch((err)  => console.log(err));
+  res.send(result);
+})
+//LOT별 재고조회
+router.get('/prodStoreList/:prodCode',async(req,res )=> {
+  let prodCode = req.params.prodCode;
+  let result = await finishStore.prodLotList(prodCode)
+                                .catch((err) => console.log(err));
+  res.send(result);                                
+})
 module.exports = router;

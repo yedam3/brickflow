@@ -20,7 +20,7 @@ export default[
         component: () => import('@/views/pages/mat/MatStore.vue')
     },
     { 
-        path: 'mat/matList',
+        path: '/mat/matList',
         name : 'MatList',
         component: () => import('@/views/pages/mat/MatStoreList.vue')
     },
