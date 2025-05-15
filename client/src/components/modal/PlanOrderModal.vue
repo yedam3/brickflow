@@ -35,8 +35,10 @@
 </template>
 
 <script>
-import { AgGridVue } from "ag-grid-vue3";
 import axios from "axios";
+
+import { AgGridVue } from "ag-grid-vue3";
+import Swal from 'sweetalert2';
 
 export default {
     name: "PlanOrderModal",
@@ -74,11 +76,13 @@ export default {
                     field: "finish_status", headerName: "상태", flex: 1,
                     valueFormatter: params => {
                         if(params.value === 'WS1') {
-                            return '지시등록';
+                            return '지시 등록';
                         } else if(params.value === 'WS2') {
                             return '생산중';
                         } else if(params.value === 'WS3') {
-                            return '생산완료';
+                            return '생산 완료';
+                        } else if(params.value == 'WS4') {
+                            return '폐기 처분';
                         }
                     },
                     cellStyle: params => {
@@ -87,6 +91,8 @@ export default {
                         } else if(params.value == 'WS2') {
                             return { textAlign: 'center', fontWeight: 'bold', color: '#fd7e14' };
                         } else if(params.value == 'WS3') {
+                            return { textAlign: 'center', fontWeight: 'bold', color: '#28a745' };
+                        } else if(params.value == 'WS4') {
                             return { textAlign: 'center', fontWeight: 'bold', color: '#28a745' };
                         }
                     }
@@ -129,7 +135,7 @@ export default {
                 .catch(error => { console.error(error) })
         },
 
-        // 계획 지시 목록 검색색
+        // 계획 지시 목록 검색
         async searchProudctOrder() {
             await axios.get(`/api/work/order/list`, {
                 params: {
@@ -142,8 +148,25 @@ export default {
         },
 
         // 그리드 행 클릭 메소드
-        onRowClicked(event) {
-            this.$emit('selectPlanOrder', event.data);
+        onRowClicked(params) {
+            if(params.data.finish_status === 'WS3') {
+                Swal.fire({
+                    title: '실패',
+                    text: '이미 생산이 완료된 지시입니다.',
+                    icon: 'error',
+                    confirmButtonText: '확인'
+                });
+                return;
+            } else if (params.data.finish_status === 'WS4') {
+                Swal.fire({
+                    title: '실패',
+                    text: '폐기된 지시입니다.',
+                    icon: 'error',
+                    confirmButtonText: '확인'
+                });
+                return;
+            }
+            this.$emit('selectPlanOrder', params.data);
             this.close();
         },
     },

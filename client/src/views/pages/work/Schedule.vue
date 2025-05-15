@@ -1,8 +1,9 @@
 <template>
-    <div class="card border-0" style="height: 800px">
-        <div class="font-semibold text-xl mb-2">생산 계획 관리</div>
-
-        <div class="font-semibold text-l mb-4">생산 계획 등록</div>
+    <div class="card border-0" style="height: calc(100vh - 8rem)">
+        <h2>생산 계획 관리</h2>
+        <div class="heading-with-line">
+            <h5 class="m-0 me-3">등록 | 수정 | 삭제</h5>
+        </div>
 
         <div class="text-end mt-3 mb-3">
             <Button label="주문목록" severity="success" class="me-3" @click="orderList" />
@@ -12,9 +13,9 @@
             <Button label="삭제" severity="danger" class="" @click="deletePlan" />
         </div>
         <div class="mb-3">
-            <Card style="overflow: hidden; background-color: #f8f9fa;">
+            <Card style="overflow: hidden; background-color: ;">
                 <template #content>
-                    <div class="mb-5 row">
+                    <div class="mb-4 row">
                         <div class="col-4">
                             <InputGroup>
                                 <InputGroupAddon>
@@ -41,7 +42,7 @@
                         </div>
                        
                     </div>
-                    <div class="mb-5 row">
+                    <div class="mb-4 row">
                         <div class="col-4">
                             <InputGroup>
                                 <InputGroupAddon>
@@ -59,7 +60,7 @@
                             </InputGroup>
                         </div>
                     </div>
-                    <div class="mb-2 row">
+                    <div class="mb-4 row">
                         <div class="col-4">
                             <InputGroup>
                                 <InputGroupAddon>
@@ -336,7 +337,7 @@ export default {
             } else {
                 Swal.fire({
                     title: '실패',
-                    text: '주문번호 존재 시 행삭제를 할 수 없습니다.',
+                    text: '주문번호 존재 시 행 삭제를 할 수 없습니다.',
                     icon: 'error',
                     confirmButtonText: '확인'
                 });
@@ -399,8 +400,8 @@ export default {
                 return;
             }
             if (this.formData.orders_code !== '') {
-                const order_statusRes = await axios.get(`/api/work/plan/order_statusCheck/${this.formData.orders_code}`).catch((err) => console.error(err));
-                if (order_statusRes.data.check > 0) {
+                const order_statusRes = await axios.get(`/api/work/plan/ordersStatus/${this.formData.orders_code}`).catch((err) => console.error(err));
+                if (order_statusRes.data.status === 'OS4') {
                     Swal.fire({
                         title: '실패',
                         text: '이미 출고가 완료된 건입니다.',
@@ -492,6 +493,26 @@ export default {
                     icon: 'error',
                     confirmButtonText: '확인'
                 });
+                return;
+            }
+            const deleteCheck = Swal.mixin({
+                customClass: {
+                    confirmButton: "btn btn-success",
+                    cancelButton: "btn btn-danger"
+                },
+                buttonsStyling: false
+            });
+
+            const deleteCheckResult = await deleteCheck.fire({
+                title: '알림',
+                text: '정말 삭제하겠습니까?',
+                icon: 'question',
+                confirmButtonText: '확인',
+                cancelButtonText: '취소',
+                showCancelButton: true
+            });
+
+            if(!deleteCheckResult.isConfirmed) {
                 return;
             }
             await axios.delete(`/api/work/plan/plan`, {

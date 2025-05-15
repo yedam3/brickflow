@@ -1,20 +1,21 @@
 <template>
-    <div class="card border-0" style="height: 800px">
-        <div class="font-semibold text-xl mb-2">생산 지시 관리</div>
-
-        <h3>지시 등록 / 수정 / 삭제</h3>
+    <div class="card border-0" style="height: calc(100vh - 8rem)">
+        <h2>생산 지시 관리</h2>
+        <div class="heading-with-line">
+            <h5 class="m-0 me-3">등록 | 수정 | 삭제</h5>
+        </div>
 
         <div class="text-end mt-3 mb-3">
             <Button label="계획목록" severity="success" class="me-3" @click="planList" />
             <Button label="지시목록" severity="info" class="me-3" @click="planOrderList" />
             <Button label="등록" severity="help" class="me-3" @click="addPlanOrder" />
             <Button label="수정" severity="danger" class="me-3" @click="updateProductOrder" />
-            <Button label="삭제" severity="danger" class="" @click="deleteProductOrder"/>
+            <Button label="삭제" severity="danger" class="" @click="deleteProductOrder" />
         </div>
         <div class="mb-3">
             <Card style="overflow: hidden; background-color: #f8f9fa;">
                 <template #content>
-                    <div class="mb-5 row">
+                    <div class="mb-4 row">
                         <div class="col-4">
                             <InputGroup>
                                 <InputGroupAddon>
@@ -40,7 +41,7 @@
                             </InputGroup>
                         </div>
                     </div>
-                    <div class="mb-5 row">
+                    <div class="mb-4 row">
                         <div class="col-4">
                             <InputGroup>
                                 <InputGroupAddon>
@@ -49,7 +50,7 @@
                                 <InputText v-model="formData.employee_name" size="large" placeholder="" />
                             </InputGroup>
                         </div>
-                         <div class="col-4">
+                        <div class="col-4">
                             <InputGroup>
                                 <InputGroupAddon>
                                     생산 지시명
@@ -58,7 +59,7 @@
                             </InputGroup>
                         </div>
                     </div>
-                    <div class="mb-5 row">
+                    <div class="mb-4 row">
                         <div class="col-4">
                             <InputGroup>
                                 <InputGroupAddon>
@@ -103,8 +104,9 @@
                     </div>
                 </div>
                 <div class="ag-wrapper" style="border: none;">
-                    <ag-grid-vue ref="mainGrid" class="ag-theme-alpine custom-grid-theme" :columnDefs="prodListDefs" :rowData="rowData"
-                        :gridOptions="gridOptions" @cellClicked="prodCellClicked" @cellValueChanged="onProdValueChanged">
+                    <ag-grid-vue ref="mainGrid" class="ag-theme-alpine custom-grid-theme" :columnDefs="prodListDefs"
+                        :rowData="rowData" :gridOptions="gridOptions" @cellClicked="prodCellClicked"
+                        @cellValueChanged="onProdValueChanged">
                     </ag-grid-vue>
                 </div>
             </div>
@@ -128,8 +130,9 @@
     </PlanOrderModal>
 
     <!-- 자재 재고 조회 모달창 -->
-    <MatStock :visible="showMatStockModal" @close="showMatStockModal = false" :prod_code="selectProd_code" :mat_code="selectMat_code" :mat_list="selectMat_list" :mat_req_qty="selectMat_req_qty" :mat_temp_data="matTempHoldDataList"
-        @matHoldData="matData"></MatStock>
+    <MatStock :visible="showMatStockModal" @close="showMatStockModal = false" :prod_code="selectProd_code"
+        :mat_code="selectMat_code" :mat_list="selectMat_list" :mat_req_qty="selectMat_req_qty"
+        :mat_temp_data="matTempHoldDataList" @matHoldData="matData"></MatStock>
 
     <!-- 제품 조회 모달창 -->
     <ProdModal :visible="showProdModal" @close="showProdModal = false" @selectProd="prodSelected"></ProdModal>
@@ -346,7 +349,7 @@ export default {
                         prod_name: obj.prod_name,
                         plan_quantity: obj.currentPlanQty,
                         priority: cnt,
-                        order_quantity: obj.quantity,
+                        order_quantity: obj.currentPlanQty,
                     });
                     cnt++;
                 }
@@ -399,7 +402,7 @@ export default {
                     prod_name: detail.prod_name,                                    // 제품명
                     plan_quantity: detail.plan_quantity,                            // 지시수량
                     priority: detail.priority,                                      // 우선순위
-                    order_quantity: detail.order_quantity,                                // 주문량
+                    order_quantity: detail.order_quantity,                          // 주문량
                 });
                 result = await axios.get(`/api/work/order/loadMatQty/${detail.product_order_detail_code}`).catch((err) => console.error(err));
                 const mat_qty_list = result.data;
@@ -474,16 +477,18 @@ export default {
                 totalQty += parseInt(mat.mat_hold_qty);
                 this.secondRowData[this.selectedSecondIndex].mat_LOTs.push({
                     mat_code: mat.mat_code,
+                    mat_LOT: mat.mat_LOT,
                     mat_hold_qty: mat.mat_hold_qty,
                 });
                 temp.push({
                     prod_code: this.secondRowData[this.selectedSecondIndex].prod_code,
                     mat_code: mat.mat_code,
+                    mat_LOT: mat.mat_LOT,
                     hold_quantity: mat.mat_hold_qty,
                 });
             };
 
-            this.matTempHoldDataList = [...temp];
+            this.matTempHoldDataList.concat(temp);
 
             this.matTempHoldDataList = this.matTempHoldDataList.filter(item => {
                 return !temp.some(t =>
@@ -492,7 +497,6 @@ export default {
                 );
             });
             this.matTempHoldDataList = this.matTempHoldDataList.concat(temp);
-            console.log(this.matTempHoldDataList);
 
             this.secondRowData[this.selectedSecondIndex].material_input_qunatity = totalQty;
             this.secondRowData = [...this.secondRowData];
@@ -612,7 +616,7 @@ export default {
             if(this.editMode == false) {
 
             };
-            if(this.anotherVaildation() > 0) {
+            if(this.insertVaildation() > 0) {
                 return;
             }
             for(let data of this.secondRowData) {
@@ -640,7 +644,15 @@ export default {
                 });
 
                 this.clearForm();
-            } else {
+            } else if (result.data[0].check === 0) {
+                Swal.fire({
+                    title: '경고',
+                    text: '등록되어 있지 않은 정보입니다.',
+                    icon: 'warning',
+                    confirmButtonText: '확인'
+                });
+            }
+            else {
                 Swal.fire({
                     title: '실패',
                     text: '생산 지시 수정 중 오류가 발생되었습니다.',
@@ -664,6 +676,26 @@ export default {
             if(this.anotherVaildation() > 0) {
                 return;
             }
+            const deleteCheck = Swal.mixin({
+                customClass: {
+                    confirmButton: "btn btn-success",
+                    cancelButton: "btn btn-danger"
+                },
+                buttonsStyling: false
+            });
+
+            const deleteCheckResult = await deleteCheck.fire({
+                title: '알림',
+                text: '정말 삭제하겠습니까?',
+                icon: 'question',
+                confirmButtonText: '확인',
+                cancelButtonText: '취소',
+                showCancelButton: true
+            });
+
+            if(!deleteCheckResult.isConfirmed) {
+                return;
+            }
             let result = await axios.delete(`/api/work/order/delete/${this.formData.product_order_code}`).catch((err) => console.error(err));
             if(result.data.affectedRows > 0 ) {
                 Swal.fire({
@@ -674,6 +706,13 @@ export default {
                 });
 
                 this.clearForm();
+            } else if (result.data[0].check === 0) {
+                Swal.fire({
+                    title: '경고',
+                    text: '등록되어 있지 않은 정보입니다.',
+                    icon: 'warning',
+                    confirmButtonText: '확인'
+                });
             } else {
                 Swal.fire({
                     title: '실패',
@@ -817,5 +856,21 @@ export default {
 <style>
 .ag-theme-alpine .ag-header-cell-label {
     justify-content: center;
+}
+.heading-with-line {
+  display: flex;
+  align-items: center;
+}
+
+.heading-with-line h3 {
+  margin-bottom: 0;
+  margin-right: 1rem;
+}
+
+.heading-with-line::after {
+  content: "";
+  flex-grow: 1;
+  height: 1px;
+  background-color: #dee2e6; /* Bootstrap의 border 색상 */
 }
 </style>
