@@ -19,4 +19,15 @@ export default[
     name: 'company',
     component: () => import('@/views/pages/qual/Company.vue')
   },
+  {
+    path: '/admin/mat',
+    name: 'mat',
+    component: () => import('@/views/pages/qual/AdMat.vue') 
+  },
+  {
+    path: '/admin/prod',
+    name: 'prod',
+    component: () => import('@/views/pages/qual/Prod.vue')
+  },
+
 ]

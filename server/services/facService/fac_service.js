@@ -239,4 +239,5 @@ module.exports = {
   updateFac,
   updateUnplayEndDate,
   delFac,
+  facService,
 }

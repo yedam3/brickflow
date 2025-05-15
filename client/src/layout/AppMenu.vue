@@ -37,6 +37,16 @@ const model = ref([
                         icon: 'pi pi-fw pi-sign-in',
                         to: '/admin/bom'
                     },
+                    {
+                        label: '자재관리',
+                        icon: 'pi pi-fw pi-sign-in',
+                        to: '/admin/mat'
+                    },
+                    {
+                        label: '제품관리',
+                        icon: 'pi pi-fw pi-sign-in',
+                        to: '/admin/prod'
+                    },
                 ]
         },
         {
