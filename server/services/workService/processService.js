@@ -105,8 +105,81 @@ const findProcessEnd = async () => {
 };
 
 // 실적 목록 조회
-const findAllProcess = async () => {
-    let result = await mariaDB.query('findAllProcess').catch((err) => console.error((err)));
+const findAllProcess = async (params) => {
+    const searchKeywords = {};
+
+    Object.keys(params).forEach((key) => {
+        if (key.startsWith("searchKeywords[")) {
+            const fieldName = key.match(/\[([^\]]+)\]/)[1];
+            searchKeywords[fieldName] = params[key];
+        }
+    });
+    console.log(searchKeywords);
+      
+    let convertedCondition = '';
+    let groupCondition = '';
+    let searchCondition = [];
+
+    // 계획 관련 조건
+    if (searchKeywords.plan_code) {
+        searchCondition.push(`p.plan_code LIKE '%${searchKeywords.plan_code}%'`);
+    }
+
+    if (searchKeywords.plan_name) {
+        searchCondition.push(`p.plan_name LIKE '%${searchKeywords.plan_name}%'`);
+    }
+
+    // 제품 주문 관련 조건
+    if (searchKeywords.product_order_code) {
+        searchCondition.push(`po.product_order_code LIKE '%${searchKeywords.product_order_code}%'`);
+    }
+
+    if (searchKeywords.product_order_name) {
+        searchCondition.push(`po.product_order_name LIKE '%${searchKeywords.product_order_name}%'`);
+    }
+
+    // 제품 관련 조건
+    if (searchKeywords.prod_name) {
+        searchCondition.push(`prod.prod_name LIKE '%${searchKeywords.prod_name}%'`);
+    }
+
+    // 공정 관련 조건
+    if (searchKeywords.process_name) {
+        searchCondition.push(`proc.process_name LIKE '%${searchKeywords.process_name}%'`);
+    }
+
+    // 날짜 관련 조건
+    // 작업 시작일 범위 처리
+    if (searchKeywords.work_start_date_from && searchKeywords.work_start_date_to) {
+        // 시작일과 종료일이 모두 있는 경우 - 범위 검색
+        searchCondition.push(`wd.work_start_date BETWEEN '${searchKeywords.work_start_date_from}' AND '${ searchKeywords.work_start_date_to}'`);
+    } else if (searchKeywords.work_start_date_from) {
+        // 시작일만 있는 경우 - 해당 날짜 이후 검색
+        searchCondition.push(`wd.work_start_date >= '${ searchKeywords.work_start_date_from}'`);
+    } else if (searchKeywords.work_start_date_to) {
+        // 종료일만 있는 경우 - 해당 날짜 이전 검색
+        searchCondition.push(`wd.work_start_date <= '${searchKeywords.work_start_date_to}'`);
+    }
+
+    // 작업 종료일 범위 처리
+    if (searchKeywords.work_end_date_from && searchKeywords.work_end_date_to) {
+        // 시작일과 종료일이 모두 있는 경우 - 범위 검색
+        searchCondition.push(`wd.work_end_date BETWEEN '${searchKeywords.work_end_date_from}' AND '${searchKeywords.work_end_date_to}'`);
+    } else if (searchKeywords.work_end_date_from) {
+        // 시작일만 있는 경우 - 해당 날짜 이후 검색
+        searchCondition.push(`wd.work_end_date >= '${searchKeywords.work_end_date_from}'`);
+    } else if (searchKeywords.work_end_date_to) {
+        // 종료일만 있는 경우 - 해당 날짜 이전 검색
+        searchCondition.push(`wd.work_end_date <= '${searchKeywords.work_end_date_to}'`);
+    }
+    if (searchCondition.length > 0) {
+        insertQuery = "AND " + searchCondition.join(" AND ");
+        convertedCondition = insertQuery;
+    }
+    console.log("00000000000000000000000000000000000");
+    console.log(convertedCondition);
+    // convertedCondition += "GROUP BY wp.work_lot, wp.product_order_detail_code, wp.process_code, wp.prod_code, wp.order_quantity";
+    let result = await mariaDB.query("findAllProcess", { searchCondition: convertedCondition }).catch((err) => console.error(err));
     return result;
 };
 

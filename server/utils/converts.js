@@ -84,10 +84,23 @@ const dateFormat = (isoString) => {
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 };
 
+const dateFormat2 = (isoString) => {
+    if (!isoString) return null;
+    
+    // ISO 문자열을 Date 객체로 변환
+    const date = new Date(isoString);
+    
+    // YYYY-MM-DD 형식으로 변환
+    return date.getFullYear() + '-' + 
+           String(date.getMonth() + 1).padStart(2, '0') + '-' + 
+           String(date.getDate()).padStart(2, '0');
+}
+
 module.exports = {
     convertObjToAry,
     convertObjToQuery,
     convertLikeToQuery,
     queryFormat,
     dateFormat,
+    dateFormat2,
 };

@@ -2,7 +2,7 @@
     <div class="card border-0" style="height: 800px">
         <div class="font-semibold text-xl mb-4">공정 진행 관리</div>
 
-        <h4>공정 진행</h4>
+        <h3>공정 진행</h3>
 
         <div class="row mt-3 mb-3">
             <div class="col input-group mb-3 w-50">
