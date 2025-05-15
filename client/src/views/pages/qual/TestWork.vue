@@ -48,6 +48,7 @@
 import { AgGridVue } from "ag-grid-vue3";
 import axios from "axios";
 import Swal from "sweetalert2";
+import { toHandlers } from "vue";
   
   export default {
     components: {
@@ -78,7 +79,7 @@ import Swal from "sweetalert2";
             }},
             { field: "input_quantity", headerName: "현검사량", flex: 1 , editable: true,
         valueFormatter: (params) => {
-              return params.value != null ? `${params.value}개` : '';
+              return params.value? `${params.value}개` : '';
               }, valueParser: params => {
                 // 숫자로 변환, 숫자가 아니면 null
                 const value = parseInt(params.newValue);
@@ -138,7 +139,7 @@ import Swal from "sweetalert2";
             resizable: false,
             sortable: false,
             cellStyle: { textAlign: "center" },
-          }
+          },
         },
         gridOptions2: {
           domLayout: "autoHeight",
@@ -156,19 +157,15 @@ import Swal from "sweetalert2";
     mounted () {
       this.testReady();
     },
-    watch : {
-    //  'rowDataIndex' : function(newVal){
-    //   console.log(newVal)
-    //   for(let data in this.rowData){
-    //      if(data != newVal){
-    //       this.rowData[data].input_quantity ='0';
-    //      }
-    //   }
-    //  }
-    },
     methods: {
       //인풋값 그리드2에 전달
       inputRender(){
+         this.rowData.forEach((item,idx) => {
+          if(idx != this.rowDataIndex){
+               this.rowData[idx].input_quantity = '';
+               
+            }
+        })
         //값체크
         if(Number(this.rowData[this.rowDataIndex].not_test) < Number(this.rowData[this.rowDataIndex].input_quantity)){
           this.rowData[this.rowDataIndex].input_quantity=0;
@@ -182,6 +179,7 @@ import Swal from "sweetalert2";
       async onRowClicked(event) {
         //클릭 인덱스 값 담기
         this.rowDataIndex =event.rowIndex;
+        
         // 클릭시 검사항목들 보여줌
         axios.get('/api/test/testMenu/'+event.data.process_code)
               //검사량 초기화
@@ -204,7 +202,12 @@ import Swal from "sweetalert2";
       async testReady(){
         await axios.get('/api/test/storeReadyList/')
                    .then(res => {
+                      
                       this.rowData = res.data;
+
+                      for(let item of this.rowData){
+                        item.input_quantity = ''
+                      }
                    })
                    .catch((err) => console.log(err))
       },

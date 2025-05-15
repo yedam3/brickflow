@@ -69,7 +69,7 @@ export default {
                 },
                 { field: "require_quantity", headerName: "필요량", flex: 2,
                  valueFormatter: (params) => {
-                        return params.value != null ? `-${params.value}개` : '';
+                        return params.value !=  0 ? `-${params.value}개` : 0;
                     } 
                 },
                 { field: "percentage", headerName: "안전 대비 보유율 (%)", flex: 3 ,
