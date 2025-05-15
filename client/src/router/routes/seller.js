@@ -18,4 +18,9 @@ export default [{
     name: 'return',
     component: () => import('@/views/pages/sales/salereturn.vue')
   },
+  {
+    path: '/seller/finishedList',
+    name: 'finishedList',
+    component: () => import('@/views/pages/sales/FinishedList.vue')
+  },
 ]

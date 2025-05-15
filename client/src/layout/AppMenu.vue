@@ -59,9 +59,9 @@ const model = ref([
                         to: '/seller/finishstore'
                     },
                     {
-                        label: '반품관리',
+                        label: '완제품 재고현황',
                         icon: 'pi pi-fw pi-sign-in',
-                        to: '/seller/return'
+                        to: '/seller/finishedList'
                     },
                 ]
             },

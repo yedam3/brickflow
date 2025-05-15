@@ -1,13 +1,13 @@
 <template>
-    <div class="card border-0" style="height: 800px">
-        <h3>자재 재고 조회</h3>
-        <div class="text-end mt-5 mb-3">
+  <div class="card border-0" style="height: 800px">
+    <h3>제품 재고 조회</h3>
+    <div class="text-end mt-5 mb-3">
             <div class="row justify-content-between align-items-center">
                 <div class="col-auto">
                     <div class="input-group">
                         <select class="form-select w-auto" v-model="searchType">
-                            <option value="m.mat_code" selected>자재코드</option>
-                            <option value="mat_name">자재명</option>
+                            <option value="p.prod_code" selected>제품코드</option>
+                            <option value="prod_name">제품명</option>
                         </select>
                         <input type="text" v-model="searchText" placeholder="검색" @input="onSearch" class="form-control"
                             style="width: 61%;" @keydown.enter="searchMaterials" />
@@ -22,13 +22,13 @@
         </div>
         <div class="row">
             <div class="col-7">
-                <h3>자재 재고</h3>
+                <h3>제품 재고</h3>
                 <ag-grid-vue class="ag-theme-alpine custom-grid-theme" style="width: 100%" :columnDefs="columnDefs"
-                    :rowData="rowData" :gridOptions="gridOptions" @cellClicked="matCellclicked">
+                    :rowData="rowData" :gridOptions="gridOptions" @cellClicked="prodClicked">
                 </ag-grid-vue>
             </div>
             <div class="col-5">
-                <h3>LOT별 자재재고</h3>
+                <h3>LOT별 제품재고</h3>
                 <ag-grid-vue ref="secondGrid" class="ag-theme-alpine custom-grid-theme"
                     style="width: 100%; height: 150px" :columnDefs="secondColumnDefs" :rowData="secondRowData"
                     :gridOptions="gridOptions" rowSelection="multiple" >
@@ -39,30 +39,31 @@
 </template>
 
 <script>
-import { AgGridVue } from "ag-grid-vue3";
-import axios from "axios";
-import ProgressCell from "@/components/ProgressCell.vue";
-export default {
-    components : {
-        AgGridVue,
-        ProgressCell
-    },
-    data() {
-        return {
-            searchType: "m.mat_code",  // 검색 조건 
+    import { AgGridVue } from "ag-grid-vue3";
+    import axios from "axios";
+    import ProgressCell from "@/components/ProgressCell.vue";
+
+export default  {
+  components : {
+    AgGridVue,
+    ProgressCell
+  },
+  data(){
+    return{
+      searchType: "p.prod_code",  // 검색 조건 
             searchText: "",   // 검색어
             //메인그리드
             rowData: [],
             //메인그리드 필드
             columnDefs: [
-                { field: "mat_code", headerName: "자재코드", flex: 2, },
-                { field: "mat_name", headerName: "자재명", flex: 3,},
+                { field: "prod_code", headerName: "제품코드", flex: 2, },
+                { field: "prod_name", headerName: "제품명", flex: 3,},
                 { field: "store_quantity", headerName: "재고량", flex: 2,
                     valueFormatter: (params) => {
                         return params.value != null ? `${params.value}개` : '';
                     }
                 },
-                { field: "safe_inventory", headerName: "안전재고량", flex: 2, 
+                { field: "proper_store", headerName: "안전재고량", flex: 2, 
                  valueFormatter: (params) => {
                         return params.value != null ? `${params.value}개` : '';
                     }
@@ -81,8 +82,8 @@ export default {
             //상세그리드 필드
             secondColumnDefs: [
                 // 체크박스 추가
-                { field: "mat_name", headerName: "자재명", flex: 2 },
-                { field: "lot", headerName: "LOT", flex: 2 },
+                { field: "prod_name", headerName: "제품명", flex: 1 },
+                { field: "lot", headerName: "LOT", flex: 1 },
                 { field: "store_quantity", headerName: "재고량", flex: 1, valueFormatter: (params) => {
                         return params.value != null ? `${params.value}개` : '';
                     }
@@ -104,22 +105,23 @@ export default {
                     cellStyle: { textAlign: "center" },
                 },
             },
-        };
-    },
-    mounted(){
+    }
+  },
+  mounted(){
         this.basicList();
     },
-    methods: {
-            async basicList () {
-                await axios.get('/api/mat/matStorepage')
-                            .then(res => {
-                                this.rowData = res.data
-                            })
-                            .catch((err) => console.log(err));
-            },
-            //검색 조회
-            async searchMaterials() {
-                await axios.get('/api/mat/matStorepage', {
+  methods : {
+    // 초기조회
+    async basicList() {
+       await axios.get('/api/sales/prodStoreList')
+                   .then(res => {
+                     this.rowData = res.data
+                   })
+                   .catch((err) => console.log(err));
+    },
+    //검색 조회
+    async searchMaterials() {
+                await axios.get('/api/sales/prodStoreList', {
                     params: {
                         type: this.searchType,
                         keyword: this.searchText,
@@ -132,30 +134,31 @@ export default {
                         console.error(error);
                     });
             },
-            async matCellclicked(event){
-                await axios.get('/api/mat/matLotList/'+event.data.mat_code)
-                           .then(res => {
-                            this.secondRowData = res.data
-                           })
-                           .catch(err => console.log(err));
-            }
-        }
-    
+      //클릭시 재고 조회
+      async prodClicked(event) {
+  
+        axios.get(`/api/sales/prodStoreList/${event.data.prod_code}`)
+             .then(res => {
+                this.secondRowData = res.data
+             })
+             .catch((err) => console.log(err));
+      }
+  }
+}
+</script>
+
+<style scoped>
+  /* 헤더 텍스트 가운데 정렬 */
+::v-deep(.ag-theme-alpine .ag-header-cell-label) {
+  justify-content: center;
 }
 
-</script>
-<style scoped>
-  .btn-primary {
+/* headerClass로 설정한 header-center 클래스에 적용 */
+::v-deep(.header-center .ag-header-cell-label) {
+  justify-content: center;
+}
+.btn-primary {
       background-color: rgb(230, 171, 98);
       border-color: rgb(230, 171, 98);
-    }
-    /* 헤더 텍스트 가운데 정렬 */
-    ::v-deep(.ag-theme-alpine .ag-header-cell-label) {
-       justify-content: center;
-    }
-    
-    /* headerClass로 설정한 header-center 클래스에 적용 */
-    ::v-deep(.header-center .ag-header-cell-label) {
-      justify-content: center;
     }
 </style>

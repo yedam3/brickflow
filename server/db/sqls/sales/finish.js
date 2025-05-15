@@ -88,6 +88,46 @@ const deleteStore = `
    DELETE FROM store
    WHERE doc_code = ? 
 `
+const prodStoreList = `
+  SELECT 
+   p.prod_code,
+   prod_name,
+   SUM(IFNULL(inbound_quantity,0)) - SUM(IFNULL(dispatch_quantity,0)) AS store_quantity,
+   proper_store,
+   size,
+   weight,
+   CASE 
+        WHEN proper_store - (SUM(IFNULL(inbound_quantity,0)) - SUM(IFNULL(dispatch_quantity,0))) < 0 
+            THEN 0
+        ELSE proper_store - (SUM(IFNULL(inbound_quantity,0)) - SUM(IFNULL(dispatch_quantity,0)))
+    END AS require_quantity,
+	CASE 
+        WHEN proper_store = 0 THEN 0
+        WHEN ROUND(((SUM(IFNULL(inbound_quantity,0)) - SUM(IFNULL(dispatch_quantity,0))) / proper_store) * 100) >100 THEN 100
+        ELSE ROUND(((SUM(IFNULL(inbound_quantity,0)) - SUM(IFNULL(dispatch_quantity,0))) / proper_store) * 100)
+    END AS percentage
+    FROM prod p 
+    LEFT JOIN store s ON p.prod_code = s.item_code
+    WHERE 1=1 
+    :searchcondition
+    GROUP BY p.prod_code
+    ORDER BY percentage
+`
+const prodLotList = `
+  SELECT 
+    p.prod_code,
+    prod_name,
+    lot,
+    SUM(IFNULL(inbound_quantity,0)) - SUM(IFNULL(dispatch_quantity,0)) AS store_quantity,
+    s.storage_code,
+    store_name
+    FROM prod p 
+LEFT JOIN store s ON p.prod_code= s.item_code
+	 JOIN storage r ON s.storage_code = r.storage_code
+WHERE p.prod_code = ?
+GROUP BY  lot
+HAVING store_quantity > 0
+`
 module.exports = {
   storeProdList,
   maxProdLot,
@@ -100,5 +140,7 @@ module.exports = {
   finishStoreUpdate,
   deliveryFinishCheck,
   deleteFinish,
-  deleteStore
+  deleteStore,
+  prodStoreList,
+  prodLotList
 }

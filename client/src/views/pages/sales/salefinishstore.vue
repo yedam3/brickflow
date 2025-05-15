@@ -281,7 +281,9 @@ export default{
           return;
       }
       //값을 다입력했는지 체크
-      if(this.formData.prod_code=='',this.formData.storage_code=='',this.formData.quantity==0,this.formData.quantity ==''){
+      console.log('ㄱㄱㄱㄱ')
+      console.log(this.formData.storage_code);
+      if(this.formData.prod_code==''||this.formData.storage_code==''||this.formData.quantity==0||this.formData.quantity ==''){
         Swal.fire({
                     title: '실패',
                     text: '해당하는 값을 다입력해주세요',
@@ -389,7 +391,7 @@ export default{
           return;
       }
       //값을 다입력했는지 체크
-      if(this.formData.prod_code=='',this.formData.storage_code=='',this.formData.quantity==0,this.formData.quantity ==''){
+      if(this.formData.prod_code==''||this.formData.storage_code==''||this.formData.quantity==0||this.formData.quantity ==''){
         Swal.fire({
                     title: '실패',
                     text: '해당하는 값을 다입력해주세요',
