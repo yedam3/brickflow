@@ -19,9 +19,10 @@ router.get("/comList", async (req, res) => {
 
 
 // 제품LOT조건 조회
-router.get('/deliveryCheck/:prodCode', async (req, res) => {
+router.get('/deliveryCheck/:prodCode/:detailCode', async (req, res) => {
   const prod_code = req.params.prodCode;
-  let result = await deliveryService.prodcheck(prod_code)
+  const detailCode = req.params.detailCode;
+  let result = await deliveryService.prodcheck(prod_code,detailCode)
     .catch((err) => console.log(err));
   res.send(result);
 })

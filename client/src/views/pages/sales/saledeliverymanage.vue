@@ -185,9 +185,10 @@ export default {
                             delivery_demand: data.delivery_demand,
                             alreadydelivery: Number(data.alreadydelivery) - Number(data.delivery_quantity),
                             yetdelivery: Number(data.yetdelivery) + Number(data.delivery_quantity),
-                            delivery_detail_code: data.delivery_detail_code
+                            delivery_detail_code: data.delivery_detail_code,
+                            delivery_quantity : data.delivery_quantity
                         })
-                        console.log(data.delivery_detail_code)    
+                        
                     }
                     
                     this.throwData = [];
@@ -342,7 +343,7 @@ export default {
             this.selectedSecondIndex = params.rowIndex;
             console.log(params.data)
             if (params.data.lotList == undefined || params.data.lotList == null) { // lotList가 없으면 lotList를 만들고 있으면 else 뒤에있는 정보를 보여줘라
-                const res = await axios.get(`/api/sales/deliveryCheck/${params.data.prod_code}`)
+                const res = await axios.get(`/api/sales/deliveryCheck/${params.data.prod_code}/${params.data.delivery_detail_code}`)
                 const serowData = res.data;
                 let detailList = [];
                 for (let a of serowData)
@@ -350,7 +351,7 @@ export default {
                         prod_LOT: a.prod_LOT,                        // 제품 LOT
                         prod_code: a.prod_code,                     // 제품 코드
                         prod_name: a.prod_name,                     // 제품명
-                        delivery_before_quantity: a.delivery_before_quantity, // 출고 가능 수량
+                        delivery_before_quantity: Number(a.delivery_before_quantity)+Number(this.serowData[this.selectedSecondIndex].delivery_quantity), // 출고 가능 수량
                         delivery_quantity:0                       // 출고 수량 (사용자 입력용으로 비워둠)
                     })
                 // 두번째 그리드의 선택한 제품에 정보를 추가
