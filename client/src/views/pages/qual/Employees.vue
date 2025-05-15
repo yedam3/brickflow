@@ -387,7 +387,11 @@ export default{
       tel: "",
       pwd: "",
     }]
-  }
+  },
+  //초기화
+  empReset(){
+     this.info = [];
+   }
   }
 };
 </script>
