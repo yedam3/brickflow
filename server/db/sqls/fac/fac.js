@@ -109,7 +109,7 @@ LIMIT 1`
 const updateFac =
 `UPDATE fac
 SET ?
-WHERE fac_code = ?;`
+WHERE fac_code = ?`
 
 //비가동수정
 const updateUnplay=

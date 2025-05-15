@@ -8,7 +8,7 @@
           <input type="text" class="form-control" v-model="rowData.fac_code" readonly />
         </div>
         <div class="col-md-4">
-          <label class="form-label">설비이름</label>
+          <label class="form-label">설비이름<small style="color: gray;">(필수)</small></label>
           <input type="text" class="form-control" v-model="rowData.model_name" />
         </div>
         <div class="col-md-4">
@@ -21,26 +21,26 @@
           <input type="text" class="form-control" v-model="rowData.employee_name" readonly/>
         </div>
         <div class="col-md-4">
-          <label class="form-label">설치일자</label>
+          <label class="form-label">설치일자<small style="color: gray;">(필수)</small></label>
           <input type="date" class="form-control" v-model="rowData.install_date" />
         </div>
         <div class="col-md-4">
-          <label class="form-label">점검주기</label>
-          <input type="number" class="form-control" v-model="rowData.inspection_cycle"  />
+          <label class="form-label">점검주기<small style="color: gray;">(월)</small></label>
+          <input type="number" class="form-control" v-model="rowData.inspection_cycle" min="0" @keydown="allowOnlyNumber"/>
         </div>
         <div class="col-md-4">
-          <label class="form-label">설비유형</label>
+          <label class="form-label">설비유형<small style="color: gray;">(필수)</small></label>
           <select v-model="rowData.fac_pattern" class="form-select">
-            <option disabled value="">설비유형</option>
+            <option disabled value="" style="color: gray;">선택</option>
             <option v-for="facPat in facPatternAry" :key="facPat.fac_pattern" :value="facPat.fac_pattern">
               {{ facPat.sub_code_name }}
             </option>
           </select>
         </div>
         <div class="col-md-4">
-          <label class="form-label">설비상태</label>
+          <label class="form-label">설비상태<small style="color: gray;">(필수)</small></label>
           <select v-model="rowData.fac_status" class="form-select">
-            <option disabled value="">설비상태</option>
+            <option disabled value="" style="color: gray;">선택</option>
             <option v-for="facSt in facStatusAry" :key="facSt.fac_status" :value="facSt.fac_status">
               {{ facSt.sub_code_name }}
             </option>
@@ -48,11 +48,11 @@
         </div>
         <div class="col-md-4">
           <label class="form-label">설비 이미지 업로드</label>
-          <input type="file" name="image" class="form-control" @change="onImageChange" ref="fileInput" />
+          <input type="file" name="image" class="form-control" @change="onImageChange" ref="fileInput" accept="image/png, image/jpeg"/>
         </div>
         <div class="col-md-4" v-if="rowData.imagePreview">
           <label class="form-label d-block">미리보기</label>
-          <img :src="rowData.imagePreview || getImageUrl(rowData.image)" alt="설비 이미지" class="img-thumbnail" style="width: 400px; height: 300px;" />
+          <img :src="rowData.imagePreview || getImageUrl(rowData.image)" alt="설비 이미지" class="img-thumbnail" style="width: 400px; height: 300px; cursor:pointer;" @click="openImageModal"/>
           <small class="text-muted d-block mt-2" style="font-size: small;">파일명: {{ rowData.image }}</small>
         </div>
       </div>
@@ -190,6 +190,25 @@
       this.statusFac();
     },
     methods: {
+      allowOnlyNumber(event) {
+        const allowedKeys = [
+          'Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete', 'Home', 'End'
+        ];
+        const isNumberKey = event.key >= '0' && event.key <= '9';
+
+        if (!isNumberKey && !allowedKeys.includes(event.key)) {
+          event.preventDefault();
+        }
+      },
+      openImageModal() {
+        Swal.fire({
+          imageUrl: this.rowData.imagePreview,
+          imageWidth: 600,
+          imageHeight: 450,
+          showConfirmButton: false,
+          showCloseButton: true
+        });
+      },
       //설비 카운트
       async autoFacCode(){
         const result = await axios.get("/api/fac/autoFacCode");
@@ -261,6 +280,35 @@
           },
       //등록
       async addFac() {
+        if (
+          !this.rowData.fac_pattern &&
+          !this.rowData.fac_status &&
+          !this.rowData.install_date &&
+          !this.rowData.model_name
+        ) {
+          Swal.fire("입력 오류", "필수 항목을 모두 입력해주세요.", "warning");
+          return;
+        }
+
+        if (!this.rowData.fac_pattern) {
+          Swal.fire("입력 오류", "설비유형을 선택해주세요.", "warning");
+          return;
+        }
+
+        if (!this.rowData.fac_status) {
+          Swal.fire("입력 오류", "설비상태를 선택해주세요.", "warning");
+          return;
+        }
+
+        if (!this.rowData.install_date) {
+          Swal.fire("입력 오류", "설치일자를 입력해주세요.", "warning");
+          return;
+        }
+
+        if (!this.rowData.model_name) {
+          Swal.fire("입력 오류", "설비이름을 입력해주세요.", "warning");
+          return;
+        }   
         const fileName = await this.uploadImage();
         if (fileName) {
           this.rowData.image = fileName;
@@ -283,21 +331,9 @@
           Swal.fire("등록성공", "정상적으로 등록되었습니다.", "success")
             .then(() => {
               this.facList();
+              this.clearForm();
               this.autoFacCode();
             });
-          this.rowData = {
-            fac_code: "",
-            model_name: "",
-            fac_location: "",
-            employee_code: useUserStore().id,
-            employee_name: useUserStore().empName,
-            fac_pattern: "",
-            install_date: "",
-            inspection_cycle: "",
-            image: "",
-            fac_status: "",
-            imagePreview: ""
-          };
           this.imageFile = null;
           if (this.$refs.fileInput) {
             this.$refs.fileInput.value = ''; // 실제 input[type="file"]의 값을 비움
@@ -334,10 +370,35 @@
           return;
         }
 
-        if ( !this.rowData.fac_pattern || !this.rowData.fac_status) {
+        if (
+          !this.rowData.fac_pattern &&
+          !this.rowData.fac_status &&
+          !this.rowData.install_date &&
+          !this.rowData.model_name
+        ) {
           Swal.fire("입력 오류", "필수 항목을 모두 입력해주세요.", "warning");
           return;
         }
+
+        if (!this.rowData.fac_pattern) {
+          Swal.fire("입력 오류", "설비유형을 선택해주세요.", "warning");
+          return;
+        }
+
+        if (!this.rowData.fac_status) {
+          Swal.fire("입력 오류", "설비상태를 선택해주세요.", "warning");
+          return;
+        }
+
+        if (!this.rowData.install_date) {
+          Swal.fire("입력 오류", "설치일자를 입력해주세요.", "warning");
+          return;
+        }
+
+        if (!this.rowData.model_name) {
+          Swal.fire("입력 오류", "설비이름을 입력해주세요.", "warning");
+          return;
+        }   
 
         const fileName = await this.uploadImage();
         if (fileName) {

@@ -30,9 +30,9 @@
           <input type="text" class="form-control" v-model="rowData.unplay_code" readonly />
         </div>
         <div class="col-md-3">
-          <label class="form-label">비가동사유</label>
+          <label class="form-label">비가동사유<small style="color: gray;">(필수)</small></label>
           <select v-model="rowData.unplay_reason_code" class="form-select">
-            <option disabled value="">비가동사유</option>
+            <option disabled value="" style="color: gray;">선택</option>
             <option v-for="reFac in reasonFacAry" :key="reFac.unplay_reason_code" :value="reFac.unplay_reason_code">
               {{ reFac.sub_code_name }}
             </option>
@@ -44,14 +44,14 @@
         </div>
         <div class="col-md-3">
           <label class="form-label">담당자</label>
-          <input type="text" class="form-control" v-model="rowData.employee_code" readonly/>
+          <input type="text" class="form-control" v-model="rowData.employee_name" readonly/>
         </div>
         <div class="col-md-3">
-          <label class="form-label">시작일시</label>
+          <label class="form-label">시작일시<small style="color: gray;">(필수)</small></label>
           <input type="datetime-local" class="form-control" v-model="rowData.unplay_start_date" />
         </div>
         <div class="col-md-6">
-          <label class="form-label">비고</label>
+          <label class="form-label">비고<small style="color: gray;">(필수)</small></label>
           <textarea class="form-control" rows="3" v-model="rowData.note"></textarea>
         </div>
       </div>
@@ -93,20 +93,19 @@ export default {
                 {
                     unplay_code: "",
                     unplay_reason_code: "",
-                    employee_code: useUserStore().empName,
-                    employee_name: useUserStore().id,
+                    employee_code: useUserStore().id,
+                    employee_name: useUserStore().empName,
                     unplay_start_date: "",
                     unplay_end_date: "",
                     note: "",
                     fac_code: '',
-                }
-            ,
+                },
             rowData2:[
                 {
                     unplay_code: "",
                     unplay_reason_code: "",
-                    employee_name: useUserStore().id,
-                    employee_code: useUserStore().empName,
+                    employee_code: useUserStore().id,
+                    employee_name: useUserStore().empName,
                     unplay_start_date: "",
                     unplay_end_date: "",
                     note: "",
@@ -167,9 +166,10 @@ export default {
         this.autoUnCode();
         this.unFacList();
         this.reasonFac();
-
+        this.resetRowData();
     },
     methods: {
+        
         dateFormatter(params) {
             const value = params?.value;
             if (!value) return '';
@@ -177,12 +177,42 @@ export default {
                 ? moment(value).format("YYYY-MM-DD HH:mm")
                 : '';
         },
+        resetRowData() {
+            this.rowData = {
+                unplay_code: "",
+                unplay_reason_code: "",
+                employee_code: useUserStore().id,
+                employee_name: useUserStore().empName,
+                unplay_start_date: "",
+                unplay_end_date: "",
+                note: "",
+                fac_code: '',
+            };
+        },
         async autoUnCode(){
             const result = await axios.get("/api/fac/autoUnCode");
             this.rowData.unplay_code = result.data[0].unplay_code;
         },
         async addUnFac() {
             console.log(this.rowData);
+
+            if (!this.rowData.unplay_reason_code && 
+            !this.rowData.unplay_start_date && 
+            !this.rowData.note) 
+            {
+                Swal.fire("입력 오류", "필수 항목을 모두 입력해주세요.", "warning");
+                return;
+            }
+            if (!this.rowData.unplay_reason_code) {
+                Swal.fire("입력오류", "설비사유를 선택해주세요", "warning");
+            }
+            if (!this.rowData.unplay_start_date) {
+                Swal.fire("입력오류", "시작일시를 입력해주세요", "warning");
+            }
+            if (!this.rowData.note) {
+                Swal.fire("입력오류", "비고란을 입력해주세요", "warning");
+            }
+
             // 등록
             axios.post('/api/fac/addUnFac', {
                 unplayFac: {
@@ -206,16 +236,9 @@ export default {
                             confirmButtonText: '확인'
                         }).then(() => {
                             this.unFacList();
+                            this.clearForm();
+                            this.autoUnCode();
                         });
-                        this.rowData = {
-                            unplay_reason_code: "",
-                            employee_code: useUserStore().id, // 코드 그대로 유지
-                            employee_name: useUserStore().empName, // 이름 그대로 유지
-                            unplay_start_date: "",
-                            unplay_end_date: "",
-                            note: "",
-                            fac_code: '',
-                        };
                     } else {
                         Swal.fire({
                             title: '등록 실패',
@@ -239,6 +262,22 @@ export default {
         },
         //수정
         async modifyUnplay() {
+            if (!this.rowData.unplay_reason_code && 
+            !this.rowData.unplay_start_date && 
+            !this.rowData.note) 
+            {
+                Swal.fire("입력 오류", "필수 항목을 모두 입력해주세요.", "warning");
+                return;
+            }
+            if (!this.rowData.unplay_reason_code) {
+                Swal.fire("입력오류", "설비사유를 선택해주세요", "warning");
+            }
+            if (!this.rowData.unplay_start_date) {
+                Swal.fire("입력오류", "시작일시를 입력해주세요", "warning");
+            }
+            if (!this.rowData.note) {
+                Swal.fire("입력오류", "비고란을 입력해주세요", "warning");
+            }
             const res = await axios.get('/api/fac/unFacCheck', {
                 params: {
                     unplayCode: this.rowData2[0].unplay_code
@@ -268,17 +307,9 @@ export default {
                             confirmButtonText: '확인'
                         }).then(() => {
                             this.unFacList();
+                            this.clearForm();
+                            this.autoUnCode();
                         });
-                        this.rowData = {
-                            unplay_code: "",
-                            unplay_reason_code: "",
-                            employee_code: useUserStore().id,
-                            employee_name: useUserStore().empName,
-                            unplay_start_date: "",
-                            unplay_end_date: "",
-                            note: "",
-                            fac_code: '',
-                        };
                     } else {
                         Swal.fire({
                             title: '수정 실패',
@@ -322,17 +353,10 @@ export default {
 
                 Swal.fire("가동처리 완료", "가동처리가 완료되었습니다.", "success")
                     .then(async () => {
-                        await this.unFacList();
+                        this.unFacList();
+                        this.clearForm();
+                        this.autoUnCode();
                     });
-                this.rowData = {
-                    unplay_code: "",
-                    unplay_reason_code: "",
-                    employee_code: "",
-                    unplay_start_date: "",
-                    unplay_end_date: formatted,
-                    note: "",
-                    fac_code: ''
-                };
             }
         },
         //선택한 값 불러오기
@@ -387,16 +411,8 @@ export default {
                 .catch(err => console.error(err));
         },
         clearForm() {
-            this.rowData = {
-                unplay_code: "",
-                unplay_reason_code: "",
-                employee_code: useUserStore().id,
-                employee_name: useUserStore().empName,
-                unplay_start_date: "",
-                unplay_end_date: "",
-                note: "",
-                fac_code: '',
-            };
+            this.resetRowData();
+            this.autoUnCode();
     },
     }
 }

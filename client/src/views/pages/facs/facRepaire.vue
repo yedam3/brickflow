@@ -17,17 +17,17 @@
         <div class="input-group mb-5 col">
           <span class="input-group-text" id="basic-addon1">담당자</span>
           <input type="text" class="form-control" placeholder="담당자" aria-label="Username"
-            aria-describedby="basic-addon1" v-model="rowData2.employee_code" readonly>
+            aria-describedby="basic-addon1" v-model="rowData2.employee_name" readonly>
         </div>
       </div>
       <div class="row">
         <div class="input-group mb-5 col">
-          <span class="input-group-text" id="basic-addon1">수리등록일자</span>
+          <span class="input-group-text" id="basic-addon1">수리등록일자<small style="color: gray;">(필수)</small></span>
           <input type="date" class="form-control" placeholder="연도-월-일" aria-label="Username"
             aria-describedby="basic-addon1" v-model="rowData2.repaire_add_date" >
         </div>
         <div class="input-group mb-5 col">
-          <span class="input-group-text" id="basic-addon1">수리처리일자</span>
+          <span class="input-group-text" id="basic-addon1">수리처리일자<small style="color: gray;">(필수)</small></span>
           <input type="date" class="form-control" placeholder="연도-월-일" aria-label="Username"
             aria-describedby="basic-addon1" v-model="rowData2.repaire_finish_date" >
         </div>
@@ -39,7 +39,7 @@
       </div>
       <div class="row">
         <div class="input-group mb-5 col">
-          <span class="input-group-text" id="basic-addon1">수리결과</span>
+          <span class="input-group-text" id="basic-addon1">수리결과<small style="color: gray;">(필수)</small></span>
           <select v-model="rowData2.fac_result" class="form-select col" aria-label="Default select example" >
             <option disabled value="" style="color: gray;">수리결과</option>
             <option v-for="repFac in facResultAry" :key="repFac.fac_result" :value="repFac.fac_result">
@@ -49,7 +49,7 @@
          
         </div>
         <div class="input-group mb-5 col">
-          <span class="input-group-text" id="basic-addon1">고장증상</span>
+          <span class="input-group-text" id="basic-addon1">고장증상<small style="color: gray;">(필수)</small></span>
           <input type="text" class="form-control" placeholder="고장증상" aria-label="Username"
             aria-describedby="basic-addon1"  v-model="rowData2.break_status" >
         </div>
@@ -61,12 +61,12 @@
       </div>
       <div class="row">
         <div class="input-group col">
-          <span class="input-group-text" id="basic-addon1">비고</span>
+          <span class="input-group-text" id="basic-addon1">비고<small style="color: gray;">(필수)</small></span>
           <textarea class="form-control" placeholder="비고" v-model="rowData2.note"
             style="height: 100px; resize: none; "></textarea>
         </div>
         <div class="input-group  col">
-          <span class="input-group-text" id="basic-addon1">수리내역</span>
+          <span class="input-group-text" id="basic-addon1">수리내역<small style="color: gray;">(필수)</small></span>
           <textarea class="form-control" placeholder="수리내역"  v-model="rowData2.fac_history"
             style="height: 100px; resize: none; "></textarea>
         </div>
@@ -97,8 +97,8 @@ export default {
         {
           unplay_code: "",
           unplay_reason_code: "",
-          employee_code: useUserStore().empName,
-          employee_name: useUserStore().id,
+          employee_code: useUserStore().id,
+          employee_name: useUserStore().empName,
           unplay_start_date: "",
           note: "",
           fac_code: '',
@@ -107,8 +107,8 @@ export default {
       rowData2:
         {
           repaire_code:"",
-          employee_code: useUserStore().empName,
-          employee_name: useUserStore().id,
+          employee_code: useUserStore().id,
+          employee_name: useUserStore().empName,
           repaire_add_date:"",
           repaire_finish_date:"",
           fac_code: '',
@@ -168,10 +168,26 @@ export default {
     this.repaireList();
     this.facResult();
     this.reasonFac();
+    this.resetRowData2();
   },
   methods: {
     comCellClicked(event) {
       console.log("셀 클릭됨:", event);
+    },
+    resetRowData2() {
+      this.rowData2 = {
+        repaire_code: "",
+        repaire_add_date: "",
+        repaire_finish_date: "",
+        employee_code: useUserStore().id,
+        employee_name: useUserStore().empName,
+        fac_code: '',
+        break_status: "",
+        fac_result: "",
+        unplay_code: "",
+        note: "",
+        fac_history: "",
+      };
     },
     //값 증가
     async autoReCode(){
@@ -185,13 +201,6 @@ export default {
     },
     //수리처리
     async addRepaire() {
-      if (!this.rowData2.repaire_add_date) {
-        this.rowData2.repaire_add_date = moment().format("YYYY-MM-DD");
-      }
-
-      if (!this.rowData2.repaire_finish_date) {
-        this.rowData2.repaire_finish_date = moment().format("YYYY-MM-DD");
-      }
       const {
         employee_code,
         repaire_add_date,
@@ -201,7 +210,6 @@ export default {
         unplay_code,
         fac_history,
       } = this.rowData2;
-
       if (
         !employee_code ||
         !repaire_add_date ||
@@ -214,7 +222,36 @@ export default {
         Swal.fire("입력 오류", "모든 필수 항목을 입력해주세요.", "warning");
         return;
       }
+      if (!this.rowData2.employee_code) {
+          Swal.fire("입력오류", "담당자를 입력해주세요", "warning");
+      }
+      if (!this.rowData2.repaire_add_date) {
+          Swal.fire("입력오류", "종료일시를 입력해주세요", "warning");
+      }
+      if (!this.rowData2.break_status) {
+          Swal.fire("입력오류", "고장증상을 입력해주세요", "warning");
+      }
+      if (!this.rowData2.fac_code) {
+          Swal.fire("입력오류", "설비코드를 입력해주세요", "warning");
+      }
+      if (!this.rowData2.fac_result) {
+          Swal.fire("입력오류", "수리결과를 선택해주세요", "warning");
+      }
+      if (!this.rowData2.unplay_code) {
+          Swal.fire("입력오류", "비가동코드를 입력해주세요", "warning");
+      }
+      if (!this.rowData2.fac_history) {
+          Swal.fire("입력오류", "수리내역을 입력해주세요", "warning");
+      }
       
+      if (!this.rowData2.repaire_add_date) {
+        this.rowData2.repaire_add_date = moment().format("YYYY-MM-DD");
+      }
+
+      if (!this.rowData2.repaire_finish_date) {
+        this.rowData2.repaire_finish_date = moment().format("YYYY-MM-DD");
+      }
+
       this.rowData2.repaire_finish_date = moment().format("YYYY-MM-DD");
       const fullFinishDateTime = moment().format("YYYY-MM-DD HH:mm");
 
@@ -259,19 +296,8 @@ export default {
           });
 
           this.repaireList();
-          this.rowData2 = {
-            repaire_code: "", 
-            repaire_add_date: "", 
-            repaire_finish_date: "",
-            employee_code: "", 
-            fac_code: '',
-            break_status: "", 
-            fac_result: "",
-            unplay_code: "", 
-            note: "", 
-            fac_history: "", 
-          };
-
+          this.resetRowData2();
+          await this.autoReCode();
         } else {
           Swal.fire("실패", "수리 등록 실패", "error");
         }

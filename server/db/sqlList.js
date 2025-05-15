@@ -18,6 +18,8 @@ const prodTest = require('./sqls/prodTest/prodTest.js')
 
 const bom = require('./sqls/admin/bom.js');
 const processFlow = require('./sqls/admin/processFlow.js');
+const adMat = require('./sqls/admin/adminMat.js')
+const prod = require('./sqls/admin/prod.js');
 const label = require('./sqls/mat/label.js');
 const mainPage = require('./sqls/mainPage/mainPage.js');
 const login = require('./sqls/login/login.js');
@@ -41,6 +43,8 @@ module.exports = {
     ...prodTest,
     ...bom,
     ...processFlow,
+    ...adMat,
+    ...prod,
     ...label,
     ...mainPage,
     ...delivery,
