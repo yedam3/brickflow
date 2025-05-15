@@ -1,5 +1,5 @@
 //mat.js
-const autoMatCode = `SELECT CONCAT('moc-',IFNULL(MAX(CAST(SUBSTR(mat_order_code,5) AS SIGNED)),100)+1) AS mat_order_code
+const autoMatRealCode = `SELECT CONCAT('moc-',IFNULL(MAX(CAST(SUBSTR(mat_order_code,5) AS SIGNED)),100)+1) AS mat_order_code
 FROM matOrders;
 `;
 //자재조회
@@ -147,7 +147,7 @@ const delOrderDetail = `
 `
 
 module.exports = {
-  autoMatCode,
+  autoMatRealCode,
   matList,
   comList,
   addMatOrder,

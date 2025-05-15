@@ -4,7 +4,7 @@ const { convertLikeToQuery } = require("../../utils/converts.js");
 
 // 자동 matCode 증가
 const autoMatCode = async () => {
-  let list = await mariaDB.query("autoMatCode").catch((err) => console.log(err));
+  let list = await mariaDB.query("autoMatRealCode").catch((err) => console.log(err));
   return list;
 };
 

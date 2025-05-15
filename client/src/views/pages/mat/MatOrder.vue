@@ -297,15 +297,15 @@ export default {
           }
         })
         .catch((err)=> console.log(err));
-        if (res.data[0].checkCount > 0) {
-          Swal.fire({
-            title: '등록 실패',
-            text: '이미 등록이 진행된 발주코드입니다.',
-            icon: 'error',
-            confirmButtonText: '확인'
-          });
-          return;
-        }
+        // if (res.data[0].checkCount > 0) {
+        //   Swal.fire({
+        //     title: '등록 실패',
+        //     text: '이미 등록이 진행된 발주코드입니다.',
+        //     icon: 'error',
+        //     confirmButtonText: '확인'
+        //   });
+        //   return;
+        // }
       if(this.fullCheck()==1){
         return;
       }else if(this.fullCheck()==2){
