@@ -106,8 +106,8 @@ export default {
         { field: 'prod_code', headerName: '제품코드', flex: 2, editable: false },
         { field: 'prod_name', headerName: '제품명', flex: 2, editable: false },
         { field: 'delivery_demand', headerName: '수량', flex: 2, editable: true, valueFormatter: (params) => { return params.value != null ? `${params.value}` : ''; } },
-        { field: 'price', headerName: '단가', flex: 2, editable: true },
-        { field: 'totalprice', headerName: '총주문 금액', valueGetter: 'Number(data.delivery_demand) * Number(data.price).toLocaleString()', flex: 3 },
+        {field: 'price', headerName: '단가', flex: 2, editable: true, valueFormatter: (params) => {const value = Number(params.value);return isNaN(value) ? '' : '₩' + value.toLocaleString();} },
+        { field: 'totalprice', headerName: '총주문 금액', valueGetter: 'Number(data.delivery_demand) * Number(data.price)', flex: 3, valueFormatter: (params) => { const value = params.value; return value != null ? '₩' + Number(value).toLocaleString() : ''; } },
         { field: 'note', headerName: '비고', flex: 3 },
       ],
       gridOptions: {
