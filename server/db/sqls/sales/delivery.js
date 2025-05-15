@@ -62,7 +62,7 @@ const findProdStroage = `
  FROM store
  WHERE lot = ?
 `
-//창고에 값 뺴기
+//창고에 출고 처리
 const addStoreProd = `
  INSERT INTO store(store_code,
    doc_code,
@@ -126,12 +126,12 @@ SELECT orders_detail_code,
         quantity - (SELECT IFNULL(SUM(delivery_quantity), 0)
                     FROM delivery_manage_detail d JOIN delivery_manage m ON(d.delivery_code = m.delivery_code)
                      WHERE orders_code = o.orders_code AND prod_code = o.prod_code) AS yetdelivery,
-                       price,
-                       note,
-                       o.prod_code,
-                       getProdName(o.prod_code) AS prod_name,
-                       finish_status,
-                       delivery_detail_code
+        price,
+        note,
+        o.prod_code,
+        getProdName(o.prod_code) AS prod_name,
+        finish_status,
+        delivery_detail_code
 FROM order_detail o JOIN delivery_manage d ON(o.orders_code = d.orders_code)
 JOIN delivery_manage_detail de ON(de.delivery_code = d.delivery_code AND o.prod_code = de.prod_code)
 JOIN company c ON(d.company_code = c.company_code)

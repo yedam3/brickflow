@@ -142,16 +142,22 @@ const modifydelivery = async (delivery,deliveryDetail) => {
             ]
             result = await mariaDB.query('deliveryDetailUpdate', test)
                 .catch((err) => console.log(err));
+             
+            //창고에 있는 detailCode 먼저 삭제
+            result = await mariaDB.query('storeDeliveryDelete', detail.delivery_detail_code)
             
             for (let data of detail.lotList) {
                 if (data.delivery_quantity > 0) {
+                    let findStore = (await mariaDB.query('findProdStroage', data.prod_LOT))[0].storage_code; // 창고 찾기
                     let info = [
-                        data.delivery_quantity,
                         detail.delivery_detail_code,
+                        detail.prod_code,
                         data.prod_LOT,
+                        data.delivery_quantity,
+                        findStore
                     ]
-                    
-                    result = await mariaDB.query('storageDeliveryUpdate', info)
+                    ///창고 에 다시 값 추가
+                    result = await mariaDB.query('addStoreProd' ,info)
                         .catch((err) => console.log(err));
                 }
             }
