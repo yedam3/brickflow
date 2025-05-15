@@ -46,12 +46,12 @@ const empModify = async (empInfo) => {
     const saltRounds = 10;
     hashedPwd = await bcrypt.hash(empInfo.pwd, saltRounds);
     result = await mariaDB.query('empModify',[empInfo.emp_name, empInfo.department,empInfo.hire_date,empInfo.tel,hashedPwd,empInfo.emp_code])
-    .catch((err) => console.log(err));
+                          .catch((err) => console.log(err));
     return result;
   }
  
   result = await mariaDB.query('empUpdate',[empInfo.emp_name, empInfo.department,empInfo.hire_date,empInfo.tel,empInfo.emp_code])
-  .catch((err) => console.log(err));
+                        .catch((err) => console.log(err));
 
   return result;         
 }

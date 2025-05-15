@@ -4,7 +4,7 @@
       <div class="text-end mt-3 mb-3"style="padding-right: 4%;">
      <Button label="초기화" severity="success" class="me-3" @click="comReset"/>
      <Button label="등록" severity="info" class="me-3" @click="comSave"/>
-     <Button label="수정" severity="help" class="me-3" @click="comModify"/>
+     <Button label="수정" severity="help" class="me-3" @click="comUpdate"/>
      <Button label="삭제" severity="danger" class="me-3" @click="comDelete"/>
    </div>
    <div class="row">
@@ -17,7 +17,7 @@
        :gridOptions="gridOptions"
        :defaultColDef="defaultColDef"
 
-       @cellClicked="empCellClicked">
+       @cellClicked="comellClicked">
    </ag-grid-vue>
   </div>
   <div class="card border-0 col" style="width: 700px; height: 500px; background-color: #F5F5F5;">
@@ -36,9 +36,9 @@
                 </div>
                 <div class="row">
                 <div class="input-group mb-5 col">
-                        <span class="input-group-text" id="basic-addon1">부서</span>
-                        <input type="text" class="form-control" placeholder="부서" aria-label="Username"
-                            aria-describedby="basic-addon1" v-model="info.department" >
+                        <span class="input-group-text" id="basic-addon1">위치</span>
+                        <input type="text" class="form-control" placeholder="위치" aria-label="Username"
+                            aria-describedby="basic-addon1" v-model="info.address" >
                     </div>
                     <div class="input-group mb-5 col">
                         <span class="input-group-text" id="basic-addon1">연락처</span>
@@ -53,9 +53,13 @@
                             aria-describedby="basic-addon1" v-model="info.emp_code" >
                     </div>
                     <div class="input-group mb-5 col">
-                        <span class="input-group-text" id="basic-addon1">업체타입</span>
-                        <input type="password" class="form-control" placeholder="업체타입" aria-label="Username"
-                            aria-describedby="basic-addon1" v-model="info.conmpany_type">
+                      <span class="input-group-text" id="basic-addon1">업체타입</span>
+                        <select class="form-select col" aria-label="Default select example" v-model="info.company_type">
+                            <option disabled selected value="">업체타입</option>
+                            <option v-for=" dep in companyListAry" :key="dep.sub_code" :value="dep.sub_code">
+                                {{ dep.sub_code_name }}
+                            </option>
+                        </select>
                     </div>
                 </div>
         </div>
@@ -78,35 +82,31 @@ export default{
        {
         company_code: "",
         company_name: "",
-        department: "",
+        address: "",
         tel: "",
         emp_code: "",
-        conmpany_type: "",
+        company_type: "",
        }
      ],
      columnDefs: [
        { field: 'company_code', headerName: '업체코드',flex:1},
        { field: 'company_name', headerName: '업체명' ,flex:1},
-       { field: 'department', headerName: '부서' ,flex:1,
-            valueFormatter: (params) => {
-                if (params.value == 'DP1') {
-                    return params.value = '관리자';
-                } else if (params.value == 'DP2') {
-                    return params.value = '영업';
-                } else if (params.value == 'DP3') {
-                    return params.value = '생산';
-                } else if (params.value == 'DP4') {
-                    return params.value = '품질';
-                } else if (params.value == 'DP5') {
-                    return params.value = '자재';
-                } else if (params.value == 'DP6') {
-                    return params.value = '설비';
-                } 
-              }
-       },
+       { field: 'address', headerName: '위치' ,flex:1,},
        { field: 'tel', headerName: '연락처' ,flex:1},
        { field: 'emp_code', headerName: '담당자' ,flex:1,},
-       { field: 'conmpany_type', headerName: '업체타입' ,flex:1,}         
+       { field: 'company_type', headerName: '업체타입' ,flex:1,
+       valueFormatter: (params) => {
+                if (params.value == 'CT1') {
+                    return params.value = '입고업체';
+                } else if (params.value == 'CT2') {
+                    return params.value = '판매업체';
+                } else if (params.value == 'CT3') {
+                    return params.value = '설비수리업체';
+                } else if (params.value == 'CT4') {
+                    return params.value = '설비구매업체';
+              }
+       }
+       }         
      ],
      gridOptions:{
          pagination: true,
@@ -129,30 +129,256 @@ export default{
     info: {
         company_code: "",
         company_name: "",
-        department: "",
+        address: "",
         tel: "",
         emp_code: "",
-        conmpany_type: "",
+        company_type: "",
     },
-    departmentListAry : [],
+    companyListAry : [],
     selectedSecondIndex: null,
     prodIndex : null,
    }
  },
  async mounted() {
-   await this.comPanyData();
+   await this.companyData();
+   await this.companyList();
  },
  methods: {
-  async comPanyData(){
+  //업체목록
+  async companyData(){
     try{
-    const response = await axios.get('/api/admin/compnay');
+    const response = await axios.get('/api/admin/company');
     this.rowData = response.data;
     } catch (err) {
       console.log('데이터 조회 실패', err);
     }
-  } 
- },
-}
+  },
+  comellClicked(event){
+     let com = event.data.company_code;
+     this.prodIndex = event.rowIndex
+     axios.get('/api/admin/company/' + com)
+                .then(res => {
+                  console.log(res)
+                      this.info = res.data[0];
+                      
+                }).catch(error => {
+                 console.error(error);
+                });
+                console.log(event);
+       },
+
+
+
+
+  //업체타입 리스트
+  async companyList(){
+    await axios.get('/api/admin/comTypeList')
+                 .then(res => {
+                  console.log(res.data);
+                  this.companyListAry = res.data;
+                 })
+  },
+
+  //값체크 validation
+  checkValue(){
+      if(this.info.emp_name == '' || this.info.company_code == '' || this.info.company_name == '' || this.info.address == '' || this.info.tel || this.info.emp_code || this.info.company_type) {
+          Swal.fire({
+           title: '실패',
+           text: '값을 다 입력해주세요',
+           icon: 'error',
+           confirmButtonText: '확인'
+         });
+         return ;
+        }
+    },
+
+  //등록
+  async comSave(){
+    console.log(this.info)
+   //값체크 validation
+   let validation = this.checkValue();
+    if(validation==1){
+      return;
+    }
+    if(this.info.company_code != ''){
+      Swal.fire({
+            title: '등록 불가',
+            text: '이미 업체가 등록된 건입니다.',
+            icon: 'error',
+            confirmButtonText: '확인'
+          });
+          return;
+    }
+    console.log(this.rowData[this.prodIndex])
+
+       //등록시작
+       const res =  await axios.post('/api/admin/comSave', this.info)
+       .then(res => {
+         if (res.data.affectedRows > 0) {
+           Swal.fire({
+             title: '등록 성공',
+             text: '정상적으로 등록이 완료되었습니다.',
+             icon: 'success',
+             confirmButtonText: '확인'
+           });
+         } else {
+           Swal.fire({
+             title: '등록 실패',
+             text: '등록이 실패하였습니다..',
+             icon: 'error',
+             confirmButtonText: '확인'
+             
+           });
+         }
+       })
+       .catch(error => {
+         console.error(error);
+         Swal.fire({
+           title: '등록 실패',
+           text: '알수 없는 오류가 발생하였습니다..',
+           icon: 'error',
+           confirmButtonText: '확인'
+         });
+         return;
+       });
+       await this.companyData();
+       this.info =  {
+                      company_code: "",
+                      company_name: "",
+                      address: "",
+                      tel: "",
+                      emp_code: "",
+                      company_type: "",
+                    } 
+      },
+        //수정
+        //값 다 넣었는지 체크
+  async comUpdate(){
+    let validation = this.checkValue();
+        if(validation==1){
+      return;
+    }
+    if(this.info.emp_code == ''){
+      Swal.fire({
+            title: '수정 불가',
+            text: '사원번호가 필요합니다.',
+            icon: 'error',
+            confirmButtonText: '확인'
+          });
+          return;
+    }
+
+      //수정시작
+      await axios.put('/api/admin/comUpdate',this.info,)
+     .then(res => {
+        if(res.data.affectedRows >0) {
+          Swal.fire({
+            title: '수정 완료',
+            text: '수정이 완료되었습니다.',
+            icon: 'success',
+            confirmButtonText: '확인'
+          });
+          this.companyData();
+       this.info =  {
+                      company_code: "",
+                      company_name: "",
+                      address: "",
+                      tel: "",
+                      emp_code: "",
+                      company_type: "",
+                    } 
+          
+        }else{
+          Swal.fire({
+            title: '수정 실패',
+            text: '수정을 실패하였습니다.',
+            icon: 'error',
+            confirmButtonText: '확인'
+          });
+          return;
+        }
+     })
+     .catch(err =>{
+       console.error(err);
+       Swal.fire({
+         title: '수정 실패',
+         text: '알수 없는 에러.',
+         icon: 'error',
+         confirmButtonText: '확인'
+       });
+       return
+     });
+     this.info = [{
+        company_code: "",
+        company_name: "",
+        address: "",
+        tel: "",
+        emp_code: "",
+        company_type: "",
+    }]
+  },
+  //삭제
+  async comDelete(){
+    if(this.info.emp_code == ''){
+      Swal.fire({
+            title: '삭제 실패',
+            text: '사원번호가 필요합니다.',
+            icon: 'error',
+            confirmButtonText: '확인'
+          });
+          return;
+    }
+    await axios.delete('/api/admin/comDelete/'+ this.info.com_code)
+    .then(res => {
+        if(res.data.affectedRows >0) {
+          Swal.fire({
+            title: '삭제 성공',
+            text: '정상적으로 삭제되었습니다.',
+            icon: 'success',
+            confirmButtonText: '확인'
+          });
+          this.companyData();
+       this.info =  {
+                      company_code: "",
+                      company_name: "",
+                      address: "",
+                      tel: "",
+                      emp_code: "",
+                      company_type: "",
+                    } 
+          
+        }else{
+          Swal.fire({
+            title: '삭제 실패',
+            text: '삭제를 실패하였습니다.',
+            icon: 'error',
+            confirmButtonText: '확인'
+          });
+          return;
+        }
+     })
+     .catch(err =>{
+       console.error(err);
+       Swal.fire({
+         title: '삭제 실패',
+         text: '알수 없는 에러.',
+         icon: 'error',
+         confirmButtonText: '확인'
+       });
+       return
+     });
+     this.info = [{
+                      company_code: "",
+                      company_name: "",
+                      address: "",
+                      tel: "",
+                      emp_code: "",
+                      company_type: "",
+    }]
+  }
+  }
+
+ };
 </script>
 <style>
  .ag-theme-alpine .ag-header {

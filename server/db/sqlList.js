@@ -24,7 +24,7 @@ const label = require('./sqls/mat/label.js');
 const mainPage = require('./sqls/mainPage/mainPage.js');
 const login = require('./sqls/login/login.js');
 const employees = require('./sqls/admin/employees.js');
-
+const company = require('./sqls/admin/company.js');
 
 
 const prodFinished = require('./sqls/sales/finish.js')
@@ -51,5 +51,6 @@ module.exports = {
     ...login,
     ...employees,
     ...prodFinished,
-    ...returns
+    ...returns,
+    ...company
 }
