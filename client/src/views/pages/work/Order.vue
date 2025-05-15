@@ -26,9 +26,17 @@
                         <div class="col-4">
                             <InputGroup>
                                 <InputGroupAddon>
-                                    생산 지시명
+                                    계획 코드
                                 </InputGroupAddon>
-                                <InputText v-model="formData.product_order_name" size="large" placeholder="(입력)" />
+                                <InputText v-model="formData.plan_code" size="large" placeholder="" readOnly />
+                            </InputGroup>
+                        </div>
+                        <div class="col-4">
+                            <InputGroup>
+                                <InputGroupAddon>
+                                    계획명
+                                </InputGroupAddon>
+                                <InputText v-model="formData.plan_name" size="large" placeholder="" readOnly />
                             </InputGroup>
                         </div>
                     </div>
@@ -41,20 +49,12 @@
                                 <InputText v-model="formData.employee_name" size="large" placeholder="" />
                             </InputGroup>
                         </div>
-                        <div class="col-4">
+                         <div class="col-4">
                             <InputGroup>
                                 <InputGroupAddon>
-                                    계획 코드
+                                    생산 지시명
                                 </InputGroupAddon>
-                                <InputText v-model="formData.plan_code" size="large" placeholder="" readOnly />
-                            </InputGroup>
-                        </div>
-                        <div class="col-4">
-                            <InputGroup>
-                                <InputGroupAddon>
-                                    계획명
-                                </InputGroupAddon>
-                                <InputText v-model="formData.plan_name" size="large" placeholder="" readOnly />
+                                <InputText v-model="formData.product_order_name" size="large" placeholder="(입력)" />
                             </InputGroup>
                         </div>
                     </div>
@@ -482,6 +482,9 @@ export default {
                     hold_quantity: mat.mat_hold_qty,
                 });
             };
+
+            this.matTempHoldDataList = [...temp];
+
             this.matTempHoldDataList = this.matTempHoldDataList.filter(item => {
                 return !temp.some(t =>
                     t.prod_code === item.prod_code &&
@@ -489,6 +492,7 @@ export default {
                 );
             });
             this.matTempHoldDataList = this.matTempHoldDataList.concat(temp);
+            console.log(this.matTempHoldDataList);
 
             this.secondRowData[this.selectedSecondIndex].material_input_qunatity = totalQty;
             this.secondRowData = [...this.secondRowData];

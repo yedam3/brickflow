@@ -26,11 +26,20 @@
                         <div class="col-4">
                             <InputGroup>
                                 <InputGroupAddon>
-                                    담당자
+                                    주문번호
                                 </InputGroupAddon>
-                                <InputText v-model="formData.emp_name" size="large" placeholder="" />
+                                <InputText v-model="formData.orders_code" size="large" placeholder="" readonly />
                             </InputGroup>
                         </div>
+                        <div class="col-4">
+                            <InputGroup>
+                                <InputGroupAddon>
+                                    주문명
+                                </InputGroupAddon>
+                                <InputText v-model="formData.order_name" size="large" placeholder="" readonly />
+                            </InputGroup>
+                        </div>
+                       
                     </div>
                     <div class="mb-5 row">
                         <div class="col-4">
@@ -44,17 +53,9 @@
                         <div class="col-4">
                             <InputGroup>
                                 <InputGroupAddon>
-                                    주문번호
+                                    담당자
                                 </InputGroupAddon>
-                                <InputText v-model="formData.orders_code" size="large" placeholder="" readonly />
-                            </InputGroup>
-                        </div>
-                        <div class="col-4">
-                            <InputGroup>
-                                <InputGroupAddon>
-                                    주문명
-                                </InputGroupAddon>
-                                <InputText v-model="formData.order_name" size="large" placeholder="" readonly />
+                                <InputText v-model="formData.emp_name" size="large" placeholder="" />
                             </InputGroup>
                         </div>
                     </div>

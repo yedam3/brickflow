@@ -190,6 +190,7 @@ export default {
                         mat_hold_qty: row.mat_hold_qty
                     });
                 }
+                console.log(this.mat_data);
             }
             if (this.mat_req_qty > totalQty) {
                 Swal.fire({
@@ -209,7 +210,7 @@ export default {
 
         },
 
-        // 자재 홀드량 반영
+        // 자재 홀드량 반영 
         setMatHoldData() {
             if (this.mat_list && this.mat_list.length > 0) {
                 this.rowData = this.rowData.map(row => {
@@ -236,7 +237,6 @@ export default {
             }
 
             this.original_rowData = [...this.rowData];
-
             for (let temp of this.mat_temp_data) {
                 let matchIndex = this.rowData.findIndex(item => {
                     return item.mat_code == temp.mat_code && item.mat_LOT == temp.mat_LOT

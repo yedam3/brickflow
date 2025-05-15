@@ -13,7 +13,7 @@
                                 <InputGroupAddon>
                                     계획코드
                                 </InputGroupAddon>
-                                <InputText v-model="formData.plan_code" size="large" placeholder="(입력)" />
+                                <InputText v-model="formData.plan_code" size="large" placeholder="(입력)" @keydown.enter="searchProcessData" />
                             </InputGroup>
                         </div>
                         <div class="col-4">
@@ -21,7 +21,7 @@
                                 <InputGroupAddon>
                                     지시 코드
                                 </InputGroupAddon>
-                                <InputText v-model="formData.product_order_code" size="large" placeholder="(입력)" />
+                                <InputText v-model="formData.product_order_code" size="large" placeholder="(입력)" @keydown.enter="searchProcessData" />
                             </InputGroup>
                         </div>
                         <div class="col-4">
@@ -29,7 +29,7 @@
                                 <InputGroupAddon>
                                     제품명
                                 </InputGroupAddon>
-                                <InputText v-model="formData.prod_name" size="large" placeholder="(입력)" />
+                                <InputText v-model="formData.prod_name" size="large" placeholder="(입력)" @keydown.enter="searchProcessData" />
                             </InputGroup>
                         </div>
                     </div>
@@ -39,7 +39,7 @@
                                 <InputGroupAddon>
                                     계획명
                                 </InputGroupAddon>
-                                <InputText v-model="formData.plan_name" size="large" placeholder="(입력)" />
+                                <InputText v-model="formData.plan_name" size="large" placeholder="(입력)" @keydown.enter="searchProcessData" />
                             </InputGroup>
                         </div>
                         <div class="col-4">
@@ -47,7 +47,7 @@
                                 <InputGroupAddon>
                                     지시명
                                 </InputGroupAddon>
-                                <InputText v-model="formData.product_order_name" size="large" placeholder="(입력)" />
+                                <InputText v-model="formData.product_order_name" size="large" placeholder="(입력)" @keydown.enter="searchProcessData" />
                             </InputGroup>
                         </div>
                         <div class="col-4">
@@ -55,7 +55,7 @@
                                 <InputGroupAddon>
                                     공정명
                                 </InputGroupAddon>
-                                <InputText v-model="formData.process_name" size="large" placeholder="(입력)" />
+                                <InputText v-model="formData.process_name" size="large" placeholder="(입력)" @keydown.enter="searchProcessData" />
                             </InputGroup>
                         </div>
                     </div>
@@ -66,12 +66,12 @@
                                     시작일자
                                 </InputGroupAddon>
                                 <DatePicker v-model="formData.work_start_date_from" size="large" dateFormat="yy/mm/dd"
-                                    placeholder="(입력)" showIcon iconDisplay="input" />
+                                    placeholder="(입력)" @keydown.enter="searchProcessData" showIcon iconDisplay="input" />
                                     <div class="align-content-center">
                                         <div class="mx-2">~</div>
                                     </div>
                                 <DatePicker v-model="formData.work_start_date_to" size="large" dateFormat="yy/mm/dd"
-                                    placeholder="(입력)" showIcon iconDisplay="input" />
+                                    placeholder="(입력)" @keydown.enter="searchProcessData" showIcon iconDisplay="input" />
                             </InputGroup>
                         </div>
                         <div class="col-6">
@@ -80,12 +80,12 @@
                                     종료일자
                                 </InputGroupAddon>
                                 <DatePicker v-model="formData.work_end_date_from" size="large" dateFormat="yy/mm/dd"
-                                    placeholder="(입력)" showIcon iconDisplay="input" />
+                                    placeholder="(입력)" @keydown.enter="searchProcessData" showIcon iconDisplay="input" />
                                     <div class="align-content-center">
                                         <div class="mx-2">~</div>
                                     </div>
                                 <DatePicker v-model="formData.work_end_date_to" size="large" dateFormat="yy/mm/dd"
-                                    placeholder="(입력)" showIcon iconDisplay="input" />
+                                    placeholder="(입력)" @keydown.enter="searchProcessData" showIcon iconDisplay="input" />
                             </InputGroup>
                         </div>
                     </div>
@@ -183,6 +183,14 @@ export default {
     },
 
     methods: {
+
+        // 초기화
+        clearForm() {
+            this.formData = {};
+            // this.processList = [];
+        },
+
+        // 실적 목록 조회
         async getProcessData() {
             await axios.get(`/api/work/process/data`).then(res => {
                 const processDataList = res.data;
@@ -214,6 +222,8 @@ export default {
                 });
             });
         },
+
+        // 실적 목록 검색
         async searchProcessData() {
             await axios.get(`/api/work/process/data`, {
                 params: {

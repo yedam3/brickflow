@@ -74,7 +74,7 @@ const logout = async () => {
                
                     
                     <button type="button" class="layout-topbar-action" @click="logout">
-                        <i class="pi-sign-out"></i>
+                        <i class="pi pi-fw pi-sign-out"></i>
                         <span>Profile</span>
                     </button>
                 </div>
