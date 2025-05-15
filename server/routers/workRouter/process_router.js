@@ -95,7 +95,8 @@ router.get('/endCheck', async (req, res) => {
 
 // 실적 목록조회
 router.get('/data', async (req, res) => {
-    let list = await processService.findAllProcess().catch((err) => console.error(err));
+    const searchKeywords = req.query;
+    let list = await processService.findAllProcess(searchKeywords).catch((err) => console.error(err));
     res.send(list);
 });
 

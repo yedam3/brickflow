@@ -251,7 +251,7 @@ WHERE NOT EXISTS (
 
 // 실적 목록 조회
 const findAllProcess = `
-SELECT wp.product_order_detail_code, getProductOrderName(wp.product_order_detail_code) AS 'product_order_name', getProcessName(wp.process_code) AS 'process_name', getProdName(wp.prod_code) AS 'prod_name', wp.order_quantity,
+SELECT wp.product_order_detail_code, po.product_order_name, proc.process_name, prod.prod_name, wp.order_quantity,
     IFNULL(SUM(wd.input_quantity), 0) AS input_quantity,
     IFNULL(SUM(wd.error_quantity), 0) AS error_quantity,
     IFNULL(SUM(wd.created_quantity), 0) AS created_quantity,
@@ -277,6 +277,13 @@ SELECT wp.product_order_detail_code, getProductOrderName(wp.product_order_detail
 	), 0) AS 'first_order_quantity'
 FROM work_process wp
 	LEFT JOIN work_data wd ON wp.work_lot = wd.work_lot AND wp.process_sequence = wd.process_sequence
+    LEFT JOIN work_detail wd2 ON wp.product_order_detail_code = wd2.product_order_detail_code
+    LEFT JOIN process proc ON wp.process_code = proc.process_code
+    LEFT JOIN prod prod ON wp.prod_code = prod.prod_code
+    LEFT JOIN product_order po ON wd2.product_order_code = po.product_order_code
+    LEFT JOIN plan p ON po.plan_code = p.plan_code
+WHERE 1=1
+:searchCondition
 GROUP BY wp.work_lot, wp.product_order_detail_code, wp.process_code, wp.prod_code, wp.order_quantity
 `;
 

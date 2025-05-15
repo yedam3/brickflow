@@ -65,12 +65,12 @@
                                 <InputGroupAddon>
                                     시작일자
                                 </InputGroupAddon>
-                                <DatePicker v-model="formData.start_date_from" size="large" dateFormat="yy/mm/dd"
+                                <DatePicker v-model="formData.work_start_date_from" size="large" dateFormat="yy/mm/dd"
                                     placeholder="(입력)" showIcon iconDisplay="input" />
                                     <div class="align-content-center">
                                         <div class="mx-2">~</div>
                                     </div>
-                                <DatePicker v-model="formData.start_date_to" size="large" dateFormat="yy/mm/dd"
+                                <DatePicker v-model="formData.work_start_date_to" size="large" dateFormat="yy/mm/dd"
                                     placeholder="(입력)" showIcon iconDisplay="input" />
                             </InputGroup>
                         </div>
@@ -79,19 +79,19 @@
                                 <InputGroupAddon>
                                     종료일자
                                 </InputGroupAddon>
-                                <DatePicker v-model="formData.end_date_from" size="large" dateFormat="yy/mm/dd"
+                                <DatePicker v-model="formData.work_end_date_from" size="large" dateFormat="yy/mm/dd"
                                     placeholder="(입력)" showIcon iconDisplay="input" />
                                     <div class="align-content-center">
                                         <div class="mx-2">~</div>
                                     </div>
-                                <DatePicker v-model="formData.end_date_to" size="large" dateFormat="yy/mm/dd"
+                                <DatePicker v-model="formData.work_end_date_to" size="large" dateFormat="yy/mm/dd"
                                     placeholder="(입력)" showIcon iconDisplay="input" />
                             </InputGroup>
                         </div>
                     </div>
                     <div class="d-flex justify-content-center">
                         <div class="mt-2">
-                            <Button label="조회" severity="success" size="large" class="me-2" @click="searchWork" />
+                            <Button label="조회" severity="success" size="large" class="me-2" @click="searchProcessData" />
                             <Button label="초기화" severity="danger" size="large" class="" @click="clearForm" />
                         </div>
                     </div>
@@ -131,10 +131,10 @@ export default {
                 plan_name: "",
                 process_name: "",
 
-                start_date_from: "",
-                start_date_to: "",
-                end_date_from: "",
-                end_date_to: "",
+                work_start_date_from: "",
+                work_start_date_to: "",
+                work_end_date_from: "",
+                work_end_date_to: "",
             },
 
             processList: [
@@ -145,6 +145,7 @@ export default {
                 domLayout: "autoHeight",            // 행을 보고 자동으로 hight부여
                 singleClickEdit: true,              // 한번 클릭 했을 때 수정
                 suppressRowClickSelection: true,    // 행 클릭할 때 체크박스 선택 방지
+                paginationPageSize: 5,             // 페이지당 갯수
                 defaultColDef: {
                     suppressMovable: true,          // 셀 이동 금지
                     resizable: false,               // 열 크기 조정 가능
@@ -202,6 +203,41 @@ export default {
                     });
                 };
 
+                this.processList = [...this.processList];
+            }).catch((err) => {
+                console.error(err);
+                Swal.fire({
+                    title: '실패',
+                    text: '실적을 조회하던 중 오류가 발생했습니다.',
+                    icon: 'error',
+                    confirmButtonText: '확인'
+                });
+            });
+        },
+        async searchProcessData() {
+            await axios.get(`/api/work/process/data`, {
+                params: {
+                    searchKeywords: this.formData,
+                }
+            }).then(res => {
+                const processDataList = res.data;
+                this.processList = [];
+                for(let data of processDataList) {
+                    let process_pct = Number(data.order_quantity) > 0 ? Number((Number(data.error_quantity) + Number(data.created_quantity)) / Number(data.order_quantity) * 100) : 0;
+                    this.processList.push({
+                        product_order_code: data.product_order_code,
+                        product_order_name: data.product_order_name,
+                        process_name: data.process_name,
+                        process_start_date: data.process_start_date,
+                        process_end_date: data.process_end_date,
+                        prod_name: data.prod_name,
+                        order_quantity: data.order_quantity,
+                        input_quantity: data.input_quantity,
+                        error_quantity: data.error_quantity,
+                        created_quantity: data.created_quantity,
+                        process_progress: process_pct,
+                    });
+                };
                 this.processList = [...this.processList];
             }).catch((err) => {
                 console.error(err);

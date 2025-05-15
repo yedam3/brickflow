@@ -62,14 +62,14 @@ export default {
             required: false,
         }
     },
-    
+
     watch: {
         visible(newVal) {
             if (newVal) {
                 this.matStockList();
             }
         },
-        rowData : {
+        rowData: {
             handler(newVal) {
 
             },
@@ -131,8 +131,9 @@ export default {
             }).catch(error => { console.error(error) });
 
             let matList = result.data;
-            for(let data of matList) {
+            for (let data of matList) {
                 this.rowData.push({
+                    prod_code: this.prod_code,
                     mat_LOT: data.mat_LOT,
                     mat_code: data.mat_code,
                     mat_name: data.mat_name,
@@ -142,26 +143,7 @@ export default {
                 });
             }
 
-            this.original_rowData = [...this.rowData];
-                
-            for(let temp of this.mat_temp_data) {
-                let matchIndex = this.rowData.findIndex(item => {
-                    return item.mat_code == temp.mat_code && item.mat_LOT == temp.mat_LOT
-                });
-                if(matchIndex !== -1) {
-                    this.rowData[matchIndex].available_qty = parseInt(this.rowData[matchIndex].available_qty) - parseInt(temp.hold_quantity);
-                }
-            }
-
-            let temp2 = [];
-            for(let data of this.rowData) {
-                if(data.available_qty >= 0) {
-                    temp2.push(data);
-                }
-            }
-            this.rowData = [...temp2];
-
-            this.setMatHoldData(); 
+            this.setMatHoldData();
         },
 
         updateAvailableQty(row) {
@@ -181,7 +163,7 @@ export default {
                 row.mat_hold_qty = holdQty;
                 remainingQty -= holdQty;
             }
-            
+
             this.rowData = [...this.rowData];
         },
 
@@ -189,9 +171,9 @@ export default {
         matSecure() {
             this.mat_data = [];
             let totalQty = 0;
-            for(let row of this.rowData) {
+            for (let row of this.rowData) {
                 totalQty += parseInt(row.mat_hold_qty);
-                if(row.mat_hold_qty != '' && parseInt(row.mat_hold_qty) > 0) {
+                if (row.mat_hold_qty != '' && parseInt(row.mat_hold_qty) > 0) {
                     if (parseInt(row.available_qty) < parseInt(row.mat_hold_qty)) {
                         Swal.fire({
                             title: '실패',
@@ -209,7 +191,7 @@ export default {
                     });
                 }
             }
-            if(this.mat_req_qty > totalQty) {
+            if (this.mat_req_qty > totalQty) {
                 Swal.fire({
                     title: '실패',
                     text: '자재 최소 요구량이 충족하지 않습니다.',
@@ -224,7 +206,7 @@ export default {
 
         // 그리드 행 클릭 메소드
         onRowClicked() {
-        
+
         },
 
         // 자재 홀드량 반영
@@ -240,10 +222,11 @@ export default {
                     return row;
                 });
             }
+
             if (this.mat_temp_data && this.mat_temp_data.length > 0) {
                 this.rowData = this.rowData.map(row => {
                     const match = this.mat_temp_data.find(item => {
-                        return (item.mat_LOT.toLowerCase() == row.mat_LOT.toLowerCase() && item.mat_code.toLowerCase() == row.mat_code.toLowerCase())
+                        return (item.prod_code.toLowerCase() == row.prod_code.toLowerCase() && item.mat_LOT.toLowerCase() == row.mat_LOT.toLowerCase() && item.mat_code.toLowerCase() == row.mat_code.toLowerCase())
                     });
                     if (match) {
                         return { ...row, mat_hold_qty: match.hold_quantity };
@@ -251,6 +234,40 @@ export default {
                     return row;
                 });
             }
+
+            this.original_rowData = [...this.rowData];
+
+            for (let temp of this.mat_temp_data) {
+                let matchIndex = this.rowData.findIndex(item => {
+                    return item.mat_code == temp.mat_code && item.mat_LOT == temp.mat_LOT
+                });
+                if (matchIndex !== -1) {
+                    this.rowData[matchIndex].available_qty = parseInt(this.rowData[matchIndex].available_qty) - parseInt(temp.hold_quantity);
+                }
+            }
+            let temp2 = [];
+
+            for (let data of this.rowData) {
+                let isMatchingLOT = false;
+
+                if (this.mat_temp_data && this.mat_temp_data.length > 0) {
+                    for (let data2 of this.mat_temp_data) {
+                        if (data.mat_LOT === data2.mat_LOT) {
+                            if (data.prod_code === data2.prod_code) {
+                                temp2.push(data);
+                                isMatchingLOT = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (!isMatchingLOT && data.available_qty > 0) {
+                    temp2.push(data);
+                }
+            }
+
+            this.rowData = [...temp2];
         }
     },
 };

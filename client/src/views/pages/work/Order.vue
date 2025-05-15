@@ -2,6 +2,8 @@
     <div class="card border-0" style="height: 800px">
         <div class="font-semibold text-xl mb-2">생산 지시 관리</div>
 
+        <h3>지시 등록 / 수정 / 삭제</h3>
+
         <div class="text-end mt-3 mb-3">
             <Button label="계획목록" severity="success" class="me-3" @click="planList" />
             <Button label="지시목록" severity="info" class="me-3" @click="planOrderList" />
@@ -472,13 +474,11 @@ export default {
                 totalQty += parseInt(mat.mat_hold_qty);
                 this.secondRowData[this.selectedSecondIndex].mat_LOTs.push({
                     mat_code: mat.mat_code,
-                    mat_LOT: mat.mat_LOT,
                     mat_hold_qty: mat.mat_hold_qty,
                 });
                 temp.push({
                     prod_code: this.secondRowData[this.selectedSecondIndex].prod_code,
                     mat_code: mat.mat_code,
-                    mat_LOT: mat.mat_LOT,
                     hold_quantity: mat.mat_hold_qty,
                 });
             };
