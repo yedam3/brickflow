@@ -1,69 +1,67 @@
 <template>
   <div class="card border-0 h-100">
-    <div class="font-semibold text-xl mb-4">공정흐름도 관리</div>
-    <div class="d-flex justify-content-start me-5">
+    <div class="flex items-center justify-between mb-4">
+      <div class="text-2xl font-bold">공정흐름도 관리</div>
+      <div>
+        <Button label="초기화" severity="help" class="me-3" @click="resetList"/>
+        <Button label="저장" severity="info" class="me-3" @click="proSave"/>
+      </div>
     </div>
 
-    <div class="text-end mt-3" style="padding-right: 4%;">
-      <Button label="초기화" severity="help" class="me-3" @click="resetList"/>
-      <Button label="저장" severity="info" class="me-3" @click="proSave"/>
-    </div>
-
-    <div class="row mt-3">
-      <div class="col-6">
-        <h5>제품목록</h5>
+    <div class="grid grid-cols-2 gap-6 ">
+      <div>
+        <h5 class="mb-2">제품목록</h5>
         <ag-grid-vue
-          class="ag-theme-alpine"
+          class="ag-theme-alpine w-full"
           :columnDefs="columnDefs"
           :rowData="rowData"
           :gridOptions="gridOptions1"
           :defaultColDef="defaultColDef"
+          
           @cellClicked="prodCellClicked">
         </ag-grid-vue>
       </div>
-      <div class="col-6">
-        <h5>공정흐름도</h5>
-        <div class="flow-container">
+      <div>
+        <h5 class="mb-2">공정흐름도</h5>
+        <div class="flow-container border rounded-lg p-2 bg-gray-50">
           <VueFlow
             :nodes="nodes"
             :edges="edges"
-            class="my-diagram-class"
-            :fit-view="true"
-          >
+            class="h-80"
+            :fit-view="true">
           </VueFlow>
         </div>
       </div>
     </div>
-    <div class="row mt-1">
-      <div class="col-6">
-        <div class="text-end mt-1 mb-3" style="padding-right: 4%;">
-          <Button label="행추가" severity="success" class="me-3" @click="addRow"/>
-          <Button label="행삭제" severity="danger" class="me-3" @click="deleteRow"/>  
-        </div>
-        <h5>상세공정조회</h5>
-        <ag-grid-vue 
-          ref="secondGrid"
-          class="ag-theme-alpine"
-          :columnDefs="columnDefs2"
-          :rowData="rowData2"
-          :gridOptions="gridOptions2"
-          rowSelection="multiple"
-          :defaultColDef="defaultColDef"
-          @cellClicked="procCellClicked"
-          @rowDragEnd="onRowDragEnd">
-        </ag-grid-vue>
-      </div>
-    </div>
-  </div>
-  <!-- 공정코드 모달창-->
-  <ProcModal
-    :visible="showProcModal"
-    rowSelection="multiple"
-    @close="showProcModal = false"
-    @selectProc="procSelected"
-  ></ProcModal>
-</template>
 
+    <div class="bg-white p-4 rounded-lg ">
+      <div class="flex justify-between items-center mb-2">
+        <h5>상세공정조회</h5>
+        <div>
+          <Button label="행추가" severity="success" class="me-3" @click="addRow"/>
+          <Button label="행삭제" severity="danger" class="me-3" @click="deleteRow"/>
+        </div>
+      </div>
+      <ag-grid-vue 
+        ref="secondGrid"
+        class="ag-theme-alpine w-full"
+        :columnDefs="columnDefs2"
+        :rowData="rowData2"
+        :gridOptions="gridOptions2"
+        rowSelection="multiple"
+        :defaultColDef="defaultColDef"
+        @cellClicked="procCellClicked"
+        @rowDragEnd="onRowDragEnd">
+      </ag-grid-vue>
+    </div>
+
+    <ProcModal
+      :visible="showProcModal"
+      rowSelection="multiple"
+      @close="showProcModal = false"
+      @selectProc="procSelected" />
+  </div>
+</template>
 <script>
 import { AgGridVue } from 'ag-grid-vue3';
 import axios from 'axios';
@@ -106,8 +104,9 @@ export default {
       gridOptions1: {
         domLayout: "autoHeight", //행을 보고 자동으로 hight부여
         pagination: true,
-        paginationPageSize: 5,
-        paginationPageSizeSelector: [5, 10, 20, 50],
+        paginationPageSize: 7,
+        paginationPageSizeSelector: false,
+        
         overlayNoRowsTemplate: '표시할 값이 없습니다.',
         defaultColDef: {
           suppressMovable: true, //컬럼 드래그로 순서바꾸기 못하게
@@ -321,6 +320,7 @@ export default {
           color: 'white',
           border: '1px solid #DA942B',
           borderRadius: '30px',
+          boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
           width: '150px',
           height: '40px',
         },
@@ -358,30 +358,77 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 /* Vue Flow CSS 임포트 */
 @import 'https://cdn.jsdelivr.net/npm/@vue-flow/core@1.43.1/dist/style.css';
 @import 'https://cdn.jsdelivr.net/npm/@vue-flow/core@1.43.1/dist/theme-default.css';
 @import 'https://cdn.jsdelivr.net/npm/@vue-flow/controls@latest/dist/style.css';
 @import 'https://cdn.jsdelivr.net/npm/@vue-flow/minimap@latest/dist/style.css';
 
+.card {
+  background-color: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+h5 {
+  font-weight: bold;
+  color: #444;
+}
+
+.text-end .p-button {
+  min-width: 90px;
+}
+
+.ag-theme-alpine {
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e0e0e0;
+}
+
 .ag-theme-alpine .ag-header {
-  background-color: #FF9900; 
+  background-color: #DA942B; 
   color: white;
+  font-weight: bold;
+  height: 40px;
+  line-height: 40px;
+}
+
+.ag-theme-alpine .ag-cell {
+  display: flex;
+  align-items: center;
+  padding-left: 8px;
 }
 
 .flow-container {
   height: 400px;
-  border: 1px solid #ccc;
+  border-radius: 12px;
+  border: 1px solid #e0e0e0;
+  background-color: #f8f8f8;
+  padding: 8px;
+  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.05);
 }
 
 .my-diagram-class {
   height: 100%;
+  border-radius: 12px;
 }
+
 .my-diagram-class .vue-flow__controls .vue-flow__controls-button {
   border: none;
   border-right: 1px solid #eee;
+  background-color: white;
 }
+
+.vue-flow__node {
+  transition: transform 0.2s ease;
+}
+.vue-flow__node:hover {
+  transform: scale(1.05);
+}
+
+
 
 
 
