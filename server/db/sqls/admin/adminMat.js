@@ -1,7 +1,7 @@
 //mat.js
 //mat_code 자동증가
-const autoMatCode =
-`SELECT CONCAT('mat-',IFNULL(MAX(CAST(SUBSTR(mat_code,5) AS SIGNED)),100)+1) AS mat_code
+const autoCountMatCode =
+`SELECT CONCAT('MAT-',IFNULL(MAX(CAST(SUBSTR(mat_code,5) AS SIGNED)),100)+1) AS mat_code
 FROM mat`
 
 //조회
@@ -41,7 +41,7 @@ DELETE FROM mat
 WHERE mat_code = ?`
 
 module.exports ={
-  autoMatCode,
+  autoCountMatCode,
   addMat,
   selectMat,
   updateMat,
