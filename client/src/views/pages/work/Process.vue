@@ -182,7 +182,7 @@ export default {
                 { field: "fac_code", headerName: "설비코드", flex: 2, cellStyle: { textAlign: "center" } },
                 { field: "model_name", headerName: "설비명", flex: 2, cellStyle: { textAlign: "center" } },
                 { 
-                    field: "fac_status", headerName: "설비상태", flex: 2,
+                    field: "fac_status", headerName: "설비상태", flex: 2, cellStyle: { textAlign: "center", color: "white"},
                     valueFormatter: params => {
                         if(params.value === 'FS1') {
                             return '사용가능';
@@ -190,11 +190,11 @@ export default {
                             return '사용불가';
                         }
                     },
-                    cellStyle: params => {
+                    cellRenderer: params => {
                         if(params.value === 'FS1') {
-                            return { textAlign: 'center', fontWeight: 'bold', color: '#28a745' };
+                            return `<span class="badge text-bg-success">사용가능</span>`;
                         } else if(params.value == 'FS2') {
-                            return { textAlign: 'center', fontWeight: 'bold', color: '#007bff' };
+                            return `<span class="badge text-bg-danger">사용불가</span>`;
                         }
                     }
                 },

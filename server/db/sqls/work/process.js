@@ -251,7 +251,7 @@ WHERE NOT EXISTS (
 
 // 실적 목록 조회
 const findAllProcess = `
-SELECT wp.product_order_detail_code, po.product_order_name, proc.process_name, prod.prod_name, wp.order_quantity,
+SELECT po.product_order_code, wp.product_order_detail_code, po.product_order_name, proc.process_name, prod.prod_name, wp.order_quantity,
     IFNULL(SUM(wd.input_quantity), 0) AS input_quantity,
     IFNULL(SUM(wd.error_quantity), 0) AS error_quantity,
     IFNULL(SUM(wd.created_quantity), 0) AS created_quantity,
