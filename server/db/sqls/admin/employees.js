@@ -1,6 +1,6 @@
 // emp_code 자동 생성
 const autoEmpCode = 
-`SELECT CONCAT('emp-',IFNULL(MAX(CAST(SUBSTR(emp_code,5) AS SIGNED)),100)+1) AS emp_code
+`SELECT CONCAT('EMP-',IFNULL(MAX(CAST(SUBSTR(emp_code,5) AS SIGNED)),100)+1) AS emp_code
 FROM employees`;
 
 //사원 목록 조회

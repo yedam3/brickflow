@@ -10,7 +10,7 @@
    <div class="row">
    <div class="com-grid col">
     <h5>업체목록</h5>
-     <ag-grid-vue style="width: 700px; height: 500px;"
+     <ag-grid-vue style="width: 860px; height: 500px;"
        class="ag-theme-alpine"
        :columnDefs="columnDefs"
        :rowData="rowData"
@@ -89,12 +89,12 @@ export default{
        }
      ],
      columnDefs: [
-       { field: 'company_code', headerName: '업체코드',flex:1},
-       { field: 'company_name', headerName: '업체명' ,flex:1},
-       { field: 'address', headerName: '위치' ,flex:1,},
-       { field: 'tel', headerName: '연락처' ,flex:1},
-       { field: 'emp_code', headerName: '담당자' ,flex:1,},
-       { field: 'company_type', headerName: '업체타입' ,flex:1,
+       { field: 'company_code', headerName: '업체코드',flex:3},
+       { field: 'company_name', headerName: '업체명' ,flex:3},
+       { field: 'address', headerName: '위치' ,flex:6,},
+       { field: 'tel', headerName: '연락처' ,flex:3},
+       { field: 'emp_code', headerName: '담당자' ,flex:2,},
+       { field: 'company_type', headerName: '업체타입' ,flex:2,
        valueFormatter: (params) => {
                 if (params.value == 'CT1') {
                     return params.value = '입고업체';
@@ -181,34 +181,25 @@ export default{
 
   //값체크 validation
   checkValue(){
-      if(this.info.emp_name == '' || this.info.company_code == '' || this.info.company_name == '' || this.info.address == '' || this.info.tel || this.info.emp_code || this.info.company_type) {
+      if(this.info.company_name == '' || this.info.address == '' || this.info.tel == ''|| this.info.emp_code == '' || this.info.company_type == '') {
           Swal.fire({
            title: '실패',
            text: '값을 다 입력해주세요',
            icon: 'error',
            confirmButtonText: '확인'
          });
-         return ;
+         return;
         }
     },
 
   //등록
   async comSave(){
     console.log(this.info)
-   //값체크 validation
-   let validation = this.checkValue();
+    let validation = this.checkValue();
     if(validation==1){
       return;
     }
-    if(this.info.company_code != ''){
-      Swal.fire({
-            title: '등록 불가',
-            text: '이미 업체가 등록된 건입니다.',
-            icon: 'error',
-            confirmButtonText: '확인'
-          });
-          return;
-    }
+
     
     console.log(this.rowData[this.prodIndex])
 
@@ -262,7 +253,7 @@ export default{
     if(this.info.emp_code == ''){
       Swal.fire({
             title: '수정 불가',
-            text: '사원번호가 필요합니다.',
+            text: '업체코드가 필요합니다.',
             icon: 'error',
             confirmButtonText: '확인'
           });
@@ -270,7 +261,7 @@ export default{
     }
 
       //수정시작
-      await axios.put('/api/admin/comUpdate',this.info,)
+      await axios.put('/api/admin/comUpdate',this.info)
      .then(res => {
         if(res.data.affectedRows >0) {
           Swal.fire({
@@ -320,15 +311,15 @@ export default{
   },
   //삭제
   async comDelete(){
-    // if(this.info.company_code == ''){
-    //   Swal.fire({
-    //         title: '삭제 실패',
-    //         text: '삭제할 업체를 선택해주세요.',
-    //         icon: 'error',
-    //         confirmButtonText: '확인'
-    //       });
-    //       return;
-    // }
+    if(this.info.company_code == ''){
+      Swal.fire({
+            title: '삭제 실패',
+            text: '삭제코드가 필요합니다.',
+            icon: 'error',
+            confirmButtonText: '확인'
+          });
+          return;
+    }
     await axios.delete('/api/admin/comDelete/'+ this.info.company_code)
     .then(res => {
         if(res.data.affectedRows >0) {
