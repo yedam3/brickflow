@@ -41,6 +41,8 @@ const empUpdate = `UPDATE employees
 //삭제
 const empDel = `DELETE FROM employees
                     WHERE emp_code=?`
+
+
 module.exports 
 = {
   autoEmpCode,

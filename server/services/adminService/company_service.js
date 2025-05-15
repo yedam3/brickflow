@@ -27,6 +27,7 @@ const comInfo = async(comno) => {
 
 //업체등록
 const comSave = async(comInfo) => {
+  console.log('등록이왜중복?'+comInfo);
   let resList = await mariaDB.query('autoComCode')
                              .catch((err) => console.log(err));
   let result = await mariaDB.query('comSave',[resList[0].company_code, comInfo.company_name, comInfo.address, comInfo.tel, comInfo.emp_code, comInfo.company_type ])
@@ -44,8 +45,9 @@ const comUpdate = async(comInfo) => {
 }
 
 //삭제
-const comDelete = async(emp_code) => {
-  let result = await mariaDB.query('empDel',emp_code)
+const comDelete = async(comCode) => {
+  console.log('삭제왜안돼ㅠ',comCode);
+  let result = await mariaDB.query('comDelete',comCode)
                             .catch((err) => console.log(err));
   return result;
 }

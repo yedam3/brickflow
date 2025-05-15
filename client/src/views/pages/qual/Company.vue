@@ -209,6 +209,7 @@ export default{
           });
           return;
     }
+    
     console.log(this.rowData[this.prodIndex])
 
        //등록시작
@@ -319,16 +320,16 @@ export default{
   },
   //삭제
   async comDelete(){
-    if(this.info.emp_code == ''){
-      Swal.fire({
-            title: '삭제 실패',
-            text: '사원번호가 필요합니다.',
-            icon: 'error',
-            confirmButtonText: '확인'
-          });
-          return;
-    }
-    await axios.delete('/api/admin/comDelete/'+ this.info.com_code)
+    // if(this.info.company_code == ''){
+    //   Swal.fire({
+    //         title: '삭제 실패',
+    //         text: '삭제할 업체를 선택해주세요.',
+    //         icon: 'error',
+    //         confirmButtonText: '확인'
+    //       });
+    //       return;
+    // }
+    await axios.delete('/api/admin/comDelete/'+ this.info.company_code)
     .then(res => {
         if(res.data.affectedRows >0) {
           Swal.fire({
@@ -375,6 +376,10 @@ export default{
                       emp_code: "",
                       company_type: "",
     }]
+  },
+  //초기화
+  comReset() {
+    this.info = [];
   }
   }
 
