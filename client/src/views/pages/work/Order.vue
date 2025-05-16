@@ -1,6 +1,6 @@
 <template>
     <div class="card border-0" style="height: calc(55vh - 5.5rem)">
-        <h2>생산 지시 관리</h2>
+        <h3>생산 지시 관리</h3>
         <div class="heading-with-line">
             <h5 class="m-0 me-3">등록 | 수정 | 삭제</h5>
         </div>

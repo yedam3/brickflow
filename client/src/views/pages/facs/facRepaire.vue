@@ -1,7 +1,7 @@
 <template>
   <div class="card border-0" style="height: calc(50vh - 5rem)">
   
-    <h2>설비 관리</h2>
+    <h3>설비 관리</h3>
 
     <div class="heading-with-line">
       <h5 class="m-0 me-3">설비 목록</h5>

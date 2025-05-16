@@ -1,6 +1,6 @@
 <template>
     <div class="card border-0" style="height: calc(50vh - 5rem)">
-        <h2>공정 관리</h2>
+        <h3>공정 관리</h3>
         <div class="heading-with-line mb-3">
             <h5 class="m-0 me-3">생산 실적 조회</h5>
         </div>

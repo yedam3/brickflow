@@ -1,6 +1,6 @@
 <template>
   <div class="card border-0" style="height: calc(50vh - 5rem)">
-    <h2>영업 관리</h2>
+    <h3>영업 관리</h3>
 
     <!-- 주문관리-->
     <div class="heading-with-line">
