@@ -114,7 +114,7 @@ WHERE fac_code = ?`
 //비가동수정
 const updateUnplay=
 `UPDATE fac_none_play
-SET unplay_end_date = SYSDATE(), fac_status = ?
+SET ?
 WHERE fac_code = ?`
 
 //수리

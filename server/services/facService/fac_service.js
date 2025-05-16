@@ -124,10 +124,7 @@ const updateFac = async (facInfo) => {
 //비가동 설비 수정
 const modifyUnplay = async (unplayInfo)=> {
   let updateUnplay = [unplayInfo, unplayInfo.unplay_code]
-  let result = await mariaDB.query('updateUnplay', updateUnplay).catch((err)=> console.log(err))
-  if(result.affectedRows < 1){
-    return result;
-  }
+  let result = await mariaDB.query('updateUnplay', updateUnplay).catch((err)=> console.log(err));
   return result;
 }
 //수리 처리

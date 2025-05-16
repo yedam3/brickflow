@@ -310,7 +310,7 @@ export default {
                 unplayFac: this.rowData
             })
                 .then(async res => {
-                    if (res.data.affectedRows > 0) {
+                    if (res && res.data && res.data.affectedRows > 0) {
                         Swal.fire({
                             title: '수정 완료',
                             text: '수정이 완료되었습니다.',
