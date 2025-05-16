@@ -1,8 +1,11 @@
 <template>
-    <div class="card border-0" style="height: 800px">
-      <div class="font-semibold text-xl mb-4">공정검사</div>
-  
-      <h4 class="text-start">공정검사대기항목</h4>
+    <div class="card border-0" style="height: calc(100vh - 8rem)">
+      <h2>공정검사</h2>
+
+      <div class="heading-with-line mb-3">
+        <h5 class="m-0 me-3">공정검사대기항목</h5>
+      </div>
+      
       <div class="text-end mt-3 mb-3">
         <Button label="조회" severity="success" class="me-3" />
         <Button label="등록" severity="info" class="me-3" @click="addTest"/>

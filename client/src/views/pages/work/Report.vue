@@ -29,17 +29,13 @@
                 </div>
             </div>
         </div>
-        <ag-grid-vue class="ag-theme-alpine custom-grid-theme" 
-                     style="width: 95%" 
-                    :columnDefs="columnDefs"
-                    :rowData="rowData" 
-                     @cellValueChanged ="inputRender"
-                    :gridOptions="gridOptions">
+        <ag-grid-vue class="ag-theme-alpine custom-grid-theme" style="width: 95%" :columnDefs="columnDefs"
+            :rowData="rowData" @cellValueChanged="inputRender" :gridOptions="gridOptions">
         </ag-grid-vue>
     </div>
-    
-        <LabelModal :visible="showModal" :datable="modalData" rowSelection="multiple" @close="showModal = false">
-        </LabelModal>
+
+    <LabelModal :visible="showModal" :datable="modalData" rowSelection="multiple" @close="showModal = false">
+    </LabelModal>
 
 </template>
 <script>

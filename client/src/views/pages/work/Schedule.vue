@@ -1,5 +1,5 @@
 <template>
-    <div class="card border-0" style="height: calc(100vh - 8rem)">
+    <div class="card border-0" style="height: calc(55vh - 5.5rem);">
         <h2>생산 계획 관리</h2>
         <div class="heading-with-line">
             <h5 class="m-0 me-3">등록 | 수정 | 삭제</h5>
@@ -12,86 +12,83 @@
             <Button label="수정" severity="danger" class="me-3" @click="updatePlan" />
             <Button label="삭제" severity="danger" class="" @click="deletePlan" />
         </div>
-        <div class="mb-3">
-            <Card style="overflow: hidden; background-color: ;">
-                <template #content>
-                    <div class="mb-4 row">
-                        <div class="col-4">
-                            <InputGroup>
-                                <InputGroupAddon>
-                                    계획코드
-                                </InputGroupAddon>
-                                <InputText v-model="formData.plan_code" size="large" placeholder="" readonly />
-                            </InputGroup>
-                        </div>
-                        <div class="col-4">
-                            <InputGroup>
-                                <InputGroupAddon>
-                                    주문번호
-                                </InputGroupAddon>
-                                <InputText v-model="formData.orders_code" size="large" placeholder="" readonly />
-                            </InputGroup>
-                        </div>
-                        <div class="col-4">
-                            <InputGroup>
-                                <InputGroupAddon>
-                                    주문명
-                                </InputGroupAddon>
-                                <InputText v-model="formData.order_name" size="large" placeholder="" readonly />
-                            </InputGroup>
-                        </div>
-                       
-                    </div>
-                    <div class="mb-4 row">
-                        <div class="col-4">
-                            <InputGroup>
-                                <InputGroupAddon>
-                                    계획명
-                                </InputGroupAddon>
-                                <InputText v-model="formData.plan_name" size="large" placeholder="(입력)" />
-                            </InputGroup>
-                        </div>
-                        <div class="col-4">
-                            <InputGroup>
-                                <InputGroupAddon>
-                                    담당자
-                                </InputGroupAddon>
-                                <InputText v-model="formData.emp_name" size="large" placeholder="" />
-                            </InputGroup>
-                        </div>
-                    </div>
-                    <div class="mb-4 row">
-                        <div class="col-4">
-                            <InputGroup>
-                                <InputGroupAddon>
-                                    시작일자
-                                </InputGroupAddon>
-                                <DatePicker v-model="formData.start_date" size="large" dateFormat="yy/mm/dd"
-                                    placeholder="(입력)" showIcon iconDisplay="input" />
-                            </InputGroup>
-                        </div>
-                        <div class="col-4">
-                            <InputGroup>
-                                <InputGroupAddon>
-                                    종료일자
-                                </InputGroupAddon>
-                                <DatePicker v-model="formData.end_date" size="large" dateFormat="yy/mm/dd"
-                                    placeholder="(입력)" showIcon iconDisplay="input" />
-                            </InputGroup>
-                        </div>
-                        <div class="col-4">
-                            <InputGroup>
-                                <InputGroupAddon>
-                                    비고
-                                </InputGroupAddon>
-                                <InputText v-model="formData.note" size="large" placeholder="" />
-                            </InputGroup>
-                        </div>
-                    </div>
-                    <Button label="초기화" severity="danger" class="me-5" @click="clearForm" />
-                </template>
-            </Card>
+
+        <div class="mb-4 row">
+            <div class="col-4">
+                <InputGroup>
+                    <InputGroupAddon>
+                        계획코드
+                    </InputGroupAddon>
+                    <InputText v-model="formData.plan_code" size="large" placeholder="" readonly />
+                </InputGroup>
+            </div>
+            <div class="col-4">
+                <InputGroup>
+                    <InputGroupAddon>
+                        주문번호
+                    </InputGroupAddon>
+                    <InputText v-model="formData.orders_code" size="large" placeholder="" readonly />
+                </InputGroup>
+            </div>
+            <div class="col-4">
+                <InputGroup>
+                    <InputGroupAddon>
+                        주문명
+                    </InputGroupAddon>
+                    <InputText v-model="formData.order_name" size="large" placeholder="" readonly />
+                </InputGroup>
+            </div>
+
         </div>
+        <div class="mb-4 row">
+            <div class="col-4">
+                <InputGroup>
+                    <InputGroupAddon>
+                        계획명
+                    </InputGroupAddon>
+                    <InputText v-model="formData.plan_name" size="large" placeholder="(입력)" />
+                </InputGroup>
+            </div>
+            <div class="col-4">
+                <InputGroup>
+                    <InputGroupAddon>
+                        담당자
+                    </InputGroupAddon>
+                    <InputText v-model="formData.emp_name" size="large" placeholder="" />
+                </InputGroup>
+            </div>
+        </div>
+        <div class="mb-4 row">
+            <div class="col-4">
+                <InputGroup>
+                    <InputGroupAddon>
+                        시작일자
+                    </InputGroupAddon>
+                    <DatePicker v-model="formData.start_date" size="large" dateFormat="yy/mm/dd" placeholder="(입력)"
+                        showIcon iconDisplay="input" />
+                </InputGroup>
+            </div>
+            <div class="col-4">
+                <InputGroup>
+                    <InputGroupAddon>
+                        종료일자
+                    </InputGroupAddon>
+                    <DatePicker v-model="formData.end_date" size="large" dateFormat="yy/mm/dd" placeholder="(입력)"
+                        showIcon iconDisplay="input" />
+                </InputGroup>
+            </div>
+            <div class="col-4">
+                <InputGroup>
+                    <InputGroupAddon>
+                        비고
+                    </InputGroupAddon>
+                    <InputText v-model="formData.note" size="large" placeholder="" />
+                </InputGroup>
+            </div>
+        </div>
+        <Button label="초기화" severity="danger" class="me-5" @click="clearForm" />
+    </div>
+    <div class="card border-0" style="height: calc(45vh - 4.5rem);">
         <div class="text-end mt-3 mb-3">
             <Button label="행추가" severity="success" class="me-3" @click="addRow" />
             <Button label="행삭제" severity="danger" class="me-5" @click="deleteRow" />
@@ -99,7 +96,7 @@
         <!-- 메인그리드 -->
         <div class="ag-wrapper d-flex justify-content-center" style="border: none;">
             <ag-grid-vue ref="mainGrid" class="ag-theme-alpine custom-grid-theme" style="width: 100%; border: none;"
-                :columnDefs="columnDefs" :rowData="rowData" :gridOptions="gridOptions"  @cellClicked="prodCellClicked">
+                :columnDefs="columnDefs" :rowData="rowData" :gridOptions="gridOptions" @cellClicked="prodCellClicked">
             </ag-grid-vue>
         </div>
     </div>

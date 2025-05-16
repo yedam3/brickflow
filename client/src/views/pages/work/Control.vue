@@ -25,14 +25,15 @@
                     <td>{{ this.processInfo.unprocessed_quantity }}</td>
                 </tr>
             </tbody>
-
+        </table>
+        <table class="table table-bordered text-center">
             <thead class="table-warning">
                 <tr>
                     <th>투입량</th>
                     <th>불량량</th>
                     <th>생산량</th>
                     <th colspan="2">작업시작일시</th>
-                    <th>작업종료일시</th>
+                    <th colspan="2">작업종료일시</th>
                 </tr>
             </thead>
             <tbody>

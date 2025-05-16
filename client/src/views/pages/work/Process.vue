@@ -1,5 +1,5 @@
 <template>
-    <div class="card border-0" style="height: calc(100vh - 8rem)">
+    <div class="card border-0" style="height: calc(60vh - 6rem)">
         <h2>공정 진행 관리</h2>
         <div class="heading-with-line mb-2">
             <h5 class="m-0 me-3">공정 진행</h5>
@@ -41,32 +41,34 @@
             </div>
         </div>
 
-        <div class="row">
-            <!-- 사원 목록 그리드 -->
-            <div class="col-6">
-                <h4 class="text-start">작업자</h4>
-                <div class="ag-wrapper justify-content-center" style="border: none;">
-                    <ag-grid-vue class="ag-theme-alpine custom-grid-theme" :columnDefs="employeeColDefs" :rowData="empDataList"
-                        :gridOptions="empGridOptions" @rowClicked="empRowClicked">
-                    </ag-grid-vue>
-                </div>
-            </div>
-            
-            <!-- 설비 목록 그리드 -->
-            <div class="col-6">
-                <h4 class="text-start">설비</h4>
-                <div class="ag-wrapper justify-content-center" style="border: none;">
-                    <ag-grid-vue class="ag-theme-alpine custom-grid-theme" :columnDefs="facColDefs" :rowData="facDataList"
-                        :gridOptions="facGridOptions" @rowClicked="facRowClicked">
-                    </ag-grid-vue>
-                </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="card border-0" style="height: calc(40vh - 4rem)">
+                <!-- 사원 목록 그리드 -->
+                    <h4 class="text-start">작업자</h4>
+                    <div class="ag-wrapper justify-content-center" style="border: none;">
+                        <ag-grid-vue class="ag-theme-alpine custom-grid-theme" :columnDefs="employeeColDefs" :rowData="empDataList"
+                            :gridOptions="empGridOptions" @rowClicked="empRowClicked">
+                        </ag-grid-vue>
+                    </div>
             </div>
         </div>
-        <div class="d-flex justify-content-center mt-3">
-            <Button label="공정 시작" severity="info" class="" size="large" style="width: 20rem; height: 3.5rem;" @click="startProcess"/>
+        <div class="col">
+            <div class="card border-0" style="height: calc(40vh - 4rem)">
+                <!-- 설비 목록 그리드 -->
+                    <h4 class="text-start">설비</h4>
+                    <div class="ag-wrapper justify-content-center" style="border: none;">
+                        <ag-grid-vue class="ag-theme-alpine custom-grid-theme" :columnDefs="facColDefs" :rowData="facDataList"
+                            :gridOptions="facGridOptions" @rowClicked="facRowClicked">
+                        </ag-grid-vue>
+                    </div>
+            </div>
         </div>
     </div>
-
+    <div class="d-flex justify-content-center">
+        <Button label="공정 시작" severity="info" class="" size="large" style="width: 20rem; height: 3.5rem;" @click="startProcess"/>
+    </div>
 </template>
 
 <script>

@@ -10,7 +10,7 @@
 }
 
 :root .p-card {
-  background-color: #FFF8E1 !important;
+  background-color: #FFF3E0 !important;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
@@ -114,6 +114,21 @@
   background-position: right 8px center;
   padding-right: 40px;
 }
+:root[class='app-dark'] .form-control{
+    color: #E0E0E0;
+  background-color: #2C3E50 !important;
+}
+:root[class='app-dark'] .form-label{
+    color: #E0E0E0;
+}
+:root[class='app-dark'] .form-label > .small{
+    color: #E0E0E0;
+}
+/* :root[class='app-dark'] .p-button {
+    color: #E0E0E0;
+} */
+
+
 .heading-with-line {
   display: flex;
   align-items: center;
