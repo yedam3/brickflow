@@ -114,4 +114,20 @@
   background-position: right 8px center;
   padding-right: 40px;
 }
+.heading-with-line {
+  display: flex;
+  align-items: center;
+}
+
+.heading-with-line h3 {
+  margin-bottom: 0;
+  margin-right: 1rem;
+}
+
+.heading-with-line::after {
+  content: "";
+  flex-grow: 1;
+  height: 1px;
+  background-color: #dee2e6; /* Bootstrap의 border 색상 */
+}
 </style>

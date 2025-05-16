@@ -1,5 +1,11 @@
 <template>
-  <div class="ag-theme-alpine p-4" style="background-color: white; min-height: 800px;">
+  <div class="card border-0" style="height: calc(50vh - 5rem)">
+    <h2>설비 관리</h2>
+
+    <div class="heading-with-line mb-3">
+      <h5 class="m-0 me-3">비가동 설비 목록</h5>
+    </div>
+
     <div class="d-flex justify-content-start mb-3">
       <div class="input-group" style="width: 65%;">
         <select v-model="searchType" class="form-select">
@@ -14,6 +20,7 @@
         </button>
       </div>
     </div>
+    
     <ag-grid-vue
       class="ag-theme-alpine custom-grid-theme mb-4"
       style="width: 100%; height: 300px;"
@@ -22,8 +29,12 @@
       :gridOptions="gridOptions"
       @rowClicked="clicked"
     />
-    <div class="card shadow-sm p-4">
-      <h5 class="mb-4">비가동 등록</h5>
+    
+  </div>
+
+  <div class="card border-0" style="height: calc(50vh - 5rem)">
+    <div class="heading-with-line">
+      <h5 class="m-0 me-3">비가동 등록</h5>
       <div class="row g-3">
         <div class="col-md-3">
           <label class="form-label">비가동코드</label>
@@ -62,13 +73,14 @@
         <Button label="가동처리" severity="danger" @click="updatePlay" />
       </div>
     </div>
-    <FacListModal
+  </div>
+
+  <FacListModal
       :visible="showFacModal"
       rowSelection="multiple"
       @close="showFacModal = false"
       @selectFac="facSelected"
     />
-  </div>
 </template>
 
 <script>
