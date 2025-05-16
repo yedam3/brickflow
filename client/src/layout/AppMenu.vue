@@ -23,27 +23,27 @@ const model = ref([
                         to: '/admin/processflow'
                     },
                     {
-                        label: '사원 관리',
+                        label: '공통사원 관리',
                         icon: 'pi pi-fw pi-sign-in',
                         to: '/admin/employees'
                     },
                     {
-                        label: '업체 관리',
+                        label: '공통업체 관리',
                         icon: 'pi pi-fw pi-sign-in',
                         to: '/admin/company'
                     },
                     {
-                        label: 'Bom관리',
+                        label: '공통Bom관리',
                         icon: 'pi pi-fw pi-sign-in',
                         to: '/admin/bom'
                     },
                     {
-                        label: '자재관리',
+                        label: '공통자재관리',
                         icon: 'pi pi-fw pi-sign-in',
                         to: '/admin/mat'
                     },
                     {
-                        label: '제품관리',
+                        label: '공통제품관리',
                         icon: 'pi pi-fw pi-sign-in',
                         to: '/admin/prod'
                     },
