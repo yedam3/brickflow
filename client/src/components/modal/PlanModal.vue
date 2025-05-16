@@ -36,8 +36,10 @@
 </template>
 
 <script>
-import { AgGridVue } from "ag-grid-vue3";
 import axios from "axios";
+
+import { AgGridVue } from "ag-grid-vue3";
+import Swal from 'sweetalert2';
 
 export default {
     name: "PlanModal",
@@ -74,19 +76,23 @@ export default {
                     field: "finish_status", headerName: "상태값", flex: 1,
                     valueFormatter: params => {
                         if(params.value === 'OC1') {
-                            return '계획등록';
+                            return '계획 등록';
                         } else if(params.value === 'OC2') {
                             return '지시중';
                         } else if(params.value === 'OC3') {
-                            return '지시완료';
+                            return '지시 완료';
+                        } else if(params.value === 'OC4') {
+                            return '페기 처리';
                         }
                     },
                     cellStyle: params => {
-                        if(params.value === 'OS1') {
+                        if(params.value === 'OC1') {
                             return { textAlign: 'center', fontWeight: 'bold', color: '#6c757d' };
-                        } else if(params.value == 'OS2') {
+                        } else if(params.value == 'OC2') {
                             return { textAlign: 'center', fontWeight: 'bold', color: '#fd7e14' };
-                        } else if(params.value == 'OS3') {
+                        } else if(params.value == 'OC3') {
+                            return { textAlign: 'center', fontWeight: 'bold', color: '#28a745' };
+                        } else if(params.value == 'OC4') {
                             return { textAlign: 'center', fontWeight: 'bold', color: '#28a745' };
                         }
                     }
@@ -142,8 +148,33 @@ export default {
         },
 
         // 그리드 행 클릭 메소드
-        onRowClicked(event) {
-            this.$emit('selectPlan', event.data);
+        onRowClicked(params) {
+            if(params.data.finish_status === 'OC2') {
+                Swal.fire({
+                    title: '실패',
+                    html: '이미 지시가 등록된 계획입니다.<br>지시목록을 통해 선택해주세요.</br>',
+                    icon: 'error',
+                    confirmButtonText: '확인'
+                });
+                return;
+            } else if(params.data.finish_status === 'OC3') {
+                Swal.fire({
+                    title: '실패',
+                    text: '이미 지시가 완료된 계획입니다.',
+                    icon: 'error',
+                    confirmButtonText: '확인'
+                });
+                return;
+            } else if (params.data.finish_status === 'OC4') {
+                Swal.fire({
+                    title: '실패',
+                    text: '폐기된 계획입니다.',
+                    icon: 'error',
+                    confirmButtonText: '확인'
+                });
+                return;
+            }
+            this.$emit('selectPlan', params.data);
             this.close();
         },
     },

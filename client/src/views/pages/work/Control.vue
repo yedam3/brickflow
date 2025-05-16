@@ -1,8 +1,9 @@
 <template>
-    <div class="card border-0" style="height: 800px">
-        <div class="font-semibold text-xl mb-2">공정 진행 관리</div>
-
-        <h4>실적 등록</h4>
+    <div class="card border-0" style="height: calc(100vh - 8rem)">
+        <h2>공정 진행 관리</h2>
+        <div class="heading-with-line mb-2">
+            <h5 class="m-0 me-3">제어</h5>
+        </div>
         <table class="table table-bordered text-center mt-3">
             <thead class="table-warning">
                 <tr>

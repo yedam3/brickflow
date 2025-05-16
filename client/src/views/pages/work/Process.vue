@@ -1,8 +1,9 @@
 <template>
-    <div class="card border-0" style="height: 800px">
-        <div class="font-semibold text-xl mb-4">공정 진행 관리</div>
-
-        <h3>공정 진행</h3>
+    <div class="card border-0" style="height: calc(100vh - 8rem)">
+        <h2>공정 진행 관리</h2>
+        <div class="heading-with-line mb-2">
+            <h5 class="m-0 me-3">공정 진행</h5>
+        </div>
 
         <div class="row mt-3 mb-3">
             <div class="col input-group mb-3 w-50">
@@ -62,7 +63,7 @@
             </div>
         </div>
         <div class="d-flex justify-content-center mt-3">
-            <Button label="공정시작" severity="info" class="" size="large" style="width: 20rem; height: 5rem;" @click="startProcess"/>
+            <Button label="공정 시작" severity="info" class="" size="large" style="width: 20rem; height: 3.5rem;" @click="startProcess"/>
         </div>
     </div>
 
@@ -182,7 +183,7 @@ export default {
                 { field: "fac_code", headerName: "설비코드", flex: 2, cellStyle: { textAlign: "center" } },
                 { field: "model_name", headerName: "설비명", flex: 2, cellStyle: { textAlign: "center" } },
                 { 
-                    field: "fac_status", headerName: "설비상태", flex: 2, cellStyle: { textAlign: "center", color: "white"},
+                    field: "fac_status", headerName: "설비상태", flex: 2,
                     valueFormatter: params => {
                         if(params.value === 'FS1') {
                             return '사용가능';
@@ -190,13 +191,18 @@ export default {
                             return '사용불가';
                         }
                     },
-                    cellRenderer: params => {
-                        if(params.value === 'FS1') {
-                            return `<span class="badge text-bg-success">사용가능</span>`;
-                        } else if(params.value == 'FS2') {
-                            return `<span class="badge text-bg-danger">사용불가</span>`;
-                        }
-                    }
+                    cellStyle: params => {
+                        return {
+                            textAlign: "center",
+                            color: "white",
+                            backgroundColor: params.value === 'FS1' ? '#0d6efd' : '#dc3545',
+                            borderRadius: '0.25rem',
+                            padding: '4px 8px',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center'
+                        };
+                    },
                 },
                 {
                     field: "using", headerName: "WORK-LOT", flex: 2, cellStyle: { textAlign: "center" }

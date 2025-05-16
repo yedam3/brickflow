@@ -1,8 +1,9 @@
 <template>
-    <div class="card border-0" style="height: 800px">
-        <div class="font-semibold text-xl mb-2">공정 진행 관리</div>
-
-        <h4>생산 실적 조회</h4>
+    <div class="card border-0" style="height: calc(100vh - 8rem)">
+        <h2>공정 진행 관리</h2>
+        <div class="heading-with-line mb-3">
+            <h5 class="m-0 me-3">생산 실적 조회</h5>
+        </div>
 
         <div class="mb-3">
             <Card style="overflow: hidden; background-color: #f8f9fa;">
@@ -143,12 +144,12 @@ export default {
 
             gridOptions: {
                 domLayout: "autoHeight",            // 행을 보고 자동으로 hight부여
-                singleClickEdit: true,              // 한번 클릭 했을 때 수정
-                suppressRowClickSelection: true,    // 행 클릭할 때 체크박스 선택 방지
-                paginationPageSize: 5,             // 페이지당 갯수
+                pagination: true,                   // 페이지네이션 활성화
+                paginationPageSize: 5,              // 페이지당 갯수
+                paginationPageSizeSelector: false,  // 
                 defaultColDef: {
                     suppressMovable: true,          // 셀 이동 금지
-                    resizable: false,               // 열 크기 조정 가능
+                    resizable: false,               // 열 크기 조정 불가능
                     sortable: false,                // 정렬 금지
                 },
             },

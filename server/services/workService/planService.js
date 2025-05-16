@@ -269,10 +269,6 @@ const updatePlanByPlan_code = async (planData, planDetailData) => {
     try{
         conn =  await mariaDB.getConnection();
         await conn.beginTransaction();
-
-        // 생산 계획 수정
-        let selectedQuery = mariaDB.selectedQuery("updatePlanByPlan_code", Object.values(newPlan));
-        result = await conn.query(selectedQuery, Object.values(newPlan));
         
         // 생산 계획 상세 수정
         for(let data of planDetailData) {
@@ -285,6 +281,10 @@ const updatePlanByPlan_code = async (planData, planDetailData) => {
             selectedQuery = mariaDB.selectedQuery("updatePlanDetailByPlan_code", Object.values(newPlan_detail));
             result = await conn.query(selectedQuery, Object.values(newPlan_detail));
         }
+        
+        // 생산 계획 수정
+        let selectedQuery = mariaDB.selectedQuery("updatePlanByPlan_code", Object.values(newPlan));
+        result = await conn.query(selectedQuery, Object.values(newPlan));
 
         await conn.commit();    
     }catch(err){
@@ -306,19 +306,11 @@ const deletePlanByPlan_code = async (plan_code, orders_code) => {
         conn =  await mariaDB.getConnection();
         await conn.beginTransaction();
 
-        // 생산 계획 삭제
-        let selectedQuery = mariaDB.selectedQuery("deletePlanByPlan_code", plan_code);
-        result = await conn.query(selectedQuery, plan_code);
-        
-        // 생산 계획 상세 삭제
-        selectedQuery = mariaDB.selectedQuery("deletePlanDetailByPlan_code", plan_code);
-        result = await conn.query(selectedQuery, plan_code);
-
         // 주문 상태 변경
         let data = ['OS1', orders_code];
         selectedQuery = mariaDB.selectedQuery("updateOrdersByOrders_code", data);
         result = await conn.query(selectedQuery, data);
-        
+
         // 주문 상세 목록 조회 (orders_code)
         selectedQuery = mariaDB.selectedQuery("findAllOrder_detailByOrders_code", orders_code);
         result = await conn.query(selectedQuery, orders_code);
@@ -329,6 +321,14 @@ const deletePlanByPlan_code = async (plan_code, orders_code) => {
             selectedQuery = mariaDB.selectedQuery("updateOrderDetailByOrders_code", orderDetailStatus);
             result = await conn.query(selectedQuery, orderDetailStatus);
         }
+        
+        // 생산 계획 상세 삭제
+        selectedQuery = mariaDB.selectedQuery("deletePlanDetailByPlan_code", plan_code);
+        result = await conn.query(selectedQuery, plan_code);
+
+        // 생산 계획 삭제
+        let selectedQuery = mariaDB.selectedQuery("deletePlanByPlan_code", plan_code);
+        result = await conn.query(selectedQuery, plan_code);
         
         await conn.commit();    
     }catch(err){
@@ -368,6 +368,12 @@ const findPlanFinish_statusByPlan_code = async (plan_code) => {
     return result;
 }
 
+// 주문 상태 조회
+const findOrdersFinish_statusByOrders_code = async (orders_code) => {
+    let result = await mariaDB.query("findOrdersFinish_statusByOrders_code", orders_code).catch((err) => console.error(err));
+    return result;
+}
+
 module.exports = {
     getPlan_code,
     findAllOrders,
@@ -381,5 +387,7 @@ module.exports = {
     updatePlanByPlan_code,
     deletePlanByPlan_code,
     findAllProd,
-    findPlanFinish_statusByPlan_code,   // 생산 계획 상태 확인
+    findPlanFinish_statusByPlan_code,       // 생산 계획 상태 확인
+
+    findOrdersFinish_statusByOrders_code,   // 주문 상태 조회회
 };

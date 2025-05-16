@@ -78,4 +78,11 @@ router.get("/prodList", async (req, res) => {
     res.send(prodList);
 });
 
+// 주문 상태 조회
+router.get("/ordersStatus/:orders_code", async (req, res) => {
+    const orders_code = req.params.orders_code;
+    let result = await planService.findOrdersFinish_statusByOrders_code(orders_code).catch((err) => console.error(err));
+    res.send(result);
+});
+
 module.exports = router;
