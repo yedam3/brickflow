@@ -1,44 +1,55 @@
 <template>
-  <div class="ag-theme-alpine" style="height: 800px; background-color: white; padding: 20px;">
-    <div class="ag-wrapper d-flex justify-content-start">
-      <ag-grid-vue class="ag-theme-alpine custom-grid-theme" style="width: 100%; height: 300px;"
+  <div class="card border-0" style="height: calc(50vh - 5rem)">
+  
+    <h2>설비 관리</h2>
+
+    <div class="heading-with-line">
+      <h5 class="m-0 me-3">설비 목록</h5>
+    </div>
+
+    <ag-grid-vue class="ag-theme-alpine custom-grid-theme" style="width: 100%; height: 300px;"
         :columnDefs="columnDefs" :rowData="rowData" :gridOptions="gridOptions" @cellClicked="comCellClicked"
         @rowClicked="clicked">
       </ag-grid-vue>
+  </div>
+
+  <div class="card border-0" style="height: calc(50vh - 5rem)">
+
+    <div class="heading-with-line mb-4">
+      <h5 class="m-0 me-3">설비 수리 처리</h5>
     </div>
-    <div class="ag-wrapper justify-content-center" style=" background-color: #F5F5F5; padding: 20px;">
-      <h5>수리처리</h5>
-      <div class="row">
-        <div class="input-group mb-5 col">
+
+    <div class="row mb-4">
+        <div class="input-group col">
           <span class="input-group-text" id="basic-addon1">설비수리코드</span>
           <input type="text" class="form-control" placeholder="" aria-label="Username"
             aria-describedby="basic-addon1" v-model="rowData2.repaire_code" readonly>
         </div>
-        <div class="input-group mb-5 col">
+        <div class="input-group col">
           <span class="input-group-text" id="basic-addon1">담당자</span>
           <input type="text" class="form-control" placeholder="담당자" aria-label="Username"
             aria-describedby="basic-addon1" v-model="rowData2.employee_name" readonly>
         </div>
       </div>
-      <div class="row">
-        <div class="input-group mb-5 col">
+      <div class="row mb-4">
+        <div class="input-group col">
           <span class="input-group-text" id="basic-addon1">수리등록일자<small style="color: gray;">(필수)</small></span>
           <input type="date" class="form-control" placeholder="연도-월-일" aria-label="Username"
             aria-describedby="basic-addon1" v-model="rowData2.repaire_add_date" >
         </div>
-        <div class="input-group mb-5 col">
+        <div class="input-group col">
           <span class="input-group-text" id="basic-addon1">수리처리일자<small style="color: gray;">(필수)</small></span>
           <input type="date" class="form-control" placeholder="연도-월-일" aria-label="Username"
             aria-describedby="basic-addon1" v-model="rowData2.repaire_finish_date" >
         </div>
-        <div class="input-group mb-5 col">
+        <div class="input-group col">
           <span class="input-group-text" id="basic-addon1">설비코드</span>
           <input type="text" class="form-control" placeholder="설비코드" aria-label="Username"
             aria-describedby="basic-addon1" v-model="rowData2.fac_code" readonly>
         </div>
       </div>
-      <div class="row">
-        <div class="input-group mb-5 col">
+      <div class="row mb-4">
+        <div class="input-group col">
           <span class="input-group-text" id="basic-addon1">수리결과<small style="color: gray;">(필수)</small></span>
           <select v-model="rowData2.fac_result" class="form-select col" aria-label="Default select example" >
             <option disabled value="" style="color: gray;">수리결과</option>
@@ -48,33 +59,32 @@
           </select>
          
         </div>
-        <div class="input-group mb-5 col">
+        <div class="input-group col">
           <span class="input-group-text" id="basic-addon1">고장증상<small style="color: gray;">(필수)</small></span>
           <input type="text" class="form-control" placeholder="고장증상" aria-label="Username"
             aria-describedby="basic-addon1"  v-model="rowData2.break_status" >
         </div>
-        <div class="input-group mb-5 col">
+        <div class="input-group col">
           <span class="input-group-text" id="basic-addon1">비가동코드</span>
           <input type="text" class="form-control" placeholder="비가동코드" aria-label="Username"
             aria-describedby="basic-addon1" v-model="rowData2.unplay_code" readonly>
         </div>
       </div>
-      <div class="row">
+      <div class="row mb-4">
         <div class="input-group col">
           <span class="input-group-text" id="basic-addon1">비고<small style="color: gray;">(필수)</small></span>
           <textarea class="form-control" placeholder="비고" v-model="rowData2.note"
             style="height: 100px; resize: none; "></textarea>
         </div>
-        <div class="input-group  col">
+        <div class="input-group col">
           <span class="input-group-text" id="basic-addon1">수리내역<small style="color: gray;">(필수)</small></span>
           <textarea class="form-control" placeholder="수리내역"  v-model="rowData2.fac_history"
             style="height: 100px; resize: none; "></textarea>
         </div>
       </div>
-      <br>
-    <div class="input-group  col" >
+
+      <div class="input-group col" >
       <Button label="처리" severity="info" class="me-3" @click="addRepaire" />
-    </div>
     </div>
   </div>
 </template>
