@@ -1,37 +1,29 @@
 <template>
-  <div class="card border-0" style="height: 800px">
-    <h3>제품 재고 조회</h3>
-    <div class="text-end mt-5 mb-3">
-            <div class="row justify-content-between align-items-center">
-                <div class="col-auto">
-                    <div class="input-group">
-                        <select class="form-select w-auto" v-model="searchType">
-                            <option value="p.prod_code" selected>제품코드</option>
-                            <option value="prod_name">제품명</option>
-                        </select>
-                        <input type="text" v-model="searchText" placeholder="검색" @input="onSearch" class="form-control"
-                            style="width: 61%;" @keydown.enter="searchMaterials" />
-
-                        <button @click="searchMaterials" class="btn btn-primary">
-                            <i class="pi pi-search"></i>
-                        </button>
-                    </div>
-                </div>
-
-            </div>
+    <div class="card border-0" style="height: calc(20vh - 2rem);">
+        <h2>영업 관리</h2>
+        <div class="heading-with-line">
+            <h5 class="m-0 me-3">제품 재고 조회</h5>
         </div>
-        <div class="row">
-            <div class="col-7">
-                <h3>제품 재고</h3>
+    </div>
+    <div class="row">
+        <div class="col-8">
+            <div class="heading-with-line">
+                <h5 class="m-0 me-3">제품 재고</h5>
+            </div>
+            <div class="card border-0" style="height: calc(80vh - 10rem);">
                 <ag-grid-vue class="ag-theme-alpine custom-grid-theme" style="width: 100%" :columnDefs="columnDefs"
                     :rowData="rowData" :gridOptions="gridOptions" @cellClicked="prodClicked">
                 </ag-grid-vue>
             </div>
-            <div class="col-5">
-                <h3>LOT별 제품재고</h3>
+        </div>
+        <div class="col-4">
+            <div class="heading-with-line">
+                <h5 class="m-0 me-3">LOT별 제품재고</h5>
+            </div>
+            <div class="card border-0" style="height: calc(80vh - 10rem);">
                 <ag-grid-vue ref="secondGrid" class="ag-theme-alpine custom-grid-theme"
                     style="width: 100%; height: 150px" :columnDefs="secondColumnDefs" :rowData="secondRowData"
-                    :gridOptions="gridOptions" rowSelection="multiple" >
+                    :gridOptions="gridOptions" rowSelection="multiple">
                 </ag-grid-vue>
             </div>
         </div>

@@ -68,7 +68,7 @@ const logout = async () => {
             >
                 <i class="pi pi-ellipsis-v"></i>
             </button>
-            <p class="mt-2 text-center text-muted font-weight-bold">{{ userStore.empName }}님 환영합니다.</p>
+            <p class="mt-2 text-center font-weight-bold emp_name">{{ userStore.empName }}님 환영합니다.</p>
             <div class="layout-topbar-menu hidden lg:block">
                 <div class="layout-topbar-menu-content">
                

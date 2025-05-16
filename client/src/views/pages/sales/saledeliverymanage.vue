@@ -1,7 +1,10 @@
 <template>
-    <!--출고 관리 그리드-->
-    <div class="card border-0 h-100">
-        <div class="font-semibold text-xl mb-4">출고 관리</div>
+    <div class="card border-0" style="height: calc(50vh - 5rem);">
+        <h2>영업 관리</h2>
+        <!--출고 관리 그리드-->
+        <div class="heading-with-line">
+            <h5 class="m-0 me-3">출고 관리</h5>
+        </div>
         <div class="text-end mt-3 mb-3">
             <Button label="출고조회" severity="success" class="me-3" @click="deliverytList" />
             <Button label="주문조회" severity="success" class="me-3" @click="orderList" />
@@ -16,42 +19,40 @@
         </ag-grid-vue>
     </div>
 
-
     <div class="row">
-        <div class="col-6">
-            <div class="row">
-                <div class="col">
-                    <div class="font-semibold text-xl mb-4">주문 요구 수량</div>
+        <div class="col">
+            <div class="card border-0" style="height: calc(50vh - 5rem);">
+                <div class="heading-with-line mb-5">
+                    <h5 class="m-0 me-3">주문 요구 수량</h5>
                 </div>
-                <div class="col text-end">
-                </div>
-            </div>
-            <div class="ag-wrapper justify-content-center" style="border: none;">
                 <ag-grid-vue class="ag-theme-alpine" style="width: 100%; 
         height: 200px;" :columnDefs="seColumnDefs" :rowData="serowData" :gridOptions="gridOptions"
                     :defaultColDef="defaultColDef" @rowClicked="selectedProd">
                 </ag-grid-vue>
             </div>
-
         </div>
-
-        <div class="col-6">
-            <div class="font-semibold text-xl mb-4">출고 가능 수량</div>
-            <div class="ag-wrapper justify-content-center" style="border: none;">
+        <div class="col">
+            <div class="card border-0" style="height: calc(50vh - 5rem);">
+                <div class="heading-with-line mb-5">
+                    <h5 class="m-0 me-3">출고 가능 수량</h5>
+                </div>
                 <ag-grid-vue class="ag-theme-alpine" style="width: 100%; 
         height: 200px; " :columnDefs="thColumnDefs" :rowData="throwData" :gridOptions="gridOptions"
                     :defaultColDef="defaultColDef" @cellValueChanged="throwChange">
                 </ag-grid-vue>
             </div>
         </div>
-
     </div>
+
     <!-- 출고 목록 조회 모달창 -->
-    <DeliveryModal ref="deliveryModal" :visible="showDeliveryModal" @close="showDeliveryModal = false" @selectOrder="deliveryOrderSelected"></DeliveryModal>
+    <DeliveryModal ref="deliveryModal" :visible="showDeliveryModal" @close="showDeliveryModal = false"
+        @selectOrder="deliveryOrderSelected"></DeliveryModal>
     <!-- 주문 목록 조회 모달창 -->
-    <OrderModal ref="orderModal" :visible="showOrderModal" @close="showOrderModal = false" @selectOrder="orderSelected"></OrderModal>
+    <OrderModal ref="orderModal" :visible="showOrderModal" @close="showOrderModal = false" @selectOrder="orderSelected">
+    </OrderModal>
     <!-- 업체 모달창-->
-    <ProdComModal :visible="showComModal" rowSelection="multiple" @close="showComModal = false"@selectCom="comSelected"></ProdComModal>
+    <ProdComModal :visible="showComModal" rowSelection="multiple" @close="showComModal = false"
+        @selectCom="comSelected"></ProdComModal>
 
 </template>
 

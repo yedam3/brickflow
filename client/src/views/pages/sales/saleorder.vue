@@ -1,13 +1,17 @@
 <template>
-  <!-- 주문관리-->
-  <div class="card border-0 h-100">
-    <div class="font-semibold text-xl mb-4">주문 관리</div>
+  <div class="card border-0" style="height: calc(50vh - 5rem)">
+    <h2>영업 관리</h2>
+
+    <!-- 주문관리-->
+    <div class="heading-with-line">
+      <h5 class="m-0 me-3">주문 관리</h5>
+    </div>
+
     <div class="text-end mt-3 mb-3">
       <Button label="조회" severity="success" class="me-3" @click="orderList" />
       <Button label="등록" severity="info" class="me-3" @click="addOrder" />
       <Button label="수정" severity="help" class="me-3" @click="modifyOrder" />
       <Button label="삭제" severity="danger" class="me-5" @click="orderDelete" />
-
     </div>
     <!-- 메인 그리드 -->
     <ag-grid-vue class="ag-theme-alpine" style="width: 100%; 
@@ -17,13 +21,14 @@
   </div>
 
   <!-- 주문 상세 그리드-->
-  <div class="card border-0 h-100">
-    <h4 class="text-start">주문 상세</h4>
+  <div class="card border-0" style="height: calc(50vh - 5rem)">
+    <div class="heading-with-line">
+      <h5 class="m-0 me-3">주문 상세</h5>
+    </div>
     <div class="text-end mt-3 mb-3 ">
       <Button label="행추가" severity="success" class="me-3" @click="addRow" />
       <Button label="행삭제" severity="danger" class="me-5" @click="deleteRow" />
     </div>
-
     <ag-grid-vue ref="secondGrid" class="ag-theme-alpine" style="width: 100%; 
     height: 150px;" :columnDefs="columnDefss" :rowData="secondRowData" :gridOptions="gridOptions"
       :defaultColDef="defaultColDef" @cellClicked="prodCellClicked">
@@ -106,7 +111,7 @@ export default {
         { field: 'prod_code', headerName: '제품코드', flex: 2, editable: false },
         { field: 'prod_name', headerName: '제품명', flex: 2, editable: false },
         { field: 'delivery_demand', headerName: '수량', flex: 2, editable: true, valueFormatter: (params) => { return params.value != null ? `${params.value}` : ''; } },
-        {field: 'price', headerName: '단가', flex: 2, editable: true, valueFormatter: (params) => {const value = Number(params.value);return isNaN(value) ? '' : '₩' + value.toLocaleString();} },
+        { field: 'price', headerName: '단가', flex: 2, editable: true, valueFormatter: (params) => { const value = Number(params.value); return isNaN(value) ? '' : '₩' + value.toLocaleString(); } },
         { field: 'totalprice', headerName: '총주문 금액', valueGetter: 'Number(data.delivery_demand) * Number(data.price)', flex: 3, valueFormatter: (params) => { const value = params.value; return value != null ? '₩' + Number(value).toLocaleString() : ''; } },
         { field: 'note', headerName: '비고', flex: 3 },
       ],
@@ -285,11 +290,11 @@ export default {
         return 1;
       }
       // 부모그리드 체크
-      
+
       //상세그리드 값 다들어 갔는지 체크
       for (let rowInclude of this.secondRowData) {
         if (rowInclude.delivery_demand == 0 ||
-            rowInclude.price == 0) {
+          rowInclude.price == 0) {
           Swal.fire({
             title: '실패',
             text: '값을 다입력하십시오',
@@ -435,7 +440,7 @@ export default {
             icon: 'error',
             confirmButtonText: '확인'
           });
-          return 
+          return
         });
     },
 
