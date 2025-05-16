@@ -21,7 +21,10 @@ app.use(express.static(publicPath));
 app.get("/", function (req, res, next) {
   res.sendFile(path.join(__dirname, "./public", "index.html"));
 }); 
-
+//404 새로고침했을떄 에러 x
+app.use((req, res) => {
+    res.status(404).sendFile(path.join(__dirname, "./public", "index.html"));
+  });
 
 // Server 실행
 app.listen(3000, () => {
