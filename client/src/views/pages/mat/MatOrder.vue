@@ -562,7 +562,6 @@ export default {
 
       } catch (err) {
         // 오류가 발생한 경우 콘솔에 오류를 출력하고 사용자에게 알림
-        
         Swal.fire({
           title: '다운로드 실패',
           text: 'PDF 다운로드 중 오류가 발생했습니다.',

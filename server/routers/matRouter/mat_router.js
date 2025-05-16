@@ -100,7 +100,7 @@ router.post('/pdfDownload',async(req,res) => {
             request_quantity : info.request_quantity
         }))
     }
-
+   //ejs 경로찾기
     const filePath  = path.join(__dirname,'/MatPdf.ejs');
     const template = fs.readFileSync(filePath , 'utf-8');
     const html = ejs.render(template,data);
@@ -109,7 +109,7 @@ router.post('/pdfDownload',async(req,res) => {
         args: ['--no-sandbox', '--disable-setuid-sandbox']
       });
     const page = await browser.newPage();
-    await page.setContent(html, { waitUntil: 'networkidle0' });
+    await page.setContent(html, { waitUntil: 'domcontentloaded' });
 
     const pdfBuffer = await page.pdf({format : 'A4'});
     await browser.close();
