@@ -105,7 +105,9 @@ router.post('/pdfDownload',async(req,res) => {
     const template = fs.readFileSync(filePath , 'utf-8');
     const html = ejs.render(template,data);
 
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({
+        args: ['--no-sandbox', '--disable-setuid-sandbox']
+      });
     const page = await browser.newPage();
     await page.setContent(html, { waitUntil: 'networkidle0' });
 
