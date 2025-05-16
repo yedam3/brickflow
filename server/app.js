@@ -14,6 +14,15 @@ const session =require('express-session');
 //cors 이용
 const cors = require('cors');
 
+const path = require('path');
+const publicPath = path.join(__dirname, 'public');
+app.use(express.static(publicPath)); 
+
+app.get("/", function (req, res, next) {
+  res.sendFile(path.join(__dirname, "./public", "index.html"));
+}); 
+
+
 // Server 실행
 app.listen(3000, () => {
     console.log("Server Start");
@@ -64,49 +73,45 @@ const loginRoter = require('./routers/loginRouter/login_router.js');
 const prodCheckRouter = require('./routers/qualRouter/prodCheck_router.js');
 const salesFinishRouter = require('./routers/salesrouter/finish_router.js');
 
-const path = require('path');
-
 const employeesRouter = require('./routers/adminRouter/employees_router.js');
 const companyRouter = require('./routers/adminRouter/companry_router.js');
-// 기본 라우팅
-app.get("/", (req, res) => {
-    res.send("Welcome!!");
-});
+
+
 //세션활용
 app.use(sessionSettion);
 // //CORS 모든 정책활용
 app.use(cors());
 // 라우터 모듈 등록
-app.use("/sales", salesRouter);
-app.use("/sales", deliveryRouter);
-app.use("/sales", returnRouter);
+app.use("/api/sales", salesRouter);
+app.use("/api/sales", deliveryRouter);
+app.use("/api/sales", returnRouter);
 
-app.use("/mat", matRouter);
-app.use("/work", workRouters);
-app.use("/fac", facRouter);
-app.use("/", agTest);
+app.use("/api/mat", matRouter);
+app.use("/api/work", workRouters);
+app.use("/api/fac", facRouter);
+app.use("/api", agTest);
 
-app.use("/mat", matCheckRouter);
+app.use("/api/mat", matCheckRouter);
 
-app.use('/mat',matRedayRouter);
-app.use('/proce',proceRouter);
-app.use('/test',prodTestRouter);
+app.use('/api/mat',matRedayRouter);
+app.use('/api/proce',proceRouter);
+app.use('/api/test',prodTestRouter);
 
-app.use('/admin',processRouter);
-app.use('/admin',bomRotuer);
-app.use('/admin',adMatRouter);
-app.use('/admin',prodRouter);
-app.use('/label',labelRouter);
+app.use('/api/admin',processRouter);
+app.use('/api/admin',bomRotuer);
+app.use('/api/admin',adMatRouter);
+app.use('/api/admin',prodRouter);
+app.use('/api/label',labelRouter);
 
-app.use('/main',mainPageRouter);
-app.use('/',loginRoter);
+app.use('/api/main',mainPageRouter);
+app.use('/api',loginRoter);
 
-app.use('/uploads/facImages', express.static(path.join(__dirname, 'uploads/facImages')));
+app.use('/api/uploads/facImages', express.static(path.join(__dirname, 'uploads/facImages')));
 
-app.use('/admin',employeesRouter);
-app.use('/admin', companyRouter);
+app.use('/api/admin',employeesRouter);
+app.use('/api/admin', companyRouter);
 
 
-app.use('/qual',prodCheckRouter);
-app.use('/sales',salesFinishRouter);
-app.use('/qual',prodCheckRouter);
+app.use('/api/qual',prodCheckRouter);
+app.use('/api/sales',salesFinishRouter);
+app.use('/api/qual',prodCheckRouter);

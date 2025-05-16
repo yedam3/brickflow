@@ -7,6 +7,7 @@ const { PrimeVueResolver } = require('@primevue/auto-import-resolver');
 const webpack = require('webpack');
 
 module.exports = {
+  outputDir: path.resolve("../server/public"),
   configureWebpack: {
     resolve: {
       alias: {
