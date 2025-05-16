@@ -26,11 +26,11 @@ const comInfo = async(comno) => {
 }
 
 //업체등록
-const comSave = async(comInfo) => {
-  console.log('등록이왜중복?'+comInfo);
+const comSave = async(insertCom) => {
   let resList = await mariaDB.query('autoComCode')
+  console.log('왜', resList)
                              .catch((err) => console.log(err));
-  let result = await mariaDB.query('comSave',[resList[0].company_code, comInfo.company_name, comInfo.address, comInfo.tel, comInfo.emp_code, comInfo.company_type ])
+  let result = await mariaDB.query('comSave',[resList[0].insertCom, insertCom.company_name, insertCom.address, insertCom.tel, insertCom.emp_code, insertCom.company_type ])
                             .catch((err) => console.log(err));
   return result;
 }

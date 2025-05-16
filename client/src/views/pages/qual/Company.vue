@@ -179,32 +179,25 @@ export default{
                  })
   },
 
-  //값체크 validation
-  checkValue(){
-      if(this.info.company_name == '' || this.info.address == '' || this.info.tel == ''|| this.info.emp_code == '' || this.info.company_type == '') {
-          Swal.fire({
+  //등록
+  async comSave(){
+    for(let data in this.info){
+      if(data.company_name == '' || data.address == '' || data.tel == ''|| data.emp_code == '' || data.company_type == ''){
+    Swal.fire({
            title: '실패',
            text: '값을 다 입력해주세요',
            icon: 'error',
            confirmButtonText: '확인'
-         });
-         return;
-        }
-    },
-
-  //등록
-  async comSave(){
-    console.log(this.info)
-    let validation = this.checkValue();
-    if(validation==1){
+        });
       return;
     }
-
-    
-    console.log(this.rowData[this.prodIndex])
-
+  }
+  console.log(this.rowData[this.prodIndex])
        //등록시작
-       const res =  await axios.post('/api/admin/comSave', this.info)
+       const res =  await axios.post('/api/admin/comSave',{
+        insertCom: this.info,
+        
+       })
        .then(res => {
          if (res.data.affectedRows > 0) {
            Swal.fire({
@@ -213,6 +206,7 @@ export default{
              icon: 'success',
              confirmButtonText: '확인'
            });
+           this.info = {};
          } else {
            Swal.fire({
              title: '등록 실패',
@@ -221,6 +215,7 @@ export default{
              confirmButtonText: '확인'
              
            });
+           return;
          }
        })
        .catch(error => {
@@ -233,7 +228,7 @@ export default{
          });
          return;
        });
-       await this.companyData();
+       
        this.info =  {
                       company_code: "",
                       company_name: "",
@@ -241,8 +236,16 @@ export default{
                       tel: "",
                       emp_code: "",
                       company_type: "",
-                    } 
+                    };
+       await this.companyData();
+          this.info = {...this.info}
       },
+
+
+
+
+
+
         //수정
         //값 다 넣었는지 체크
   async comUpdate(){
