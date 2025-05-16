@@ -116,7 +116,7 @@ router.post('/pdfDownload',async(req,res) => {
 
     res.set({
         "Content-Type": "application/pdf",
-        "Content-Disposition": `attachment; filename=order_${data.date}.pdf`,
+        "Content-Disposition": `attachment; filename=${data.mat_order_code}.pdf`,
     });
     res.send(pdfBuffer);
 })
