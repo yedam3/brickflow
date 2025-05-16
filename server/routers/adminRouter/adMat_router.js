@@ -14,15 +14,22 @@ router.get('/mat', async (req, res) => {
 });
 
 //자재등록
-router.post("/mat", async (req, res) => {
-  const {matCode} = req.body;
-  let result = await adMatService.addMat(matCode).catch(err => console.log(err));
-  res.send(result);
+router.post("/addMat", async (req, res) => {
+  const matData = req.body; // 클라이언트에서 보내는 자재 정보
+
+  if (!matData || !matData.mat_code) {
+    console.error("유효하지 않은 mat_code:", matData);
+    return res.status(400).send("mat_code가 필요합니다.");
+  }
+
+  let reuslt = await adMatService.addMat(matData).catch((err) => console.log(err));
+  res.send(reuslt);
 })
 
 //자재 수정
 router.put('/updateMat', async (req, res) => {
-  let result = await adMatService.updateMat().catch((err) => console.log(err));
+  const {mat} = req.body;
+  let result = await adMatService.updateMat(mat).catch((err) => console.log(err));
   res.send(result);
 })
 

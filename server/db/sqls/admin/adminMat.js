@@ -1,7 +1,7 @@
 //mat.js
 //mat_code 자동증가
 const autoCountMatCode =
-`SELECT CONCAT('MAT-',IFNULL(MAX(CAST(SUBSTR(mat_code,5) AS SIGNED)),100)+1) AS mat_code
+`SELECT CONCAT('MAT-', IFNULL(MAX(CAST(SUBSTR(UPPER(mat_code),5) AS SIGNED)),100)+1) AS mat_code
 FROM mat`
 
 //조회
