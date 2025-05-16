@@ -1,13 +1,14 @@
 <template>
-    <div class="card border-0" style="height: calc(60vh - 6rem)">
-        <h2>공정 진행 관리</h2>
+    <div class="card border-0" style="height: calc(58vh - 5.8rem);">
+        <h3>공정 진행 관리</h3>
         <div class="heading-with-line mb-2">
             <h5 class="m-0 me-3">공정 진행</h5>
         </div>
 
-        <div class="row mt-3 mb-3">
+        <div class="row">
             <div class="col input-group mb-3 w-50">
-                <select class="form-select" aria-label="Default select example" v-model="searchType1" @change="searchSelect">
+                <select class="form-select" aria-label="Default select example" v-model="searchType1"
+                    @change="searchSelect">
                     <option value="none" selected>지시명:전체</option>
                     <option v-for="productOrder in productOrderSelect" :key="productOrder" :value="productOrder">
                         {{ productOrder }}
@@ -15,7 +16,8 @@
                 </select>
             </div>
             <div class="col input-group mb-3 w-50">
-                <select class="form-select" aria-label="Default select example" v-model="searchType2" @change="searchSelect">
+                <select class="form-select" aria-label="Default select example" v-model="searchType2"
+                    @change="searchSelect">
                     <option value="none" selected>공정명:전체</option>
                     <option v-for="process in processSelect" :key="process" :value="process">
                         {{ process }}
@@ -23,7 +25,8 @@
                 </select>
             </div>
             <div class="col input-group mb-3 w-50">
-                <select class="form-select" aria-label="Default select example" v-model="searchType3" @change="searchSelect">
+                <select class="form-select" aria-label="Default select example" v-model="searchType3"
+                    @change="searchSelect">
                     <option value="none" selected>제품명:전체</option>
                     <option v-for="product in productSelect" :key="product" :value="product">
                         {{ product }}
@@ -34,9 +37,10 @@
 
         <!-- 생산 지시 목록 그리드 -->
         <div class="mb-3">
-            <div class="ag-wrapper justify-content-center" style="border: none;">
+            <div class="ag-wrapper justify-content-center">
                 <ag-grid-vue class="ag-theme-alpine custom-grid-theme" :columnDefs="productOrderColDefs"
-                    :rowData="productOrderDataList" :gridOptions="productOrderGridOptions" @rowClicked="productOrderRowClicked">
+                    :rowData="productOrderDataList" :gridOptions="productOrderGridOptions"
+                    @rowClicked="productOrderRowClicked">
                 </ag-grid-vue>
             </div>
         </div>
@@ -44,30 +48,35 @@
     </div>
     <div class="row">
         <div class="col">
-            <div class="card border-0" style="height: calc(40vh - 4rem)">
+            <div class="card border-0" style="height: calc(42vh - 4.2rem)">
                 <!-- 사원 목록 그리드 -->
-                    <h4 class="text-start">작업자</h4>
-                    <div class="ag-wrapper justify-content-center" style="border: none;">
-                        <ag-grid-vue class="ag-theme-alpine custom-grid-theme" :columnDefs="employeeColDefs" :rowData="empDataList"
-                            :gridOptions="empGridOptions" @rowClicked="empRowClicked">
-                        </ag-grid-vue>
-                    </div>
+                <div class="heading-with-line">
+                    <h5 class="me-3">작업자</h5>
+                </div>
+                <div class="ag-wrapper justify-content-center">
+                    <ag-grid-vue class="ag-theme-alpine custom-grid-theme" :columnDefs="employeeColDefs"
+                        :rowData="empDataList" :gridOptions="empGridOptions" @rowClicked="empRowClicked">
+                    </ag-grid-vue>
+                </div>
             </div>
         </div>
         <div class="col">
-            <div class="card border-0" style="height: calc(40vh - 4rem)">
+            <div class="card border-0" style="height: calc(42vh - 4.2rem)">
                 <!-- 설비 목록 그리드 -->
-                    <h4 class="text-start">설비</h4>
-                    <div class="ag-wrapper justify-content-center" style="border: none;">
-                        <ag-grid-vue class="ag-theme-alpine custom-grid-theme" :columnDefs="facColDefs" :rowData="facDataList"
-                            :gridOptions="facGridOptions" @rowClicked="facRowClicked">
-                        </ag-grid-vue>
-                    </div>
+                <div class="heading-with-line">
+                    <h5 class="me-3">설비</h5>
+                </div>
+                <div class="ag-wrapper justify-content-center">
+                    <ag-grid-vue class="ag-theme-alpine custom-grid-theme" :columnDefs="facColDefs"
+                        :rowData="facDataList" :gridOptions="facGridOptions" @rowClicked="facRowClicked">
+                    </ag-grid-vue>
+                </div>
             </div>
         </div>
     </div>
     <div class="d-flex justify-content-center">
-        <Button label="공정 시작" severity="info" class="" size="large" style="width: 20rem; height: 3.5rem;" @click="startProcess"/>
+        <Button label="공정 시작" severity="info" class="" size="large" style="width: 20rem; height: 3.5rem;"
+            @click="startProcess" />
     </div>
 </template>
 
@@ -143,7 +152,7 @@ export default {
 
             // AG-GRID 정보
             productOrderColDefs: [
-                { field: "work_lot", headerName: "WORK-LOT", flex: 2, cellStyle: { textAlign: "center" } },
+                { field: "work_lot", headerName: "WORK-LOT", flex: 3, cellStyle: { textAlign: "center" } },
                 { field: "product_order_name", headerName: "생산지시명", flex: 3, cellStyle: { textAlign: "center" } },
                 { field: "prod_name", headerName: "제품명", flex: 3, cellStyle: { textAlign: "center" } },
                 { field: "process_name", headerName: "공정명", flex: 3, cellStyle: { textAlign: "center" }, cellEditor: "datePicker" },
@@ -214,8 +223,11 @@ export default {
             productOrderGridOptions: {
                 domLayout: "autoHeight",
                 singleClickEdit: true,
-                suppressRowClickSelection: false,  // 행 선택 활성화
-                rowSelection: 'single',            // 단일 행 선택
+                suppressRowClickSelection: false,   // 행 선택 활성화
+                rowSelection: 'single',             // 단일 행 선택
+                pagination: true,
+                paginationPageSize: 4,              // 페이지당 갯수
+                paginationPageSizeSelector: false,  // 
                 getRowClass: (params) => {
                     return this.selectedProductOrderRow === params.node ? 'ag-row-selected-custom' : '';
                 },
@@ -230,6 +242,9 @@ export default {
                 singleClickEdit: true,
                 suppressRowClickSelection: false,  // 행 선택 활성화
                 rowSelection: 'single',            // 단일 행 선택
+                pagination: true,
+                paginationPageSize: 3,              // 페이지당 갯수
+                paginationPageSizeSelector: false,  // 
                 getRowClass: (params) => {
                     return this.selectedEmpRow === params.node ? 'ag-row-selected-custom' : '';
                 },
@@ -244,6 +259,9 @@ export default {
                 singleClickEdit: true,
                 suppressRowClickSelection: false,  // 행 선택 활성화
                 rowSelection: 'single',            // 단일 행 선택
+                pagination: true,
+                paginationPageSize: 3,              // 페이지당 갯수
+                paginationPageSizeSelector: false,  // 
                 getRowClass: (params) => {
                     return this.selectedFacRow === params.node ? 'ag-row-selected-custom' : '';
                 },
@@ -397,21 +415,7 @@ export default {
                 // };
             }).catch((err) => console.error(err));
 
-            this.processData.process = {
-                work_lot: params.data.work_lot,                         // 공정 LOT
-                product_order_name: params.data.product_order_code,     // 생산 지시명
-                prod_name: params.data.prod_name,                       // 제품명
-                process_code: params.data.process_code,                 // 공정 코드
-                process_name: params.data.process_name,                 // 공정명
-                process_sequence: params.data.process_sequence,         // 공정 순서
-                order_quantity: params.data.order_quantity,             // 지시량
-                input_quantity: params.data.input_quantity,             // 투입량
-                created_quantity: params.data.created_quantity,         // 생산량
-                error_quantity: params.data.error_quantity,             // 불량량
-                work_start_date: params.data.work_start_date,           // 시작 시간
-                work_end_date: params.data.work_end_date,               // 종료 시간
-                finish_status: params.data.finish_status,               // 상태
-            };
+            this.processData.process = this.productOrderDataList.filter(item => item.work_lot === params.data.work_lot)[0];
         },
 
         // 사원 행 클릭
@@ -425,6 +429,38 @@ export default {
 
         // 설비 행 클릭
         facRowClicked(params) {
+            // 설비 상태확인
+            console.log(params.data.using);
+            console.log(this.processData.process.fac_code);
+            console.log(this.processData.process.work_lot);
+            console.log(this.processData.process.fac_code);
+            if (this.processData.process.fac_code) {
+                if (params.data.using === "" &&
+                    params.data.using !== this.processData.process.work_lot &&
+                    params.data.fac_status === 'FS1') {
+
+                    Swal.fire({
+                        title: '오류',
+                        html: '사용 중이던 설비와 일치하지 않습니다.<br>기존에 사용 중이던 설비를 사용하세요.<br>사용 중인 설비: ' + this.processData.process.fac_code + '<br>',
+                        icon: 'error',
+                        confirmButtonText: '확인',
+                    });
+                    params.node.setSelected(false);
+                    return;
+                }
+            }
+
+            if (params.data.fac_status === 'FS2' && params.data.using !== this.processData.process.work_lot) {
+                Swal.fire({
+                    title: '오류',
+                    text: '사용불가 상태의 설비입니다.',
+                    icon: 'error',
+                    confirmButtonText: '확인',
+                });
+                params.node.setSelected(false);
+                return;
+            }
+
             this.processData.fac = {
                 fac_code: params.data.fac_code,             // 설비 코드
                 model_name: params.data.model_name,         // 설비명
@@ -461,16 +497,6 @@ export default {
                 Swal.fire({
                     title: '오류',
                     text: '설비를 선택하세요.',
-                    icon: 'error',
-                    confirmButtonText: '확인',
-                });
-                return;
-            }
-            // 설비 상태 확인
-            if((this.processData.fac.fac_status === 'FS2') && !(this.processData.process.work_lot != this.processData.fac.fac_code)) {
-                Swal.fire({
-                    title: '오류',
-                    text: '사용불가 상태의 설비입니다.',
                     icon: 'error',
                     confirmButtonText: '확인',
                 });

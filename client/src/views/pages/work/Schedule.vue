@@ -1,6 +1,6 @@
 <template>
     <div class="card border-0" style="height: calc(55vh - 5.5rem);">
-        <h2>생산 계획 관리</h2>
+        <h3>생산 계획 관리</h3>
         <div class="heading-with-line">
             <h5 class="m-0 me-3">등록 | 수정 | 삭제</h5>
         </div>
@@ -86,10 +86,13 @@
                 </InputGroup>
             </div>
         </div>
-        <Button label="초기화" severity="danger" class="me-5" @click="clearForm" />
+        <Button label="초기화" severity="danger" class="" @click="clearForm" />
     </div>
     <div class="card border-0" style="height: calc(45vh - 4.5rem);">
-        <div class="text-end mt-3 mb-3">
+        <div class="heading-with-line">
+            <h5 class="m-0 me-3">제품</h5>
+        </div>
+        <div class="text-end mb-3">
             <Button label="행추가" severity="success" class="me-3" @click="addRow" />
             <Button label="행삭제" severity="danger" class="me-5" @click="deleteRow" />
         </div>

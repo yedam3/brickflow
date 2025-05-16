@@ -1,6 +1,6 @@
 <template>
     <div class="card border-0" style="height: calc(100vh - 8rem)">
-        <h2>생산 전표 관리</h2>
+        <h3>생산 전표 관리</h3>
         <div class="heading-with-line mb-2">
             <h5 class="m-0 me-3">전표 출력</h5>
         </div>

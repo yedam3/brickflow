@@ -2,7 +2,7 @@
     <div class="container-fluid p-0">
         <!-- 설비 등록 섹션 -->
         <div class="card border-0 mb-4">
-            <h2>설비 관리</h2>
+            <h3>설비 관리</h3>
 
             <div class="heading-with-line mb-3">
                 <h5 class="m-0 me-3">설비 등록</h5>

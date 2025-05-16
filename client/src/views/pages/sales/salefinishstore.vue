@@ -1,6 +1,6 @@
 <template>
   <div class="card border-0" style="height: calc(50vh - 5rem)">
-    <h2>영업 관리</h2>
+    <h3>영업 관리</h3>
 
     <div class="heading-with-line">
       <h5 class="m-0 me-3">완제품 관리</h5>
