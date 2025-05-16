@@ -26,8 +26,9 @@ router.get('/company/:comno', async (req, res) => {
 
 //등록
 router.post('/comSave', async (req, res) => {
-  let comInfo = req.body;
-  let result = await companyService.comSave(comInfo)
+  let {insertCom} = req.body;
+  console.log('아',insertCom);
+  let result = await companyService.comSave(insertCom)
                                    .catch((err) => console.log(err)); 
   res.send(result);
   
