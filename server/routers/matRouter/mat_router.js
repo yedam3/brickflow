@@ -4,9 +4,34 @@ const matService = require("../../services/matService/mat_service.js");
 const fs = require("fs");
 const ejs = require("ejs");
 const path = require("path");
+const puppeteer = require("puppeteer");
+
+let browser;  // 전역 변수로 선언
+
+// 서버가 시작할 때 한번만 실행하는 함수
+async function initBrowser() {
+  if (!browser) {
+    //크롬을 여는 것과 같음 launch()
+    browser = await puppeteer.launch({
+    //리눅스 서버에서 보안 모듈로 인해 옵션을 설정
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    // 브라우저를 화면 없이 백그라운드에서 실행 
+    // 만약 true로 실행되면 화면에는 안보이지만 내부에서 크롬창이 띄워지고 보여짐
+      headless: true,
+    });
+    console.log("펴터시작.");
+  }
+}
+
+// 라우터 파일이 로드될 때 브라우저 초기화 시작
+initBrowser()
+.catch(err => {
+  console.error("퍼피티어 에러", err);
+});
 
 //MatCode 자동증가
 router.get("/autoMatCode", async (req, res) => {
+    
     let autoMatCode = await matService.autoMatCode()
                                       .catch((err)=> console.log(err));
     res.send(autoMatCode);
@@ -82,12 +107,12 @@ router.delete('/delete/:ocd',async(req,res)=>{
     let result = await matService.deleteOrder(orderCdoe)
     res.send(result);
 })
+ 
 // //pdf다운로드
 router.post('/pdfDownload',async(req,res) => {
-    const {rowData} = req.body;
-    const {rowDataDetail} = req.body;
-    const puppeteer = require("puppeteer");
-
+    
+    const {rowData,rowDataDetail} = req.body;
+    
     const data = {
         mat_order_code : rowData[0].mat_order_code,
         mat_order_name : rowData[0].mat_order_name,
@@ -100,21 +125,23 @@ router.post('/pdfDownload',async(req,res) => {
             request_quantity : info.request_quantity
         }))
     }
-   //ejs 경로찾기
+    //ejs 경로찾기
     const filePath  = path.join(__dirname,'/MatPdf.ejs');
+    //ejs 파일 읽기
     const template = fs.readFileSync(filePath , 'utf-8');
+    // ejs rendr에서 html에 닮기
     const html = ejs.render(template,data);
-
-    const browser = await puppeteer.launch({
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
-      });
+   
+    //쓰던 browser 재활용
     const page = await browser.newPage();
+    //해상도 낮춰서 속도 향상 시키기
+    await page.setViewport({ width: 1280, height: 720 }); 
     await page.setContent(html, { waitUntil: 'domcontentloaded' });
 
     const pdfBuffer = await page.pdf({format : 'A4'});
-    await browser.close();
-
-    res.set({
+    //페이지 닫기
+    await page.close();
+     res.set({
         "Content-Type": "application/pdf",
         "Content-Disposition": `attachment; filename=${data.mat_order_code}.pdf`,
     });
