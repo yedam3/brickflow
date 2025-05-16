@@ -9,38 +9,38 @@
         </div>
         <div class="col-md-4">
           <label class="form-label">자재명</label>
-          <input type="text" class="form-control"  v-model="rowData.mat_name" />
+          <input type="text" class="form-control" v-model="rowData.mat_name" />
         </div>
         <div class="col-md-4">
           <label class="form-label">단위</label>
-          <input type="text" class="form-control"  v-model="rowData.unit" />
+          <input type="text" class="form-control" v-model="rowData.unit" />
         </div>
         <div class="col-md-4">
           <label class="form-label">크기</label>
-          <input type="text" class="form-control"  v-model="rowData.size" />
+          <input type="text" class="form-control" v-model="rowData.size" />
         </div>
         <div class="col-md-4">
           <label class="form-label">색상</label>
-          <input type="text" class="form-control"  v-model="rowData.color" />
+          <input type="text" class="form-control" v-model="rowData.color" />
         </div>
         <div class="col-md-4">
           <label class="form-label">재질</label>
-          <input type="text" class="form-control"  v-model="rowData.texture" />
+          <input type="text" class="form-control" v-model="rowData.texture" />
         </div>
         <div class="col-md-4">
           <label class="form-label">모양</label>
-          <input type="text" class="form-control"  v-model="rowData.shape" />
+          <input type="text" class="form-control" v-model="rowData.shape" />
         </div>
         <div class="col-md-4">
           <label class="form-label">안전재고</label>
-          <input type="number" class="form-control"  v-model="rowData.safe_inventory" min="0"  @keydown="allowOnlyNumber"/>
+          <input type="number" class="form-control" v-model="rowData.safe_inventory" min="0"  @keydown="allowOnlyNumber"/>
         </div>
         </div>
       <div class="d-flex justify-content-end mt-4 gap-3">
         <Button label="초기화" severity="secondary" @click="clearForm" />
         <Button label="등록" severity="info" @click="addMat" />
-        <Button label="수정" severity="warning" />
-        <Button label="삭제" severity="danger"  />
+        <Button label="수정" severity="warning" @click="updateMat"/>
+        <Button label="삭제" severity="danger" @click="deleteMat" />
       </div>
     </div>
     <!-- 그리드 -->
@@ -113,8 +113,8 @@
       }
     },
     mounted(){
-      this.matList();
       this.autoMatCode();
+      this.matList();
     },
     methods: {
       allowOnlyNumber(event) {
@@ -127,10 +127,23 @@
           event.preventDefault();
         }
       },
+      //행클릭
+      clicked(event) {
+        console.log('클릭된 행 데이터:', event.data); // 클릭된 행 데이터 출력
+        this.rowData = event.data; // 클릭된 행 데이터를 폼에 반영
+      },
       //자재 카운트
-      async autoMatCode(){
-        const result = await axios.get("/api/admin/autoMatCode");
-        this.rowData.mat_code = result.data[0].mat_code;
+      async autoMatCode() {
+        axios.get("/api/admin/autoMatCode")
+          .then(result => {
+
+            const data = result.data;
+            // 응답이 배열이고, 그 안에 mat_code가 있으면 세팅
+            this.rowData = data;
+          })
+          .catch(error => {
+            console.error("mat_code 요청 오류:", error);
+          });
       },
       clearForm(){
         this.rowData = {
@@ -143,6 +156,7 @@
           shape: "",
           safe_inventory:""
         };
+        this.autoMatCode();
       },
       //조회
       async matList(){
@@ -154,9 +168,12 @@
       },
       //등록
       async addMat() {
-        const res = await axios.post('/api/admin/mat', this.rowData)
+        
+        console.log('프론트에서 보내는 mat_code:', this.rowData.mat_code);
+        const res = await axios.post('/api/admin/addMat', this.rowData)
         .catch(error => {
           console.error("등록 실패:", error);
+          this.autoMatCode(); // 중복 에러 발생 시 새 코드 요청
           Swal.fire("등록 실패", "자재 등록 중 오류가 발생했습니다.", "error");
           return null;
         });
@@ -173,9 +190,12 @@
       },
       //수정
       async updateMat() {
-        axios.put('/api/admin/updateMat', this.rowData)
+        axios.put('/api/admin/updateMat', {
+          mat: this.rowData
+
+        })
           .then(res => {
-            if (res && res.data && res.data.result == true) {
+            if (res && res.data && res.data.affectedRows > 0) {
               Swal.fire("수정 완료", "자재정보가 수정되었습니다.", "success")
                 .then(() => {
                   this.matList();
@@ -213,8 +233,8 @@
               if (res && res.data && res.data.affectedRows > 0) {
                   Swal.fire("삭제 완료", "자재정보가 삭제되었습니다.", "success")
                     .then(() => {
-                      this.facList();
                       this.clearForm();
+                      this.matList();
                     });
                 } else {
                   Swal.fire("삭제 실패", "자재 삭제에 실패했습니다.", "error");
