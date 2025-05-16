@@ -1,5 +1,5 @@
 <template>
-  <div class="card border-0" style="height: calc(50vh - 5rem)">
+  <div class="card border-0" style="height: calc(65vh - 6.5rem)">
     <h2>설비 관리</h2>
 
     <div class="heading-with-line mb-3">
@@ -7,7 +7,7 @@
     </div>
 
     <div class="d-flex justify-content-start mb-3">
-      <div class="input-group" style="width: 65%;">
+      <div class="input-group">
         <select v-model="searchType" class="form-select">
           <option value="" selected style="color: gray;">전체</option>
           <option v-for="unFac in reasonFacAry" :key="unFac.unplay_reason_code" :value="unFac.unplay_reason_code">
@@ -20,22 +20,28 @@
         </button>
       </div>
     </div>
-    
+
     <ag-grid-vue
       class="ag-theme-alpine custom-grid-theme mb-4"
-      style="width: 100%; height: 300px;"
+      style="width: 100%; height: auto;"
       :columnDefs="columnDefs"
       :rowData="rowData2"
       :gridOptions="gridOptions"
       @rowClicked="clicked"
     />
-    
   </div>
 
-  <div class="card border-0" style="height: calc(50vh - 5rem)">
+  <div class="card border-0" style="height: calc(35vh - 3.5rem)">
     <div class="heading-with-line">
       <h5 class="m-0 me-3">비가동 등록</h5>
-      <div class="row g-3">
+    </div>
+      <div class="d-flex justify-content-end gap-3">
+        <Button label="초기화" severity="secondary" @click="clearForm" />
+        <Button label="등록" severity="info" @click="addUnFac" />
+        <Button label="수정" severity="help" @click="modifyUnplay" />
+        <Button label="가동처리" severity="danger" @click="updatePlay" />
+    </div>
+    <div class="row g-3">
         <div class="col-md-3">
           <label class="form-label">비가동코드</label>
           <input type="text" class="form-control" v-model="rowData.unplay_code" readonly />
@@ -63,16 +69,9 @@
         </div>
         <div class="col-md-6">
           <label class="form-label">비고<small style="color: gray;">(필수)</small></label>
-          <textarea class="form-control" rows="3" v-model="rowData.note"></textarea>
+          <textarea class="form-control" col="" v-model="rowData.note"></textarea>
         </div>
       </div>
-      <div class="d-flex justify-content-end mt-4 gap-3">
-        <Button label="초기화" severity="secondary" @click="clearForm" />
-        <Button label="등록" severity="info" @click="addUnFac" />
-        <Button label="수정" severity="help" @click="modifyUnplay" />
-        <Button label="가동처리" severity="danger" @click="updatePlay" />
-      </div>
-    </div>
   </div>
 
   <FacListModal

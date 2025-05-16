@@ -1,82 +1,125 @@
 <template>
-    <div class="card border-0" style="height: calc(50vh - 5rem)">
-        <h2>설비 관리</h2>
+    <div class="container-fluid p-0">
+        <!-- 설비 등록 섹션 -->
+        <div class="card border-0 mb-4">
+            <h2>설비 관리</h2>
 
-        <div class="heading-with-line mb-3">
-            <h5 class="m-0 me-3">설비 등록</h5>
-        </div>
-
-        <div class="row g-3">
-            <div class="col-md-4">
-                <label class="form-label">설비코드</label>
-                <input type="text" class="form-control" v-model="rowData.fac_code" readonly />
-            </div>
-            <div class="col-md-4">
-                <label class="form-label">설비이름<small style="color: gray;">(필수)</small></label>
-                <input type="text" class="form-control" v-model="rowData.model_name" />
-            </div>
-            <div class="col-md-4">
-                <label class="form-label">설비위치</label>
-                <input type="text" class="form-control" v-model="rowData.fac_location" />
+            <div class="heading-with-line mb-3">
+                <h5 class="m-0 me-3">설비 등록</h5>
             </div>
 
-            <div class="col-md-4">
-                <label class="form-label">담당자</label>
-                <input type="text" class="form-control" v-model="rowData.employee_name" readonly />
+            <div class="row g-3 mb-3">
+                <!-- 첫 번째 행 -->
+                <div class="col-md-4">
+                    <label class="form-label">설비코드</label>
+                    <input type="text" class="form-control" v-model="rowData.fac_code" readonly />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">설비이름<small style="color: gray;">(필수)</small></label>
+                    <input type="text" class="form-control" v-model="rowData.model_name" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">설비위치</label>
+                    <input type="text" class="form-control" v-model="rowData.fac_location" />
+                </div>
+
+                <!-- 두 번째 행 -->
+                <div class="col-md-4">
+                    <label class="form-label">담당자</label>
+                    <input type="text" class="form-control" v-model="rowData.employee_name" readonly />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">설치일자<small style="color: gray;">(필수)</small></label>
+                    <input type="date" class="form-control" v-model="rowData.install_date" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">점검주기<small style="color: gray;">(월)</small></label>
+                    <input type="number" class="form-control" v-model="rowData.inspection_cycle" min="0"
+                        @keydown="allowOnlyNumber" />
+                </div>
+
+                <!-- 세 번째 행 -->
+                <div class="col-md-4">
+                    <label class="form-label">설비유형<small style="color: gray;">(필수)</small></label>
+                    <select v-model="rowData.fac_pattern" class="form-select">
+                        <option disabled value="" style="color: gray;">선택</option>
+                        <option v-for="facPat in facPatternAry" :key="facPat.fac_pattern" :value="facPat.fac_pattern">
+                            {{ facPat.sub_code_name }}
+                        </option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">설비상태<small style="color: gray;">(필수)</small></label>
+                    <select v-model="rowData.fac_status" class="form-select">
+                        <option disabled value="" style="color: gray;">선택</option>
+                        <option v-for="facSt in facStatusAry" :key="facSt.fac_status" :value="facSt.fac_status">
+                            {{ facSt.sub_code_name }}
+                        </option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">설비 이미지 업로드</label>
+                    <input type="file" name="image" class="form-control" @change="onImageChange" ref="fileInput"
+                        accept="image/png, image/jpeg" />
+                </div>
             </div>
-            <div class="col-md-4">
-                <label class="form-label">설치일자<small style="color: gray;">(필수)</small></label>
-                <input type="date" class="form-control" v-model="rowData.install_date" />
+
+            <!-- 이미지 미리보기 부분 (별도 행으로 분리) -->
+            <div class="row justify-content-end" v-if="rowData.imagePreview">
+                <div class="col-4">
+                    <label class="form-label">이미지 미리보기</label>
+                    <div class="d-flex align-items-center">
+                        <div class="image-preview-container"
+                            style="max-width: 200px; max-height: 150px; overflow: hidden;">
+                            <img :src="rowData.imagePreview || getImageUrl(rowData.image)" alt="설비 이미지"
+                                class="img-thumbnail" style="width: 100%; height: auto; cursor: pointer;"
+                                @click="openImageModal" />
+                        </div>
+                        <div class="ms-3">
+                            <small class="text-muted" style="font-size: small;">파일명: {{ rowData.image }}</small>
+                            <button v-if="rowData.image" class="btn btn-sm btn-outline-danger ms-2"
+                                @click="removeImage">
+                                삭제
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="col-md-4">
-                <label class="form-label">점검주기<small style="color: gray;">(월)</small></label>
-                <input type="number" class="form-control" v-model="rowData.inspection_cycle" min="0"
-                    @keydown="allowOnlyNumber" />
-            </div>
-            <div class="col-md-4">
-                <label class="form-label">설비유형<small style="color: gray;">(필수)</small></label>
-                <select v-model="rowData.fac_pattern" class="form-select">
-                    <option disabled value="" style="color: gray;">선택</option>
-                    <option v-for="facPat in facPatternAry" :key="facPat.fac_pattern" :value="facPat.fac_pattern">
-                        {{ facPat.sub_code_name }}
-                    </option>
-                </select>
-            </div>
-            <div class="col-md-4">
-                <label class="form-label">설비상태<small style="color: gray;">(필수)</small></label>
-                <select v-model="rowData.fac_status" class="form-select">
-                    <option disabled value="" style="color: gray;">선택</option>
-                    <option v-for="facSt in facStatusAry" :key="facSt.fac_status" :value="facSt.fac_status">
-                        {{ facSt.sub_code_name }}
-                    </option>
-                </select>
-            </div>
-            <div class="col-md-4">
-                <label class="form-label">설비 이미지 업로드</label>
-                <input type="file" name="image" class="form-control" @change="onImageChange" ref="fileInput"
-                    accept="image/png, image/jpeg" />
-            </div>
-            <div class="col-md-4" v-if="rowData.imagePreview">
-                <label class="form-label d-block">미리보기</label>
-                <img :src="rowData.imagePreview || getImageUrl(rowData.image)" alt="설비 이미지" class="img-thumbnail"
-                    style="width: 400px; height: 300px; cursor:pointer;" @click="openImageModal" />
-                <small class="text-muted d-block mt-2" style="font-size: small;">파일명: {{ rowData.image }}</small>
+
+            <!-- 버튼 그룹 -->
+            <div class="d-flex justify-content-end gap-3">
+                <Button label="초기화" severity="secondary" @click="clearForm" />
+                <Button label="등록" severity="info" @click="addFac" />
+                <Button label="수정" severity="warning" @click="updateFac" />
+                <Button label="삭제" severity="danger" @click="deleteFac" />
             </div>
         </div>
-        <div class="d-flex justify-content-end mt-4 gap-3">
-            <Button label="초기화" severity="secondary" @click="clearForm" />
-            <Button label="등록" severity="info" @click="addFac" />
-            <Button label="수정" severity="warning" @click="updateFac" />
-            <Button label="삭제" severity="danger" @click="deleteFac" />
+
+        <!-- 설비 목록 섹션 -->
+        <div class="card border-0">
+            <div class="heading-with-line mb-3">
+                <h5 class="m-0 me-3">설비 목록</h5>
+            </div>
+            <!-- 그리드 -->
+            <ag-grid-vue class="ag-theme-alpine custom-grid-theme" style="width: 100%; height: 300px;"
+                :columnDefs="columnDefs" :rowData="rowData2" :gridOptions="gridOptions" @rowClicked="clicked" />
         </div>
-    </div>
-    <div class="card border-0" style="height: calc(50vh - 5rem)">
-        <div class="heading-with-line mb-3">
-            <h5 class="m-0 me-3">설비 목록</h5>
+
+        <!-- 이미지 모달 -->
+        <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="imageModalLabel">설비 이미지</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <img :src="rowData.imagePreview || getImageUrl(rowData.image)" alt="설비 이미지 확대"
+                            class="img-fluid" />
+                    </div>
+                </div>
+            </div>
         </div>
-        <!-- 그리드 -->
-        <ag-grid-vue class="ag-theme-alpine custom-grid-theme" style="width: 100%; height: 300px;"
-            :columnDefs="columnDefs" :rowData="rowData2" :gridOptions="gridOptions" @rowClicked="clicked" />
     </div>
 </template>
 

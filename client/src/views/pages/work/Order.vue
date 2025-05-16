@@ -1,5 +1,5 @@
 <template>
-    <div class="card border-0" style="height: calc(100vh - 8rem)">
+    <div class="card border-0" style="height: calc(55vh - 5.5rem)">
         <h2>생산 지시 관리</h2>
         <div class="heading-with-line">
             <h5 class="m-0 me-3">등록 | 수정 | 삭제</h5>
@@ -13,94 +13,91 @@
             <Button label="삭제" severity="danger" class="" @click="deleteProductOrder" />
         </div>
         <div class="mb-3">
-            <Card style="overflow: hidden; background-color: #f8f9fa;">
-                <template #content>
-                    <div class="mb-4 row">
-                        <div class="col-4">
-                            <InputGroup>
-                                <InputGroupAddon>
-                                    생산 지시 코드
-                                </InputGroupAddon>
-                                <InputText v-model="formData.product_order_code" size="large" placeholder="" readOnly />
-                            </InputGroup>
-                        </div>
-                        <div class="col-4">
-                            <InputGroup>
-                                <InputGroupAddon>
-                                    계획 코드
-                                </InputGroupAddon>
-                                <InputText v-model="formData.plan_code" size="large" placeholder="" readOnly />
-                            </InputGroup>
-                        </div>
-                        <div class="col-4">
-                            <InputGroup>
-                                <InputGroupAddon>
-                                    계획명
-                                </InputGroupAddon>
-                                <InputText v-model="formData.plan_name" size="large" placeholder="" readOnly />
-                            </InputGroup>
-                        </div>
-                    </div>
-                    <div class="mb-4 row">
-                        <div class="col-4">
-                            <InputGroup>
-                                <InputGroupAddon>
-                                    담당자
-                                </InputGroupAddon>
-                                <InputText v-model="formData.employee_name" size="large" placeholder="" />
-                            </InputGroup>
-                        </div>
-                        <div class="col-4">
-                            <InputGroup>
-                                <InputGroupAddon>
-                                    생산 지시명
-                                </InputGroupAddon>
-                                <InputText v-model="formData.product_order_name" size="large" placeholder="(입력)" />
-                            </InputGroup>
-                        </div>
-                    </div>
-                    <div class="mb-4 row">
-                        <div class="col-4">
-                            <InputGroup>
-                                <InputGroupAddon>
-                                    시작일자
-                                </InputGroupAddon>
-                                <DatePicker v-model="formData.start_date" size="large" dateFormat="yy/mm/dd"
-                                    placeholder="(입력)" showIcon iconDisplay="input" />
-                            </InputGroup>
-                        </div>
-                        <div class="col-4">
-                            <InputGroup>
-                                <InputGroupAddon>
-                                    종료일자
-                                </InputGroupAddon>
-                                <DatePicker v-model="formData.end_date" size="large" dateFormat="yy/mm/dd"
-                                    placeholder="(입력)" showIcon iconDisplay="input" />
-                            </InputGroup>
-                        </div>
-                        <div class="col-4">
-                            <InputGroup>
-                                <InputGroupAddon>
-                                    비고
-                                </InputGroupAddon>
-                                <InputText v-model="formData.note" size="large" placeholder="" />
-                            </InputGroup>
-                        </div>
-                    </div>
-                    <Button label="초기화" severity="danger" class="me-5" size="large" @click="clearForm" />
-                </template>
-            </Card>
+            <div class="row mb-4">
+                <div class="col-4">
+                    <InputGroup>
+                        <InputGroupAddon>
+                            생산 지시 코드
+                        </InputGroupAddon>
+                        <InputText v-model="formData.product_order_code" size="large" placeholder="" readOnly />
+                    </InputGroup>
+                </div>
+                <div class="col-4">
+                    <InputGroup>
+                        <InputGroupAddon>
+                            계획 코드
+                        </InputGroupAddon>
+                        <InputText v-model="formData.plan_code" size="large" placeholder="" readOnly />
+                    </InputGroup>
+                </div>
+                <div class="col-4">
+                    <InputGroup>
+                        <InputGroupAddon>
+                            계획명
+                        </InputGroupAddon>
+                        <InputText v-model="formData.plan_name" size="large" placeholder="" readOnly />
+                    </InputGroup>
+                </div>
+            </div>
+            <div class="row mb-4">
+                <div class="col-4">
+                    <InputGroup>
+                        <InputGroupAddon>
+                            담당자
+                        </InputGroupAddon>
+                        <InputText v-model="formData.employee_name" size="large" placeholder="" />
+                    </InputGroup>
+                </div>
+                <div class="col-4">
+                    <InputGroup>
+                        <InputGroupAddon>
+                            생산 지시명
+                        </InputGroupAddon>
+                        <InputText v-model="formData.product_order_name" size="large" placeholder="(입력)" />
+                    </InputGroup>
+                </div>
+            </div>
+            <div class="row mb-4">
+                <div class="col-4">
+                    <InputGroup>
+                        <InputGroupAddon>
+                            시작일자
+                        </InputGroupAddon>
+                        <DatePicker v-model="formData.start_date" size="large" dateFormat="yy/mm/dd" placeholder="(입력)"
+                            showIcon iconDisplay="input" />
+                    </InputGroup>
+                </div>
+                <div class="col-4">
+                    <InputGroup>
+                        <InputGroupAddon>
+                            종료일자
+                        </InputGroupAddon>
+                        <DatePicker v-model="formData.end_date" size="large" dateFormat="yy/mm/dd" placeholder="(입력)"
+                            showIcon iconDisplay="input" />
+                    </InputGroup>
+                </div>
+                <div class="col-4">
+                    <InputGroup>
+                        <InputGroupAddon>
+                            비고
+                        </InputGroupAddon>
+                        <InputText v-model="formData.note" size="large" placeholder="" />
+                    </InputGroup>
+                </div>
+            </div>
+            <Button label="초기화" severity="danger" class="me-5" size="large" @click="clearForm" />
         </div>
-
-        <div class="row">
-            <div class="col">
-                <div class="d-flex justify-content-between mb-3">
-                    <h4 class="text-start m-0">생산 제품 목록</h4>
-                    <div class="row">
-                        <div class="col">
-                            <Button label="행추가" severity="success me-2" @click="addRow" />
-                            <Button label="행삭제" severity="danger" @click="deleteRow" />
-                        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="card border-0" style="height: calc(45vh - 4.5rem)">
+                <div class="heading-with-line mb-2">
+                    <h5 class="m-0 me-3">생산 제품 목록</h5>
+                </div>
+                <div class="row justify-content-end mb-3">
+                    <div class="col">
+                        <Button label="행추가" severity="success me-2" @click="addRow" />
+                        <Button label="행삭제" severity="danger" @click="deleteRow" />
                     </div>
                 </div>
                 <div class="ag-wrapper" style="border: none;">
@@ -110,8 +107,12 @@
                     </ag-grid-vue>
                 </div>
             </div>
-            <div class="col">
-                <h4 class="text-start">자재 홀드량</h4>
+        </div>
+        <div class="col">
+            <div class="card border-0" style="height: calc(45vh - 4.5rem)">
+                <div class="heading-with-line mb-3">
+                    <h5 class="m-0 me-3">자재 홀드</h5>
+                </div>
                 <div class="ag-wrapper" style="border: none;">
                     <ag-grid-vue class="ag-theme-alpine custom-grid-theme" :columnDefs="matHoldListDefs"
                         :rowData="secondRowData" :gridOptions="gridOptions" @rowClicked="matRowClicked">
@@ -226,7 +227,7 @@ export default {
             ],
             prodListDefs: [
                 { checkboxSelection: true, width: 50 },
-                { 
+                {
                     field: "prod_code", headerName: "제품코드", flex: 1.5,
                     cellStyle: params => {
                         if (!params.data.prod_code) {
@@ -236,7 +237,7 @@ export default {
                         }
                     }
                 },
-                { 
+                {
                     field: "prod_name", headerName: "제품명", flex: 2.5,
                     cellStyle: params => {
                         if (!params.data.prod_code) {
@@ -248,7 +249,7 @@ export default {
                 },
                 { field: "plan_quantity", headerName: "주문수량", flex: 1.5, cellStyle: { textAlign: "center" } },
                 { field: "priority", headerName: "우선순위", flex: 1.5, cellStyle: { textAlign: "center" } },
-                { 
+                {
                     field: "order_quantity", headerName: "지시량", flex: 1, editable: true,
                     cellStyle: params => {
                         if ((params.data.prod_code)) {
@@ -268,13 +269,15 @@ export default {
                 { field: "material_input_qunatity", headerName: "투입량", flex: 1, cellStyle: { textAlign: "center" } },
             ],
             gridOptions: {
-                domLayout: "autoHeight", //행을 보고 자동으로 hight부여
-                singleClickEdit: true, //한 번 클릭 했을 때 수정
-                suppressRowClickSelection: true, //	행 클릭할 때 체크박스 선택 방지
+                domLayout: "autoHeight",            //행을 보고 자동으로 hight부여
+                singleClickEdit: true,              //한 번 클릭 했을 때 수정
+                suppressRowClickSelection: true,    // 행 클릭할 때 체크박스 선택 방지
+                paginationPageSize: 5,              // 페이지당 갯수
+                paginationPageSizeSelector: false,  // 
                 defaultColDef: {
-                    suppressMovable: true, //셀 이동 금지
-                    resizable: false, // 열 크기 조정 가능
-                    sortable: false, //정렬 금지
+                    suppressMovable: true,          //셀 이동 금지
+                    resizable: false,               // 열 크기 조정 가능
+                    sortable: false,                //정렬 금지
                 },
             },
         };
@@ -299,11 +302,11 @@ export default {
                 end_date: "",                                               // 종료일자
                 note: "",                                                   // 비고
             },
-            this.rowData = [];
+                this.rowData = [];
             this.secondRowData = [];
             this.matTempHoldDataList = [];
             this.matHoldDataList = [];
-            
+
             this.autoOrder_Code();
         },
 
@@ -381,7 +384,7 @@ export default {
         async planOrderSelected(planOrder) {
             this.clearForm();
             let result = await axios.get(`/api/work/order/productOrder/${planOrder.product_order_code}`, {
-                
+
             }).catch((err) => console.error(err));
             const product_order_data = result.data;
             this.formData.product_order_code = product_order_data.product_order_code;
@@ -504,7 +507,7 @@ export default {
 
         // 행추가
         addRow() {
-            if(this.formData.plan_code != '') {
+            if (this.formData.plan_code != '') {
                 Swal.fire({
                     title: '실패',
                     text: '생산 계획으로 가져온 데이터는 추가가 불가능합니다.',
@@ -545,17 +548,17 @@ export default {
         // 생산 지시 등록
         async addPlanOrder() {
             let check = await axios.get(`/api/work/order/orderCheck/${this.formData.product_order_code}`)
-            .catch((err) => {
-                console.error(err)
-                Swal.fire({
-                    title: '실패',
-                    text: '생산 계획 코드 조회 중 오류가 발생했습니다.',
-                    icon: 'error',
-                    confirmButtonText: '확인'
+                .catch((err) => {
+                    console.error(err)
+                    Swal.fire({
+                        title: '실패',
+                        text: '생산 계획 코드 조회 중 오류가 발생했습니다.',
+                        icon: 'error',
+                        confirmButtonText: '확인'
+                    });
+                    return 1;
                 });
-                return 1;
-            });
-            if(check.data.check > 0) {
+            if (check.data.check > 0) {
                 Swal.fire({
                     title: '실패',
                     text: '이미 등록된 생산 계획 코드입니다.',
@@ -565,7 +568,7 @@ export default {
                 return;
             }
 
-            if(this.insertVaildation() > 0) {
+            if (this.insertVaildation() > 0) {
                 return;
             }
             let orderData = {
@@ -598,7 +601,7 @@ export default {
                     icon: 'success',
                     confirmButtonText: '확인'
                 });
-                
+
                 this.clearForm();
             } else {
                 Swal.fire({
@@ -613,14 +616,14 @@ export default {
         // 생산 지시 수정
         async updateProductOrder() {
             // 생산 계획을 가져왔는 지 확인
-            if(this.editMode == false) {
+            if (this.editMode == false) {
 
             };
-            if(this.insertVaildation() > 0) {
+            if (this.insertVaildation() > 0) {
                 return;
             }
-            for(let data of this.secondRowData) {
-                if(!Array.isArray(data.mat_LOTs)) {
+            for (let data of this.secondRowData) {
+                if (!Array.isArray(data.mat_LOTs)) {
                     Swal.fire({
                         title: '실패',
                         text: '자재 확보를 먼저 하신 후 수정바랍니다.',
@@ -635,7 +638,7 @@ export default {
                 workDetailList: this.rowData,
                 matHoldDataList: this.secondRowData,
             }).catch((err) => console.error(err));
-            if(result.data.affectedRows > 0 ) {
+            if (result.data.affectedRows > 0) {
                 Swal.fire({
                     title: '성공',
                     text: '생산 지시가 정상적으로 수정되었습니다.',
@@ -673,7 +676,7 @@ export default {
                     confirmButtonText: '확인'
                 });
             };
-            if(this.anotherVaildation() > 0) {
+            if (this.anotherVaildation() > 0) {
                 return;
             }
             const deleteCheck = Swal.mixin({
@@ -693,11 +696,11 @@ export default {
                 showCancelButton: true
             });
 
-            if(!deleteCheckResult.isConfirmed) {
+            if (!deleteCheckResult.isConfirmed) {
                 return;
             }
             let result = await axios.delete(`/api/work/order/delete/${this.formData.product_order_code}`).catch((err) => console.error(err));
-            if(result.data.affectedRows > 0 ) {
+            if (result.data.affectedRows > 0) {
                 Swal.fire({
                     title: '성공',
                     text: '생산 지시가 정상적으로 삭제되었습니다.',
@@ -725,7 +728,7 @@ export default {
 
         // 제품 명 제품 코드 선택 시 모달창 열기
         prodCellClicked(params) {
-            if((params.colDef.field == "prod_code" || params.colDef.field == "prod_name") && (this.formData.plan_code === "")) {
+            if ((params.colDef.field == "prod_code" || params.colDef.field == "prod_name") && (this.formData.plan_code === "")) {
                 this.selectedProdIndex = params.rowIndex;
                 this.showProdModal = true;
             }
@@ -750,14 +753,14 @@ export default {
         // 생산 제품 자재 요구량 조회 (prod_code)
         async nonePlanOrder() {
             this.secondRowData = [];
-            for(let prodData of this.rowData) {
+            for (let prodData of this.rowData) {
                 let result = await axios.get(`/api/work/order/matReqQtyByProd_code`, {
                     params: {
                         prod_code: prodData.prod_code,
                         quantity: prodData.order_quantity,
                     }
                 }).catch((err) => console.error(err));
-                for(let matData of result.data) {
+                for (let matData of result.data) {
                     this.secondRowData.push({
                         prod_code: matData.prod_code,
                         mat_code: matData.mat_code,
@@ -793,7 +796,7 @@ export default {
                 });
                 return 1;
             }
-            if(this.rowData.length <= 0) {
+            if (this.rowData.length <= 0) {
                 Swal.fire({
                     title: '실패',
                     text: '생산 제품이 없습니다.',
@@ -813,7 +816,7 @@ export default {
                     return 1;
                 }
             };
-            if(this.secondRowData.length > 0) {
+            if (this.secondRowData.length > 0) {
                 for (let data of this.secondRowData) {
                     if (!(Array.isArray(data.mat_LOTs))) {
                         Swal.fire({
@@ -857,20 +860,22 @@ export default {
 .ag-theme-alpine .ag-header-cell-label {
     justify-content: center;
 }
+
 .heading-with-line {
-  display: flex;
-  align-items: center;
+    display: flex;
+    align-items: center;
 }
 
 .heading-with-line h3 {
-  margin-bottom: 0;
-  margin-right: 1rem;
+    margin-bottom: 0;
+    margin-right: 1rem;
 }
 
 .heading-with-line::after {
-  content: "";
-  flex-grow: 1;
-  height: 1px;
-  background-color: #dee2e6; /* Bootstrap의 border 색상 */
+    content: "";
+    flex-grow: 1;
+    height: 1px;
+    background-color: #dee2e6;
+    /* Bootstrap의 border 색상 */
 }
 </style>
