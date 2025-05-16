@@ -21,16 +21,7 @@ app.use(express.static(publicPath));
 app.get("/", function (req, res, next) {
   res.sendFile(path.join(__dirname, "./public", "index.html"));
 }); 
-//404 새로고침했을떄 에러 x
-app.use((req, res) => {
-    res.status(404).sendFile(path.join(__dirname, "./public", "index.html"));
-  });
 
-// Server 실행
-app.listen(3000, () => {
-    console.log("Server Start");
-    console.log("http://localhost:3000");
-});
 
 //세션설정
 let sessionSettion = session({
@@ -118,3 +109,16 @@ app.use('/api/admin', companyRouter);
 app.use('/api/qual',prodCheckRouter);
 app.use('/api/sales',salesFinishRouter);
 app.use('/api/qual',prodCheckRouter);
+
+
+
+//404 새로고침했을떄 에러 x
+app.use((req, res) => {
+    res.status(404).sendFile(path.join(__dirname, "./public", "index.html"));
+  });
+
+// Server 실행
+app.listen(3000, () => {
+    console.log("Server Start");
+    console.log("http://localhost:3000");
+});
