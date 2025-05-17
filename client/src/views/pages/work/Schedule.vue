@@ -350,6 +350,16 @@ export default {
 
         // 주문 모달창 값 전달
         async orderSelected(order) {
+            console.log(order);
+            if(order.finish_status === 'OS4') {
+                Swal.fire({
+                    title: '실패',
+                    text: '해당 건은 이미 출고가 완료되었습니다.',
+                    icon: 'error',
+                    confirmButtonText: '확인'
+                });
+                return;
+            }
             await axios.get('/api/work/plan/plan', {
                 params: {
                     orders_code: order.orders_code
