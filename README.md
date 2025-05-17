@@ -12,7 +12,10 @@
 # 🔥 PROJECT: BrickFlow 🔥
 
 </div>
-
+<!-- 도넛 그래프 (개발 구성 비율) -->
+<p align="center">
+  <img src="https://quickchart.io/chart?c={type:'doughnut',data:{labels:['Frontend','Backend','Libraries'],datasets:[{data:[50,30,20],backgroundColor:['%234FC08D','%23339933','%23FFCE56']}]},options:{plugins:{legend:{position:'bottom'}}}}" width="300"/>
+</p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white"/>
