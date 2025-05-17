@@ -31,9 +31,14 @@ SELECT CONCAT('STR-', IFNULL(MAX(CAST(SUBSTR(store_code, 5) AS SIGNED)), 100) + 
 ` 
 
 const finishCheck = ` 
- SELECT COUNT(*) AS COUNT
-FROM finishStore f JOIN prod_check c ON(f.prod_check_code = c.prod_check_code)
-WHERE c.prod_check_code = ?
+ SELECT (SELECT IFNULL(SUM(check_quantity),0)
+		FROM prod_check
+        WHERE prod_check_code = ?)-
+        (SELECT IFNULL(SUM(quantity),0)
+        FROM finishStore
+        WHERE prod_check_code= ?) AS count
+FROM prod_check
+WHERE prod_check_code= ?
 `
 const finishList = `
 SELECT prod_lot,
@@ -56,6 +61,7 @@ SELECT c.prod_check_code,
 FROM prod_check c  LEFT JOIN finishStore f
                   ON(c.prod_check_code = f.prod_check_code)
 WHERE c.prod_code = ? 
+AND c.prod_check_code = ?
 GROUP BY c.prod_check_code
 HAVING pass_quantity > 0
 `
@@ -71,12 +77,29 @@ SET inbound_quantity= ?,
     storage_code = ? 
 WHERE doc_code = ?
 `
+
+//출고 건이 있는지 확인
+const storeFinishiCheck = `
+  SELECT COUNT(*) AS checkCount
+  FROM store
+  WHERE lot = ?
+  AND dispatch_quantity > 0;
+
+`
+
+
 //출고값 있는지 체크
 const deliveryFinishCheck = `
-  SELECT COUNT(*) AS count
-FROM delivery_manage_detail d JOIN finishStore s 
-                               ON(d.prod_lot = s.prod_lot)
-WHERE s.prod_lot = ? 
+  SELECT ?
+     -  IFNULL(SUM(dispatch_quantity),0) AS COUNT
+  FROM store
+  WHERE lot = ?
+`
+const deleteFinishCheck = `
+ SELECT count(*) AS COUNT
+ FROM store
+ WHERE LOT = ? 
+ AND dispatch_quantity > 0
 `
 
 const deleteFinish = `
@@ -142,5 +165,7 @@ module.exports = {
   deleteFinish,
   deleteStore,
   prodStoreList,
-  prodLotList
+  prodLotList,
+  storeFinishiCheck,
+  deleteFinishCheck
 }

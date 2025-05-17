@@ -56,19 +56,22 @@ const finishAdd = async (finishedInfo) => {
 
 //값체크
 const countCheck = async(checkCode) => {
-  let result = await mariaDB.query('finishCheck',checkCode)
+  let result = await mariaDB.query('finishCheck',[checkCode,checkCode,checkCode])
+                              .catch((err) => console.log(err))
   return result
 }
 
 //완제품 입고 항목 조회
 const finishList = async() => {
   let result = await mariaDB.query('finishList')
+                              .catch((err) => console.log(err))
   return result;
 }
 //제고 가능 수량 조회
-const possibleQuantity = async(prodcode,quantity) => {
+const possibleQuantity = async(prodcode,quantity,checkCode) => {
 
-  let result = await mariaDB.query('possibleProdQuantity',[quantity,prodcode])
+  let result = await mariaDB.query('possibleProdQuantity',[quantity,prodcode,checkCode])
+                            .catch((err) => console.log(err))
   return result ; 
 }
 
@@ -98,14 +101,33 @@ const finishUpdate = async (finishInfo) => {
   return result;
 }
 //출거건 있는지확인
- const deliveryCount = async(prodLot) => {
-   let result = await mariaDB.query('deliveryFinishCheck',prodLot)
-   return result;
- } 
+ const deliveryCount = async(prodLot,quantity) => {
+  let checkCount = (await mariaDB.query('storeFinishiCheck', prodLot))[0].checkCount
+                                 
+  console.log(checkCount)
+  result = null;
+  if (checkCount > 0) {
+    
+    result = await mariaDB.query('deliveryFinishCheck', [quantity,prodLot])
+                          .catch((err) => console.log(err))
+    console.log(result)
+    return result
+  }
+  result = [{ count: 1 }]
+  return result
+} 
+//삭제시 출고건 있는지 확인
+const deleteCount = async(prodLot) => {
+  let result = await mariaDB.query('deleteFinishCheck',prodLot)
+                           .catch((err) => console.log(err))
+  return result                           
+}
  //삭제
  const deleteFinish = async(prodLot) => {
-  let result = await mariaDB.query('deleteFinish',prodLot);
-  result = await mariaDB.query('deleteStore',prodLot);
+  let result = await mariaDB.query('deleteFinish',prodLot)
+                            .catch((err) => console.log(err))
+  result = await mariaDB.query('deleteStore',prodLot)
+                          .catch((err) => console.log(err));
   return result;
  }
  //재고 조회
@@ -139,5 +161,6 @@ module.exports={
   deliveryCount,
   deleteFinish,
   prodList,
-  prodLotList
+  prodLotList,
+  deleteCount
 }

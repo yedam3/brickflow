@@ -8,7 +8,7 @@
       style="min-width: 1000px"
     >
       <CModalHeader>
-        <slot name="header">업체 목록</slot>
+        <slot name="header">입고가능 목록</slot>
       </CModalHeader>
   
       <CModalBody>
@@ -74,10 +74,10 @@
           { field: "mat_lot", headerName: "lot", flex: 1 },
           { field: "mat_code", headerName: "자재코드", flex: 1 },
           { field: "mat_name", headerName: "자재명", flex: 1 },
-          { field: "storage_code", headerName: "창고코드", flex: 1 },
+          { field: "storage_code", headerName: "창고코드", flex: 1, hide:true},
           { field: "store_name", headerName: "창고명", flex: 1 },
           { field: "mat_check_pass", headerName: "입고가능수량", flex: 1 },
-          { field: "check_code", headerName: "검수코드", flex: 1 },
+          { field: "check_code", headerName: "검수코드", flex: 1,hide:true },
           { field: "store_quantity", headerName: "입고량", flex: 1 }
         ],
         gridOptions: {

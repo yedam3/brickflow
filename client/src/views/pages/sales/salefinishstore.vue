@@ -7,6 +7,7 @@
     </div>
 
     <div class="text-end mt-3 mb-3">
+      <Button label="초기화" severity="secondary" class="me-3" @click="clearForm" />
       <Button label="입고 가능 재고조회" severity="success" class="me-3" @click="orderList" />
       <Button label="등록" severity="info" class="me-3" @click="addFunc" />
       <Button label="수정" severity="help" class="me-3" @click="modifyFunc" />
@@ -189,6 +190,7 @@ export default {
       storeListAry: [],
       showOrderModal: false,
       secondIndex: null,
+      rowDataIndex : null
     }
   },
   async mounted() {
@@ -223,9 +225,11 @@ export default {
     },
     //모달창 값 메인그리드로 전달
     orderSelected(value) {
+      this.formData.prod_lot = ''
       this.formData.prod_name = value.prod_name;
       this.formData.prod_code = value.prod_code;
       this.formData.quantity = value.pass_quantity;
+      this.storage_code = '';
       this.formData.prod_check_code = value.prod_check_code;
     },
     //초기화
@@ -241,7 +245,9 @@ export default {
         store_date: this.getToday(),// 입고 일자
         storage_code: '',
         prod_check_code: ''
-      }
+      },
+      this.secondRowData =[];
+
     },
     //창고조회
     async storeList() {
@@ -272,8 +278,6 @@ export default {
         return;
       }
       //값을 다입력했는지 체크
-      console.log('ㄱㄱㄱㄱ')
-      console.log(this.formData.storage_code);
       if (this.formData.prod_code == '' || this.formData.storage_code == '' || this.formData.quantity == 0 || this.formData.quantity == '') {
         Swal.fire({
           title: '실패',
@@ -286,7 +290,7 @@ export default {
       let res = await axios.get('/api/sales/checkCount/' + this.formData.prod_check_code)
         .catch((err) => console.log(err));
 
-      if (Number(res.data[0].COUNT) > 0) {
+      if (Number(res.data[0].COUNT) < 1) {
         Swal.fire({
           title: '정보',
           text: '이미 입고가 진행된 건입니다.',
@@ -329,6 +333,7 @@ export default {
     },
     //값 체크시 조회
     async clicked(event) {
+      this.rowDataIndex = event.rowIndex;
       this.formData.prod_check_code = event.data.prod_check_code;
       this.formData.prod_code = event.data.prod_code;
       this.formData.prod_name = event.data.prod_name;
@@ -336,7 +341,7 @@ export default {
       this.formData.prod_lot = event.data.prod_lot;
       this.formData.storage_code = event.data.storage_code;
       this.formData.quantity = 0;
-      await axios.get('/api/sales/possibleQuantity/' + event.data.prod_code + '/' + event.data.quantity)
+      await axios.get(`/api/sales/possibleQuantity/${event.data.prod_code}/${event.data.quantity}/${event.data.prod_check_code}`)
         .then(res => {
           this.secondRowData = res.data;
         })
@@ -345,8 +350,20 @@ export default {
     //검수량 전달 
     async inputRender(event) {
       this.secondIndex = event.rowIndex;
-
       this.secondRowData[this.secondIndex].quantity = event.data.quantity;
+
+      //가능수량 넘을 시 
+      if(this.secondRowData[this.secondIndex].pass_quantity <this.secondRowData[this.secondIndex].quantity){
+        Swal.fire({
+          title: '실패',
+          text: '가능수량을 넘어섰습니다.',
+          icon: 'error',
+          confirmButtonText: '확인'
+        });
+        this.secondRowData[this.secondIndex].quantity = 0 ;
+        this.secondRowData = [...this.secondRowData];
+        return;
+      }
 
       let totalQuantity = this.secondRowData.reduce((sum, info, idx) => {
         if (info.quantity > 0) {
@@ -369,10 +386,10 @@ export default {
         return;
       }
       //출고건이 있는 지확인
-      let delCount = await axios.get(`/api/sales/deliveryCount/${this.formData.prod_lot}`)
+      let delCount = await axios.get(`/api/sales/deliveryCount/${this.formData.prod_lot}/${this.formData.quantity}`)
         .catch((err) => console.log(err));
-
-      if (delCount.data[0].count > 0) {
+      console.log(delCount.data[0].COUNT);
+      if (delCount.data[0].COUNT < 0) {
         Swal.fire({
           title: '정보',
           text: '이미 출고가 진행된 LOT입니다.',
@@ -393,7 +410,6 @@ export default {
       }
       let res = await axios.get('/api/sales/checkCount/' + this.formData.prod_check_code)
         .catch((err) => console.log(err));
-
       if (Number(res.data[0].COUNT) < 1) {
         Swal.fire({
           title: '정보',
@@ -409,7 +425,7 @@ export default {
           if (res.data.affectedRows > 0) {
             Swal.fire({
               title: '성공',
-              text: '제품 입고가 정상적으로 등록되었습니다.',
+              text: '제품 입고가 정상적으로 수정되었습니다.',
               icon: 'success',
               confirmButtonText: '확인'
             });
@@ -418,7 +434,7 @@ export default {
           } else {
             Swal.fire({
               title: '정보',
-              text: '제품입고가 이 정상적 등록되지지 않았습니다.',
+              text: '제품입고가 이 정상적 수정되지지 않았습니다.',
               icon: 'info',
               confirmButtonText: '확인'
             });
@@ -447,10 +463,11 @@ export default {
         return;
       }
       //출고건이 있는 지확인
-      let delCount = await axios.get(`/api/sales/deliveryCount/${this.formData.prod_lot}`)
+      
+      let delCount = await axios.get(`/api/sales/deleteCheck/${this.formData.prod_lot}`)
         .catch((err) => console.log(err));
-
-      if (delCount.data[0].count > 0) {
+      console.log(delCount.data[0].COUNT)
+      if (delCount.data[0].COUNT > 0) {
         Swal.fire({
           title: '정보',
           text: '이미 출고가 진행된 LOT입니다.',
@@ -476,7 +493,7 @@ export default {
           if (res.data.affectedRows > 0) {
             Swal.fire({
               title: '성공',
-              text: '제품 입고가 정상적으로 등록되었습니다.',
+              text: '정상적으로 삭제되었습니다.',
               icon: 'success',
               confirmButtonText: '확인'
             });
@@ -485,7 +502,7 @@ export default {
           } else {
             Swal.fire({
               title: '정보',
-              text: '제품입고가 이 정상적 등록되지지 않았습니다.',
+              text: '정상적 삭제되지지 않았습니다.',
               icon: 'info',
               confirmButtonText: '확인'
             });

@@ -64,7 +64,7 @@
             prod_check_code : item.prod_check_code
           });
           const encodedData = encodeURIComponent(jsonData);
-          return `http://localhost:8099/seller/finishstore?data=${encodedData}`;
+          return `http://www.brickflow.shop/seller/finishstore?data=${encodedData}`;
         } catch (error) {
           console.error("QR 코드 생성 오류:", error);
           return "";

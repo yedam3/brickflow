@@ -8,7 +8,7 @@
           style="min-width: 1000px"
         >
           <CModalHeader>
-            <slot name="header">업체 목록</slot>
+            <slot name="header">검수 목록</slot>
           </CModalHeader>
       
           <CModalBody>
