@@ -270,6 +270,7 @@ const updatePlanByPlan_code = async (planData, planDetailData) => {
         conn =  await mariaDB.getConnection();
         await conn.beginTransaction();
         
+        let selectedQuery;
         // 생산 계획 상세 수정
         for(let data of planDetailData) {
             const newPlan_detail = plan_detail_fields.reduce((obj, key) => {
@@ -283,7 +284,7 @@ const updatePlanByPlan_code = async (planData, planDetailData) => {
         }
         
         // 생산 계획 수정
-        let selectedQuery = mariaDB.selectedQuery("updatePlanByPlan_code", Object.values(newPlan));
+        selectedQuery = mariaDB.selectedQuery("updatePlanByPlan_code", Object.values(newPlan));
         result = await conn.query(selectedQuery, Object.values(newPlan));
 
         await conn.commit();    
@@ -308,7 +309,7 @@ const deletePlanByPlan_code = async (plan_code, orders_code) => {
 
         // 주문 상태 변경
         let data = ['OS1', orders_code];
-        selectedQuery = mariaDB.selectedQuery("updateOrdersByOrders_code", data);
+        let selectedQuery = mariaDB.selectedQuery("updateOrdersByOrders_code", data);
         result = await conn.query(selectedQuery, data);
 
         // 주문 상세 목록 조회 (orders_code)
@@ -327,7 +328,7 @@ const deletePlanByPlan_code = async (plan_code, orders_code) => {
         result = await conn.query(selectedQuery, plan_code);
 
         // 생산 계획 삭제
-        let selectedQuery = mariaDB.selectedQuery("deletePlanByPlan_code", plan_code);
+        selectedQuery = mariaDB.selectedQuery("deletePlanByPlan_code", plan_code);
         result = await conn.query(selectedQuery, plan_code);
         
         await conn.commit();    

@@ -216,7 +216,7 @@ export default {
                     },
                 },
                 {
-                    field: "using", headerName: "WORK-LOT", flex: 2, cellStyle: { textAlign: "center" }
+                    field: "using", headerName: "WORK-LOT", flex: 2, cellStyle: { textAlign: "center" }, hide: true,
                 },
             ],
             // 각 그리드별 옵션 분리

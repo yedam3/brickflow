@@ -322,6 +322,7 @@ export default {
     },
     mounted() {
         this.clearForm();
+        this.autoOrder_Code();
     },
     methods: {
         // 상품 컬럼 클릭
@@ -359,8 +360,6 @@ export default {
             this.matTempHoldDataList = [];
             this.matHoldDataList = [];
             this.editMode = false;
-
-            this.autoOrder_Code();
         },
 
         // 생산 계획 모달창
@@ -431,14 +430,14 @@ export default {
             });
 
             this.rowData = [...this.rowData];
+            this.nonePlanOrder();
         },
 
         // 생산 지시 모달창 값 전달
         async planOrderSelected(planOrder) {
             this.clearForm();
-            let result = await axios.get(`/api/work/order/productOrder/${planOrder.product_order_code}`, {
-
-            }).catch((err) => console.error(err));
+            console.log(planOrder.product_order_code);
+            let result = await axios.get(`/api/work/order/productOrder/${planOrder.product_order_code}`).catch((err) => console.error(err));
             const product_order_data = result.data;
             this.formData.product_order_code = product_order_data.product_order_code;
             this.formData.product_order_name = product_order_data.product_order_name;
@@ -451,6 +450,8 @@ export default {
 
             result = await axios.get(`/api/work/order/workDetail/${planOrder.product_order_code}`).catch((err) => console.error(err));
             const work_detail_list = result.data;
+
+            // 상품
             for (let detail of work_detail_list) {
                 this.rowData.push({
                     product_order_detail_code: detail.product_order_detail_code,    // 생산 지시 상세 코드 
@@ -460,16 +461,11 @@ export default {
                     priority: detail.priority,                                      // 우선순위
                     order_quantity: detail.order_quantity,                          // 주문량
                 });
+                // 자재 요구량
                 result = await axios.get(`/api/work/order/loadMatQty/${detail.product_order_detail_code}`).catch((err) => console.error(err));
                 const mat_qty_list = result.data;
                 for (let matQty of mat_qty_list) {
-                    this.secondRowData.push({
-                        prod_code: matQty.prod_code,                                // 제품코드
-                        mat_code: matQty.mat_code,                                  // 자재코드
-                        mat_name: matQty.mat_name,                                  // 자재명
-                        req_material_quantity: matQty.req_material_quantity,        // 요구량
-                        material_input_qunatity: matQty.hold_quantity,              // 투입량
-                    });
+                    // 자재 투입량
                     result = await axios.get(`/api/work/order/loadMat`, {
                         params: {
                             product_order_detail_code: detail.product_order_detail_code,    // 생산 지시 상세 코드
@@ -477,19 +473,33 @@ export default {
                         }
                     }).catch((err) => console.error(err));
                     const mat_list = result.data;
+                    let totalQty = 0;
+                    let tempMatList = [];
                     for (let mat of mat_list) {
-                        this.matHoldDataList.push({
+                        let tempMat = {
                             prod_code: mat.prod_code,
                             mat_code: matQty.mat_code,
                             mat_LOT: mat.mat_LOT,
                             mat_hold_qty: mat.hold_quantity,
-                        });
+                        }
+                        this.matHoldDataList.push(tempMat);
+                        tempMatList.push(tempMat);
+                        totalQty += parseInt(mat.hold_quantity);
                     }
+                    // 자재 요구량 등록
+                    this.secondRowData.push({
+                        prod_code: matQty.prod_code,                                // 제품코드
+                        mat_code: matQty.mat_code,                                  // 자재코드
+                        mat_name: matQty.mat_name,                                  // 자재명
+                        req_material_quantity: matQty.req_material_quantity,        // 요구량
+                        material_input_qunatity: totalQty,                          // 투입량                
+                        mat_LOTs: tempMatList,
+                    });
                 }
             };
             this.rowData = [...this.rowData];
             this.secondRowData = [...this.secondRowData];
-
+            this.matHoldDataList = [...this.matHoldDataList];
             this.editMode = true;
         },
 
@@ -617,6 +627,7 @@ export default {
                 });
 
                 this.clearForm();
+                this.autoOrder_Code();
             } else {
                 Swal.fire({
                     title: '경고',
@@ -661,6 +672,7 @@ export default {
                 });
 
                 this.clearForm();
+                this.autoOrder_Code();
             } else if (result.data[0].check === 0) {
                 Swal.fire({
                     title: '경고',
@@ -723,6 +735,7 @@ export default {
                 });
 
                 this.clearForm();
+                this.autoOrder_Code();
             } else if (result.data[0].check === 0) {
                 Swal.fire({
                     title: '경고',
