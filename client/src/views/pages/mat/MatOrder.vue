@@ -106,7 +106,7 @@ export default {
       columnDefs: [
       { field: "mat_order_code", headerName: "자재발주코드", flex: 2,},
       { field: "mat_order_name", headerName: "발주명", flex: 2,editable:true},
-      { field: "company_code", headerName: "업체코드", flex: 2,},
+      { field: "company_code", headerName: "업체코드", flex: 2, hide: true},
       { field: "company_name", headerName: "업체명", flex: 2,},
       { field: "request_date", headerName: "발주일자", flex: 2 },
       { field: "delivery_date", headerName: "납기예정일", flex: 3, editable: true, cellEditor: "datePicker" },

@@ -33,10 +33,11 @@ router.get('/finishedList',async(req,res) => {
 })
 
 //입고가능 수량 조회
-router.get('/possibleQuantity/:prodCode/:quantity' ,async(req,res) => {
+router.get('/possibleQuantity/:prodCode/:quantity/:checkCode' ,async(req,res) => {
   let prodCode = req.params.prodCode;
   let quantity = req.params.quantity;
-  let result = await finishStore.possibleQuantity(prodCode,quantity)
+  let checkCode = req.params.checkCode;
+  let result = await finishStore.possibleQuantity(prodCode,quantity,checkCode)
                                 .catch((err) => console.log(err));
   res.send(result);
 })
@@ -48,13 +49,20 @@ router.put('/finishUpdate',async(req,res) => {
   res.send(result);
 })
 //출고건이 있는지 체크
-router.get('/deliveryCount/:prodLot',async(req,res) => {
+router.get('/deliveryCount/:prodLot/:quantity',async(req,res) => {
   let prodLot = req.params.prodLot;
-  let result = await finishStore.deliveryCount(prodLot)
+  let quantity = Number(req.params.quantity);
+  let result = await finishStore.deliveryCount(prodLot,quantity)
                                 .catch((err) => console.log(err));
   res.send(result);
 })
-
+//삭제시 출고건 있는지 조회
+router.get('/deleteCheck/:prodLot',async(req,res) => {
+  let prodLot = req.params.prodLot;
+  let result = await finishStore.deleteCount(prodLot)
+                                .catch((err) => console.log(err));
+  res.send(result);                              
+})
 //삭제
 router.delete('/finishDelete/:prodLot',async(req,res) => {
   let prodLot = req.params.prodLot;
@@ -76,4 +84,5 @@ router.get('/prodStoreList/:prodCode',async(req,res )=> {
                                 .catch((err) => console.log(err));
   res.send(result);                                
 })
+
 module.exports = router;

@@ -280,8 +280,9 @@ export default {
         },
         //값체크
         checkValue(){
+            console.log(this.info.check_history)
             //값이 다들어있는지 체크
-            if(this.info.mat_code==''||this.info.check_quantity==''||this.info.check_quantity==0 ){
+            if(this.info.mat_code==''||this.info.check_quantity==''||this.info.check_quantity==0 || !this.info.check_history){
                 Swal.fire({
                     title: '실패',
                     text: '해당하는 값을 입력해주십시오.',

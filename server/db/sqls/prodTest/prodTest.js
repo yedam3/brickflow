@@ -7,6 +7,7 @@ SELECT o.product_order_name,
        getProdName(p.prod_code) AS prod_name,
        p.order_quantity,
        p.process_code,
+       p.process_sequence,
        (SELECT sum(input_quantity)
 							FROM work_process
                             WHERE work_lot = p.work_lot) AS already_test,

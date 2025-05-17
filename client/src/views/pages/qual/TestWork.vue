@@ -68,6 +68,7 @@ import { toHandlers } from "vue";
           { field: "prod_code", headerName: "제품코드", flex: 1 },
           { field: "prod_name", headerName: "제품명", flex: 1 },
           { field: "process_code", headerName: "공정코드", flex: 1 },
+          { field: "process_sequence", headerName: "공정순서", flex: 1 },
           { field: "order_quantity", headerName: "지시량", flex: 1 ,
         valueFormatter: (params) => {
               return params.value != null ? `${params.value}개` : '';
