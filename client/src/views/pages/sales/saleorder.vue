@@ -8,6 +8,7 @@
     </div>
 
     <div class="text-end mt-3 mb-3">
+      <Button label="초기화" severity="secondary" class="me-3" @click="Allrest" />
       <Button label="조회" severity="success" class="me-3" @click="orderList" />
       <Button label="등록" severity="info" class="me-3" @click="addOrder" />
       <Button label="수정" severity="help" class="me-3" @click="modifyOrder" />
@@ -144,6 +145,31 @@ export default {
   },
 
   methods: {
+    //초기화
+    Allrest() {
+      this.rowData = [{
+        orders_code: '',
+        order_name: '',
+        orders_date: this.getToday(),
+        del_date: '',
+        employee_code: useUserStore().id,
+        emp_name: useUserStore().empName,
+        company_name: '',
+        note: '',
+      }
+      ]
+      this.secondRowData = [{
+        orders_code: '',
+        prod_code: '',
+        prod_name: '',
+        delivery_demand: 0,
+        price: 0,
+        totalprice: 0,
+        note: '',
+      }
+      ];
+      this.orderStop = false
+    },
     // 사이트 접속시  자동증가
     async autosalescode() {
       const result = await axios.get(`/api/sales/comList`);
@@ -207,7 +233,8 @@ export default {
         });
         return
       }
-      this.secondRowData.push({
+      let tempscgrid = [...this.secondRowData]
+      tempscgrid.push({
         orders_code: "",
         prod_code: "",
         prod_name: "",
@@ -216,6 +243,7 @@ export default {
         totalprice: 0,
         note: "",
       })
+      this.secondRowData = tempscgrid
     },
     //행삭제
     deleteRow() {

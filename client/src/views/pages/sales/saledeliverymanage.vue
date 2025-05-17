@@ -105,7 +105,7 @@ export default {
              { field: "prod_code", headerName: "제품코드", flex: 2, cellStyle: { textAlign: "center" } },
                 { field: "prod_name", headerName: "제품명", flex: 2, editable: false, cellStyle: { textAlign: "center" } },
                 { field: "delivery_demand", headerName: "요구량", flex: 2, cellStyle: { textAlign: "center" } },
-                { field: "delivery_detail_code", headerName: "상세코드", flex: 2, cellStyle: { textAlign: "center" } },
+                { field: "delivery_detail_code", headerName: "상세코드", flex: 2, cellStyle: { textAlign: "center" },hide: true },
                 { field: "alreadydelivery", headerName: "기납기량", flex: 2, cellStyle: { textAlign: "center" } },
                 { field: "yetdelivery", headerName: "미납기량", flex: 2, editable: false, cellStyle: { textAlign: "center" } },
                 { field: "delivery_quantity", headerName: "출고량", flex: 2, cellStyle: { textAlign: "center" } },
