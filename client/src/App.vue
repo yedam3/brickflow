@@ -145,4 +145,19 @@
   height: 1px;
   background-color: #dee2e6; /* Bootstrap의 border 색상 */
 }
+
+.card {
+  background-color: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.layout-topbar {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.layout-sidebar {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
 </style>

@@ -1,16 +1,17 @@
 <template>
-    <div class="card border-0" style="height: calc(55vh - 5.5rem)">
+    <div class="card border-0" style="height: calc(50vh - 5rem)">
         <h3>생산 지시 관리</h3>
         <div class="heading-with-line">
             <h5 class="m-0 me-3">등록 | 수정 | 삭제</h5>
         </div>
 
-        <div class="text-end mt-3 mb-3">
-            <Button label="계획목록" severity="success" class="me-3" @click="planList" />
-            <Button label="지시목록" severity="info" class="me-3" @click="planOrderList" />
-            <Button label="등록" severity="help" class="me-3" @click="addPlanOrder" />
-            <Button label="수정" severity="danger" class="me-3" @click="updateProductOrder" />
-            <Button label="삭제" severity="danger" class="" @click="deleteProductOrder" />
+        <div class="d-flex flex-wrap justify-content-end gap-2 text-end mt-3 mb-4">
+            <Button label="계획목록" severity="success" class="" @click="planList" />
+            <Button label="지시목록" severity="info" class="" @click="planOrderList" />
+            <Button label="등록" v-if="!editMode" severity="help" class="" @click="addPlanOrder" />
+            <Button label="수정" v-if="editMode" severity="danger" class="" @click="updateProductOrder" />
+            <Button label="삭제" v-if="editMode" severity="danger" class="" @click="deleteProductOrder" />
+            <Button label="초기화" severity="danger" class="" @click="clearForm" />
         </div>
         <div class="mb-3">
             <div class="row mb-4">
@@ -85,35 +86,34 @@
                     </InputGroup>
                 </div>
             </div>
-            <Button label="초기화" severity="danger" class="me-5" size="large" @click="clearForm" />
         </div>
     </div>
     <div class="row">
         <div class="col">
-            <div class="card border-0" style="height: calc(45vh - 4.5rem)">
-                <div class="heading-with-line mb-2">
+            <div class="card border-0" style="height: calc(50vh - 5rem)">
+                <div class="heading-with-line mb-3">
                     <h5 class="m-0 me-3">생산 제품 목록</h5>
                 </div>
                 <div class="row justify-content-end mb-3">
                     <div class="col">
-                        <Button label="행추가" severity="success me-2" @click="addRow" />
-                        <Button label="행삭제" severity="danger" @click="deleteRow" />
+                        <!-- <Button label="행추가" severity="success me-2" @click="addRow" />
+                        <Button label="행삭제" severity="danger" @click="deleteRow" /> -->
                     </div>
                 </div>
-                <div class="ag-wrapper" style="border: none;">
+                <div class="ag-wrapper">
                     <ag-grid-vue ref="mainGrid" class="ag-theme-alpine custom-grid-theme" :columnDefs="prodListDefs"
-                        :rowData="rowData" :gridOptions="gridOptions" @cellClicked="prodCellClicked"
-                        @cellValueChanged="onProdValueChanged">
+                        :rowData="rowData" :gridOptions="prodOptions" @cellClicked="prodCellClicked"
+                        @cellValueChanged="onProdValueChanged" :context="{ componentParent: this }">
                     </ag-grid-vue>
                 </div>
             </div>
         </div>
         <div class="col">
-            <div class="card border-0" style="height: calc(45vh - 4.5rem)">
+            <div class="card border-0" style="height: calc(50vh - 5rem)">
                 <div class="heading-with-line mb-3">
-                    <h5 class="m-0 me-3">자재 홀드</h5>
+                    <h5 class="me-3">자재 홀드</h5>
                 </div>
-                <div class="ag-wrapper" style="border: none;">
+                <div class="ag-wrapper">
                     <ag-grid-vue class="ag-theme-alpine custom-grid-theme" :columnDefs="matHoldListDefs"
                         :rowData="secondRowData" :gridOptions="gridOptions" @rowClicked="matRowClicked">
                     </ag-grid-vue>
@@ -145,6 +145,7 @@ import axios from "axios";
 import { useUserStore } from '@/stores/user';
 
 import { AgGridVue } from "ag-grid-vue3";
+import HeaderButton from "@/components/HeaderButton.vue";
 import Swal from 'sweetalert2';
 
 import PlanModal from "@/components/modal/PlanModal.vue";
@@ -259,6 +260,26 @@ export default {
                         }
                     }
                 },
+                {
+                    field: "editRow", headerName: "", flex: 1, cellStyle: { textAlign: 'center' },
+                    headerComponent: HeaderButton,
+                    cellRenderer: params => {
+                        return `<button class="btn btn-sm btn-danger" @click="deleteRow">삭제</button>`;
+                    },
+                    onCellClicked: params => {
+                        if(params.column.colId === "editRow") {
+                            const target = params.event.target;
+                            if(target.tagName === "BUTTON") {
+                                const selectedData = params.data;
+                                this.rowData = this.rowData.filter(row => row !== selectedData);
+                                params.api.applyTransaction({
+                                    remove: [params.data]
+                                });
+                                this.nonePlanOrder();
+                            }
+                        }
+                    }
+                },
             ],
             matHoldListDefs: [
                 { field: "prod_code", headerName: "제품코드", flex: 2, cellStyle: { textAlign: "center" } },
@@ -268,11 +289,25 @@ export default {
                 // { field: "mat_LOTs", headerName: "자재명", flex: 1, cellStyle: { textAlign: "center" } },
                 { field: "material_input_qunatity", headerName: "투입량", flex: 1, cellStyle: { textAlign: "center" } },
             ],
+            prodOptions: {
+                domLayout: "autoHeight",            //행을 보고 자동으로 hight부여
+                singleClickEdit: true,              //한 번 클릭 했을 때 수정
+                suppressRowClickSelection: true,    // 행 클릭할 때 체크박스 선택 방지
+		        pagination: true,
+                paginationPageSize: 4,              // 페이지당 갯수
+                paginationPageSizeSelector: false,  // 
+                defaultColDef: {
+                    suppressMovable: true,          //셀 이동 금지
+                    resizable: false,               // 열 크기 조정 가능
+                    sortable: false,                //정렬 금지
+                },
+            },
             gridOptions: {
                 domLayout: "autoHeight",            //행을 보고 자동으로 hight부여
                 singleClickEdit: true,              //한 번 클릭 했을 때 수정
                 suppressRowClickSelection: true,    // 행 클릭할 때 체크박스 선택 방지
-                paginationPageSize: 5,              // 페이지당 갯수
+		        pagination: true,
+                paginationPageSize: 4,              // 페이지당 갯수
                 paginationPageSizeSelector: false,  // 
                 defaultColDef: {
                     suppressMovable: true,          //셀 이동 금지
@@ -289,6 +324,14 @@ export default {
         this.clearForm();
     },
     methods: {
+        // 상품 컬럼 클릭
+        prodColumnHeaderClicked(params) {
+            if(params.column.colId === "editRow") {
+                const target = params
+                console.log(target);
+            }
+        },
+
         // FormData 초기화
         clearForm() {
             this.formData = {
@@ -302,10 +345,20 @@ export default {
                 end_date: "",                                               // 종료일자
                 note: "",                                                   // 비고
             },
-                this.rowData = [];
+            this.rowData = [
+                {
+                    prod_code: "",          // 제품코드
+                    prod_name: "",          // 제품명
+                    plan_quantity: "",      // 계획수량
+                    priority: "",           // 우선순위
+                    quantity: "",           // 주문량
+                }
+            ];
+            this.rowData = [];
             this.secondRowData = [];
             this.matTempHoldDataList = [];
             this.matHoldDataList = [];
+            this.editMode = false;
 
             this.autoOrder_Code();
         },
@@ -436,6 +489,8 @@ export default {
             };
             this.rowData = [...this.rowData];
             this.secondRowData = [...this.secondRowData];
+
+            this.editMode = true;
         },
 
         // 자재 선택 모달창
@@ -504,47 +559,6 @@ export default {
             this.secondRowData[this.selectedSecondIndex].material_input_qunatity = totalQty;
             this.secondRowData = [...this.secondRowData];
         },
-
-        // 행추가
-        addRow() {
-            if (this.formData.plan_code != '') {
-                Swal.fire({
-                    title: '실패',
-                    text: '생산 계획으로 가져온 데이터는 추가가 불가능합니다.',
-                    icon: 'error',
-                    confirmButtonText: '확인'
-                });
-                return;
-            }
-            this.rowData.push({
-                orders_code: "",
-                prod_name: "",
-                plan_quantity: "",
-                priority: "",
-                order_quantity: "",
-            })
-            // 새 배열로 설정하여 AG Grid가 반영하게 만듬
-            this.rowData = [...this.rowData];
-        },
-
-        // 행삭제
-        deleteRow() {
-            if (this.formData.plan_code != '') {
-                Swal.fire({
-                    title: '실패',
-                    text: '생산 계획으로 가져온 데이터는 삭제가 불가능합니다.',
-                    icon: 'error',
-                    confirmButtonText: '확인'
-                });
-                return;
-            }
-            const selectedNodes = this.$refs.mainGrid.api.getSelectedNodes();
-            const selectedData = selectedNodes.map(node => node.data);
-
-            this.rowData = this.rowData.filter(row => !selectedData.includes(row));
-            this.nonePlanOrder();
-        },
-
         // 생산 지시 등록
         async addPlanOrder() {
             let check = await axios.get(`/api/work/order/orderCheck/${this.formData.product_order_code}`)
@@ -728,11 +742,70 @@ export default {
 
         // 제품 명 제품 코드 선택 시 모달창 열기
         prodCellClicked(params) {
+            if(params.column.colId === 'editRow') {
+                const target = params.event.target;
+                if(target.tagName === 'BUTTON') {
+                    const action = target.getAttribute('data-action');
+                    if (action == 'delete') {
+                        params.api.applyTransaction({
+                            remove: [params.data]
+                        });
+                        this.rowData[params.rowIndex];
+                    }
+                }
+            }
             if ((params.colDef.field == "prod_code" || params.colDef.field == "prod_name") && (this.formData.plan_code === "")) {
                 this.selectedProdIndex = params.rowIndex;
                 this.showProdModal = true;
             }
         },
+
+        // 행추가
+        addNewRow(newRow) {
+            this.rowData.push(newRow);
+            this.rowData = [...this.rowData];
+        },
+
+        // 행추가
+        addRow() {
+            if (this.formData.plan_code != '') {
+                Swal.fire({
+                    title: '실패',
+                    text: '생산 계획으로 가져온 데이터는 추가가 불가능합니다.',
+                    icon: 'error',
+                    confirmButtonText: '확인'
+                });
+                return;
+            }
+            this.rowData.push({
+                orders_code: "",
+                prod_name: "",
+                plan_quantity: "",
+                priority: "",
+                order_quantity: "",
+            })
+            // 새 배열로 설정하여 AG Grid가 반영하게 만듬
+            this.rowData = [...this.rowData];
+        },
+
+        // 행삭제
+        deleteRow() {
+            if (this.formData.plan_code != '') {
+                Swal.fire({
+                    title: '실패',
+                    text: '생산 계획으로 가져온 데이터는 삭제가 불가능합니다.',
+                    icon: 'error',
+                    confirmButtonText: '확인'
+                });
+                return;
+            }
+            const selectedNodes = this.$refs.mainGrid.api.getSelectedNodes();
+            const selectedData = selectedNodes.map(node => node.data);
+
+            this.rowData = this.rowData.filter(row => !selectedData.includes(row));
+            this.nonePlanOrder();
+        },
+
 
         // 제품 모달창 값 전달
         prodSelected(prod) {

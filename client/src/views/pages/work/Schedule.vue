@@ -1,19 +1,20 @@
 <template>
-    <div class="card border-0" style="height: calc(55vh - 5.5rem);">
+    <div class="card border-0" style="height: calc(50vh - 5rem);">
         <h3>생산 계획 관리</h3>
         <div class="heading-with-line">
             <h5 class="m-0 me-3">등록 | 수정 | 삭제</h5>
         </div>
 
-        <div class="text-end mt-3 mb-3">
-            <Button label="주문목록" severity="success" class="me-3" @click="orderList" />
-            <Button label="계획목록" severity="info" class="me-3" @click="planList" />
-            <Button label="등록" severity="help" class="me-3" @click="addPlan" />
-            <Button label="수정" severity="danger" class="me-3" @click="updatePlan" />
-            <Button label="삭제" severity="danger" class="" @click="deletePlan" />
+        <div class="d-flex flex-wrap justify-content-end gap-2 text-end mt-3 mb-3">
+            <Button label="주문목록" severity="success" class="" @click="orderList" />
+            <Button label="계획목록" severity="info" class="" @click="planList" />
+            <Button label="등록" v-if="!editMode" severity="help" class="" @click="addPlan" />
+            <Button label="수정" v-if="editMode" severity="danger" class="" @click="updatePlan" />
+            <Button label="삭제" v-if="editMode" severity="danger" class="" @click="deletePlan" />
+            <Button label="초기화" severity="danger" class="" @click="clearForm" />
         </div>
 
-        <div class="mb-4 row">
+        <div class="row mb-4">
             <div class="col-4">
                 <InputGroup>
                     <InputGroupAddon>
@@ -40,7 +41,7 @@
             </div>
 
         </div>
-        <div class="mb-4 row">
+        <div class="row mb-4">
             <div class="col-4">
                 <InputGroup>
                     <InputGroupAddon>
@@ -58,7 +59,7 @@
                 </InputGroup>
             </div>
         </div>
-        <div class="mb-4 row">
+        <div class="row mb-4">
             <div class="col-4">
                 <InputGroup>
                     <InputGroupAddon>
@@ -86,15 +87,14 @@
                 </InputGroup>
             </div>
         </div>
-        <Button label="초기화" severity="danger" class="" @click="clearForm" />
     </div>
-    <div class="card border-0" style="height: calc(45vh - 4.5rem);">
+    <div class="card border-0" style="height: calc(50vh - 5rem);">
         <div class="heading-with-line">
             <h5 class="m-0 me-3">제품</h5>
         </div>
         <div class="text-end mb-3">
             <Button label="행추가" severity="success" class="me-3" @click="addRow" />
-            <Button label="행삭제" severity="danger" class="me-5" @click="deleteRow" />
+            <Button label="행삭제" severity="danger" class="" @click="deleteRow" />
         </div>
         <!-- 메인그리드 -->
         <div class="ag-wrapper d-flex justify-content-center" style="border: none;">
@@ -190,6 +190,9 @@ export default {
                 domLayout: "autoHeight",            // 행을 보고 자동으로 hight부여
                 singleClickEdit: true,              // 한번 클릭 했을 때 수정
                 suppressRowClickSelection: true,    // 행 클릭할 때 체크박스 선택 방지
+                pagination: true,
+                paginationPageSize: 3,              // 페이지당 갯수
+                paginationPageSizeSelector: false,  // 
                 defaultColDef: {
                     suppressMovable: true,          // 셀 이동 금지
                     resizable: false,               // 열 크기 조정 가능
