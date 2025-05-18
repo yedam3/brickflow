@@ -188,31 +188,21 @@ export default{
            icon: 'error',
            confirmButtonText: '확인'
          });
-         return;
-        }
+         return 1;
+        } else
+        return 0;
     },
     
    //등록
    async empSave(){
-    console.log(this.info)
-    //값체크 validation
     let validation = this.checkValue();
-    if(validation==1){
-      return;
-    }
-    if(this.info.emp_code != ''){
-      Swal.fire({
-            title: '등록 불가',
-            text: '이미 사원번호가 등록된 건입니다.',
-            icon: 'error',
-            confirmButtonText: '확인'
-          });
-          return;
-    }
+      if(validation == 1){
+        return;
+      }
 
-    console.log(this.rowData[this.prodIndex])
-//등록시작
-    const res =  await axios.post('/api/admin/empSave', this.info)
+
+
+      const res =  await axios.post('/api/admin/empSave', this.info)
        .then(res => {
          if (res.data.affectedRows > 0) {
            Swal.fire({
@@ -227,7 +217,6 @@ export default{
              text: '등록이 실패하였습니다..',
              icon: 'error',
              confirmButtonText: '확인'
-             
            });
          }
        })
@@ -250,18 +239,17 @@ export default{
                       tel: "",
                       pwd: "",
                     } 
-      },
-      
 
 
-      // 수정
-      //값 다 넣었는지 체크
-      async empModify(){
-        let validation = this.checkValue();
-        if(validation==1){
-      return;
-    }
-    if(this.info.emp_code == ''){
+   },
+
+   //수정
+   async empModify(){
+    let validation = this.checkValue();
+      if(validation == 1){
+        return;
+      }
+      if(this.info.emp_code == ''){
       Swal.fire({
             title: '수정 불가',
             text: '사원번호가 필요합니다.',
@@ -270,9 +258,7 @@ export default{
           });
           return;
     }
-
-      //수정시작
-      await axios.put('/api/admin/empModify',this.info,)
+    await axios.put('/api/admin/empUpdate',this.info,)
      .then(res => {
         if(res.data.affectedRows >0) {
           Swal.fire({
@@ -311,74 +297,16 @@ export default{
        });
        return
      });
-     this.info = [{
+     this.info = {
       emp_code: "",
       emp_name: "",
       department: "",
       hire_date: "",
       tel: "",
       pwd: "",
-    }]
-  },
-  //삭제
-  async empDelete(){
-    if(this.info.emp_code == ''){
-      Swal.fire({
-            title: '삭제 실패',
-            text: '사원번호가 필요합니다.',
-            icon: 'error',
-            confirmButtonText: '확인'
-          });
-          return;
     }
-    await axios.delete('/api/admin/empDelete/'+ this.info.emp_code)
-    .then(res => {
-        if(res.data.affectedRows >0) {
-          Swal.fire({
-            title: '삭제 성공',
-            text: '정상적으로 삭제되었습니다.',
-            icon: 'success',
-            confirmButtonText: '확인'
-          });
-          this.EmployeesData();
-       this.info =  {
-                      emp_code: "",
-                      emp_name: "",
-                      department: "",
-                      hire_date: "",
-                      tel: "",
-                      pwd: "",
-                    } 
-          
-        }else{
-          Swal.fire({
-            title: '삭제 실패',
-            text: '삭제를 실패하였습니다.',
-            icon: 'error',
-            confirmButtonText: '확인'
-          });
-          return;
-        }
-     })
-     .catch(err =>{
-       console.error(err);
-       Swal.fire({
-         title: '삭제 실패',
-         text: '알수 없는 에러.',
-         icon: 'error',
-         confirmButtonText: '확인'
-       });
-       return
-     });
-     this.info = [{
-      emp_code: "",
-      emp_name: "",
-      department: "",
-      hire_date: "",
-      tel: "",
-      pwd: "",
-    }]
   },
+
   //초기화
   empReset(){
      this.info = [];

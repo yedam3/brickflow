@@ -8,12 +8,10 @@
      <div class="text-end mt-3 mb-3"style="padding-right: 4%;">
      <Button label="초기화" severity="help" class="me-3" @click="resetList"/>
      <Button label="저장" severity="info" class="me-3" @click="bomSave"/>
-   </div>
-
-   <div class="text-end mt-3 mb-3"style="padding-right: 4%;">
      <Button label="행추가" severity="success" class="me-3" @click="addRow"/>
      <Button label="행삭제" severity="danger" class="me-3" @click="deleteRow"/>  
    </div>
+
  <div class="par-grid">
    <div class="prod-grid">
     <h5>제품목록</h5>
