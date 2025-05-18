@@ -5,7 +5,7 @@
             <h5 class="m-0 me-3">등록 | 수정 | 삭제</h5>
         </div>
 
-        <div class="d-flex flex-wrap justify-content-end gap-2 text-end mt-3 mb-3">
+        <div class="d-flex flex-wrap justify-content-end gap-2 text-end mt-3 mb-4">
             <Button label="주문목록" severity="success" class="" @click="orderList" />
             <Button label="계획목록" severity="info" class="" @click="planList" />
             <Button label="등록" v-if="!editMode" severity="help" class="" @click="addPlan" />

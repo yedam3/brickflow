@@ -251,7 +251,7 @@ export default {
                 { field: "plan_quantity", headerName: "주문수량", flex: 1.5, cellStyle: { textAlign: "center" } },
                 { field: "priority", headerName: "우선순위", flex: 1.5, cellStyle: { textAlign: "center" } },
                 {
-                    field: "order_quantity", headerName: "지시량", flex: 1, editable: true,
+                    field: "order_quantity", headerName: "지시량", flex: 1.5, editable: true,
                     cellStyle: params => {
                         if ((params.data.prod_code)) {
                             return { textAlign: "center", backgroundColor: '#d9f2ff !important' };

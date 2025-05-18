@@ -7,7 +7,7 @@
         <div class="container">
             <div class="row g-3">
                 <div class="col-md-4">
-                    <div class="p-3 bg-light border rounded d-flex align-items-center">
+                    <div class="p-3 border rounded d-flex align-items-center card-mode">
                         <i class="bi bi-gear-fill fs-4 me-3 text-primary"></i>
                         <div>
                             <div class="fw-bold">공정명</div>
@@ -16,7 +16,7 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="p-3 bg-light border rounded d-flex align-items-center">
+                    <div class="p-3 border rounded d-flex align-items-center card-mode">
                         <i class="bi bi-cpu fs-4 me-3 text-success"></i>
                         <div>
                             <div class="fw-bold">설비명</div>
@@ -25,7 +25,7 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="p-3 bg-light border rounded d-flex align-items-center">
+                    <div class="p-3 border rounded d-flex align-items-center card-mode">
                         <i class="bi bi-box-seam fs-4 me-3 text-info"></i>
                         <div>
                             <div class="fw-bold">제품명</div>
@@ -37,7 +37,7 @@
 
             <div class="row g-3 mt-2">
                 <div class="col-md-4">
-                    <div class="p-3 bg-light border rounded d-flex align-items-center">
+                    <div class="p-3 border rounded d-flex align-items-center card-mode">
                         <i class="bi bi-person-circle fs-4 me-3 text-dark"></i>
                         <div>
                             <div class="fw-bold">작업자명</div>
@@ -46,7 +46,7 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="p-3 bg-light border rounded d-flex align-items-center">
+                    <div class="p-3 border rounded d-flex align-items-center card-mode">
                         <i class="bi bi-check2-all fs-4 me-3 text-success"></i>
                         <div>
                             <div class="fw-bold">기작업량</div>
@@ -55,7 +55,7 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="p-3 bg-light border rounded d-flex align-items-center">
+                    <div class="p-3 border rounded d-flex align-items-center card-mode">
                         <i class="bi bi-x-circle fs-4 me-3 text-danger"></i>
                         <div>
                             <div class="fw-bold">미작업량</div>
@@ -69,7 +69,7 @@
         <div class="container mt-3">
             <div class="row g-5">
                 <div class="col-md-2">
-                    <div class="p-3 bg-light border rounded d-flex align-items-center">
+                    <div class="p-3 border rounded d-flex align-items-center card-mode">
                         <i class="bi bi-gear-fill fs-4 me-3 text-primary"></i>
                         <div>
                             <div class="fw-bold">투입량</div>
@@ -78,7 +78,7 @@
                     </div>
                 </div>
                 <div class="col-md-2">
-                    <div class="p-3 bg-light border rounded d-flex align-items-center">
+                    <div class="p-3 border rounded d-flex align-items-center card-mode">
                         <i class="bi bi-cpu fs-4 me-3 text-success"></i>
                         <div>
                             <div class="fw-bold">불량량</div>
@@ -87,7 +87,7 @@
                     </div>
                 </div>
                 <div class="col-md-2">
-                    <div class="p-3 bg-light border rounded d-flex align-items-center">
+                    <div class="p-3 border rounded d-flex align-items-center card-mode">
                         <i class="bi bi-box-seam fs-4 me-3 text-info"></i>
                         <div>
                             <div class="fw-bold">생산량</div>
@@ -96,7 +96,7 @@
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="p-3 bg-light border rounded d-flex align-items-center">
+                    <div class="p-3 border rounded d-flex align-items-center card-mode">
                         <i class="bi bi-person-circle fs-4 me-3 text-dark"></i>
                         <div>
                             <div class="fw-bold">작업시작일시</div>
@@ -106,7 +106,7 @@
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="p-3 bg-light border rounded d-flex align-items-center">
+                    <div class="p-3 border rounded d-flex align-items-center card-mode">
                         <i class="bi bi-x-circle fs-4 me-3 text-danger"></i>
                         <div>
                             <div class="fw-bold">작업종료일</div>
@@ -121,8 +121,8 @@
         <div class="container mt-4">
             <div class="row row-cols-1 row-cols-md-3 g-4">
                 <div class="col">
-                    <div class="card h-100 border-info" :class="{
-                        'bg-white': focusedField !== 'input_quantity',
+                    <div class="card h-100 card-mode border-info" :class="{
+                        '': focusedField !== 'input_quantity',
                         'bg-info text-white fw-bold border-3 border-info': focusedField === 'input_quantity'
                     }">
                         <div class="card-body" @click="setFocus('input_quantity')">
@@ -132,8 +132,8 @@
                     </div>
                 </div>
                 <div class="col">
-                    <div class="card h-100 border-warning" :class="{
-                        'bg-white': focusedField !== 'error_quantity',
+                    <div class="card h-100  card-mode border-warning" :class="{
+                        '': focusedField !== 'error_quantity',
                         'bg-warning text-white fw-bold border-3 border-warning': focusedField === 'error_quantity'
                     }">
                         <div class="card-body" @click="setFocus('error_quantity')">
@@ -143,8 +143,8 @@
                     </div>
                 </div>
                 <div class="col">
-                    <div class="card h-100 border-success" :class="{
-                        'bg-white': focusedField !== 'created_quantity',
+                    <div class="card h-100 border-success card-mode" :class="{
+                        '': focusedField !== 'created_quantity',
                         'bg-success text-white fw-bold border-3 border-success': focusedField === 'created_quantity'
                     }">
                         <div class="card-body" @click="setFocus('created_quantity')">
@@ -596,4 +596,75 @@ export default {
     box-shadow: 0 0 10px rgba(13, 110, 253, 0.5);
     transition: all 0.1s ease-in-out;
 }
+
+.card-mode {
+    background-color: #f8f9fa;
+}
+
+.card-body {
+    background-color: #f8f9fa;
+    color: black;
+}
+
+.card.bg-info .card-body {
+    background-color: rgba(var(--cui-info-rgb),var(--cui-border-opacity)) !important;
+    color: white !important;
+}
+
+.card.bg-warning .card-body {
+    background-color: rgba(var(--cui-warning-rgb),var(--cui-border-opacity)) !important;
+    color: white !important;
+}
+
+.card.bg-success .card-body {
+    background-color: rgba(var(--cui-success-rgb),var(--cui-border-opacity)) !important;
+    color: white !important;
+}
+
+:root[class='app-dark'] .card {
+    color: #BDBDBD;
+    background-color: #263238;
+}
+
+:root[class='app-dark'] .card-mode {
+    color: #BDBDBD;
+    background-color: #263238;
+}
+
+:root[class='app-dark'] .card-body {
+    color: #BDBDBD;
+    background-color: #263238;
+}
+
+:root[class='app-dark'] .bg-info {
+    background-color: rgba(var(--cui-info-rgb),var(--cui-border-opacity)) !important;
+}
+
+:root[class='app-dark'] .bg-warning {
+    background-color: rgba(var(--cui-warning-rgb),var(--cui-border-opacity)) !important;
+}
+
+:root[class='app-dark'] .bg-success {
+    background-color: #198754 !important;
+}
+
+:root[class='app-dark'] .text-white {
+    color: white !important;
+}
+
+:root[class='app-dark'] .card.bg-info .card-body {
+    background-color: rgba(var(--cui-info-rgb),var(--cui-border-opacity)) !important;
+    color: white !important;
+}
+
+:root[class='app-dark'] .card.bg-warning .card-body {
+    background-color: rgba(var(--cui-warning-rgb),var(--cui-border-opacity)) !important;
+    color: white !important;
+}
+
+:root[class='app-dark'] .card.bg-success .card-body {
+    background-color: rgba(var(--cui-success-rgb),var(--cui-border-opacity)) !important;
+    color: white !important;
+}
+
 </style>
