@@ -24,12 +24,12 @@
                     </div>
                 </div>
 
-                <div class="col-auto" style="margin-right: 100px;">
+                <div class="col-auto">
                     <Button label="전표출력" severity="warn" @click="labelView" />
                 </div>
             </div>
         </div>
-        <ag-grid-vue class="ag-theme-alpine custom-grid-theme" style="width: 95%" :columnDefs="columnDefs"
+        <ag-grid-vue class="ag-theme-alpine custom-grid-theme" :columnDefs="columnDefs"
             :rowData="rowData" @cellValueChanged="inputRender" :gridOptions="gridOptions">
         </ag-grid-vue>
     </div>
