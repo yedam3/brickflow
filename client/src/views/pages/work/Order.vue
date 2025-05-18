@@ -264,7 +264,7 @@ export default {
                     field: "editRow", headerName: "", flex: 1, cellStyle: { textAlign: 'center' },
                     headerComponent: HeaderButton,
                     cellRenderer: params => {
-                        return `<button class="btn btn-sm btn-danger" @click="deleteRow">삭제</button>`;
+                        return `<button class="btn btn-sm btn-danger text-white" @click="deleteRow">삭제</button>`;
                     },
                     onCellClicked: params => {
                         if(params.column.colId === "editRow") {
@@ -436,7 +436,6 @@ export default {
         // 생산 지시 모달창 값 전달
         async planOrderSelected(planOrder) {
             this.clearForm();
-            console.log(planOrder.product_order_code);
             let result = await axios.get(`/api/work/order/productOrder/${planOrder.product_order_code}`).catch((err) => console.error(err));
             const product_order_data = result.data;
             this.formData.product_order_code = product_order_data.product_order_code;
@@ -499,6 +498,7 @@ export default {
             };
             this.rowData = [...this.rowData];
             this.secondRowData = [...this.secondRowData];
+            console.log(this.secondRowData);
             this.matHoldDataList = [...this.matHoldDataList];
             this.editMode = true;
         },

@@ -13,7 +13,7 @@
                             계획코드
                         </InputGroupAddon>
                         <InputText v-model="formData.plan_code" size="large" placeholder="(입력)"
-                            @keydown.enter="searchProcessData" />
+                            @keydown.enter="searchProcessData"/>
                     </InputGroup>
                 </div>
                 <div class="col-4">

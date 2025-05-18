@@ -1,78 +1,157 @@
 <template>
-    <div class="card border-0" style="height: calc(100vh - 8rem)">
+    <div class="card border-0" style="min-height: calc(100vh - 8rem)">
         <h3>공정 진행 관리</h3>
         <div class="heading-with-line mb-2">
             <h5 class="m-0 me-3">제어</h5>
         </div>
-        <table class="table table-bordered text-center mt-3">
-            <thead class="table-warning">
-                <tr>
-                    <th>공정명</th>
-                    <th>설비명</th>
-                    <th>제품명</th>
-                    <th>작업자명</th>
-                    <th>기작업량</th>
-                    <th>미작업량</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>{{ this.processInfo.process_name }}</td>
-                    <td>{{ this.processInfo.model_name }}</td>
-                    <td>{{ this.processInfo.prod_name }}</td>
-                    <td>{{ this.processInfo.emp_name }}</td>
-                    <td>{{ this.processInfo.processed_quantity }}</td>
-                    <td>{{ this.processInfo.unprocessed_quantity }}</td>
-                </tr>
-            </tbody>
-        </table>
-        <table class="table table-bordered text-center">
-            <thead class="table-warning">
-                <tr>
-                    <th>투입량</th>
-                    <th>불량량</th>
-                    <th>생산량</th>
-                    <th colspan="2">작업시작일시</th>
-                    <th colspan="2">작업종료일시</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>{{ this.processInfo.input_quantity }}</td>
-                    <td>{{ this.processInfo.error_quantity }}</td>
-                    <td>{{ this.processInfo.created_quantity }}</td>
-                    <td colspan="2">{{ this.processInfo.work_start_date }}</td>
-                    <td>{{ this.processInfo.work_end_date }}</td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="container">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="p-3 bg-light border rounded d-flex align-items-center">
+                        <i class="bi bi-gear-fill fs-4 me-3 text-primary"></i>
+                        <div>
+                            <div class="fw-bold">공정명</div>
+                            <div>{{ this.processInfo.process_name }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-3 bg-light border rounded d-flex align-items-center">
+                        <i class="bi bi-cpu fs-4 me-3 text-success"></i>
+                        <div>
+                            <div class="fw-bold">설비명</div>
+                            <div>{{ this.processInfo.model_name }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-3 bg-light border rounded d-flex align-items-center">
+                        <i class="bi bi-box-seam fs-4 me-3 text-info"></i>
+                        <div>
+                            <div class="fw-bold">제품명</div>
+                            <div>{{ this.processInfo.prod_name }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-        <div class="row text-center mt-4">
-            <div class="col-4" @click="setFocus('input_quantity')">
-                <div class="border p-2 bg-warning text-white">투입량</div>
-                <div class="border p-2" :class="{
-                    'bg-white': focusedField !== 'input_quantity',
-                    'bg-primary text-white fw-bold border-3 border-primary': focusedField === 'input_quantity'
-                }">
-                    {{ focusedField === 'input_quantity' ? currentInput : processInfo.input_quantity }}
+            <div class="row g-3 mt-2">
+                <div class="col-md-4">
+                    <div class="p-3 bg-light border rounded d-flex align-items-center">
+                        <i class="bi bi-person-circle fs-4 me-3 text-dark"></i>
+                        <div>
+                            <div class="fw-bold">작업자명</div>
+                            <div>{{ this.processInfo.emp_name }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-3 bg-light border rounded d-flex align-items-center">
+                        <i class="bi bi-check2-all fs-4 me-3 text-success"></i>
+                        <div>
+                            <div class="fw-bold">기작업량</div>
+                            <div>{{ this.processInfo.processed_quantity }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-3 bg-light border rounded d-flex align-items-center">
+                        <i class="bi bi-x-circle fs-4 me-3 text-danger"></i>
+                        <div>
+                            <div class="fw-bold">미작업량</div>
+                            <div>{{ this.processInfo.unprocessed_quantity }}</div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="col-4" @click="setFocus('error_quantity')">
-                <div class="border p-2 bg-warning text-white">불량량</div>
-                <div class="border p-2" :class="{
-                    'bg-white': focusedField !== 'error_quantity',
-                    'bg-danger text-white fw-bold border-3 border-danger': focusedField === 'error_quantity'
-                }">
-                    {{ focusedField === 'error_quantity' ? currentInput : processInfo.error_quantity }}
+        </div>
+
+        <div class="container mt-3">
+            <div class="row g-5">
+                <div class="col-md-2">
+                    <div class="p-3 bg-light border rounded d-flex align-items-center">
+                        <i class="bi bi-gear-fill fs-4 me-3 text-primary"></i>
+                        <div>
+                            <div class="fw-bold">투입량</div>
+                            <div>{{ this.processInfo.input_quantity }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="p-3 bg-light border rounded d-flex align-items-center">
+                        <i class="bi bi-cpu fs-4 me-3 text-success"></i>
+                        <div>
+                            <div class="fw-bold">불량량</div>
+                            <div>{{ this.processInfo.error_quantity }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="p-3 bg-light border rounded d-flex align-items-center">
+                        <i class="bi bi-box-seam fs-4 me-3 text-info"></i>
+                        <div>
+                            <div class="fw-bold">생산량</div>
+                            <div>{{ this.processInfo.created_quantity }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-3 bg-light border rounded d-flex align-items-center">
+                        <i class="bi bi-person-circle fs-4 me-3 text-dark"></i>
+                        <div>
+                            <div class="fw-bold">작업시작일시</div>
+                            <div>{{ this.processInfo.work_start_date === "" ? "X" : this.processInfo.work_start_date }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-3 bg-light border rounded d-flex align-items-center">
+                        <i class="bi bi-x-circle fs-4 me-3 text-danger"></i>
+                        <div>
+                            <div class="fw-bold">작업종료일</div>
+                            <div>{{ this.processInfo.work_end_date === "" ? "X" : this.processInfo.work_start_date }}
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="col-4" @click="setFocus('created_quantity')">
-                <div class="border p-2 bg-warning text-white">생산량</div>
-                <div class="border p-2" :class="{
-                    'bg-white': focusedField !== 'created_quantity',
-                    'bg-success text-white fw-bold border-3 border-success': focusedField === 'created_quantity'
-                }">
-                    {{ focusedField === 'created_quantity' ? currentInput : processInfo.created_quantity }}
+        </div>
+
+        <div class="container mt-4">
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                <div class="col">
+                    <div class="card h-100 border-info" :class="{
+                        'bg-white': focusedField !== 'input_quantity',
+                        'bg-info text-white fw-bold border-3 border-info': focusedField === 'input_quantity'
+                    }">
+                        <div class="card-body" @click="setFocus('input_quantity')">
+                            <h5 class="card-title">투입량</h5>
+                            {{ focusedField === 'input_quantity' ? currentInput : processInfo.input_quantity }}
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card h-100 border-warning" :class="{
+                        'bg-white': focusedField !== 'error_quantity',
+                        'bg-warning text-white fw-bold border-3 border-warning': focusedField === 'error_quantity'
+                    }">
+                        <div class="card-body" @click="setFocus('error_quantity')">
+                            <h5 class="card-title">불량량</h5>
+                            {{ focusedField === 'error_quantity' ? currentInput : processInfo.error_quantity }}
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card h-100 border-success" :class="{
+                        'bg-white': focusedField !== 'created_quantity',
+                        'bg-success text-white fw-bold border-3 border-success': focusedField === 'created_quantity'
+                    }">
+                        <div class="card-body" @click="setFocus('created_quantity')">
+                            <h5 class="card-title">생산량</h5>
+                            {{ focusedField === 'created_quantity' ? currentInput : processInfo.created_quantity }}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -80,27 +159,29 @@
         <div class="container d-flex justify-content-center mt-5">
             <div class="card p-3" style="width: 600px;">
                 <div class="row row-cols-3 g-2 text-center">
-                    <div class="col border py-3 keypad" v-for="key in ['1','2','3','4','5','6','7','8','9']" :key="key" @click="handleKey(key)">{{ key }}
-                        
+                    <div class="col border py-3 keypad" v-for="key in ['1', '2', '3', '4', '5', '6', '7', '8', '9']"
+                        :key="key" @click="handleKey(key)">{{ key }}
+
                     </div>
                     <div class="col border py-3 keypad-backspace" @click="handleKey('<')">
-                        <
-                    </div>
-                    <div class="col border py-3 keypad-zero" @click="handleKey('0')">
-                        0
-                    </div>
-                    <div class="col border py-3 keypad-enter" @click="handleKey('✓')">
-                        ✓
+                        < </div>
+                            <div class="col border py-3 keypad-zero" @click="handleKey('0')">
+                                0
+                            </div>
+                            <div class="col border py-3 keypad-enter" @click="handleKey('✓')">
+                                ✓
+                            </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="d-flex justify-content-center mt-4 gap-3">
-            <Button label="작업 시작" severity="primary" class="" size="large" style="width: 20rem; height: 5rem;" @click="processStart" />
-            <Button label="작업 종료" severity="info" class="" size="large" style="width: 20rem; height: 5rem;" @click="processEnd" />
+            <div class="d-flex justify-content-center mt-4 gap-3">
+                <Button label="작업 시작" severity="primary" class="" size="large" style="width: 20rem; height: 5rem;"
+                    @click="processStart" />
+                <Button label="작업 종료" severity="info" class="" size="large" style="width: 20rem; height: 5rem;"
+                    @click="processEnd" />
+            </div>
         </div>
-    </div>
 
 </template>
 
@@ -157,7 +238,7 @@ export default {
     },
     mounted() {
         const processInfoData = this.$route.query;
-        if(typeof processInfoData.work_lot !== 'undefined') {
+        if (typeof processInfoData.work_lot !== 'undefined') {
             this.processInfo.work_lot = processInfoData.work_lot;
             this.processInfo.emp_code = processInfoData.emp_code;
             this.processInfo.fac_code = processInfoData.fac_code;
@@ -167,7 +248,7 @@ export default {
     methods: {
         // 개체 선택
         setFocus(field) {
-            if((this.processInfo.work_start_date === null || this.processInfo.work_start_date === "" ) && field == "error_quantity") {
+            if ((this.processInfo.work_start_date === null || this.processInfo.work_start_date === "") && field == "error_quantity") {
                 Swal.fire({
                     title: '오류',
                     text: '작업 시작 이전에는 불량 수량을 입력할 수 없습니다.',
@@ -176,7 +257,7 @@ export default {
                 });
                 return;
             };
-            if((this.processInfo.work_start_date === null || this.processInfo.work_start_date === "") && field == "created_quantity") {
+            if ((this.processInfo.work_start_date === null || this.processInfo.work_start_date === "") && field == "created_quantity") {
                 Swal.fire({
                     title: '오류',
                     text: '작업 시작 이전에는 생산 수량을 입력할 수 없습니다.',
@@ -185,7 +266,7 @@ export default {
                 });
                 return;
             };
-            if((this.processInfo.work_start_date !== null && this.processInfo.work_start_date !== "") && field == "input_quantity") {
+            if ((this.processInfo.work_start_date !== null && this.processInfo.work_start_date !== "") && field == "input_quantity") {
                 Swal.fire({
                     title: '오류',
                     text: '작업 시작 이후에는 투입 수량을 입력할 수 없습니다.',
@@ -194,11 +275,11 @@ export default {
                 });
                 return;
             };
-            if(this.focusedField == field) {
+            if (this.focusedField == field) {
                 this.focusedField = null;
             } else {
                 this.focusedField = field;
-                this.currentInput = this.processInfo[field] === 0 ? "" :  this.processInfo[field].toString();
+                this.currentInput = this.processInfo[field] === 0 ? "" : this.processInfo[field].toString();
             }
         },
 
@@ -220,21 +301,21 @@ export default {
 
         // 숫자 추가
         appendNumber(num) {
-            if(this.focusedField) {
+            if (this.focusedField) {
                 this.currentInput += num;
             }
         },
 
         // 입력 위치 수정
         backspace() {
-            if(this.focusedField) {
+            if (this.focusedField) {
                 this.currentInput = this.currentInput.slice(0, -1);
             }
         },
 
         // 입력 반영
         confirmInput() {
-            if(this.focusedField) {
+            if (this.focusedField) {
                 const numValue = parseInt(this.currentInput) || 0;
                 this.processInfo[this.focusedField] = numValue;
                 this.focusedField = null;
@@ -247,7 +328,7 @@ export default {
             if (this.pressedKey === key.toString()) {
                 return {
                     cursor: 'pointer',
-                    backgroundColor: '#0d6efd', 
+                    backgroundColor: '#0d6efd',
                     color: 'white',
                     fontWeight: 'bold',
                     border: '3px solid #0d6efd',
@@ -264,7 +345,7 @@ export default {
         // 공정 정보 표시
         async displayLoad() {
             let work_lot = this.processInfo.work_lot;
-                console.log(this.processInfo);
+            console.log(this.processInfo);
             await axios.get(`/api/work/process/select`, {
                 params: {
                     work_lot: this.processInfo.work_lot,
@@ -343,7 +424,7 @@ export default {
             }).then(res => {
                 const nowTime = new Date()
                 this.processInfo.work_start_date = this.formatDate(nowTime);
-                if(res.data[1][0].result_code === 0) {
+                if (res.data[1][0].result_code === 0) {
                     Swal.fire({
                         title: '성공',
                         text: '작업이 문제 없이 시작되었습니다.',
@@ -409,14 +490,14 @@ export default {
             }).then(res => {
                 const nowTime = new Date()
                 this.processInfo.work_end_date = this.formatDate(nowTime);
-                if(res.data[1][0].result_code === 0) {
+                if (res.data[1][0].result_code === 0) {
                     Swal.fire({
                         title: '성공',
                         text: '작업이 문제 없이 종료되었습니다.',
                         icon: 'success',
                         confirmButtonText: '확인',
                     });
-                    this.$router.push({ name: 'Process'});
+                    this.$router.push({ name: 'Process' });
                 } else {
                     Swal.fire({
                         title: '오류',
@@ -428,11 +509,11 @@ export default {
             }).catch((err) => {
                 console.error(err);
                 Swal.fire({
-                        title: '오류',
-                        text: '작업 종료 과정에서 오류가 발생했습니다.',
-                        icon: 'error',
-                        confirmButtonText: '확인',
-                    });
+                    title: '오류',
+                    text: '작업 종료 과정에서 오류가 발생했습니다.',
+                    icon: 'error',
+                    confirmButtonText: '확인',
+                });
             });
         },
 
@@ -456,8 +537,9 @@ export default {
 .ag-theme-alpine .ag-header-cell-label {
     justify-content: center;
 }
+
 .keypad {
-  transition: background-color 0.2s ease;
+    transition: background-color 0.2s ease;
 }
 
 .keypad:hover {
@@ -469,10 +551,12 @@ export default {
     box-shadow: 0 0 10px rgba(13, 110, 253, 0.5);
     transition: all 0.1s ease-in-out;
 }
+
 .keypad-backspace {
     background-color: gray;
     color: white;
 }
+
 .keypad-backspace:hover {
     cursor: pointer;
     background-color: #0d6efd;
@@ -482,10 +566,12 @@ export default {
     box-shadow: 0 0 10px rgba(13, 110, 253, 0.5);
     transition: all 0.1s ease-in-out;
 }
+
 .keypad-zero {
     background-color: #212529;
     color: white;
 }
+
 .keypad-zero:hover {
     cursor: pointer;
     background-color: #0d6efd;
@@ -495,10 +581,12 @@ export default {
     box-shadow: 0 0 10px rgba(13, 110, 253, 0.5);
     transition: all 0.1s ease-in-out;
 }
+
 .keypad-enter {
     background-color: gray;
     color: white;
 }
+
 .keypad-enter:hover {
     cursor: pointer;
     background-color: #0d6efd;
