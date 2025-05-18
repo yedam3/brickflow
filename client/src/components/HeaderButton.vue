@@ -1,7 +1,7 @@
 <template>
     <div class="custom-header">
         <span>{{ params.displayName }}</span>
-        <button class="btn btn-sm btn-success" @click="onClick">추가</button>
+        <button class="btn btn-sm btn-success text-white" @click="onClick">추가</button>
     </div>
 </template>
 

@@ -50,8 +50,8 @@
         <div class="col">
             <div class="card border-0" style="height: calc(42vh - 4.2rem)">
                 <!-- 사원 목록 그리드 -->
-                <div class="heading-with-line">
-                    <h5 class="me-3">작업자</h5>
+                <div class="heading-with-line mb-3">
+                    <h5 class="m-0 me-3">작업자</h5>
                 </div>
                 <div class="ag-wrapper justify-content-center">
                     <ag-grid-vue class="ag-theme-alpine custom-grid-theme" :columnDefs="employeeColDefs"
@@ -63,8 +63,8 @@
         <div class="col">
             <div class="card border-0" style="height: calc(42vh - 4.2rem)">
                 <!-- 설비 목록 그리드 -->
-                <div class="heading-with-line">
-                    <h5 class="me-3">설비</h5>
+                <div class="heading-with-line mb-3">
+                    <h5 class="m-0 me-3">설비</h5>
                 </div>
                 <div class="ag-wrapper justify-content-center">
                     <ag-grid-vue class="ag-theme-alpine custom-grid-theme" :columnDefs="facColDefs"
