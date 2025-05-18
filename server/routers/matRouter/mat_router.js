@@ -5,6 +5,7 @@ const fs = require("fs");
 const ejs = require("ejs");
 const path = require("path");
 const puppeteer = require("puppeteer");
+const QRCode = require('qrcode');
 
 let browser;  // 전역 변수로 선언
 
@@ -112,7 +113,15 @@ router.delete('/delete/:ocd',async(req,res)=>{
 router.post('/pdfDownload',async(req,res) => {
     
     const {rowData,rowDataDetail} = req.body;
-    
+
+    //각 발주 상세 항목마다 QR코드 담기
+    const qrImages = await Promise.all(
+        rowDataDetail.map(async (detail) => {
+            const qrData = `http://www.brickflow.shop/mat/check?data=${detail.mat_order_detailcode}`;
+            return await QRCode.toDataURL(qrData);
+        })
+    );
+  
     const data = {
         mat_order_code : rowData[0].mat_order_code,
         mat_order_name : rowData[0].mat_order_name,
@@ -120,10 +129,12 @@ router.post('/pdfDownload',async(req,res) => {
         request_date : rowData[0].request_date,
         note : rowData[0].note,
         delivery_date : rowData[0].delivery_date,
-        detail: rowDataDetail.map(info => ({
+        detail: rowDataDetail.map((info,idx) => ({
             mat_name  : info.mat_name,
-            request_quantity : info.request_quantity
-        }))
+            request_quantity : info.request_quantity,
+            qrImage :qrImages[idx]
+        })),
+        
     }
     //ejs 경로찾기
     const filePath  = path.join(__dirname,'/MatPdf.ejs');

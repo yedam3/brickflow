@@ -204,8 +204,16 @@ export default {
            
         };
     },
-    mounted() {
-        this.matList();
+    async mounted() {
+        const raw = this.$route.query.data;
+        if(raw){
+            // 디코딩 (필요한 경우만)
+            const decoded = decodeURIComponent(raw);
+
+            // 객체로 파싱
+            await this.clicked({ data: {mat_order_detailCode:decoded} })
+        }
+        await this.matList();
     },
     computed:{
         //박스갯수 체크
@@ -263,6 +271,7 @@ export default {
         },
         //클릭했을때 검수량 렌더링
         async clicked(event) {
+            console.log(event)
             let detail = event.data.mat_order_detailCode;
             await axios.get('/api/mat/checkList/' + detail)
                           .then(res => {
