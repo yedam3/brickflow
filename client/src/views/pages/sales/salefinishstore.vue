@@ -65,13 +65,13 @@
               <InputGroupAddon>
                 제품수량
               </InputGroupAddon>
-              <InputText v-model="formData.quantity" size="large" placeholder="" readonly />
+              <InputText v-model="formData.quantity" size="large" placeholder=""  />
             </InputGroup>
           </div>
           <div class="col-3">
             <InputGroup>
               <InputGroupAddon>
-                제품수량
+                창고
               </InputGroupAddon>
               <select class="form-select col" aria-label="Default select example" v-model="formData.storage_code">
                 <option disabled selected value="">창고(선택)</option>
@@ -265,7 +265,7 @@ export default {
           this.rowData = res.data;
         })
     },
-
+//등록
     async addFunc() {
       //등록건인지체크
       if (this.formData.prod_lot != '') {
@@ -289,11 +289,11 @@ export default {
       }
       let res = await axios.get('/api/sales/checkCount/' + this.formData.prod_check_code)
         .catch((err) => console.log(err));
-
-      if (Number(res.data[0].COUNT) < 1) {
+      console.log('입고건',res.data[0].count)
+      if (Number(res.data[0].count) <  Number(this.formData.quantity)) {
         Swal.fire({
           title: '정보',
-          text: '이미 입고가 진행된 건입니다.',
+          text: '입고 가능수량을 넘으셨습니다.',
           icon: 'info',
           confirmButtonText: '확인'
         });
@@ -385,6 +385,18 @@ export default {
         });
         return;
       }
+      //입고 가능수량 체크
+      let res = await axios.get('/api/sales/checkCount/' + this.formData.prod_check_code)
+        .catch((err) => console.log(err));
+      if (Number(res.data[0].count)+Number(this.rowData[this.rowDataIndex].quantity) < Number(this.formData.quantity)) {
+        Swal.fire({
+          title: '정보',
+          text: '입고가능 수량보다 넘으셨습니다.',
+          icon: 'info',
+          confirmButtonText: '확인'
+        });
+        return
+      }
       //출고건이 있는 지확인
       let delCount = await axios.get(`/api/sales/deliveryCount/${this.formData.prod_lot}/${this.formData.quantity}`)
         .catch((err) => console.log(err));
@@ -408,17 +420,7 @@ export default {
         });
         return;
       }
-      let res = await axios.get('/api/sales/checkCount/' + this.formData.prod_check_code)
-        .catch((err) => console.log(err));
-      if (Number(res.data[0].COUNT) < 1) {
-        Swal.fire({
-          title: '정보',
-          text: '입고가 진행된 계획코드가 아닙니다.',
-          icon: 'info',
-          confirmButtonText: '확인'
-        });
-        return
-      }
+      
       //수정진행
       await axios.put('/api/sales/finishUpdate/', this.formData)
         .then(res => {
@@ -476,18 +478,7 @@ export default {
         });
         return;
       }
-      let res = await axios.get('/api/sales/checkCount/' + this.formData.prod_check_code)
-        .catch((err) => console.log(err));
 
-      if (Number(res.data[0].COUNT) < 1) {
-        Swal.fire({
-          title: '정보',
-          text: '입고가 진행된 계획코드가 아닙니다.',
-          icon: 'info',
-          confirmButtonText: '확인'
-        });
-        return
-      }
       await axios.delete(`/api/sales/finishDelete/${this.formData.prod_lot}`)
         .then(res => {
           if (res.data.affectedRows > 0) {

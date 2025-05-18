@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <meta charset="UTF-8">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic&display=swap');
-
     body {
       font-family:'Nanum Gothic';
       font-size: 12px;
@@ -83,7 +83,22 @@
 <body>
 
   <div class="title">발 주 서</div>
-
+  <table class="float-end mb-3">
+    <tr>
+           <% detail.forEach((item, idx) => { %>
+             <td>
+               <%= item.mat_name %>
+             </td> 
+           <% }) %>
+    </tr>
+    <tr>
+            <% detail.forEach((item, idx) => { %>
+            <td>
+              <img src="<%= item.qrImage %>" alt="QR 코드" width="70" height="70" />
+            </td>
+           <% }) %>
+    </tr>
+   </table>
   <table class="info-table">
     <tr>
       <td class="backGray"><strong>발주번호</strong></td>
@@ -114,13 +129,13 @@
       </tr>
     </thead>
     <tbody>
-      <% detail.forEach((item, idx) => { %>
-        <tr>
-          <td><%= idx + 1 %></td>
-          <td><%= item.mat_name %></td>
-          <td><%= item.request_quantity %>개</td>
-        </tr>
-      <% }) %>
+        <% for (let idx = 0; idx < 10; idx++) { %>
+          <tr>
+            <td><%= idx + 1 %></td>
+            <td><%= detail[idx]?.mat_name || '' %></td>
+            <td><%= detail[idx]?.request_quantity || '' %>개</td>
+          </tr>
+        <% } %>
     </tbody>
   </table>
 

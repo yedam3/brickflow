@@ -56,6 +56,7 @@
   
       getQRCodeValue(item) {
         try {
+          //제이슨 형식으로 변경
           const jsonData = JSON.stringify({
             prod_code: item.prod_code,
             quantity: item.finish_quantity,
@@ -63,7 +64,9 @@
             work_lot :item.work_lot,
             prod_check_code : item.prod_check_code
           });
+          //URI 형식으로 파싱 왜냐면 객체형식으로 보내야하기 때문
           const encodedData = encodeURIComponent(jsonData);
+          
           return `http://www.brickflow.shop/seller/finishstore?data=${encodedData}`;
         } catch (error) {
           console.error("QR 코드 생성 오류:", error);
