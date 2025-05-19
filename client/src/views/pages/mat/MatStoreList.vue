@@ -1,6 +1,9 @@
 <template>
     <div class="card border-0" style="height: 800px">
         <h3>자재 재고 조회</h3>
+        <div class="heading-with-line">
+            <h5 class="m-0 me-3">조회</h5>
+        </div>
         <div class="text-end mt-5 mb-3">
             <div class="row justify-content-between align-items-center">
                 <div class="col-auto">
@@ -22,16 +25,16 @@
         </div>
         <div class="row">
             <div class="col-7">
-                <h3>자재 재고</h3>
+                <h4>자재 재고</h4>
                 <ag-grid-vue class="ag-theme-alpine custom-grid-theme" style="width: 100%" :columnDefs="columnDefs"
-                    :rowData="rowData" :gridOptions="gridOptions" @cellClicked="matCellclicked">
+                    :rowData="rowData" :gridOptions="gridOptions1" @cellClicked="matCellclicked">
                 </ag-grid-vue>
             </div>
             <div class="col-5">
-                <h3>LOT별 자재재고</h3>
+                <h4>LOT별 자재재고</h4>
                 <ag-grid-vue ref="secondGrid" class="ag-theme-alpine custom-grid-theme"
                     style="width: 100%; height: 150px" :columnDefs="secondColumnDefs" :rowData="secondRowData"
-                    :gridOptions="gridOptions" rowSelection="multiple" >
+                    :gridOptions="gridOptions">
                 </ag-grid-vue>
             </div>
         </div>
@@ -87,8 +90,24 @@ export default {
                         return params.value != null ? `${params.value}개` : '';
                     }
                 },
-                { field: "store_name", headerName: "창고", flex: 1,},
+                { field: "store_name", headerName: "창고", flex: 2,},
             ],
+              gridOptions1: {
+                domLayout: "autoHeight",
+                singleClickEdit: true,
+                suppressRowClickSelection: false,
+                rowSelection:"single",
+                pagination: true,
+                paginationPageSize: 10,
+                paginationPageSizeSelector: false,
+                overlayNoRowsTemplate: '표시할 값이 없습니다.',
+                defaultColDef: {
+                    suppressMovable: true,
+                    resizable: false,
+                    sortable: false,
+                    cellStyle: { textAlign: "center" },
+                },
+            },
             gridOptions: {
                 domLayout: "autoHeight",
                 singleClickEdit: true,
@@ -145,6 +164,9 @@ export default {
 
 </script>
 <style scoped>
+::v-deep(.ag-row-selected) {
+    background-color: #BADDF9 !important; 
+  }
   .btn-primary {
       background-color: rgb(230, 171, 98);
       border-color: rgb(230, 171, 98);

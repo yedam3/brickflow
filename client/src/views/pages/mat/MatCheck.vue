@@ -1,6 +1,9 @@
 <template>
-    <div class="card border-0" style="height: 800px">
-        <div class="font-semibold text-xl mb-4">자재검수관리</div>
+    <div class="card border-0" style="height: 900px">
+        <h3>자재 검수 관리</h3>
+        <div class="heading-with-line">
+            <h5 class="m-0 me-3">등록 | 수정 | 삭제</h5>
+        </div>
         <div class="text-end mt-3 mb-3">
             <Button label="조회" severity="success" class="me-3" @click="checkResultList" />
             <Button label="등록" severity="info" class="me-3" @click="checkAdd" />
@@ -30,8 +33,14 @@
                     </div>
                 </div>
                 <!-- ag-Grid 테이블 -->
-                <AgGridVue style="width: 100%; height: 100%" class="ag-theme-alpine" :columnDefs="columnDefs"
-                    :rowData="rowData" :gridOptions="gridOptions" @rowClicked="clicked" />
+                <ag-grid-vue 
+                    class="ag-theme-alpine custom-grid-theme"
+                    style="width: 100%;
+                    height: 100%" 
+                    :rowData="rowData"
+                    :columnDefs="columnDefs"
+                    :gridOptions="gridOptions"
+                    @cellClicked="clicked" />
             </div>
             <div class="card border-0 col" style="height: 650px; background-color: #F5F5F5;">
                 <h5>검수등록</h5>
@@ -86,7 +95,7 @@
                 <div class="row">
                     <div class="input-group col">
                         <span class="input-group-text" id="basic-addon1">검수내역</span>
-                        <textarea class="form-control" v-model="info.check_history" placeholder="비고"
+                        <textarea class="form-control" v-model="info.check_history" placeholder="검수 내역"
                             style="height: 100px; resize: none;"></textarea>
                     </div>
                     <div class="input-group mb-5 col">
@@ -95,7 +104,7 @@
                             aria-describedby="basic-addon1" v-model="info.emp_name" readonly>
                     </div>
                 </div>
-                <div v-if="info.check_quantity > 0 " >
+                <div class="mt-3" v-if="info.check_quantity > 0 ">
                     <h5>검사항목</h5>
                     <div class="row">
                         <div class="form-check col-6" v-for="errInfo in error_check_ary">
@@ -163,13 +172,15 @@ export default {
                 },
                 
             ],
+            // 첫번째 그리드 선택된 행
             gridOptions: {
                 domLayout: "autoHeight",
                 singleClickEdit: true,
-                suppressRowClickSelection: true,
+                suppressRowClickSelection: false,
                 pagination: true,
                 paginationPageSize: 8,
                 paginationPageSizeSelector: false,
+                rowSelection:"single",
                 overlayNoRowsTemplate: '표시할 값이 없습니다.',
                 defaultColDef: {
                     suppressMovable: true,
@@ -200,6 +211,7 @@ export default {
                     { mat_error_code : 'E03', mat_error_name : '색상', check : false, mat_check_error : 0 },
                     { mat_error_code : 'E04', mat_error_name : '외관', check : false, mat_check_error : 0 },
             ],
+            
             showModal : false
            
         };
@@ -601,6 +613,11 @@ export default {
 </script>
 
 <style scoped>
+ 
+  /* 선택된 행 색상 스타일 */
+  ::v-deep(.ag-row-selected) {
+    background-color: #BADDF9 !important; 
+  }
 .btn-primary {
     background-color: rgb(230, 171, 98);
     border-color: rgb(230, 171, 98);
@@ -619,4 +636,5 @@ export default {
     background-color: #FFCC80;
     border-color: #FFCC80;
 }
+
 </style>

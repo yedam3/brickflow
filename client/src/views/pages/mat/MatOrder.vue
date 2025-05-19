@@ -1,6 +1,9 @@
 <template>
   <div class="card border-0" style="height: 800px">
-    <div class="font-semibold text-xl mb-4">자재발주관리</div>
+    <h3>자재 발주 관리</h3>
+    <div class="heading-with-line">
+            <h5 class="m-0 me-3">등록 | 수정 | 삭제</h5>
+    </div>
 
     <div class="text-end mt-3 mb-3">
       <Button label="조회" severity="success" class="me-3" @click="matOrderList"/>
@@ -128,7 +131,7 @@ export default {
       secondColumnDefs: [
         // 체크박스 추가
         { headerCheckboxSelection: true, checkboxSelection: true, width: 50 },
-        { field: "mat_order_detailcode", headerName: "자재발주상세코드", flex: 2 },
+        { field: "mat_order_detailcode", headerName: "자재발주상세코드", flex: 2 ,hide:true},
         { field: "mat_order_code", headerName: "자재발주코드", flex: 2 },
         { field: "mat_code", headerName: "자재코드", flex: 3 },
         { field: "mat_name", headerName: "자재명", flex: 3 },

@@ -98,7 +98,12 @@
                 }
             },
           { field: "mat_name", headerName: "자재명", flex: 2 },
-          { field: "total_quantity", headerName: "발주총갯수", flex: 1 },
+          {
+            field: "total_quantity", headerName: "발주총갯수", flex: 1,
+            valueFormatter: (params) => {
+              return params.value != null ? `${params.value}개` : '';
+            }
+          },
           { field: "status_name", headerName: "발주상태", flex: 1 ,
           cellStyle: params => {
                   if (params.value == '검수대기') {
