@@ -29,7 +29,7 @@ export default {
                     prod_name: '',
                     plan_quantity: '',
                     priority: '',
-                    order_quantity: ''
+                    order_quantity: '',
                 };
                 this.params.context.componentParent.addNewRow(newRow);
                 console.log('행 추가됨:', newRow);
