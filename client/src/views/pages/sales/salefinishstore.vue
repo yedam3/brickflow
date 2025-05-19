@@ -6,86 +6,84 @@
       <h5 class="m-0 me-3">완제품 관리</h5>
     </div>
 
-    <div class="text-end mt-3 mb-3">
-      <Button label="초기화" severity="secondary" class="me-3" @click="clearForm" />
-      <Button label="입고 가능 재고조회" severity="success" class="me-3" @click="orderList" />
-      <Button label="등록" severity="info" class="me-3" @click="addFunc" />
-      <Button label="수정" severity="help" class="me-3" @click="modifyFunc" />
-      <Button label="삭제" severity="danger" class="me-5" @click="deleteFunc" />
+    <div class="d-flex justify-content-end mt-3 mb-5 gap-3">
+      <Button label="초기화" severity="secondary" class="" @click="clearForm" />
+      <Button label="입고 가능 재고조회" severity="success" class="" @click="orderList" />
+      <Button label="등록" severity="info" class="" @click="addFunc" />
+      <Button label="수정" severity="help" class="" @click="modifyFunc" />
+      <Button label="삭제" severity="danger" class="" @click="deleteFunc" />
     </div>
 
-    <Card style="overflow: hidden; ">
-      <template #content>
-        <div class="mb-5 row">
-          <div class="col-4">
-            <InputGroup>
-              <InputGroupAddon>
-                LOT 번호
-              </InputGroupAddon>
-              <InputText v-model="formData.prod_lot" size="large" placeholder="LOT" readonly />
-            </InputGroup>
-          </div>
-          <div class="col-4">
-            <InputGroup>
-              <InputGroupAddon>
-                담당자
-              </InputGroupAddon>
-              <InputText v-model="formData.emp_name" size="large" placeholder="" readonly />
-            </InputGroup>
-          </div>
-          <div class="col-4">
-            <InputGroup>
-              <InputGroupAddon>
-                입고일자
-              </InputGroupAddon>
-              <InputText v-model="formData.store_date" size="large" placeholder="" readonly />
-            </InputGroup>
-          </div>
-        </div>
+    <div class="mb-5 row">
+      <div class="col-4">
+        <InputGroup>
+          <InputGroupAddon>
+            LOT 번호
+          </InputGroupAddon>
+          <InputText v-model="formData.prod_lot" size="large" placeholder="LOT" readonly />
+        </InputGroup>
+      </div>
+      <div class="col-4">
+        <InputGroup>
+          <InputGroupAddon>
+            담당자
+          </InputGroupAddon>
+          <InputText v-model="formData.emp_name" size="large" placeholder="" readonly />
+        </InputGroup>
+      </div>
+      <div class="col-4">
+        <InputGroup>
+          <InputGroupAddon>
+            입고일자
+          </InputGroupAddon>
+          <InputText v-model="formData.store_date" size="large" placeholder="" readonly />
+        </InputGroup>
+      </div>
+    </div>
 
-        <div class="mb-5 row">
-          <div class="col-3">
-            <InputGroup>
-              <InputGroupAddon>
-                제품명
-              </InputGroupAddon>
-              <InputText v-model="formData.prod_name" size="large" placeholder="" readonly />
-            </InputGroup>
-          </div>
-          <div class="col-3">
-            <InputGroup>
-              <InputGroupAddon>
-                제품코드
-              </InputGroupAddon>
-              <InputText v-model="formData.prod_code" size="large" placeholder="" readonly />
-            </InputGroup>
-          </div>
-          <div class="col-3">
-            <InputGroup>
-              <InputGroupAddon>
-                제품수량
-              </InputGroupAddon>
-              <InputText v-model="formData.quantity" size="large" placeholder=""  />
-            </InputGroup>
-          </div>
-          <div class="col-3">
-            <InputGroup>
-              <InputGroupAddon>
-                창고
-              </InputGroupAddon>
-              <select class="form-select col" aria-label="Default select example" v-model="formData.storage_code">
-                <option disabled selected value="">창고(선택)</option>
-                <option v-for="store in storeListAry" :key="store.storage_code" :value="store.storage_code">
-                  {{ store.store_name }}
-                </option>
-              </select>
-            </InputGroup>
-          </div>
-        </div>
-        <div class="mb-5 row">
+    <div class="mb-5 row">
+      <div class="col-3">
+        <InputGroup>
+          <InputGroupAddon>
+            제품명
+          </InputGroupAddon>
+          <InputText v-model="formData.prod_name" size="large" placeholder="" readonly />
+        </InputGroup>
+      </div>
+      <div class="col-3">
+        <InputGroup>
+          <InputGroupAddon>
+            제품코드
+          </InputGroupAddon>
+          <InputText v-model="formData.prod_code" size="large" placeholder="" readonly />
+        </InputGroup>
+      </div>
+      <div class="col-3">
+        <InputGroup>
+          <InputGroupAddon>
+            제품수량
+          </InputGroupAddon>
+          <InputText v-model="formData.quantity" size="large" placeholder="" />
+        </InputGroup>
+      </div>
+      <div class="col-3">
+        <InputGroup>
+          <InputGroupAddon>
+            창고
+          </InputGroupAddon>
+          <select class="form-select col" aria-label="Default select example" v-model="formData.storage_code">
+            <option disabled selected value="">창고(선택)</option>
+            <option v-for="store in storeListAry" :key="store.storage_code" :value="store.storage_code">
+              {{ store.store_name }}
+            </option>
+          </select>
+        </InputGroup>
+      </div>
+    </div>
+    <div class="mb-5 row">
 
-        </div>
-        <!-- <div class="mb-5 row">
+    </div>
+    <!-- <div class="mb-5 row">
             <div class="col-auto">
               <select class="form-select col" aria-label="Default select example" v-model="formData.storage_code">
                 <option disabled selected value="">창고</option>
@@ -95,9 +93,6 @@
               </select>
             </div>
           </div> -->
-
-      </template>
-    </Card>
   </div>
 
   <div class="row">

@@ -134,7 +134,7 @@ export default {
       //메인그리드 행 인덱스 ary
       selectedRowIndexes: [],
       //상세그리드 행 인덱스
-      selectedSecondIndex: [],
+      selectedSecondIndex: null,
       orderStop: false, // 행추가 막기
 
     };
@@ -205,6 +205,7 @@ export default {
     prodCellClicked(params) {
       if ((params.colDef.field == "prod_code" || params.colDef.field == "prod_name")) {
         this.selectedSecondIndex = params.rowIndex;
+        console.log(this.selectedSecondIndex);
         this.showProdModal = true;
       }
     },
@@ -212,7 +213,7 @@ export default {
     prodSelected(prod) {
       this.secondRowData[this.selectedSecondIndex].prod_code = prod.prod_code;
       this.secondRowData[this.selectedSecondIndex].prod_name = prod.prod_name;
-      // this.secondRowData = [...this.secondRowData];
+      this.secondRowData = [...this.secondRowData];
     },
     //현재날짜 가져오기
     getToday() {
