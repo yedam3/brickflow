@@ -36,4 +36,14 @@ router.delete('/resetProd/:ProdCode', async (req, res) => {
   res.send(result);
 })
 
+
+//값체크
+router.get('/prodCheck/:prodCode',async (req,res)=>{
+    const prodCode = req.params.prodCode;
+    let list = await ProdService.prodCheck(prodCode)
+        .catch((err) => console.log(err));
+    res.send(list);
+})
+
+
 module.exports = router;

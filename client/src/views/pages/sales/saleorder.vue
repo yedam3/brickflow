@@ -114,7 +114,7 @@ export default {
         { field: 'delivery_demand', headerName: '수량', flex: 2, editable: true, valueFormatter: (params) => { return params.value != null ? `${params.value}` : ''; } },
         { field: 'price', headerName: '단가', flex: 2, editable: true, valueFormatter: (params) => { const value = Number(params.value); return isNaN(value) ? '' : '₩' + value.toLocaleString(); } },
         { field: 'totalprice', headerName: '총주문 금액', valueGetter: 'Number(data.delivery_demand) * Number(data.price)', flex: 3, valueFormatter: (params) => { const value = params.value; return value != null ? '₩' + Number(value).toLocaleString() : ''; } },
-        { field: 'note', headerName: '비고', flex: 3 },
+        
       ],
       gridOptions: {
         domLayout: "autoHeight", //행을 보고 자동으로 hight부여
@@ -318,7 +318,6 @@ export default {
         });
         return 1;
       }
-      // 부모그리드 체크
 
       //상세그리드 값 다들어 갔는지 체크
       for (let rowInclude of this.secondRowData) {
