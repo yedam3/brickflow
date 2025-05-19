@@ -230,24 +230,31 @@ export default {
       }
       if (!this.rowData2.employee_code) {
           Swal.fire("입력오류", "담당자를 입력해주세요", "warning");
+          return;
       }
       if (!this.rowData2.repaire_add_date) {
           Swal.fire("입력오류", "종료일시를 입력해주세요", "warning");
+          return;
       }
       if (!this.rowData2.break_status) {
           Swal.fire("입력오류", "고장증상을 입력해주세요", "warning");
+          return;
       }
       if (!this.rowData2.fac_code) {
           Swal.fire("입력오류", "설비코드를 입력해주세요", "warning");
+          return;
       }
       if (!this.rowData2.fac_result) {
           Swal.fire("입력오류", "수리결과를 선택해주세요", "warning");
+          return;
       }
       if (!this.rowData2.unplay_code) {
           Swal.fire("입력오류", "비가동코드를 입력해주세요", "warning");
+          return;
       }
       if (!this.rowData2.fac_history) {
           Swal.fire("입력오류", "수리내역을 입력해주세요", "warning");
+          return;
       }
       
       if (!this.rowData2.repaire_add_date) {

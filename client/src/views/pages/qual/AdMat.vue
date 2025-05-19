@@ -175,7 +175,38 @@
       },
       //등록
       async addMat() {
-        
+
+            if (!this.rowData.mat_name) {
+                Swal.fire("입력 오류", "자재명을 선택해주세요.", "warning");
+                return;
+            }
+            if (!this.rowData.unit) {
+                Swal.fire("입력 오류", "단위을 선택해주세요.", "warning");
+                return;
+            }
+            if (!this.rowData.size) {
+                Swal.fire("입력 오류", "크기를 선택해주세요.", "warning");
+                return;
+            }
+
+            if (!this.rowData.color) {
+                Swal.fire("입력 오류", "색상을 입력해주세요.", "warning");
+                return;
+            }
+
+            if (!this.rowData.texture) {
+                Swal.fire("입력 오류", "재질을 입력해주세요.", "warning");
+                return;
+            }
+            if (!this.rowData.shape) {
+                Swal.fire("입력 오류", "모양을 입력해주세요.", "warning");
+                return;
+            }
+            if (!this.rowData.safe_inventory) {
+                Swal.fire("입력 오류", "안전재고를 입력해주세요.", "warning");
+                return;
+            }
+
         console.log('프론트에서 보내는 mat_code:', this.rowData.mat_code);
         const res = await axios.post('/api/admin/addMat', this.rowData)
         .catch(error => {
@@ -197,6 +228,7 @@
       },
       //수정
       async updateMat() {
+        
         axios.put('/api/admin/updateMat', {
           mat: this.rowData
 

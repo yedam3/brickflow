@@ -312,9 +312,9 @@ export default {
         //등록
         async addFac() {
             if (
-                !this.rowData.fac_pattern &&
-                !this.rowData.fac_status &&
-                !this.rowData.install_date &&
+                !this.rowData.fac_pattern ||
+                !this.rowData.fac_status ||
+                !this.rowData.install_date ||
                 !this.rowData.model_name
             ) {
                 Swal.fire("입력 오류", "필수 항목을 모두 입력해주세요.", "warning");

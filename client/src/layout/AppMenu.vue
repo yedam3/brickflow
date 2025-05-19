@@ -59,11 +59,6 @@ const model = ref([
                         to: '/seller/order'
                     },
                     {
-                        label: '출고 관리',
-                        icon: 'pi pi-fw pi-times-circle',
-                        to: '/seller/deliverymanage'
-                    },
-                    {
                         label: '완제품 입고관리',
                         icon: 'pi pi-fw pi-times-circle',
                         to: '/seller/finishstore'
@@ -72,6 +67,11 @@ const model = ref([
                         label: '완제품 재고현황',
                         icon: 'pi pi-fw pi-sign-in',
                         to: '/seller/finishedList'
+                    },
+                    {
+                        label: '출고 관리',
+                        icon: 'pi pi-fw pi-times-circle',
+                        to: '/seller/deliverymanage'
                     },
                 ]
             },
@@ -161,26 +161,11 @@ const model = ref([
                         label: '설비 수리 관리',
                         icon: 'pi pi-fw pi-sign-in',
                         to: '/facs/repaire'
-                    },
-                    {
-                        label: '설비 통계 관리',
-                        icon: 'pi pi-fw pi-sign-in',
-                        to: '/facs/statistic'
-                    },
-                    {
-                        label: '설비 점검 관리',
-                        icon: 'pi pi-fw pi-sign-in',
-                        to: '/facs/inspection'
-                    },
+                    },                
                     {
                         label: '설비 수리 내역',
                         icon: 'pi pi-fw pi-clipboard',
                         to: '/facs/repirList'
-                    },
-                    {
-                        label: '설비 점검 내역',
-                        icon: 'pi pi-fw pi-clipboard',
-                        to: '/facs/inspectList'
                     },
                 ]
             },
