@@ -119,7 +119,14 @@ export default{
        { field: 'prod_name', headerName: '제품명',flex:4},
        { field: 'check_list', headerName: '검수항목',flex:3},
        { field: 'pass_quantity', headerName: '합격량' ,flex:2},
-       { field: 'error_quantity', headerName: '불량량' ,flex:2,editable:true},
+       { field: 'error_quantity', headerName: '불량량' ,flex:2,editable:true, 
+       valueParser: (params) => {
+          if (/[^0-9+:]/.test(params.newValue)) {
+          alert('숫자 형식으로 입력해주세요.');
+          return params.oldValue;
+    }
+    return params.newValue;
+  }},
      ],
      gridOptions2:{
        domLayout: "autoHeight", //행을 보고 자동으로 hight부여
@@ -290,6 +297,7 @@ export default{
                           pass_quantity: "",
                           error_quantity: "",
                         }];
+                        this.bottomRow = [];
      await this.prodcheckData();
       this.rowData = [...this.rowData]
     },

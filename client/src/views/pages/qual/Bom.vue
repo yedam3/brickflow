@@ -19,7 +19,7 @@
        class="ag-theme-alpine"
        :columnDefs="columnDefs"
        :rowData="rowData"
-       :gridOptions="gridOptions"
+       :gridOptions="gridOptions1"
        :defaultColDef="defaultColDef"
        @cellClicked="prodCellClicked">
    </ag-grid-vue>
@@ -67,12 +67,12 @@ export default{
        { field: 'prod_code', headerName: '제품코드',flex:1,editable:true},
        { field: 'prod_name', headerName: '제품명' ,flex:1},
      ],
-     gridOptions:{
-         pagination: true,
-         paginationPageSize: 5,
-         paginationPageSizeSelector: [5, 10, 20, 50],
-         overlayNoRowsTemplate: '표시할 값이 없습니다.',
-         defaultColDef: {
+     gridOptions1:{
+        pagination: true,
+        paginationPageSize: 9,
+        paginationPageSizeSelector: false,
+        overlayNoRowsTemplate: '표시할 값이 없습니다.',
+        defaultColDef: {
            suppressMovable: true, //컬럼 드래그로 순서바꾸기 못하게
            resizable: false, //컬럼 너비 마우스로 조절 못하게
            sortable: false, //정렬 기능 비활성화

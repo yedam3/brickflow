@@ -38,15 +38,18 @@ const empCodeList = async () => {
 }
 
 //수정
-const empModify = async (empInfo) => {
-  console.log(empInfo);
+const empUpdate = async (empInfo) => {
+  
   let hashedPwd = null;
   let result = null;
   if(empInfo.pwd){
+    console.log('ㅠㅠ서비스',empInfo);
     const saltRounds = 10;
     hashedPwd = await bcrypt.hash(empInfo.pwd, saltRounds);
-    result = await mariaDB.query('empModify',[empInfo.emp_name, empInfo.department,empInfo.hire_date,empInfo.tel,hashedPwd,empInfo.emp_code])
+    console.log('해쉬된 자료',hashedPwd)
+    result = await mariaDB.query('empPassUpdate',[empInfo.emp_name, empInfo.department,empInfo.hire_date,empInfo.tel,hashedPwd,empInfo.emp_code])
                           .catch((err) => console.log(err));
+    console.log('결관',result)
     return result;
   }
  
@@ -69,6 +72,6 @@ module.exports
   empInfo,
   saveEmp,
   empCodeList,
-  empModify,
+  empUpdate,
   empDelete,
 }

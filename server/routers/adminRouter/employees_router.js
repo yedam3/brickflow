@@ -33,9 +33,10 @@ router.get('/departmentList',async(req,res) => {
 });
 
 // 수정
-router.put('/empmodify', async(req,res) => {
-    let empModify = req.body;
-    let result = await employeesService.empModify(empModify)
+router.put('/empUpdate', async(req,res) => {
+    console.log('제발라우터',req.body);
+    let empUpdate = req.body;
+    let result = await employeesService.empUpdate(empUpdate)
                                         .catch((err) => console.log(err));
     res.send(result);
 });
