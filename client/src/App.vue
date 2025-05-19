@@ -164,4 +164,5 @@
 .ag-row {
   cursor: pointer;
 }
+
 </style>

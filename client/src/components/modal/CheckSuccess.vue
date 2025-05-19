@@ -73,7 +73,11 @@ export default {
                 { field: "prod_code", headerName: "제품코드", flex: 3,},
                 { field: "prod_name", headerName: "제품명", flex: 2,},
                 { field: "work_lot", headerName: "생산LOT", flex: 2,  },
-                { field: "pass_quantity", headerName: "입고가능수량", flex: 3,}
+                { field: "pass_quantity", headerName: "입고가능수량", flex: 2,
+                  valueFormatter: (params) => {
+                    return params.value != null ? `${params.value}개` : '';
+                  }
+                }
             ],
       gridOptions: {
         domLayout: "autoHeight", //행을 보고 자동으로 hight부여
@@ -81,7 +85,7 @@ export default {
         suppressRowClickSelection: true, //	행 클릭할 때 체크박스 선택 방지
         overlayNoRowsTemplate: '표시할 값이 없습니다.',
         pagination: true,
-        paginationPageSize: 8,
+        paginationPageSize: 6,
         paginationPageSizeSelector: false,
         defaultColDef: {
           suppressMovable: true, //셀 이동 금지
@@ -138,3 +142,19 @@ export default {
 }
 
 </script>
+
+<style scoped>
+   .btn-primary {
+      background-color: rgb(230, 171, 98);
+      border-color: rgb(230, 171, 98);
+    }
+  /* 헤더 텍스트 가운데 정렬 */
+    ::v-deep(.ag-theme-alpine .ag-header-cell-label) {
+       justify-content: center;
+    }
+
+/* headerClass로 설정한 header-center 클래스에 적용 */
+    ::v-deep(.header-center .ag-header-cell-label) {
+      justify-content: center;
+    }
+</style>

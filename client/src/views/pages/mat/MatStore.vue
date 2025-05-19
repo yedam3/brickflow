@@ -1,11 +1,14 @@
 <template>
     <div class="card border-0" style="height: 800px">
-        <div class="font-semibold text-xl mb-4">자재입고관리</div>
+        <h3>자재 입고 관리</h3>
+        <div class="heading-with-line">
+            <h5 class="m-0 me-3">등록 | 수정 | 삭제</h5>
+        </div>
         <div class="text-end mt-3 mb-3">
-            <Button label="조회" severity="success" class="me-3" @click="searchStore"/>
-            <Button label="등록" severity="info" class="me-3" @click="addStore"/>
-            <Button label="수정" severity="help" class="me-3" @click="updateStore"/>
-            <Button label="삭제" severity="danger" class="me-5" @click="deleteStore"/>
+            <Button label="조회" severity="success" class="me-3" @click="searchStore" />
+            <Button label="등록" severity="info" class="me-3" @click="addStore" />
+            <Button label="수정" severity="help" class="me-3" @click="updateStore" />
+            <Button label="삭제" severity="danger" class="me-5" @click="deleteStore" />
         </div>
         <div class="row">
             <div class="ag-theme-alpine col me-5" style="height: 400px; width: 50%">
@@ -89,12 +92,8 @@
             </div>
         </div>
     </div>
-    <StoreList
-        :visible="showModal"
-        rowSelection="multiple"
-        @close="showModal = false"
-        @selectOrder="orderSelected"
-   ></StoreList>
+    <StoreList :visible="showModal" rowSelection="multiple" @close="showModal = false" @selectOrder="orderSelected">
+    </StoreList>
 </template>
   
   <script>
@@ -129,9 +128,10 @@
         gridOptions: {
           domLayout: "autoHeight",
           singleClickEdit: true,
-          suppressRowClickSelection: true,
+          suppressRowClickSelection: false,
           pagination: true,
           paginationPageSize: 8,
+          rowSelection:"single",
           paginationPageSizeSelector: false,
           overlayNoRowsTemplate: '표시할 값이 없습니다.',
           defaultColDef: {
@@ -409,6 +409,9 @@
   </script>
   
   <style scoped>
+  ::v-deep(.ag-row-selected) {
+    background-color: #BADDF9 !important; 
+  }
   .btn-primary {
       background-color: rgb(230, 171, 98);
       border-color: rgb(230, 171, 98);
