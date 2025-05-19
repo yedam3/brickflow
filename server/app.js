@@ -118,7 +118,7 @@ app.use((req, res) => {
   });
 
 // Server 실행
-app.listen(80, () => {
+app.listen(3000, () => {
     console.log("Server Start");
-    console.log("http://localhost:80");
+    console.log("http://localhost:3000");
 });
