@@ -19,10 +19,6 @@ jobs:
       with:
         node-version: '20'
 
-    - name: Install frontapp dependencies
-      working-directory: client
-      run: npm ci
-
     - name: Build Vue app
       working-directory: client
       run: |
