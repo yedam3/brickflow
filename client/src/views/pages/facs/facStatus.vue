@@ -54,7 +54,25 @@
         { field:"fac_code", headerName: "설비코드", flex: 2,  },
         { field:"model_name", headerName: "설비이름", flex: 2 },
         { field:"fac_location", headerName: "설비위치", flex: 2 },
-        { field:"fac_pattern", headerName: "설비유형", flex: 2 },
+        { field:"fac_pattern", headerName: "설비유형", flex: 2 ,
+        valueFormatter: (params) => {
+                        if (params.value == 'FC1') {
+                            return params.value = '사출 성형기';
+                        } else if (params.value == 'FC2') {
+                            return params.value = '자동 조립 장비';
+                        } else if (params.value == 'FC3') {
+                            return params.value = '도장';
+                        } else if (params.value == 'FC4') {
+                            return params.value = '포장 설비';
+                        } else if (params.value == 'FC5') {
+                            return params.value = '품질 검사 설비';
+                        } else if (params.value == 'FC6') {
+                            return params.value = '물류 운반 설비';
+                        } else if (params.value == 'FC7') {
+                            return params.value = '정밀 금형 관리';
+                        }
+                    }
+        },
         { field:"employee_code", headerName: "담당자", flex: 2 ,
           valueFormatter: (params) => {
             return params.data?.employee_name || params.value;
@@ -92,13 +110,15 @@
             cellStyle: { textAlign: "center" },
           },
         },
-        statusFacAry: []
+        statusFacAry: [],
+        facPatternAry: []
     }
   },
-  async mounted(){
-    await this.facStatus();
-    await this.updateList();
-    await this.statusFac();
+  mounted(){
+    this.facStatus();
+    this.updateList();
+    this.statusFac();
+    this.facPattern();
 
   },
   methods:{
@@ -133,6 +153,14 @@
         })
         .catch(err => console.log(err));
     },
+    async facPattern() {
+            await axios.get('/api/fac/facPattern')
+                .then(res => {
+                    this.facPatternAry = res.data;
+                    this.facPatternAry = [...res.data];
+                })
+                .catch(err => console.log(err));
+        },
 
   }
 }
