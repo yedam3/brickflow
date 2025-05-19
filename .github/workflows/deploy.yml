@@ -22,7 +22,7 @@ jobs:
     - name: Build Vue app
       working-directory: client
       run: |
-        npm ci
+        npm update
         npm run build
 
     - name: Setup SSH key
