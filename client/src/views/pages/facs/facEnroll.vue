@@ -71,16 +71,12 @@
                     <div class="d-flex align-items-center">
                         <div class="image-preview-container"
                             style="max-width: 200px; max-height: 150px; overflow: hidden;">
-                            <img :src="rowData.imagePreview || getImageUrl(rowData.image)" alt="설비 이미지"
+                            <img :src="rowData.imagePreview " alt="설비 이미지"
                                 class="img-thumbnail" style="width: 100%; height: auto; cursor: pointer;"
                                 @click="openImageModal" />
                         </div>
                         <div class="ms-3">
                             <small class="text-muted" style="font-size: small;">파일명: {{ rowData.image }}</small>
-                            <button v-if="rowData.image" class="btn btn-sm btn-outline-danger ms-2"
-                                @click="removeImage">
-                                삭제
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -104,22 +100,6 @@
             <ag-grid-vue class="ag-theme-alpine custom-grid-theme" style="width: 100%; height: 300px;"
                 :columnDefs="columnDefs" :rowData="rowData2" :gridOptions="gridOptions" @rowClicked="clicked" />
         </div>
-
-        <!-- 이미지 모달 -->
-        <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="imageModalLabel">설비 이미지</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body text-center">
-                        <img :src="rowData.imagePreview || getImageUrl(rowData.image)" alt="설비 이미지 확대"
-                            class="img-fluid" />
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 </template>
 
@@ -141,6 +121,7 @@ export default {
                 model_name: "",
                 fac_location: "",
                 employee_code: useUserStore().id,
+                employee_name: useUserStore().empName,
                 fac_pattern: "",
                 install_date: "",
                 inspection_cycle: "",
@@ -155,7 +136,6 @@ export default {
                 model_name: "",
                 fac_location: "",
                 employee_code: useUserStore().id,
-             
                 fac_pattern: "",
                 install_date: "",
                 inspection_cycle: "",
@@ -272,7 +252,7 @@ export default {
                 model_name: "",
                 fac_location: "",
                 employee_code: useUserStore().id,
-              
+                employee_name: useUserStore().empName,
                 fac_pattern: "",
                 install_date: "",
                 inspection_cycle: "",
@@ -400,7 +380,7 @@ export default {
             const formData = new FormData();
             formData.append("image", this.imageFile);
 
-            const res = await axios.post("http://localhost:8099/api/fac/uploadImage", formData, {
+            const res = await axios.post("http://223.130.150.38/api/fac/uploadImage", formData, {
                 headers: { "Content-Type": "multipart/form-data" }
             }).catch(err => {
                 console.error("이미지 업로드 실패:", err);
@@ -422,9 +402,9 @@ export default {
             }
 
             if (
-                !this.rowData.fac_pattern &&
-                !this.rowData.fac_status &&
-                !this.rowData.install_date &&
+                !this.rowData.fac_pattern ||
+                !this.rowData.fac_status ||
+                !this.rowData.install_date ||
                 !this.rowData.model_name
             ) {
                 Swal.fire("입력 오류", "필수 항목을 모두 입력해주세요.", "warning");
@@ -478,7 +458,7 @@ export default {
         getImageUrl(fileName) {
             if (!fileName) return '';
             if (fileName.startsWith("data:image")) return fileName;
-            return `http://localhost:3000/uploads/facImages/${fileName}`; // 또는 환경 변수 사용
+            return `http://223.130.150.38/uploads/facImages/${fileName}`; // 또는 환경 변수 사용
         },
         onImageChange(event) {
             const file = event.target.files[0];
