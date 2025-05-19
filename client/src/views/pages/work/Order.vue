@@ -359,7 +359,6 @@ export default {
         prodColumnHeaderClicked(params) {
             if(params.column.colId === "editRow") {
                 const target = params
-                console.log(target);
             }
         },
 
@@ -617,7 +616,6 @@ export default {
                 this.editMode = true;
 
                 this.updateProgress(100, '로드 완료!');
-                console.log('로드 완료:', this.secondRowData);
 
                 // 완료 후 잠시 대기 후 프로그레스바 숨김
                 setTimeout(() => {
