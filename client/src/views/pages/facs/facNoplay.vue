@@ -214,12 +214,15 @@ export default {
             }
             if (!this.rowData.unplay_reason_code) {
                 Swal.fire("입력오류", "설비사유를 선택해주세요", "warning");
+                return;
             }
             if (!this.rowData.unplay_start_date) {
                 Swal.fire("입력오류", "시작일시를 입력해주세요", "warning");
+                return;
             }
             if (!this.rowData.note) {
                 Swal.fire("입력오류", "비고란을 입력해주세요", "warning");
+                return;
             }
 
 
@@ -286,12 +289,15 @@ export default {
             }
             if (!this.rowData.unplay_reason_code) {
                 Swal.fire("입력오류", "설비사유를 선택해주세요", "warning");
+                return;
             }
             if (!this.rowData.unplay_start_date) {
                 Swal.fire("입력오류", "시작일시를 입력해주세요", "warning");
+                return;
             }
             if (!this.rowData.note) {
                 Swal.fire("입력오류", "비고란을 입력해주세요", "warning");
+                return;
             }
             const res = await axios.get('/api/fac/unFacCheck', {
                 params: {
