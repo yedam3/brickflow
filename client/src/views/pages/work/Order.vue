@@ -11,7 +11,7 @@
             <Button label="등록" v-if="!editMode" severity="help" class="" @click="addPlanOrder" />
             <Button label="수정" v-if="editMode" severity="danger" class="" @click="updateProductOrder" />
             <Button label="삭제" v-if="editMode" severity="danger" class="" @click="deleteProductOrder" />
-            <Button label="초기화" severity="danger" class="" @click="clearForm" />
+            <Button label="초기화" severity="danger" class="" @click="clearBtn" />
         </div>
         <div class="mb-3">
             <div class="row mb-4">
@@ -360,6 +360,11 @@ export default {
             this.matTempHoldDataList = [];
             this.matHoldDataList = [];
             this.editMode = false;
+        },
+
+        clearBtn() {
+            this.clearForm();
+            this.autoOrder_Code();
         },
 
         // 생산 계획 모달창
