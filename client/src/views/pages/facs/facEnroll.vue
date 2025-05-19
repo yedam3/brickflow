@@ -71,7 +71,7 @@
                     <div class="d-flex align-items-center">
                         <div class="image-preview-container"
                             style="max-width: 200px; max-height: 150px; overflow: hidden;">
-                            <img :src="rowData.imagePreview " alt="설비 이미지"
+                            <img :src="`${rowData.imagePreview}`" alt="설비 이미지"
                                 class="img-thumbnail" style="width: 100%; height: auto; cursor: pointer;"
                                 @click="openImageModal" />
                         </div>
@@ -458,7 +458,7 @@ export default {
         getImageUrl(fileName) {
             if (!fileName) return '';
             if (fileName.startsWith("data:image")) return fileName;
-            return `http://223.130.150.38/uploads/facImages/${fileName}`; // 또는 환경 변수 사용
+            return `http://223.130.150.38/api/uploads/facImages/${fileName}`; // 또는 환경 변수 사용
         },
         onImageChange(event) {
             const file = event.target.files[0];
