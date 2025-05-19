@@ -43,11 +43,20 @@ const deleteProdreset = async (prodCode) => {
   return result;
 }
 
+//값중복확인
+const prodCheck = async (prodCode) => {
+  console.log(prodCode);
+        let list = await mariaDB.query('prodAddCheck', prodCode).catch((err) => console.log(err));
+        return list;
+      }
+
+
 module.exports = {
   autoProdCode,
   findAllProd, //조회
   prodAdd, //등록
   updateProdNum, //수정
   deleteProdreset, //삭제
+  prodCheck,
 
 }

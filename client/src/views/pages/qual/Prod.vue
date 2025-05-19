@@ -166,8 +166,21 @@ export default {
           this.rowData2 = res.data;
         })
     },
+    
     //등록
     async addprod() {
+      const check = await axios.get(`/api/admin/prodCheck/${this.rowData.prod_code}`).catch((err) => console.log(err));
+      if (check.data[0].inputCount > 0) {
+        Swal.fire("등록 실패", "이미 등록된 제품 코드입니다.", "error");
+        return;
+      }
+      if (this.rowData.prod_code == '' || !this.rowData.prod_name || !this.rowData.unit
+        || !this.rowData.by_unit_number || !this.rowData.size || !this.rowData.weight
+        || !this.rowData.proper_store
+      ) {
+        Swal.fire("등록 실패", "값을 입력해주세요.", "error");
+        return;
+      }
       console.log("등록 요청 데이터:", this.rowData); // 이걸 확인하세요.
       const res = await axios.post('/api/admin/prodinput', this.rowData)
         .catch(error => {

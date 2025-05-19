@@ -38,11 +38,18 @@ const deleteProd =
   `DELETE FROM prod
 WHERE prod_code = ?`
 
+//수정 및 등록 체크
+const prodAddCheck = `
+  SELECT COUNT(*) AS inputCount
+  FROM prod
+  WHERE prod_code = ?`
+
 module.exports = {
   autoCountProdCode,  //자동증가
   selectProdchoice,   //제품조회
   addInputAdd,        //제품등록
   updateProdInput,     //제품수정
   deleteProd,         //제품삭제
+  prodAddCheck,
   
 }
