@@ -77,6 +77,7 @@ export default{
            suppressMovable: true, //컬럼 드래그로 순서바꾸기 못하게
            resizable: false, //컬럼 너비 마우스로 조절 못하게
            sortable: false, //정렬 기능 비활성화
+           cellClass: 'cursor-pointer',
          onGridReady: function (event) {
          event.api.sizeColumnsToFit();
        },
@@ -128,6 +129,7 @@ export default{
          suppressMovable: true, //컬럼 드래그로 순서바꾸기 못하게
            resizable: false, //컬럼 너비 마우스로 조절 못하게
            sortable: false, //정렬 기능 비활성화
+           cellClass: 'cursor-pointer',
         onGridReady: function (event){
         event.api.sizeColumnsToFit();
        },

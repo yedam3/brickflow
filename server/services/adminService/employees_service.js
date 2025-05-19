@@ -58,6 +58,7 @@ const empModify = async (empInfo) => {
 
 //삭제
 const empDelete = async(emp_code) => {
+
   let result = await mariaDB.query('empDel',emp_code)
   .catch((err) => console.log(err));
   return result;
