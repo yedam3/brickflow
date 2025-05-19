@@ -45,8 +45,9 @@ const findByOrders_code = async (orders_code) => {
 };
 
 // 생산 계획 목록 조회
-const findAllPlan = async (type, keyword) => {
+const findAllPlan = async (type, keyword, onlyOC1) => {
     let searchCondition = {};
+    let finish_statusCondition = '';
     let convertedCondition = '';
     switch (type) {
         case "plan_name":
@@ -69,7 +70,10 @@ const findAllPlan = async (type, keyword) => {
         const converted = convertLikeToQuery(searchCondition, []);
         convertedCondition = converted.serchKeyword;
     }
-    let planList = await mariaDB.query("findAllPlan", {searchCondition: convertedCondition}).catch((err) => console.error(err));
+    if(onlyOC1 === 'true') {
+        finish_statusCondition = "AND p.finish_status = 'OC1'";
+    }
+    let planList = await mariaDB.query("findAllPlan", {searchCondition: convertedCondition, finishStatusCondition: finish_statusCondition}).catch((err) => console.error(err));
     return planList;
 };
 

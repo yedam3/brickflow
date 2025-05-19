@@ -27,9 +27,10 @@ const findAllMatReqByProd_code = async (prod_code, quantity) => {
 }
 
 // 생산 지시 목록 조회
-const findAllPlanOrder = async (type, keyword) => {
+const findAllPlanOrder = async (type, keyword, onlyW1) => {
     let searchCondition = {};
     let convertedCondition = '';
+    let finish_statusCondition = '';
     switch (type) {
         case "product_order_name":
             type = "po.product_order_name";
@@ -48,7 +49,11 @@ const findAllPlanOrder = async (type, keyword) => {
         const converted = convertLikeToQuery(searchCondition, []);
         convertedCondition = converted.serchKeyword;
     }
-    let result = await mariaDB.query("findAllPlanOrder", {searchCondition: convertedCondition}).catch((err) => console.error(err));
+
+    if(onlyW1 === 'true') {
+        finish_statusCondition = "AND po.finish_status = 'WS1'";
+    }
+    let result = await mariaDB.query("findAllPlanOrder", {searchCondition: convertedCondition, finishStatusCondition: finish_statusCondition}).catch((err) => console.error(err));
     return result;
 };
 
@@ -220,6 +225,7 @@ const insertProduct_order = async (orderData, orderDetailDataList, matHoldDataLi
     return result;
 };
 
+// 생산 지시 수정
 const updateProduct_order = async (orderData, workDetailList, matHoldDataList) => {
     let conn;
     let result;
@@ -246,8 +252,12 @@ const updateProduct_order = async (orderData, workDetailList, matHoldDataList) =
             selectedQuery = mariaDB.selectedQuery("deleteMat_holdByProduct_order_detail_code", work_detail.product_order_detail_code);
             result = await conn.query(selectedQuery, work_detail.product_order_detail_code);
 
+            // 공정 실적 삭제
+            selectedQuery = mariaDB.selectedQuery("deleteWork_dataByProduct_order_detail_code", work_detail.product_order_detail_code);
+            result = await conn.query(selectedQuery, work_detail.product_order_detail_code);
+
             // 공정 초기 세팅 삭제
-            selectedQuery = mariaDB.selectedQuery("deleteWork_processByProduct_order_Detail_code", work_detail.product_order_detail_code);
+            selectedQuery = mariaDB.selectedQuery("deleteWork_processByProduct_order_detail_code", work_detail.product_order_detail_code);
             result = await conn.query(selectedQuery, work_detail.product_order_detail_code);
         }
 
@@ -454,7 +464,7 @@ const deleteProduct_order = async (product_order_code) => {
             result = await conn.query(selectedQuery, work_detail.product_order_detail_code);
 
             // 공정 초기 세팅 삭제
-            selectedQuery = mariaDB.selectedQuery("deleteWork_processByProduct_order_Detail_code", work_detail.product_order_detail_code);
+            selectedQuery = mariaDB.selectedQuery("deleteWork_processByProduct_order_detail_code", work_detail.product_order_detail_code);
             result = await conn.query(selectedQuery, work_detail.product_order_detail_code);
         }
 

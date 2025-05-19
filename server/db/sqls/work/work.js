@@ -90,6 +90,7 @@ FROM plan p
     JOIN prod prod ON pd.prod_code = prod.prod_code
 WHERE 1=1
     :searchCondition
+    :finishStatusCondition
 GROUP BY p.plan_code, o.order_name, p.plan_name, p.start_date, p.end_date, p.finish_status, od.orders_code
 `;
 
