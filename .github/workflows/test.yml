@@ -1,4 +1,4 @@
-name: Build Vue and Deploy Node App
+name: TEST App
 
 on:
   pull_request:
