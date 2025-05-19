@@ -1,6 +1,6 @@
 <template>
   <div class="card border-0" style="height: calc(65vh - 6.5rem)">
-    <h3>설비 관리</h3>
+    <h2>설비 관리</h2>
 
     <div class="heading-with-line mb-3">
       <h5 class="m-0 me-3">비가동 설비 목록</h5>
@@ -105,7 +105,6 @@ export default {
                     unplay_code: "",
                     unplay_reason_code: "",
                     employee_code: useUserStore().id,
-                    employee_name: useUserStore().empName,
                     unplay_start_date: "",
                     unplay_end_date: "",
                     note: "",
@@ -116,7 +115,6 @@ export default {
                     unplay_code: "",
                     unplay_reason_code: "",
                     employee_code: useUserStore().id,
-                    employee_name: useUserStore().empName,
                     unplay_start_date: "",
                     unplay_end_date: "",
                     note: "",
@@ -224,13 +222,19 @@ export default {
                 Swal.fire("입력오류", "비고란을 입력해주세요", "warning");
             }
 
+
+            const dataToSend = {
+                unplay_code: this.rowData.unplay_code,
+                unplay_reason_code: this.rowData.unplay_reason_code,
+                employee_code: useUserStore().id,
+                unplay_start_date: this.rowData.unplay_start_date,
+                unplay_end_date: this.rowData.unplay_end_date || null,
+                note: this.rowData.note,
+                fac_code: this.rowData.fac_code,
+            };
             // 등록
             axios.post('/api/fac/addUnFac', {
-                unplayFac: {
-                    ...this.rowData,
-                    unplay_end_date: this.rowData.unplay_end_date || null,
-                    employee_code: useUserStore().id, // 코드로 DB에 저장
-                }
+                unplayFac: dataToSend
             })
                 .then(async res => {
                     if (res.data.affectedRows > 0) {
@@ -273,8 +277,8 @@ export default {
         },
         //수정
         async modifyUnplay() {
-            if (!this.rowData.unplay_reason_code && 
-            !this.rowData.unplay_start_date && 
+            if (!this.rowData.unplay_reason_code || 
+            !this.rowData.unplay_start_date || 
             !this.rowData.note) 
             {
                 Swal.fire("입력 오류", "필수 항목을 모두 입력해주세요.", "warning");
@@ -304,27 +308,44 @@ export default {
                 });
                 return;
             }
-
+            const dataToSend = {
+                unplay_code: this.rowData.unplay_code,
+                unplay_reason_code: this.rowData.unplay_reason_code,
+                employee_code: this.rowData.employee_code,
+                unplay_start_date: this.rowData.unplay_start_date,
+                unplay_end_date: this.rowData.unplay_end_date || null,
+                note: this.rowData.note,
+                fac_code: this.rowData.fac_code,
+            };
             // 설비 수정
             await axios.put('/api/fac/modifyUnplay', {
-                unplayFac: this.rowData
+                unplayFac: dataToSend
             })
                 .then(async res => {
-                    if (res && res.data && res.data.affectedRows > 0) {
-                        Swal.fire({
-                            title: '수정 완료',
-                            text: '수정이 완료되었습니다.',
-                            icon: 'success',
-                            confirmButtonText: '확인'
-                        }).then(() => {
-                            this.unFacList();
-                            this.clearForm();
-                            this.autoUnCode();
-                        });
+                    if (res && res.data) {
+                        if (res.data.affectedRows > 0) {
+                            Swal.fire({
+                                title: '수정 완료',
+                                text: '수정이 완료되었습니다.',
+                                icon: 'success',
+                                confirmButtonText: '확인'
+                            }).then(() => {
+                                this.unFacList();
+                                this.clearForm();
+                                this.autoUnCode();
+                            });
+                        } else {
+                            Swal.fire({
+                                title: '변경 없음',
+                                text: '기존 값과 동일하여 변경되지 않았습니다.',
+                                icon: 'info',
+                                confirmButtonText: '확인'
+                            });
+                        }
                     } else {
                         Swal.fire({
                             title: '수정 실패',
-                            text: '수정을 실패하였습니다.',
+                            text: '응답이 올바르지 않습니다.',
                             icon: 'error',
                             confirmButtonText: '확인'
                         });
@@ -339,7 +360,6 @@ export default {
                         confirmButtonText: '확인'
                     });
                 });
-
             this.autoUnCode();
         },
         // 가동처리
@@ -373,20 +393,20 @@ export default {
         //선택한 값 불러오기
         clicked(event) {
             const data = event.data;
-            this.rowData = {
-                unplay_code: data.unplay_code || '',
-                unplay_reason_code: data.unplay_reason_code || '',
-                employee_code: data.employee_code || '',
-                employee_name: data.employee_name || '', 
-                unplay_start_date: data.unplay_start_date && moment(data.unplay_start_date).isValid()
-                    ? moment(data.unplay_start_date).format("YYYY-MM-DD HH:mm")
-                    : '',
-                unplay_end_date: data.unplay_end_date && moment(data.unplay_end_date).isValid()
-                    ? moment(data.unplay_end_date).format("YYYY-MM-DD HH:mm")
-                    : '',
-                fac_code: data.fac_code || '',
-                note: data.note || ''
-            };
+            console.log('선택된 행 데이터:', data); // 이걸로 값이 실제 있는지 확인!
+
+            this.rowData.unplay_code = data.unplay_code || '';
+            this.rowData.unplay_reason_code = data.unplay_reason_code || '';
+            this.rowData.employee_code = data.employee_code || useUserStore().id;
+            this.rowData.employee_name = data.employee_name || useUserStore().empName;
+            this.rowData.unplay_start_date = data.unplay_start_date && moment(data.unplay_start_date).isValid()
+                ? moment(data.unplay_start_date).format("YYYY-MM-DD HH:mm")
+                : '';
+            this.rowData.unplay_end_date = data.unplay_end_date && moment(data.unplay_end_date).isValid()
+                ? moment(data.unplay_end_date).format("YYYY-MM-DD HH:mm")
+                : '';
+            this.rowData.fac_code = data.fac_code || '';
+            this.rowData.note = data.note || '';
         },
         //조회
         async unFacList() {
