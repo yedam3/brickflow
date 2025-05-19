@@ -1,11 +1,7 @@
 <template>
   <div class="card border-0 h-100">
-     <div class="font-semibold text-xl mb-4">BOM 관리</div>
-     <div class="d-flex justify-content-start me-5">
-
-         </div>
-
-     <div class="text-end mt-3 mb-3"style="padding-right: 4%;">
+    <h3>BOM 관리</h3>
+     <div class="text-end mt-3 mb-3"style="padding-right: 2%;">
      <Button label="초기화" severity="help" class="me-3" @click="resetList"/>
      <Button label="저장" severity="info" class="me-3" @click="bomSave"/>
      <Button label="행추가" severity="success" class="me-3" @click="addRow"/>
@@ -14,7 +10,9 @@
 
  <div class="par-grid">
    <div class="prod-grid">
+    <div class="heading-with-line">
     <h5>제품목록</h5>
+  </div>
      <ag-grid-vue style="width: 700px; height: 500px;"
        class="ag-theme-alpine"
        :columnDefs="columnDefs"
@@ -25,7 +23,9 @@
    </ag-grid-vue>
   </div>
   <div class="bom-grid">
+    <div class="heading-with-line">
     <h5>BOM목록</h5>
+  </div>
  <ag-grid-vue style="width: 700px; height: 500px;"
      ref="secondGrid"
      class="ag-theme-alpine"
@@ -281,7 +281,7 @@ export default{
 
 .prod-grid {
  display: inline-block;
- margin-right: 30px;
+ margin-right: 70px;
  
 }
 .bom-grid {

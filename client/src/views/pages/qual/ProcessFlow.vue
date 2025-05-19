@@ -1,16 +1,18 @@
 <template>
-  <div class="card border-0 h-100">
-    <div class="flex items-center justify-between mb-4">
-      <div class="text-2xl font-bold">공정흐름도 관리</div>
-      <div>
+  <div class="card border-0" style="height: calc(75vh - 5rem);">
+    
+      <h3>공정흐름도 관리</h3>
+      <div class="d-flex flex-wrap justify-content-end gap-2 text-end mt-3 mb-4">
         <Button label="초기화" severity="help" class="me-3" @click="resetList"/>
         <Button label="저장" severity="info" class="me-3" @click="proSave"/>
       </div>
-    </div>
+    
 
     <div class="grid grid-cols-2 gap-6 ">
       <div>
-        <h5 class="mb-2">제품목록</h5>
+        <div class="heading-with-line">
+          <h5 class="m-0 me-3">제품목록</h5>
+      </div>
         <ag-grid-vue
           class="ag-theme-alpine w-full"
           :columnDefs="columnDefs"
@@ -22,7 +24,9 @@
         </ag-grid-vue>
       </div>
       <div>
-        <h5 class="mb-2">공정흐름도</h5>
+        <div class="heading-with-line">
+          <h5 class="m-0 me-3">공정흐름도</h5>
+      </div>
         <div class="flow-container border rounded-lg p-2 bg-gray-50">
           <VueFlow
             :nodes="nodes"
@@ -33,15 +37,16 @@
         </div>
       </div>
     </div>
-
+  </div>
     <div class="bg-white p-4 rounded-lg ">
-      <div class="flex justify-between items-center mb-2">
+      <div class="heading-with-line">
         <h5>상세공정조회</h5>
-        <div>
+      </div>
+        <div class="d-flex flex-wrap justify-content-end gap-2 text-end mt-3 mb-4">
           <Button label="행추가" severity="success" class="me-3" @click="addRow"/>
           <Button label="행삭제" severity="danger" class="me-3" @click="deleteRow"/>
         </div>
-      </div>
+      
       <ag-grid-vue 
         ref="secondGrid"
         class="ag-theme-alpine w-full"
@@ -60,7 +65,7 @@
       rowSelection="multiple"
       @close="showProcModal = false"
       @selectProc="procSelected" />
-  </div>
+  
 </template>
 <script>
 import { AgGridVue } from 'ag-grid-vue3';
