@@ -36,11 +36,9 @@ const barChart = `
 const pieChart = `
     SELECT 
         getProdName(a.prod_code) AS prodName,
-        SUM(IFNULL(a.delivery_quantity,0) * IFNULL(l.price, 0)) AS quantity
+        SUM(IFNULL(a.delivery_quantity,0))  AS quantity
     FROM delivery_manage d
     JOIN delivery_manage_detail a ON d.delivery_code = a.delivery_code
-    JOIN orders o ON d.orders_code = o.orders_code
-    JOIN order_detail l ON o.orders_code = l.orders_code AND a.prod_code = l.prod_code
     GROUP BY a.prod_code
 `
 const popChart = `
