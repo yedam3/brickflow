@@ -1,20 +1,8 @@
 <template>
   <div class="card border-0" style="background-color: white; height: 800px; ">
     <div class="d-flex justify-content-start">
+      <h3>설비상태</h3>
       <div class="input-group mb-5" style="width: 65%;">
-        <!-- 검색 조건 선택 -->
-        <select v-model="searchType" class="form-select" aria-label="Default select example">
-          <option value="" style="color: gray;">전체</option>
-          <option v-for="staFac in statusFacAry" :key="staFac.fac_status"
-            :value="staFac.fac_status">{{ staFac.sub_code_name }}</option>
-        </select>
-        <!-- 검색어 입력 -->
-        <input type="text" v-model="searchText" placeholder="검색어 입력" class="form-control w-50" style="width: 100%"
-          @keydown.enter="facStatus" />
-        <!-- 검색 버튼 -->
-        <button @click="facStatus" class="btn btn-primary">
-          <i class="pi pi-search"></i>
-        </button>
       </div>
     </div>
     <div class="col" style="margin-right: 50px; ">

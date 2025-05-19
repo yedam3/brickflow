@@ -1,21 +1,7 @@
 <template>
   <div class="card border-0" style="background-color: white; height: 800px; ">
     <div class="d-flex justify-content-start">
-      <div class="input-group mb-5" style="width: 65%;">
-        <!-- 검색 조건 선택 -->
-        <select v-model="searchType" class="form-select" aria-label="Default select example">
-          <option value="" disabled style="color: gray;">전체</option>
-          <option v-for="reFac in resultFacAry" :key="reFac.fac_result"
-            :value="reFac.fac_result">{{ reFac.sub_code_name }}</option>
-        </select>
-        <!-- 검색어 입력 -->
-        <input type="text" v-model="searchText" placeholder="검색어 입력" class="form-control w-50" style="width: 100%"
-          @keydown.enter="repaireFac" />
-        <!-- 검색 버튼 -->
-        <button @click="repaireFac" class="btn btn-primary">
-          <i class="pi pi-search"></i>
-        </button>
-      </div>
+      <h3>수리내역</h3>
     </div>
     <div class="col" style="margin-right: 50px; ">
       <div class="ag-wrapper d-flex justify-content-center">

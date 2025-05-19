@@ -5,22 +5,6 @@
     <div class="heading-with-line mb-3">
       <h5 class="m-0 me-3">비가동 설비 목록</h5>
     </div>
-
-    <div class="d-flex justify-content-start mb-3">
-      <div class="input-group">
-        <select v-model="searchType" class="form-select">
-          <option value="" selected style="color: gray;">전체</option>
-          <option v-for="unFac in reasonFacAry" :key="unFac.unplay_reason_code" :value="unFac.unplay_reason_code">
-            {{ unFac.sub_code_name }}
-          </option>
-        </select>
-        <input type="text" v-model="searchText" placeholder="검색어 입력" class="form-control" @keydown.enter="unFacList" />
-        <button @click="unFacList" class="btn btn-primary">
-          <i class="pi pi-search"></i>
-        </button>
-      </div>
-    </div>
-
     <ag-grid-vue
       class="ag-theme-alpine custom-grid-theme mb-4"
       style="width: 100%; height: auto;"

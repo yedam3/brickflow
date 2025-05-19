@@ -3,11 +3,9 @@
         <!-- 설비 등록 섹션 -->
         <div class="card border-0 mb-4">
             <h3>설비 관리</h3>
-
             <div class="heading-with-line mb-3">
                 <h5 class="m-0 me-3">설비 등록</h5>
             </div>
-
             <div class="row g-3 mb-3">
                 <!-- 첫 번째 행 -->
                 <div class="col-md-4">
