@@ -38,6 +38,14 @@ const empUpdate = `UPDATE employees
                           hire_date =?,
                           tel =?
                     WHERE emp_code =?`
+
+const empPassUpdate = `UPDATE employees
+                      SET emp_name=?,
+                          department =?,
+                          hire_date =?,
+                          tel =?,
+                          pwd= ? 
+                    WHERE emp_code =?`
 //삭제
 const empDel = `DELETE FROM employees
                     WHERE emp_code=?`
@@ -52,4 +60,5 @@ module.exports
   departmentList,
   empUpdate,
   empDel,
+  empPassUpdate
 }

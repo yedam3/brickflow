@@ -10,7 +10,7 @@
    <div class="row">
    <div class="com-grid col">
     <h5>업체목록</h5>
-     <ag-grid-vue style="width: 860px; height: 500px;"
+     <ag-grid-vue style="width: 1000px; height: 500px;"
        class="ag-theme-alpine"
        :columnDefs="columnDefs"
        :rowData="rowData"
@@ -90,7 +90,7 @@ export default{
      ],
      columnDefs: [
        { field: 'company_code', headerName: '업체코드',flex:3},
-       { field: 'company_name', headerName: '업체명' ,flex:3},
+       { field: 'company_name', headerName: '업체명' ,flex:5},
        { field: 'address', headerName: '위치' ,flex:6,},
        { field: 'tel', headerName: '연락처' ,flex:3},
        { field: 'emp_code', headerName: '담당자' ,flex:2,},

@@ -259,7 +259,7 @@ export default{
           });
           return;
     }
-    await axios.put('/api/admin/empmodify',this.info,)
+    await axios.put('/api/admin/empUpdate',this.info)
      .then(res => {
         if(res.data.affectedRows >0) {
           Swal.fire({
@@ -277,7 +277,6 @@ export default{
                       tel: "",
                       pwd: "",
                     } 
-          
         }else{
           Swal.fire({
             title: '수정 실패',
@@ -298,14 +297,14 @@ export default{
        });
        return
      });
-     this.info = {
+     this.info = [{
       emp_code: "",
       emp_name: "",
       department: "",
       hire_date: "",
       tel: "",
       pwd: "",
-    }
+    }]
   },
 
   //삭제
