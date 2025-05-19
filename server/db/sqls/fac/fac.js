@@ -23,7 +23,8 @@ const selectFacList =
         inspection_cycle,
         image,
         fac_status
-FROM fac`
+FROM fac
+ORDER BY fac_code DESC`
 
 //설비상태페이지 리스트
 const statusList =
