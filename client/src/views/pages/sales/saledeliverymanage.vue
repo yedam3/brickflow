@@ -5,12 +5,12 @@
         <div class="heading-with-line">
             <h5 class="m-0 me-3">출고 관리</h5>
         </div>
-        <div class="text-end mt-3 mb-3">
-            <Button label="출고조회" severity="success" class="me-3" @click="deliverytList" />
-            <Button label="주문조회" severity="success" class="me-3" @click="orderList" />
-            <Button label="등록" severity="info" class="me-3" @click="addDelivery" />
-            <Button label="수정" severity="help" class="me-3" @click="modifyOrder" />
-            <Button label="삭제" severity="danger" class="me-5" @click="deliveryDelete" />
+        <div class="d-flex justify-content-end mt-4 mb-5 gap-3">
+            <Button label="출고조회" severity="success" class="" @click="deliverytList" />
+            <Button label="주문조회" severity="success" class="" @click="orderList" />
+            <Button label="등록" severity="info" class="" @click="addDelivery" />
+            <Button label="수정" severity="help" class="" @click="modifyOrder" />
+            <Button label="삭제" severity="danger" class="" @click="deliveryDelete" />
         </div>
         <!-- 메인 그리드 -->
         <ag-grid-vue class="ag-theme-alpine" style="width: 100%; 

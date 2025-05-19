@@ -1,50 +1,56 @@
 <template>
-  <div class="ag-theme-alpine p-4" style="background-color: white; min-height: 800px;">
-    <div class="card shadow-sm mb-4 p-4">
-      <h5 class="mb-4">제품 등록</h5>
-
-      <div class="row g-3">
-        <div class="col-md-4">
-          <label class="form-label">제품코드</label>
-          <input type="text" class="form-control" v-model="rowData.prod_code" />
-        </div>
-        <div class="col-md-4">
-          <label class="form-label">제품명</label>
-          <input type="text" class="form-control" v-model="rowData.prod_name" />
-        </div>
-        <div class="col-md-4">
-          <label class="form-label">단위</label>
-          <input type="text" class="form-control" v-model="rowData.unit" />
-        </div>
-        <div class="col-md-4">
-          <label class="form-label">무게</label>
-          <input type="text" class="form-control" v-model="rowData.weight" />
-        </div>
-        <div class="col-md-4">
-          <label class="form-label">크기</label>
-          <input type="text" class="form-control" v-model="rowData.size" />
-        </div>
-        <div class="col-md-4">
-          <label class="form-label">단위별 수량</label>
-          <input type="text" class="form-control" v-model="rowData.by_unit_number" />
-        </div>
-        <div class="col-md-4">
-          <label class="form-label">적정재고</label>
-          <input type="number" class="form-control" min="0" v-model="rowData.proper_store" @keydown="allowOnlyNumber" />
-        </div>
-      </div>
-      <div class="d-flex justify-content-end mt-4 gap-3">
-        <Button label="초기화" severity="secondary" class="me-3" @click="Allrest" />
-        <Button label="등록" severity="info" class="me-3" @click="addprod" />
-        <Button label="수정" severity="warning" class="me-3" @click="updateprod" />
-        <Button label="삭제" severity="danger" class="me-3" @click="deleteProd" />
-      </div>
+  <div class="card border-0" style="height: calc(50vh - 5rem);">
+    <h3>공통 관리</h3>
+    <div class="heading-with-line mb-3">
+      <h5 class="m-0 me-3">제품 등록</h5>
     </div>
 
-    <!-- 그리드 -->
+    <div class="row g-3">
+      <div class="col-md-4">
+        <label class="form-label">제품코드</label>
+        <input type="text" class="form-control" v-model="rowData.prod_code" />
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">제품명</label>
+        <input type="text" class="form-control" v-model="rowData.prod_name" />
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">단위</label>
+        <input type="text" class="form-control" v-model="rowData.unit" />
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">무게</label>
+        <input type="text" class="form-control" v-model="rowData.weight" />
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">크기</label>
+        <input type="text" class="form-control" v-model="rowData.size" />
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">단위별 수량</label>
+        <input type="text" class="form-control" v-model="rowData.by_unit_number" />
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">적정재고</label>
+        <input type="number" class="form-control" min="0" v-model="rowData.proper_store" @keydown="allowOnlyNumber" />
+      </div>
+    </div>
+    <div class="d-flex justify-content-end mt-4 gap-3">
+      <Button label="초기화" severity="secondary" class="me-3" @click="Allrest" />
+      <Button label="등록" severity="info" class="me-3" @click="addprod" />
+      <Button label="수정" severity="warning" class="me-3" @click="updateprod" />
+      <Button label="삭제" severity="danger" class="me-3" @click="deleteProd" />
+    </div>
+  </div>
+  <div class="card border-0" style="height: calc(50vh - 5rem);">
+    <div class="heading-with-line mb-3">
+      <h5 class="m-0 me-3">제품 목록</h5>
+    </div>
     <ag-grid-vue class="ag-theme-alpine custom-grid-theme" style="width: 100%; 
     height: 300px;" :columnDefs="columnDefs" :rowData="rowData2" :gridOptions="gridOptions" @rowClicked="clicked" />
   </div>
+
+  <!-- 그리드 -->
 
 
 </template>
@@ -142,16 +148,16 @@ export default {
         });
     },
 
-    allowOnlyNumber(event) {
-      const allowedKeys = [
-        'Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete', 'Home', 'End'
-      ];
-      const isNumberKey = event.key >= '0' && event.key <= '9';
+    // allowOnlyNumber(event) {
+    //   const allowedKeys = [
+    //     'Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete', 'Home', 'End'
+    //   ];
+    //   const isNumberKey = event.key >= '0' && event.key <= '9';
 
-      if (!isNumberKey && !allowedKeys.includes(event.key)) {
-        event.preventDefault();
-      }
-    },
+    //   if (!isNumberKey && !allowedKeys.includes(event.key)) {
+    //     event.preventDefault();
+    //   }
+    // },
     //조회
     async prodList() {
       await axios.get('/api/admin/Prod')
@@ -162,6 +168,7 @@ export default {
     },
     //등록
     async addprod() {
+      console.log("등록 요청 데이터:", this.rowData); // 이걸 확인하세요.
       const res = await axios.post('/api/admin/prodinput', this.rowData)
         .catch(error => {
           console.error("등록 실패:", error);
@@ -177,8 +184,17 @@ export default {
             this.autoProdCode();
           });
       } else if (res) {
-        Swal.fire("등록 실패", "등록이 실패하였습니다.", "error");
+        Swal.fire("등록 실패", "값을 다 입력해주세요", "error");
       }
+      this.rowData[{
+          prod_code: ""
+        , prod_name: ""
+        , unit: ""
+        , by_unit_number: ""
+        , proper_store: ""
+        , size: ""
+        , weight: ""
+      }]
     },
     //수정
     async updateprod() {
@@ -201,6 +217,15 @@ export default {
           console.error("수정 실패:", error);
           Swal.fire("오류 발생", "제품정보 수정 중 오류가 발생했습니다.", "error");
         });
+      this.rowData[{
+          prod_code: ""
+        , prod_name: ""
+        , unit: ""
+        , by_unit_number: ""
+        , proper_store: ""
+        , size: ""
+        , weight: ""
+      }]
     },
     // 삭제
     async deleteProd() {
@@ -237,6 +262,15 @@ export default {
             });
         }
       })
+      this.rowData[{
+        prod_code: ""
+        , prod_name: ""
+        , unit: ""
+        , by_unit_number: ""
+        , proper_store: ""
+        , size: ""
+        , weight: ""
+      }]
     },
   }
 }
