@@ -17,7 +17,7 @@ const selectFacList =
 `SELECT fac_code,
         model_name,
         fac_location,
-        getEmpName(employee_code) AS employee_code,
+        getEmpName(employee_code) AS employee_name,
         fac_pattern,
         install_date,
         inspection_cycle,
@@ -30,7 +30,7 @@ const statusList =
 `SELECT fac_code,
         model_name,
         fac_location,
-        getEmpName(employee_code) AS employee_code,
+        getEmpName(employee_code) AS employee_name,
         fac_pattern,
         fac_status
 FROM fac`;
@@ -40,7 +40,7 @@ const facModal =
 `SELECT fac_code,
         model_name,
         fac_location,
-        getEmpName(employee_code) AS employee_code,
+        getEmpName(employee_code) AS employee_name,
         fac_status
 FROM fac
 WHERE fac_code = ?`
@@ -49,12 +49,13 @@ WHERE fac_code = ?`
 const unplayList =
 `SELECT unplay_code,
         unplay_reason_code,
-        getEmpName(employee_code) AS employee_code,
+        getEmpName(employee_code) AS employee_name,
         unplay_start_date,
         unplay_end_date,
         note,
         fac_code
-FROM fac_none_play`
+FROM fac_none_play
+ORDER BY unplay_start_date DESC`
 
 // 값 체크
 const facCheck =
@@ -115,7 +116,7 @@ WHERE fac_code = ?`
 const updateUnplay=
 `UPDATE fac_none_play
 SET ?
-WHERE fac_code = ?`
+WHERE unplay_code = ?`
 
 //수리
 const updateReFac = `

@@ -116,8 +116,9 @@ const repaireFac = async (repaireFacData) => {
 }
 //설비수정
 const updateFac = async (facInfo) => {
-  const { imagePreview, ...data } = facInfo;
+  const { imagePreview, employee_name ,...data } = facInfo;
   const updateParams = [data, data.fac_code];
+  console.log(updateParams)
   const result = await mariaDB.query('updateFac', updateParams);
   return result;
 }

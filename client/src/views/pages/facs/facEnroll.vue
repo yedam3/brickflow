@@ -141,7 +141,6 @@ export default {
                 model_name: "",
                 fac_location: "",
                 employee_code: useUserStore().id,
-                employee_name: useUserStore().empName,
                 fac_pattern: "",
                 install_date: "",
                 inspection_cycle: "",
@@ -156,7 +155,7 @@ export default {
                 model_name: "",
                 fac_location: "",
                 employee_code: useUserStore().id,
-                employee_name: useUserStore().empName,
+             
                 fac_pattern: "",
                 install_date: "",
                 inspection_cycle: "",
@@ -273,7 +272,7 @@ export default {
                 model_name: "",
                 fac_location: "",
                 employee_code: useUserStore().id,
-                employee_name: useUserStore().empName,
+              
                 fac_pattern: "",
                 install_date: "",
                 inspection_cycle: "",

@@ -1,8 +1,6 @@
 <template>
   <div class="card border-0" style="height: calc(50vh - 5rem)">
-  
     <h3>설비 관리</h3>
-
     <div class="heading-with-line">
       <h5 class="m-0 me-3">설비 목록</h5>
     </div>
@@ -108,7 +106,6 @@ export default {
           unplay_code: "",
           unplay_reason_code: "",
           employee_code: useUserStore().id,
-          employee_name: useUserStore().empName,
           unplay_start_date: "",
           note: "",
           fac_code: '',
@@ -118,7 +115,6 @@ export default {
         {
           repaire_code:"",
           employee_code: useUserStore().id,
-          employee_name: useUserStore().empName,
           repaire_add_date:"",
           repaire_finish_date:"",
           fac_code: '',
@@ -324,22 +320,30 @@ export default {
                     this.rowData = res.data.filter(item => item.fac_result !== 'OH1');
                 })
     },
-    async clicked(event) {
-      console.log(event.data);
-      const clickedData = event.data;
-      this.rowData2 = {
-        ...clickedData,
-        repaire_code: "", 
-        repaire_add_date: "",
-        repaire_finish_date: "",
-        fac_history: "",
-        break_status: "",
-        fac_result: "",
-      };
-      await this.autoReCode();
+    clicked(event) {
+  const data = event.data;
+
+  if (data) {
+    this.rowData2 = {
+      ...this.rowData2, // 기존 값 유지
+      fac_code: data.fac_code || '',
+      unplay_code: data.unplay_code || '',
+      employee_name: data.employee_name || useUserStore().empName,
+      // 필요한 경우 아래 값도 추가
+      break_status: data.break_status || '',
+      note: data.note || '',
+      fac_result: data.fac_result || '',
+      fac_history: data.fac_history || '',
+    };
+  }
+},
+
+    // 셀 클릭 시 호출되는 메서드 (옵션)
+    comCellClicked(event) {
+      console.log("셀 클릭됨:", event);
     },
     //수리결과
-    async facResult(){
+    async facResult() {
       await axios.get('/api/fac/facResult')
       .then(res => {
         this.facResultAry = res.data;
@@ -357,8 +361,9 @@ export default {
         })
         .catch(err => console.error(err));
     }
+  },
   }
-}
+
 </script>
 
 <style scoped>

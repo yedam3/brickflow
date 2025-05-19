@@ -1,7 +1,10 @@
 <template>
-  <div class="ag-theme-alpine p-4" style="background-color: white; min-height: 800px;">
-    <div class="card shadow-sm mb-4 p-4">
-      <h5 class="mb-4">자재 등록</h5>
+  <div class="card border-0" style="height: calc(50vh - 5rem)">
+    <h2>공통 관리</h2>
+
+    <div class="heading-with-line mb-3">
+      <h5 class="m-0 me-3">자재 등록</h5>
+    </div>
       <div class="row g-3">
         <div class="col-md-4">
           <label class="form-label">자재코드</label>
@@ -42,6 +45,10 @@
         <Button label="수정" severity="warning" @click="updateMat"/>
         <Button label="삭제" severity="danger" @click="deleteMat" />
       </div>
+    </div>
+    <div class="card border-0" style="height: calc(50vh - 5rem)">
+      <div class="heading-with-line mb-3">
+      <h5 class="m-0 me-3">자재 목록</h5>
     </div>
     <!-- 그리드 -->
     <ag-grid-vue
