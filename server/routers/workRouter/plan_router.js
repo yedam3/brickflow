@@ -24,8 +24,9 @@ router.get("/plan", async (req, res) => {
 
 // 상산 계획 목록 조회
 router.get("/planList", async (req, res) => {
-    const { type, keyword } = req.query;
-    let planList = await planService.findAllPlan(type, keyword).catch((err) => console.error(err));
+    console.log(req.query);
+    const { type, keyword, onlyOC1 } = req.query;
+    let planList = await planService.findAllPlan(type, keyword, onlyOC1).catch((err) => console.error(err));
     res.send(planList);
 });
 

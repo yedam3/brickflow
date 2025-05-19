@@ -114,10 +114,8 @@ const findAllProcess = async (params) => {
             searchKeywords[fieldName] = params[key];
         }
     });
-    console.log(searchKeywords);
-      
+
     let convertedCondition = '';
-    let groupCondition = '';
     let searchCondition = [];
 
     // 계획 관련 조건
@@ -176,8 +174,6 @@ const findAllProcess = async (params) => {
         insertQuery = "AND " + searchCondition.join(" AND ");
         convertedCondition = insertQuery;
     }
-    console.log("00000000000000000000000000000000000");
-    console.log(convertedCondition);
     // convertedCondition += "GROUP BY wp.work_lot, wp.product_order_detail_code, wp.process_code, wp.prod_code, wp.order_quantity";
     let result = await mariaDB.query("findAllProcess", { searchCondition: convertedCondition }).catch((err) => console.error(err));
     return result;

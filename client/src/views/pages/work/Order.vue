@@ -13,6 +13,7 @@
             <Button label="삭제" v-if="editMode" severity="danger" class="" @click="deleteProductOrder" />
             <Button label="초기화" severity="danger" class="" @click="clearBtn" />
         </div>
+        
         <div class="mb-3">
             <div class="row mb-4">
                 <div class="col-4">
@@ -118,6 +119,30 @@
                         :rowData="secondRowData" :gridOptions="gridOptions" @rowClicked="matRowClicked">
                     </ag-grid-vue>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 프로그레스바바 오버레이 -->
+    <div v-if="isLoading" class="loading-overlay">
+        <div class="loading-content">
+            <div class="loading-spinner">
+                <div class="spinner"></div>
+            </div>
+
+            <!-- 프로그레스바 -->
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" :style="{ width: loadingProgress + '%' }"></div>
+                </div>
+                <div class="progress-text">
+                    {{ loadingProgress.toFixed(0) }}%
+                </div>
+            </div>
+
+            <!-- 로딩 메시지 -->
+            <div class="loading-message">
+                {{ loadingMessage }}
             </div>
         </div>
     </div>
@@ -315,6 +340,11 @@ export default {
                     sortable: false,                //정렬 금지
                 },
             },
+
+            // 지시 조회 프로그레스바
+            isLoading: false,
+            loadingProgress: 0,
+            loadingMessage: '',
         };
     },
     watch() {
@@ -381,7 +411,7 @@ export default {
         matStockList() {
         },
 
-        // 사이트 접속시 plan_code 자동증가
+        // 사이트 접속시 product_order_code 자동증가
         async autoOrder_Code() {
             try {
                 const result = await axios.get("/api/work/order/orderAutoCode");
@@ -438,74 +468,204 @@ export default {
             this.nonePlanOrder();
         },
 
-        // 생산 지시 모달창 값 전달
+        
+        // 프로그레스바가 포함된 생산 지시 모달창 값 전달
         async planOrderSelected(planOrder) {
-            this.clearForm();
-            let result = await axios.get(`/api/work/order/productOrder/${planOrder.product_order_code}`).catch((err) => console.error(err));
-            const product_order_data = result.data;
-            this.formData.product_order_code = product_order_data.product_order_code;
-            this.formData.product_order_name = product_order_data.product_order_name;
-            this.formData.employee_code = product_order_data.employee_code;
-            this.formData.plan_code = product_order_data.plan_code;
-            this.formData.plan_name = product_order_data.plan_name;
-            this.formData.start_date = product_order_data.start_date;
-            this.formData.end_date = product_order_data.end_date;
-            this.formData.note = product_order_data.note;
+            try {
+                this.clearForm();
 
-            result = await axios.get(`/api/work/order/workDetail/${planOrder.product_order_code}`).catch((err) => console.error(err));
-            const work_detail_list = result.data;
+                // 프로그레스바 초기화
+                this.isLoading = true;
+                this.loadingProgress = 0;
+                this.loadingMessage = '생산 지시 정보를 불러오는 중...';
 
-            // 상품
-            for (let detail of work_detail_list) {
-                this.rowData.push({
-                    product_order_detail_code: detail.product_order_detail_code,    // 생산 지시 상세 코드 
-                    prod_code: detail.prod_code,                                    // 제품코드
-                    prod_name: detail.prod_name,                                    // 제품명
-                    plan_quantity: detail.plan_quantity,                            // 지시수량
-                    priority: detail.priority,                                      // 우선순위
-                    order_quantity: detail.order_quantity,                          // 주문량
+                // 1. 기본 정보 로드
+                this.updateProgress(10, '기본 정보 조회 중...');
+                const [productOrderResult, workDetailResult] = await Promise.all([
+                    axios.get(`/api/work/order/productOrder/${planOrder.product_order_code}`),
+                    axios.get(`/api/work/order/workDetail/${planOrder.product_order_code}`)
+                ]);
+
+                const product_order_data = productOrderResult.data;
+                const work_detail_list = workDetailResult.data;
+
+                // 기본 폼 데이터 설정
+                this.formData = {
+                    product_order_code: product_order_data.product_order_code,
+                    product_order_name: product_order_data.product_order_name,
+                    employee_name: product_order_data.employee_name,
+                    employee_code: product_order_data.employee_code,
+                    plan_code: product_order_data.plan_code,
+                    plan_name: product_order_data.plan_name,
+                    start_date: product_order_data.start_date,
+                    end_date: product_order_data.end_date,
+                    note: product_order_data.note
+                };
+
+                this.updateProgress(20, '작업 상세 정보 처리 중...');
+
+                // 2. 자재 요구량 정보 로드
+                this.updateProgress(25, '자재 요구량 조회 중...');
+                const matQtyPromises = work_detail_list.map((detail, index) =>
+                    axios.get(`/api/work/order/loadMatQty/${detail.product_order_detail_code}`)
+                        .then(result => {
+                            // 개별 요청 완료 시 진행률 업데이트
+                            const progressIncrement = 25 / work_detail_list.length;
+                            this.updateProgress(25 + (progressIncrement * (index + 1)),
+                                `자재 요구량 조회 중... (${index + 1}/${work_detail_list.length})`);
+                            return { detail, matQtyList: result.data };
+                        })
+                        .catch(err => {
+                            console.error(`자재 요구량 로드 실패 (${detail.product_order_detail_code}):`, err);
+                            return { detail, matQtyList: [] };
+                        })
+                );
+
+                const matQtyResults = await Promise.all(matQtyPromises);
+
+                // 3. 자재 투입량 정보 로드
+                this.updateProgress(50, '자재 투입량 조회 중...');
+                const matInputPromises = [];
+                const matQtyMap = new Map();
+
+                matQtyResults.forEach(({ detail, matQtyList }) => {
+                    matQtyList.forEach(matQty => {
+                        const key = `${detail.product_order_detail_code}_${matQty.mat_code}`;
+                        matQtyMap.set(key, { detail, matQty });
+                        matInputPromises.push({ key, detail, matQty });
+                    });
                 });
-                // 자재 요구량
-                result = await axios.get(`/api/work/order/loadMatQty/${detail.product_order_detail_code}`).catch((err) => console.error(err));
-                const mat_qty_list = result.data;
-                for (let matQty of mat_qty_list) {
-                    // 자재 투입량
-                    result = await axios.get(`/api/work/order/loadMat`, {
+
+                // 자재 투입량 API 호출
+                const matInputCalls = matInputPromises.map((item, index) =>
+                    axios.get(`/api/work/order/loadMat`, {
                         params: {
-                            product_order_detail_code: detail.product_order_detail_code,    // 생산 지시 상세 코드
-                            mat_code: matQty.mat_code,                                      // 자재 코드
+                            product_order_detail_code: item.detail.product_order_detail_code,
+                            mat_code: item.matQty.mat_code
                         }
-                    }).catch((err) => console.error(err));
-                    const mat_list = result.data;
+                    })
+                        .then(result => {
+                            // 개별 요청 완료 시 진행률 업데이트
+                            const progressIncrement = 30 / matInputPromises.length;
+                            this.updateProgress(50 + (progressIncrement * (index + 1)),
+                                `자재 투입량 조회 중... (${index + 1}/${matInputPromises.length})`);
+                            return { key: item.key, matList: result.data };
+                        })
+                        .catch(err => {
+                            console.error(`자재 투입량 로드 실패 (${item.key}):`, err);
+                            return { key: item.key, matList: [] };
+                        })
+                );
+
+                const matInputResults = await Promise.all(matInputCalls);
+
+                // 4. 데이터 조합
+                this.updateProgress(80, '데이터 조합 중...');
+                const newRowData = [];
+                const newSecondRowData = [];
+                const newMatHoldDataList = [];
+
+                // 제품 정보 설정
+                work_detail_list.forEach(detail => {
+                    newRowData.push({
+                        product_order_detail_code: detail.product_order_detail_code,
+                        prod_code: detail.prod_code,
+                        prod_name: detail.prod_name,
+                        plan_quantity: detail.plan_quantity,
+                        priority: detail.priority,
+                        order_quantity: detail.order_quantity
+                    });
+                });
+
+                this.updateProgress(85, '자재 정보 조합 중...');
+
+                // 자재 정보 설정
+                matInputResults.forEach(({ key, matList }) => {
+                    const { detail, matQty } = matQtyMap.get(key);
+
                     let totalQty = 0;
-                    let tempMatList = [];
-                    for (let mat of mat_list) {
-                        let tempMat = {
+                    const tempMatList = [];
+
+                    matList.forEach(mat => {
+                        const tempMat = {
                             prod_code: mat.prod_code,
                             mat_code: matQty.mat_code,
                             mat_LOT: mat.mat_LOT,
-                            mat_hold_qty: mat.hold_quantity,
-                        }
-                        this.matHoldDataList.push(tempMat);
+                            mat_hold_qty: mat.hold_quantity
+                        };
+                        newMatHoldDataList.push(tempMat);
                         tempMatList.push(tempMat);
                         totalQty += parseInt(mat.hold_quantity);
-                    }
-                    // 자재 요구량 등록
-                    this.secondRowData.push({
-                        prod_code: matQty.prod_code,                                // 제품코드
-                        mat_code: matQty.mat_code,                                  // 자재코드
-                        mat_name: matQty.mat_name,                                  // 자재명
-                        req_material_quantity: matQty.req_material_quantity,        // 요구량
-                        material_input_qunatity: totalQty,                          // 투입량                
-                        mat_LOTs: tempMatList,
                     });
-                }
-            };
-            this.rowData = [...this.rowData];
-            this.secondRowData = [...this.secondRowData];
-            console.log(this.secondRowData);
-            this.matHoldDataList = [...this.matHoldDataList];
-            this.editMode = true;
+
+                    newSecondRowData.push({
+                        prod_code: matQty.prod_code,
+                        mat_code: matQty.mat_code,
+                        mat_name: matQty.mat_name,
+                        req_material_quantity: matQty.req_material_quantity,
+                        material_input_qunatity: totalQty,
+                        mat_LOTs: tempMatList
+                    });
+                });
+
+                this.updateProgress(95, '최종 설정 중...');
+
+                // 5. 상태 업데이트
+                this.rowData = newRowData;
+                this.secondRowData = newSecondRowData;
+                this.matHoldDataList = newMatHoldDataList;
+                this.editMode = true;
+
+                this.updateProgress(100, '로드 완료!');
+                console.log('로드 완료:', this.secondRowData);
+
+                // 완료 후 잠시 대기 후 프로그레스바 숨김
+                setTimeout(() => {
+                    this.isLoading = false;
+                    this.loadingProgress = 0;
+                    this.loadingMessage = '';
+                }, 500);
+
+            } catch (error) {
+                console.error('생산 지시 로드 중 오류 발생:', error);
+                this.loadingMessage = '로드 중 오류가 발생했습니다.';
+
+                // 에러 발생 시 3초 후 프로그레스바 숨김
+                setTimeout(() => {
+                    this.isLoading = false;
+                    this.loadingProgress = 0;
+                    this.loadingMessage = '';
+                }, 3000);
+            }
+        },
+
+        // 프로그레스바 업데이트 헬퍼 함수
+        updateProgress(progress, message) {
+            this.loadingProgress = Math.min(progress, 100);
+            this.loadingMessage = message;
+
+            // Vue의 반응성을 위해 nextTick 사용
+            this.$nextTick(() => {
+                // 프로그레스바 UI 강제 업데이트
+                this.$forceUpdate();
+            });
+        },
+
+        // 더 부드러운 프로그레스바를 위한 애니메이션 버전
+        async updateProgressSmooth(targetProgress, message, duration = 200) {
+            const startProgress = this.loadingProgress;
+            const progressDiff = targetProgress - startProgress;
+            const steps = Math.max(1, Math.floor(duration / 16));
+            const stepSize = progressDiff / steps;
+
+            this.loadingMessage = message;
+
+            for (let i = 0; i < steps; i++) {
+                await new Promise(resolve => setTimeout(resolve, 16));
+                this.loadingProgress = Math.min(startProgress + (stepSize * (i + 1)), 100);
+            }
+
+            this.loadingProgress = Math.min(targetProgress, 100);
         },
 
         // 자재 선택 모달창
@@ -968,5 +1128,146 @@ export default {
     height: 1px;
     background-color: #dee2e6;
     /* Bootstrap의 border 색상 */
+}
+</style>
+<style scoped>
+/* 로딩 오버레이 스타일 */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.loading-content {
+    background-color: white;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    min-width: 300px;
+}
+
+/* 스피너 애니메이션 */
+.loading-spinner {
+    margin-bottom: 24px;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #2196F3;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* 프로그레스바 스타일 */
+.progress-container {
+    margin-bottom: 20px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background-color: #e0e0e0;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #2196F3, #21CBF3);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+    position: relative;
+}
+
+/* 프로그레스바 애니메이션 효과 */
+.progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: linear-gradient(90deg,
+            transparent,
+            rgba(255, 255, 255, 0.4),
+            transparent);
+    animation: progress-shine 1.5s infinite;
+}
+
+@keyframes progress-shine {
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+.progress-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: #2196F3;
+}
+
+/* 로딩 메시지 스타일 */
+.loading-message {
+    font-size: 16px;
+    color: #666;
+    margin-top: 8px;
+    min-height: 20px;
+}
+
+/* 컨텐츠 블러 효과 */
+.content-blurred {
+    filter: blur(2px);
+    pointer-events: none;
+}
+
+/* 모바일 반응형 */
+@media (max-width: 480px) {
+    .loading-content {
+        margin: 20px;
+        padding: 30px 20px;
+        min-width: auto;
+    }
+}
+
+/* 다크모드 지원 (선택사항) */
+@media (prefers-color-scheme: dark) {
+    .loading-content {
+        background-color: #333;
+        color: white;
+    }
+
+    .loading-message {
+        color: #ccc;
+    }
+
+    .progress-bar {
+        background-color: #555;
+    }
 }
 </style>

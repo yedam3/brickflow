@@ -7,18 +7,28 @@
         <CModalBody>
             <div class="ag-theme-alpine" style="height: 400px; width: 100%">
                 <!-- 생산계획 검색 -->
-                <div class="d-flex justify-content-center me-5">
-                    <div class="input-group mb-3 w-50">
-                        <select class="form-select" v-model="searchType" aria-label="Default select example">
-                            <option value="product_order_name" selected>지시명</option>
-                            <option value="product_order_code">지시 코드</option>
-                            <option value="prod_name">제품명</option>
-                        </select>
-                        <input type="text" v-model="searchText" placeholder="검색어 입력" @keydown.enter="searchProudctOrder"
-                            class="form-control w-50" style="width: 30%" />
-                        <button @click="searchProudctOrder" class="btn btn-primary">
-                            <i class="pi pi-search"></i>
-                        </button>
+                <div class="row">
+                    <div class="col-3">
+
+                    </div>
+                    <div class="col-6">
+                        <div class="d-flex justify-content-center">
+                            <div class="input-group mb-3 w-100">
+                                <select class="form-select" v-model="searchType" aria-label="Default select example">
+                                    <option value="product_order_name" selected>지시명</option>
+                                    <option value="product_order_code">지시 코드</option>
+                                    <option value="prod_name">제품명</option>
+                                </select>
+                                <input type="text" v-model="searchText" placeholder="검색어 입력"
+                                    @keydown.enter="searchProudctOrder" class="form-control w-50" style="width: 30%" />
+                                <button @click="searchProudctOrder" class="btn btn-primary">
+                                    <i class="pi pi-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-3 p-2">
+                        <CFormCheck class="text-dark" v-model="isOnlyW1" @change="searchProudctOrder" label="지시등록 상태만 보기" />
                     </div>
                 </div>
                 <AgGridVue style="width: 100%; height: 100%" class="ag-theme-alpine" :columnDefs="columnDefs"
@@ -65,6 +75,7 @@ export default {
             ],
             searchType: "product_order_name",
             searchText: "",
+            isOnlyW1: false,
 
             columnDefs: [
                 { field: "product_order_code", headerName: "생산지시코드", flex: 1 },
@@ -119,6 +130,7 @@ export default {
     mounted() {
         // 계획 지시 목록
         this.planOrderList();
+        this.isOnlyW1 = false;
     },
     methods: {
         // 모달창 닫기 이벤트
@@ -141,6 +153,7 @@ export default {
                 params: {
                     type: this.searchType,
                     keyword: this.searchText,
+                    onlyW1: this.isOnlyW1 === true ? false : true,
                 }
             }).then(res => {
                 this.rowData = res.data;
@@ -149,6 +162,15 @@ export default {
 
         // 그리드 행 클릭 메소드
         onRowClicked(params) {
+            if(params.data.finish_status === 'WS2') {
+                Swal.fire({
+                    title: '실패',
+                    text: '이미 생산이 진행되고 있는 지시입니다.',
+                    icon: 'error',
+                    confirmButtonText: '확인'
+                });
+                return;
+            }
             if(params.data.finish_status === 'WS3') {
                 Swal.fire({
                     title: '실패',

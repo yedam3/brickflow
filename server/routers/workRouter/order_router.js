@@ -28,8 +28,8 @@ router.get("/matReqQtyByProd_code", async (req, res) => {
 
 // 생산 지시 목록 조회
 router.get("/list", async (req, res) => {
-    const { type, keyword } = req.query;
-    let list = await orderService.findAllPlanOrder(type, keyword).catch((err) => console.error(err));
+    const { type, keyword, onlyW1 } = req.query;
+    let list = await orderService.findAllPlanOrder(type, keyword, onlyW1).catch((err) => console.error(err));
     res.send(list);
 });
 

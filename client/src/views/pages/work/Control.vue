@@ -317,6 +317,23 @@ export default {
         confirmInput() {
             if (this.focusedField) {
                 const numValue = parseInt(this.currentInput) || 0;
+                if(this.focusedField !== 'input_quantity' && this.processInfo['input_quantity'] < this.currentInput) {
+                    Swal.fire({
+                        title: '오류',
+                        text: '입력값이 투입량을 초과할 수 없습니다.',
+                        icon: 'error',
+                        confirmButtonText: '확인',
+                    });
+                    this.focusedField = null;
+                    this.currentInput = "";
+                    return;
+                }
+                if(this.focusedField === 'error_quantity' && this.currentInput <= this.processInfo['input_quantity']) {
+                    this.processInfo['created_quantity'] = this.processInfo['input_quantity'] - this.currentInput;
+                }
+                if(this.focusedField === 'created_quantity' && this.currentInput <= this.processInfo['input_quantity']) {
+                    this.processInfo['error_quantity'] = this.processInfo['input_quantity'] - this.currentInput;
+                }
                 this.processInfo[this.focusedField] = numValue;
                 this.focusedField = null;
                 this.currentInput = "";
