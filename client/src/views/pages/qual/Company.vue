@@ -1,7 +1,7 @@
 <template>
   <div class="card border-0 h-100">
-      <div class="font-semibold text-xl mb-4">업체 관리</div>
-      <div class="text-end mt-3 mb-3"style="padding-right: 4%;">
+    <h3>업체 관리</h3>
+      <div class="text-end mt-3 mb-3">
      <Button label="초기화" severity="success" class="me-3" @click="comReset"/>
      <Button label="등록" severity="info" class="me-3" @click="comSave"/>
      <Button label="수정" severity="help" class="me-3" @click="comUpdate"/>
@@ -9,7 +9,9 @@
    </div>
    <div class="row">
    <div class="com-grid col">
+    <div class="heading-with-line">
     <h5>업체목록</h5>
+  </div>
      <ag-grid-vue style="width: 1000px; height: 500px;"
        class="ag-theme-alpine"
        :columnDefs="columnDefs"
@@ -110,7 +112,7 @@ export default{
      ],
      gridOptions:{
          pagination: true,
-         paginationPageSize: 10,
+         paginationPageSize: 9,
          paginationPageSizeSelector: [5, 10, 20, 50],
          overlayNoRowsTemplate: '표시할 값이 없습니다.',
          defaultColDef: {
@@ -201,7 +203,17 @@ export default{
       if(validation == 1){
         return;
       }
-  
+      if(this.info.company_code != ''){
+      Swal.fire({
+            title: '등록 불가',
+            text: '이미 업체가 등록된 건입니다.',
+            icon: 'error',
+            confirmButtonText: '확인'
+          });
+          return;
+    }
+
+
        //등록시작
        const res =  await axios.post('/api/admin/comSave', this.info)
        .then(res => {
