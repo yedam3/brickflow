@@ -37,7 +37,7 @@ jobs:
     # 서버에 접속하여 배포 실행          
     - name: SSH into server and deploy
       run: |
-        scp   -r -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ~/yedam3/brickflow/client/dist/* ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/root/brickflow/server/public/      
+        scp   -r -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ~/work/yedam3/brickflow/client/dist/* ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/root/brickflow/server/public/      
         ssh -vvv -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no  ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
             cd ~/brickflow
             git pull origin main
