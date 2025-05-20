@@ -79,11 +79,12 @@
           <textarea class="form-control" placeholder="수리내역"  v-model="rowData2.fac_history"
             style="height: 100px; resize: none; "></textarea>
         </div>
+        <div class="input-group " >
+        
+        <Button  label="처리" severity="info" class="me-3 mt-3" @click="addRepaire" />
+      </div>
       </div>
 
-      <div class="input-group col" >
-      <Button label="처리" severity="info" class="me-3" @click="addRepaire" />
-    </div>
   </div>
 </template>
 
