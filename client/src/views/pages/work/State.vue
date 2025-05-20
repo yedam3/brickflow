@@ -412,7 +412,7 @@ export default {
                         `검색 결과 처리 중... (${Math.min((batchIndex + 1) * batchSize, totalItems)}/${totalItems})`
                     );
 
-                    // UI 업데이트를 위한 짧은 대기
+                    // UI 업데이트 대기
                     await new Promise(resolve => setTimeout(resolve, 8));
                 }
 
