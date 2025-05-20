@@ -26,7 +26,7 @@
 
                 <div class="col-auto d-flex flex-wrap justify-content-end gap-2 text-end mt-3 mb-4">
                     <Button label="Excel 내보내기" severity="success" @click="excelExport" />
-                    <Button label="SCV 내보내기" severity="success" @click="scvExport" />
+                    <Button label="SCV 내보내기" severity="danger" @click="scvExport" />
                     <Button label="전표출력" severity="warn" @click="labelView" />
                 </div>
             </div>

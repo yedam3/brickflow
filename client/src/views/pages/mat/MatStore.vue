@@ -14,7 +14,7 @@
             <div class="ag-theme-alpine col me-5" style="height: 400px; width: 50%">
                 <!-- 검색창 -->
                 <div class="d-flex justify-content-start">
-                    <div class="input-group mb-5" style="width: 65%;">
+                    <div class="input-group" style="width: 65%;">
                         <!-- 검색 조건 선택 -->
                         <select v-model="searchType" class="form-select" aria-label="Default select example">
                             <option value="mat_name" selected>자재명</option>
@@ -31,6 +31,7 @@
                         </button>
                     </div>
                 </div>
+                <h5>입고 대기 항목</h5>
                 <!-- ag-Grid 테이블 -->
                 <AgGridVue style="width: 100%; height: 100%" class="ag-theme-alpine" :columnDefs="columnDefs"
                     :rowData="rowData" :gridOptions="gridOptions" @rowClicked="clicked" />
