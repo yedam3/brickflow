@@ -85,11 +85,11 @@ export default {
             mat_data: [],
 
             columnDefs: [
-                { field: "mat_LOT", headerName: "LOT번호", flex: 1 },
-                { field: "mat_code", headerName: "자재코드", flex: 1 },
-                { field: "mat_name", headerName: "자재명", flex: 1 },
-                { field: "store_date", headerName: "입고일자", flex: 1 },
-                { field: "available_qty", headerName: "자재출고 가능 수량", flex: 2 },
+                { field: "mat_LOT", headerName: "LOT번호", flex: 2 },
+                { field: "mat_code", headerName: "자재코드", flex: 2 },
+                { field: "mat_name", headerName: "자재명", flex: 3 },
+                { field: "store_date", headerName: "입고일자", flex: 2 },
+                { field: "available_qty", headerName: "자재출고 가능 수량", flex: 3 },
                 { field: "mat_hold_qty", headerName: "자재출고 수량", editable: true, flex: 2 },
             ],
             gridOptions: {
