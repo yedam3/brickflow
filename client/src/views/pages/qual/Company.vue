@@ -202,19 +202,7 @@ export default{
 
   //등록
   async comSave(){
-    let validation = this.checkValue();
-      if(validation == 1){
-        return;
-      }
-      if(this.info.company_code != ''){
-      Swal.fire({
-            title: '등록 불가',
-            text: '이미 업체가 등록된 건입니다.',
-            icon: 'error',
-            confirmButtonText: '확인'
-          });
-          return;
-    }
+ 
 
 
        //등록시작
