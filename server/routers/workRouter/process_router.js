@@ -22,7 +22,7 @@ router.get('/facList/:work_lot', async (req, res) => {
     res.send(list);
 });
 
-// 정보 조회
+// 공정 정보 조회
 router.get('/select', async (req, res) => {
     let { work_lot, emp_code, fac_code } = req.query;
     let result = await processService.findProcessInfo(work_lot, emp_code, fac_code).catch((err) => console.error(err));
