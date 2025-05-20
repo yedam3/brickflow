@@ -322,7 +322,7 @@ export default {
             } else {
                 Swal.fire({
                     title: '실패',
-                    text: '주문번호 존재 시 행추가를 할 수 없습니다.',
+                    text: '주문 건 존재 시 행추가를 할 수 없습니다.',
                     icon: 'error',
                     confirmButtonText: '확인'
                 });
@@ -340,7 +340,7 @@ export default {
             } else {
                 Swal.fire({
                     title: '실패',
-                    text: '주문번호 존재 시 행 삭제를 할 수 없습니다.',
+                    text: '주문 건 존재 시 행 삭제를 할 수 없습니다.',
                     icon: 'error',
                     confirmButtonText: '확인'
                 });
