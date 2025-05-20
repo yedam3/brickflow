@@ -74,7 +74,7 @@
             </div>
         </div>
     </div>
-    <div class="d-flex justify-content-center">
+    <div class="d-flex justify-content-center mt-3">
         <Button label="공정 시작" severity="info" class="" size="large" style="width: 20rem; height: 3.5rem;"
             @click="startProcess" />
     </div>

@@ -285,7 +285,7 @@ export default {
                         });
                     }
 
-                    // 배치 처리 완료 후 진행률 업데이트
+                    // 배치 처리 완료 후 진행 업데이트
                     const progressIncrement = 30 / batches.length;
                     const currentProgress = 60 + (progressIncrement * (batchIndex + 1));
                     this.updateProgress(
@@ -293,7 +293,7 @@ export default {
                         `실적 데이터 처리 중... (${Math.min((batchIndex + 1) * batchSize, totalItems)}/${totalItems})`
                     );
 
-                    // UI 업데이트를 위한 짧은 대기
+                    // UI 업데이트 대기
                     await new Promise(resolve => setTimeout(resolve, 10));
                 }
 
@@ -379,7 +379,7 @@ export default {
                     batches.push(processDataList.slice(i, i + batchSize));
                 }
 
-                // 각 배치별로 처리하며 진행률 업데이트
+                // 각 배치별로 처리 후 진행률 업데이트
                 for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
                     const batch = batches[batchIndex];
 
@@ -611,7 +611,7 @@ export default {
     }
 }
 
-/* 다크모드 지원 (선택사항) */
+/* 다크모드 지원 */
 @media (prefers-color-scheme: dark) {
     .loading-content {
         background-color: #333;
