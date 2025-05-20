@@ -14,13 +14,11 @@ router.post('/login', async (req, res) => {
     res.send({ result: 'idIncorrect' });
     return;
   }
-  //  // 1. 비밀번호 해시
-  const saltRounds = 10;
-  const hashedPwd = await bcrypt.hash(pwd, saltRounds);
-  console.log(hashedPwd);
+
+  console.log('클라언트에서 가져온 비밀번호 값: ' + pwd)
   // DB에서 가져온 해시값
   const hashedPwdFromDB = result[0].pwd;
-
+  
   // 입력한 비밀번호와 해시값 비교
   const isMatch = await bcrypt.compare(pwd, hashedPwdFromDB);
   
@@ -29,7 +27,7 @@ router.post('/login', async (req, res) => {
     res.send({ result: 'pwdIncorrect' });
     return;
   }
-
+  //만약 맞을 시 세션 저장
   let department = result[0].departmentName;
   let empName = result[0].emp_name;
   req.session.empId = id;

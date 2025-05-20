@@ -74,12 +74,12 @@ export default {
         .then(async res => {
             console.log(res.data)
             if(res.data.result == 'success'){
-                //피니아 중간 저장소에 등록
+                //세션값 연결
                 let result  = await axios.get('/api/session')
-                                    .catch((err) => console.log(err));
+                .catch((err) => console.log(err));
                 console.log(result)
                 const store = useUserStore();
-
+                //피니아 중간 저장소에 등록
                 store.setUser({
                     id: this.id,
                     empName : result.data.empName,
