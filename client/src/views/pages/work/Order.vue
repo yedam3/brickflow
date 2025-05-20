@@ -295,6 +295,15 @@ export default {
                         if(params.column.colId === "editRow") {
                             const target = params.event.target;
                             if(target.tagName === "BUTTON") {
+                                if (this.formData.plan_code != '') {
+                                    Swal.fire({
+                                        title: '실패',
+                                        text: '생산 계획으로 가져온 데이터는 삭제가 불가능합니다.',
+                                        icon: 'error',
+                                        confirmButtonText: '확인'
+                                    });
+                                    return;
+                                }
                                 const selectedData = params.data;
                                 this.rowData = this.rowData.filter(row => row !== selectedData);
                                 params.api.applyTransaction({
