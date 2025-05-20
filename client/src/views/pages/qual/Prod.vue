@@ -260,13 +260,13 @@ export default {
           axios.delete(`/api/admin/resetProd/${this.rowData.prod_code}`)
             .then((res) => {
               if (res && res.data && res.data.affectedRows > 0) {
-                Swal.fire("삭제 완료", "자재정보가 삭제되었습니다.", "success")
+                Swal.fire("삭제 완료", "제품정보가 삭제되었습니다.", "success")
                   .then(() => {
                     this.Allrest();
                     this.prodList();
                   });
               } else {
-                Swal.fire("삭제 실패", "자재 삭제에 실패했습니다.", "error");
+                Swal.fire("삭제 실패", "제품 삭제에 실패했습니다.", "error");
               }
             })
             .catch((error) => {
