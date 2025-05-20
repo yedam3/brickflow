@@ -5,26 +5,48 @@
             <h5 class="m-0 me-3">제품 재고 조회</h5>
         </div>
     </div>
+
     <div class="row">
-        <div class="col-8">
+        <div class="col-7">
             <div class="heading-with-line">
                 <h5 class="m-0 me-3">제품 재고</h5>
             </div>
             <div class="card border-0" style="height: calc(80vh - 10rem);">
+                <div class="text-end mb-2">
+                    <div class="row justify-content-between align-items-center">
+                        <div class="col-auto">
+                            <div class="input-group">
+                                <select class="form-select w-auto" v-model="searchType">
+                                    <option value="p.prod_code" selected>제품코드</option>
+                                    <option value="prod_name">제품명</option>
+                                </select>
+                                <input type="text" v-model="searchText" placeholder="검색" @input="onSearch"
+                                    class="form-control" style="width: 61%;" @keydown.enter="searchMaterials" />
+
+                                <button @click="searchMaterials" class="btn btn-primary">
+                                    <i class="pi pi-search"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
                 <ag-grid-vue class="ag-theme-alpine custom-grid-theme" style="width: 100%" :columnDefs="columnDefs"
-                    :rowData="rowData" :gridOptions="gridOptions" @cellClicked="prodClicked">
+                    :rowData="rowData" :gridOptions="gridOptions1" @cellClicked="prodClicked">
                 </ag-grid-vue>
             </div>
         </div>
-        <div class="col-4">
+        <div class="col-5">
             <div class="heading-with-line">
                 <h5 class="m-0 me-3">LOT별 제품재고</h5>
             </div>
-            <div class="card border-0" style="height: calc(80vh - 10rem);">
+            <div class="card border-0 " style="height: calc(80vh - 10rem);">
+                <div class="mt-5">
                 <ag-grid-vue ref="secondGrid" class="ag-theme-alpine custom-grid-theme"
                     style="width: 100%; height: 150px" :columnDefs="secondColumnDefs" :rowData="secondRowData"
                     :gridOptions="gridOptions" rowSelection="multiple">
                 </ag-grid-vue>
+                </div>
             </div>
         </div>
     </div>
@@ -74,7 +96,7 @@ export default  {
             //상세그리드 필드
             secondColumnDefs: [
                 // 체크박스 추가
-                { field: "prod_name", headerName: "제품명", flex: 1 },
+                { field: "prod_name", headerName: "제품명", hide:true },
                 { field: "lot", headerName: "LOT", flex: 1 },
                 { field: "store_quantity", headerName: "재고량", flex: 1, valueFormatter: (params) => {
                         return params.value != null ? `${params.value}개` : '';
@@ -82,12 +104,28 @@ export default  {
                 },
                 { field: "store_name", headerName: "창고", flex: 1,},
             ],
+             gridOptions1: {
+                domLayout: "autoHeight",
+                singleClickEdit: true,
+                suppressRowClickSelection: false,
+                rowSelection:"single",
+                pagination: true,
+                paginationPageSize: 8,
+                paginationPageSizeSelector: false,
+                overlayNoRowsTemplate: '표시할 값이 없습니다.',
+                defaultColDef: {
+                    suppressMovable: true,
+                    resizable: false,
+                    sortable: false,
+                    cellStyle: { textAlign: "center" },
+                },
+            },
             gridOptions: {
                 domLayout: "autoHeight",
                 singleClickEdit: true,
                 suppressRowClickSelection: true,
                 pagination: true,
-                paginationPageSize: 10,
+                paginationPageSize: 8,
                 paginationPageSizeSelector: false,
                 overlayNoRowsTemplate: '표시할 값이 없습니다.',
                 defaultColDef: {
@@ -140,6 +178,9 @@ export default  {
 </script>
 
 <style scoped>
+::v-deep(.ag-row-selected) {
+    background-color: #BADDF9 !important; 
+  }
   /* 헤더 텍스트 가운데 정렬 */
 ::v-deep(.ag-theme-alpine .ag-header-cell-label) {
   justify-content: center;

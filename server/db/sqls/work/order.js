@@ -62,13 +62,14 @@ FROM product_order po
     LEFT JOIN prod prod ON wd.prod_code = prod.prod_code
 WHERE 1=1
     :searchCondition
+    :finishStatusCondition
 GROUP BY po.product_order_code, po.product_order_name, po.finish_status, sc.sub_code_name, po.plan_code, po.start_date, po.end_date
 ORDER BY po.product_order_code
 `;
 
 // 생산 지시 조회
 const findAllProductOrderByProduct_order_code = `
-SELECT po.product_order_code, po.plan_code, p.plan_name, po.product_order_name, po.employee_code, po.start_date, po.end_date, po.note
+SELECT po.product_order_code, po.plan_code, p.plan_name, po.product_order_name, getEmpName(po.employee_code) AS 'employee_name', po.employee_code, po.start_date, po.end_date, po.note
 FROM product_order po
 	LEFT JOIN plan p ON po.plan_code = p.plan_code
 WHERE po.product_order_code = ?
@@ -287,8 +288,16 @@ FROM mat_hold
 WHERE product_order_detail_code = ?
 `;
 
+// 생산 실적 삭제
+const deleteWork_dataByProduct_order_detail_code = `
+DELETE wd 
+FROM work_data wd
+    JOIN work_process wp ON wd.work_lot = wp.work_lot
+WHERE wp.product_order_detail_code = ?
+`;
+
 // 생산 지시 공정 초기 세팅 삭제
-const deleteWork_processByProduct_order_Detail_code = `
+const deleteWork_processByProduct_order_detail_code = `
 DELETE
 FROM work_process
 WHERE product_order_detail_code = ?
@@ -341,5 +350,6 @@ module.exports = {
     deleteProduct_orderByProduct_order_code,                // 생산 지시 삭제
     deleteWork_detailByProduct_order_code,                  // 생산 지시 상세 삭제
     deleteMat_holdByProduct_order_detail_code,              // 생산 지시 홀드량 삭제
-    deleteWork_processByProduct_order_Detail_code,          // 생산 지시 공정 초기 세팅 삭제
+    deleteWork_dataByProduct_order_detail_code,             // 생산 실적 삭제
+    deleteWork_processByProduct_order_detail_code,          // 생산 지시 공정 초기 세팅 삭제
 };

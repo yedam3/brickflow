@@ -1,9 +1,9 @@
 <template>
   <div class="card border-0 h-100">
-     <div class="font-semibold text-xl mb-4">제품검수</div>
-     <div class="d-flex justify-content-start me-5">
-    
-         </div>
+    <h3>제품검수</h3>
+        <div class="heading-with-line">
+            <h5 class="m-0 me-3">초기화 | 저장</h5>
+        </div>
 
      <div class="text-end mt-3 mb-3" style="padding-right: 2%;">
      <Button label="초기화" severity="help" class="me-3" @click="resetList"/>
@@ -12,7 +12,9 @@
 
  <div class="par-grid">
    <div class="prod-grid">
+    <div class="heading-with-line">
     <h5>제품목록</h5>
+  </div>
      <ag-grid-vue style="width: 650px; height: 500px;"
        class="ag-theme-alpine"
        :columnDefs="columnDefs"
@@ -23,7 +25,9 @@
    </ag-grid-vue>
   </div>
   <div class="prodcheck-grid">
+    <div class="heading-with-line">
     <h5>제품검수</h5>
+  </div> 
  <ag-grid-vue style="width: 780px; height: 500px;"
      ref="secondGrid"
      class="ag-theme-alpine"
@@ -119,7 +123,14 @@ export default{
        { field: 'prod_name', headerName: '제품명',flex:4},
        { field: 'check_list', headerName: '검수항목',flex:3},
        { field: 'pass_quantity', headerName: '합격량' ,flex:2},
-       { field: 'error_quantity', headerName: '불량량' ,flex:2,editable:true},
+       { field: 'error_quantity', headerName: '불량량' ,flex:2,editable:true, 
+       valueParser: (params) => {
+          if (/[^0-9+:]/.test(params.newValue)) {
+          alert('숫자 형식으로 입력해주세요.');
+          return params.oldValue;
+    }
+    return params.newValue;
+  }},
      ],
      gridOptions2:{
        domLayout: "autoHeight", //행을 보고 자동으로 hight부여
@@ -290,6 +301,7 @@ export default{
                           pass_quantity: "",
                           error_quantity: "",
                         }];
+                        this.bottomRow = [];
      await this.prodcheckData();
       this.rowData = [...this.rowData]
     },

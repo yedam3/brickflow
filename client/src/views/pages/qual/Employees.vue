@@ -1,9 +1,8 @@
 <template>
   <div class="card border-0 h-100">
-      <div class="font-semibold text-xl mb-4">사원 관리</div>
+    <h3>사원 관리</h3>
   
-  
-      <div class="text-end mt-3 mb-3"style="padding-right: 4%;">
+      <div class="text-end mt-3 mb-3">
      <Button label="초기화" severity="success" class="me-3" @click="empReset"/>
      <Button label="등록" severity="info" class="me-3" @click="empSave"/>
      <Button label="수정" severity="help" class="me-3" @click="empModify"/>
@@ -11,7 +10,9 @@
    </div>
    <div class="row">
    <div class="emp-grid col">
+    <div class="heading-with-line">
     <h5>사원목록</h5>
+  </div>
      <ag-grid-vue style="width: 700px; height: 500px;"
        class="ag-theme-alpine"
        :columnDefs="columnDefs"
@@ -201,6 +202,16 @@ export default{
         return;
       }
 
+      if(this.info.emp_code != ''){
+      Swal.fire({
+            title: '등록 불가',
+            text: '이미 사원번호가 등록된 건입니다.',
+            icon: 'error',
+            confirmButtonText: '확인'
+          });
+          return;
+    }
+
 
 
       const res =  await axios.post('/api/admin/empSave', this.info)
@@ -259,7 +270,7 @@ export default{
           });
           return;
     }
-    await axios.put('/api/admin/empmodify',this.info,)
+    await axios.put('/api/admin/empUpdate',this.info)
      .then(res => {
         if(res.data.affectedRows >0) {
           Swal.fire({
@@ -277,7 +288,6 @@ export default{
                       tel: "",
                       pwd: "",
                     } 
-          
         }else{
           Swal.fire({
             title: '수정 실패',
@@ -298,14 +308,14 @@ export default{
        });
        return
      });
-     this.info = {
+     this.info = [{
       emp_code: "",
       emp_name: "",
       department: "",
       hire_date: "",
       tel: "",
       pwd: "",
-    }
+    }]
   },
 
   //삭제

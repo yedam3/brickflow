@@ -147,7 +147,7 @@ router.post('/pdfDownload',async(req,res) => {
     const page = await browser.newPage();
     //해상도 낮춰서 속도 향상 시키기
     await page.setViewport({ width: 1280, height: 720 }); 
-    await page.setContent(html, { waitUntil: 'domcontentloaded' });
+    await page.setContent(html, { waitUntil: 'networkidle0' });
 
     const pdfBuffer = await page.pdf({format : 'A4'});
     //페이지 닫기

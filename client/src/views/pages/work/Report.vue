@@ -24,7 +24,9 @@
                     </div>
                 </div>
 
-                <div class="col-auto">
+                <div class="col-auto d-flex flex-wrap justify-content-end gap-2 text-end mt-3 mb-4">
+                    <Button label="Excel 내보내기" severity="success" @click="excelExport" />
+                    <Button label="SCV 내보내기" severity="success" @click="scvExport" />
                     <Button label="전표출력" severity="warn" @click="labelView" />
                 </div>
             </div>
@@ -138,14 +140,99 @@ export default {
             let filterData = this.rowData.filter(info => info.finish_quantity>0)
             this.modalData = filterData;
             this.showModal = true;
+        },
+
+        // Excel 내보내기
+        excelExport() {
+            let tab_text = '<html xmlns:x="urn:schemas-microsoft-com:office:excel">';
+            tab_text += '<head><meta http-equiv="content-type" content="application/vnd.ms-excel; charset=UTF-8">';
+            tab_text += '<xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>';
+            tab_text += '<x:Name>Sheet1</x:Name>';
+            tab_text += '<x:WorksheetOptions><x:Panes></x:Panes></x:WorksheetOptions></x:ExcelWorksheet>';
+            tab_text += '</x:ExcelWorksheets></x:ExcelWorkbook></xml></head><body>';
+            tab_text += "<table border='1'><thead><tr>";
+
+            // 컬럼명 추출
+            const keys = Object.keys(this.rowData[0]);
+            for (let key of keys) {
+                tab_text += `<th>${key}</th>`;
+            }
+            tab_text += "</tr></thead><tbody>";
+
+            // 데이터 삽입
+            for (let row of this.rowData) {
+                tab_text += "<tr>";
+                for (let key of keys) {
+                    tab_text += `<td>${row[key]}</td>`;
+                }
+                tab_text += "</tr>";
+            }
+
+            tab_text += "</tbody></table></body></html>";
+
+            // Blob 및 다운로드
+            const blob = new Blob([tab_text], {
+                type: "application/vnd.ms-excel;charset=utf-8;",
+            });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = 'brickflow' + this.nowDateTime() + ".xls";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        },
+
+        // csv 내보내기
+        scvExport() {
+            if (!this.rowData || !this.rowData.length) {
+                Swal.fire({
+                    title: '실패',
+                    text: '데이터가 존재하지 않습니다.',
+                    icon: 'error',
+                    confirmButtonText: '확인'
+                })
+                return;
+            }
+
+            const keys = Object.keys(this.rowData[0]);
+
+            // CSV 헤더
+            let csvContent = keys.join(",") + "\n";
+
+            // CSV 데이터 행
+            this.rowData.forEach(row => {
+                const values = keys.map(k => `"${String(row[k]).replace(/"/g, '""')}"`);
+                csvContent += values.join(",") + "\n";
+            });
+
+            // Blob 생성 및 다운로드
+            const BOM = '\uFEFF';
+
+            const blob = new Blob([BOM + csvContent], {
+                type: "text/csv;charset=utf-8;",
+            });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.setAttribute("download", 'brickflow' + this.nowDateTime());
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        },
+        
+        // 현재 시간 날짜
+        nowDateTime() {
+            const now = new Date();
+            const timestamp = now.toISOString()
+                .replace(/T/, '_')
+                .replace(/:/g, '-')
+                .replace(/\..+/, '');
+            return timestamp;
         }
-      
     },
 };
 </script>
 
 <style scoped>
-
 .btn-primary {
       background-color: rgb(230, 171, 98);
       border-color: rgb(230, 171, 98);

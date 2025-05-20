@@ -7,10 +7,7 @@
       </div>
       
       <div class="text-end mt-3 mb-3">
-        <Button label="조회" severity="success" class="me-3" />
-        <Button label="등록" severity="info" class="me-3" @click="addTest"/>
-        <Button label="수정" severity="help" class="me-3" />
-        <Button label="삭제" severity="danger" class="me-5" />
+        <Button label="검사처리" severity="info" class="me-5" @click="addTest"/>
       </div>
   
       <div class="ag-wrapper d-flex justify-content-center">
@@ -42,6 +39,7 @@
           rowSelection="multiple"
           @cellValueChanged="testChange"
           @cellClicked="testValueclicked"
+          
         />
       </div>
     </div>
@@ -51,8 +49,7 @@
 import { AgGridVue } from "ag-grid-vue3";
 import axios from "axios";
 import Swal from "sweetalert2";
-import { toHandlers } from "vue";
-  
+import { useUserStore } from '@/stores/user';
   export default {
     components: {
       AgGridVue,
@@ -128,8 +125,8 @@ import { toHandlers } from "vue";
               }
               return result;
             }
-          },
-          { field: "emp_code", headerName: "담당자", flex: 1 }
+          }
+          
         ],
         gridOptions: {
           domLayout: "autoHeight",
@@ -167,12 +164,13 @@ import { toHandlers } from "vue";
          this.rowData.forEach((item,idx) => {
           if(idx != this.rowDataIndex){
                this.rowData[idx].input_quantity = '';
-               
-            }
-        })
+              }
+            })
+        this.rowData = [...this.rowData]
         //값체크
         if(Number(this.rowData[this.rowDataIndex].not_test) < Number(this.rowData[this.rowDataIndex].input_quantity)){
           this.rowData[this.rowDataIndex].input_quantity=0;
+          
           this.rowData = [...this.rowData]
           alert('미검사량 보다 더많은값을 기입할 수 없습니다.')
           return;

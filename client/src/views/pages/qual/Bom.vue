@@ -1,11 +1,7 @@
 <template>
   <div class="card border-0 h-100">
-     <div class="font-semibold text-xl mb-4">BOM 관리</div>
-     <div class="d-flex justify-content-start me-5">
-
-         </div>
-
-     <div class="text-end mt-3 mb-3"style="padding-right: 4%;">
+    <h3>BOM 관리</h3>
+     <div class="text-end mt-3 mb-3"style="padding-right: 2%;">
      <Button label="초기화" severity="help" class="me-3" @click="resetList"/>
      <Button label="저장" severity="info" class="me-3" @click="bomSave"/>
      <Button label="행추가" severity="success" class="me-3" @click="addRow"/>
@@ -14,18 +10,22 @@
 
  <div class="par-grid">
    <div class="prod-grid">
+    <div class="heading-with-line">
     <h5>제품목록</h5>
+  </div>
      <ag-grid-vue style="width: 700px; height: 500px;"
        class="ag-theme-alpine"
        :columnDefs="columnDefs"
        :rowData="rowData"
-       :gridOptions="gridOptions"
+       :gridOptions="gridOptions1"
        :defaultColDef="defaultColDef"
        @cellClicked="prodCellClicked">
    </ag-grid-vue>
   </div>
   <div class="bom-grid">
+    <div class="heading-with-line">
     <h5>BOM목록</h5>
+  </div>
  <ag-grid-vue style="width: 700px; height: 500px;"
      ref="secondGrid"
      class="ag-theme-alpine"
@@ -67,12 +67,12 @@ export default{
        { field: 'prod_code', headerName: '제품코드',flex:1,editable:true},
        { field: 'prod_name', headerName: '제품명' ,flex:1},
      ],
-     gridOptions:{
-         pagination: true,
-         paginationPageSize: 5,
-         paginationPageSizeSelector: [5, 10, 20, 50],
-         overlayNoRowsTemplate: '표시할 값이 없습니다.',
-         defaultColDef: {
+     gridOptions1:{
+        pagination: true,
+        paginationPageSize: 9,
+        paginationPageSizeSelector: false,
+        overlayNoRowsTemplate: '표시할 값이 없습니다.',
+        defaultColDef: {
            suppressMovable: true, //컬럼 드래그로 순서바꾸기 못하게
            resizable: false, //컬럼 너비 마우스로 조절 못하게
            sortable: false, //정렬 기능 비활성화
@@ -281,7 +281,7 @@ export default{
 
 .prod-grid {
  display: inline-block;
- margin-right: 30px;
+ margin-right: 70px;
  
 }
 .bom-grid {

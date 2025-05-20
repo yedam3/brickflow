@@ -7,19 +7,30 @@
         <CModalBody>
             <div class="ag-theme-alpine" style="height: 400px; width: 100%">
                 <!-- 생산 계획 검색 -->
-                <div class="d-flex justify-content-center me-5">
-                    <div class="input-group mb-3 w-50">
-                        <select class="form-select" v-model="searchType" aria-label="Default select example">
-                            <option value="plan_name" selected>계획명</option>
-                            <option value="order_name">주문명</option>
-                            <option value="prod_name">제품명</option>
-                            <option value="plan_code">계획코드</option>
-                        </select>
-                        <input type="text" v-model="searchText" placeholder="검색어 입력" @keydown.enter="searchPlan"
-                            class="form-control w-50" style="width: 30%" />
-                        <button @click="searchPlan" class="btn btn-primary">
-                            <i class="pi pi-search"></i>
-                        </button>
+                <div class="row">
+                    <div class="col-3">
+
+                    </div>
+                    <div class="col-6">
+                        <div class="d-flex justify-content-center">
+                            <div class="input-group mb-3 w-100">
+                                <select class="form-select" v-model="searchType" aria-label="Default select example">
+                                    <option value="plan_name" selected>계획명</option>
+                                    <option value="order_name">주문명</option>
+                                    <option value="prod_name">제품명</option>
+                                    <option value="plan_code">계획코드</option>
+                                </select>
+                                <input type="text" v-model="searchText" placeholder="검색어 입력" @keydown.enter="searchPlan"
+                                    class="form-control w-50" style="width: 30%" />
+                                <button @click="searchPlan" class="btn btn-primary">
+                                    <i class="pi pi-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-3 p-2">
+                        <CFormCheck class="text-dark" v-model="isOnlyOC1" @change="searchPlan"
+                            label="계획등록 상태만 보기" />
                     </div>
                 </div>
                 <AgGridVue style="width: 100%; height: 100%" class="ag-theme-alpine" :columnDefs="columnDefs"
@@ -64,6 +75,7 @@ export default {
             rowData: [],
             searchType: "plan_name",
             searchText: "",
+            isOnlyOC1: false,
 
             columnDefs: [
                 { field: "plan_code", headerName: "계획코드", flex: 1 },
@@ -119,6 +131,7 @@ export default {
     mounted() {
         // 주문 목록
         this.planList();
+        this.isOnlyOC1 = false;
     },
     methods: {
         // 모달창 닫기 이벤트
@@ -141,6 +154,7 @@ export default {
                 params: {
                     type: this.searchType,
                     keyword: this.searchText,
+                    onlyOC1: this.isOnlyOC1 === true ? false : true,
                 }
             }).then(res => {
                 this.rowData = res.data;

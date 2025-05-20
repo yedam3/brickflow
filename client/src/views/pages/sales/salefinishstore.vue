@@ -160,7 +160,7 @@ export default {
       ],
       secondRowData: [],
       thColumnDefs: [
-        { field: 'prod_check_code', headerName: '체크코드', flex: 3, },
+        { field: 'prod_check_code', headerName: '체크코드', flex: 3, hide:true},
         { field: 'prod_code', headerName: '제품코드', flex: 2, },
         { field: 'prod_name', headerName: '제품명', flex: 3, },
         { field: 'work_lot', headerName: '생산지시코드', flex: 3, },
@@ -514,4 +514,15 @@ export default {
   background-color: #FFCC80;
   border-color: #FFCC80;
 }
+
+/* 헤더 텍스트 가운데 정렬 */
+::v-deep(.ag-theme-alpine .ag-header-cell-label) {
+  justify-content: center;
+}
+
+/* headerClass로 설정한 header-center 클래스에 적용 */
+::v-deep(.header-center .ag-header-cell-label) {
+  justify-content: center;
+}
+
 </style>
