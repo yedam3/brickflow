@@ -103,6 +103,7 @@ GROUP BY m.emp_code,
        r.store_name
 HAVING 1=1
 :searchcondition
+ORDER BY m.mat_lot DESC
 `
 //삭제
 const storeDelete = `
