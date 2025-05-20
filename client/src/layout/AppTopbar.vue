@@ -1,9 +1,9 @@
 <script setup>
 import { useLayout } from '@/layout/composables/layout';
 import AppConfigurator from './AppConfigurator.vue';
-import { useUserStore } from '@/stores/user';
 import axios from 'axios';
 import router from '@/router';
+import { useUserStore } from '@/stores/user';
 const userStore = useUserStore();
 const { toggleMenu, toggleDarkMode, isDarkTheme } = useLayout();
 
@@ -68,7 +68,8 @@ const logout = async () => {
             >
                 <i class="pi pi-ellipsis-v"></i>
             </button>
-            <p class="mt-2 text-center font-weight-bold emp_name">{{ userStore.empName }}님 환영합니다.</p>
+            <p class="mt-2 text-center font-weight-bold emp_name">
+                {{ userStore.empName }}님 환영합니다.</p>
             <div class="layout-topbar-menu hidden lg:block">
                 <div class="layout-topbar-menu-content">
                
