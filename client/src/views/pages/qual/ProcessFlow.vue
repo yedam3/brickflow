@@ -29,7 +29,7 @@
             </div>
         </div>
     </div>
-    <div class="card border-0" style="height: calc(40vh - 4rem);">
+    <div class="card border-0" style="min-height: calc(40vh - 4rem);">
         <div class="heading-with-line">
             <h5 class="m-0 me-3">상세 공정 조회</h5>
         </div>
