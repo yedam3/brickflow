@@ -235,25 +235,25 @@ export default {
                 this.loadingProgress = 0;
                 this.loadingMessage = '실적 데이터를 조회하는 중...';
 
-                // 1단계: API 호출 시작 (20%)
+                // 1. API 호출 시작
                 this.updateProgress(20, '서버에서 실적 데이터 요청 중...');
 
                 const response = await axios.get(`/api/work/process/data`);
 
-                // 2단계: 데이터 수신 완료 (50%)
+                // 2. 데이터 수신 완료
                 this.updateProgress(50, '실적 데이터 수신 완료, 처리 중...');
 
                 const processDataList = response.data;
                 const totalItems = processDataList.length;
 
-                // 3단계: 데이터 처리 시작 (50% -> 90%)
+                // 3. 데이터 처리 시작
                 this.updateProgress(60, `${totalItems}개의 실적 데이터 처리 중...`);
 
                 // 기존 리스트 초기화
                 this.processList = [];
 
-                // 배치 처리로 UI 업데이트 최적화
-                const batchSize = Math.max(1, Math.floor(totalItems / 10)); // 10단계로 나누어 처리
+                // UI 업데이트 최적화
+                const batchSize = Math.max(1, Math.floor(totalItems / 10)); // 10단계
                 const batches = [];
 
                 for (let i = 0; i < processDataList.length; i += batchSize) {
@@ -297,7 +297,7 @@ export default {
                     await new Promise(resolve => setTimeout(resolve, 10));
                 }
 
-                // 4단계: 최종 처리 (90% -> 100%)
+                // 4. 최종 처리
                 this.updateProgress(95, '화면 업데이트 중...');
                 this.processList = [...this.processList];
 
@@ -339,19 +339,17 @@ export default {
                 this.loadingProgress = 0;
                 this.loadingMessage = '실적 데이터를 검색하는 중...';
 
-                // 1단계: 검색 조건 준비 (15%)
+                // 1. 검색 조건 준비
                 this.updateProgress(15, '검색 조건 준비 중...');
 
-                // 2단계: API 호출 시작 (30%)
+                // 2. API 호출 시작
                 this.updateProgress(30, '서버에 검색 요청 중...');
 
                 const response = await axios.get(`/api/work/process/data`, {
-                    params: {
-                        searchKeywords: this.formData,
-                    }
+                    params: this.formData,
                 });
 
-                // 3단계: 검색 결과 수신 (60%)
+                // 3. 검색 결과 수신
                 this.updateProgress(60, '검색 결과 수신 완료, 처리 중...');
 
                 const processDataList = response.data;
@@ -370,11 +368,11 @@ export default {
                     return;
                 }
 
-                // 4단계: 검색 결과 처리 (60% -> 95%)
+                // 4. 검색 결과 처리
                 this.updateProgress(70, `${totalItems}개의 검색 결과 처리 중...`);
 
                 // 배치 처리로 UI 업데이트 최적화
-                const batchSize = Math.max(1, Math.floor(totalItems / 8)); // 8단계로 나누어 처리
+                const batchSize = Math.max(1, Math.floor(totalItems / 8)); // 8단계
                 const batches = [];
 
                 for (let i = 0; i < processDataList.length; i += batchSize) {
@@ -418,7 +416,7 @@ export default {
                     await new Promise(resolve => setTimeout(resolve, 8));
                 }
 
-                // 5단계: 최종 처리 (95% -> 100%)
+                // 5. 최종 처리
                 this.updateProgress(98, '검색 결과 정렬 중...');
                 this.processList = [...this.processList];
 

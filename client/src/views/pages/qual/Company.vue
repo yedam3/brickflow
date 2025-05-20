@@ -1,72 +1,75 @@
 <template>
-  <div class="card border-0 h-100">
-    <h3>업체 관리</h3>
-      <div class="text-end mt-3 mb-3">
-     <Button label="초기화" severity="success" class="me-3" @click="comReset"/>
-     <Button label="등록" severity="info" class="me-3" @click="comSave"/>
-     <Button label="수정" severity="help" class="me-3" @click="comUpdate"/>
-     <Button label="삭제" severity="danger" class="me-3" @click="comDelete"/>
-   </div>
-   <div class="row">
-   <div class="com-grid col">
-    <div class="heading-with-line">
-    <h5>업체목록</h5>
-  </div>
-     <ag-grid-vue style="width: 1000px; height: 500px;"
-       class="ag-theme-alpine"
-       :columnDefs="columnDefs"
-       :rowData="rowData"
-       :gridOptions="gridOptions"
-       :defaultColDef="defaultColDef"
-
-       @cellClicked="comellClicked">
-   </ag-grid-vue>
-  </div>
-  <div class="card border-0 col" style="width: 700px; height: 500px; background-color: #F5F5F5;">
-                <h5>업체상세</h5>
-                <div class="row">
-                    <div class="input-group mb-5 col">
-                        <span class="input-group-text" id="basic-addon1">업체코드</span>
-                        <input type="text" class="form-control" placeholder="업체코드" aria-label="Username"
-                            aria-describedby="basic-addon1" v-model="info.company_code" readonly>
-                    </div>
-                    <div class="input-group mb-5 col">
-                        <span class="input-group-text" id="basic-addon1">업체명</span>
-                        <input type="text" class="form-control" placeholder="업체명" aria-label="Username"
-                            aria-describedby="basic-addon1" v-model="info.company_name" >
-                    </div>
-                </div>
-                <div class="row">
-                <div class="input-group mb-5 col">
-                        <span class="input-group-text" id="basic-addon1">위치</span>
-                        <input type="text" class="form-control" placeholder="위치" aria-label="Username"
-                            aria-describedby="basic-addon1" v-model="info.address" >
-                    </div>
-                    <div class="input-group mb-5 col">
-                        <span class="input-group-text" id="basic-addon1">연락처</span>
-                        <input type="text" class="form-control" placeholder="연락처" aria-label="Username"
-                            aria-describedby="basic-addon1" v-model="info.tel" >
-                    </div>
-                  </div>
-                <div class="row">
-                    <div class="input-group mb-5 col">
-                        <span class="input-group-text" id="basic-addon1">담당자</span>
-                        <input type="text" class="form-control" placeholder="담당자" aria-label="Username"
-                            aria-describedby="basic-addon1" v-model="info.emp_code" >
-                    </div>
-                    <div class="input-group mb-5 col">
-                      <span class="input-group-text" id="basic-addon1">업체타입</span>
-                        <select class="form-select col" aria-label="Default select example" v-model="info.company_type">
-                            <option disabled selected value="">업체타입</option>
-                            <option v-for=" dep in companyListAry" :key="dep.sub_code" :value="dep.sub_code">
-                                {{ dep.sub_code_name }}
-                            </option>
-                        </select>
-                    </div>
-                </div>
+  <div class="card border-0" style="min-height: calc(100vh - 8rem)">
+    <h3>공통 관리</h3>
+    <div class="heading-with-line mb-2">
+      <h5 class="m-0 me-3">업체 관리</h5>
+    </div>
+    <div class="d-flex flex-wrap justify-content-end gap-2 text-end mb-3">
+      <Button label="초기화" severity="success" class="" @click="comReset" />
+      <Button label="등록" severity="info" class="" @click="comSave" />
+      <Button label="수정" severity="help" class="" @click="comUpdate" />
+      <Button label="삭제" severity="danger" class="" @click="comDelete" />
+    </div>
+    <div class="row">
+      <div class="col-8">
+        <div class="heading-with-line mb-3">
+          <h5 class="m-0 me-3">업체 목록</h5>
+        </div>
+        <div class="container-fluid">
+          <ag-grid-vue style="height: 500px;" class="ag-theme-alpine" :columnDefs="columnDefs"
+            :rowData="rowData" :gridOptions="gridOptions" :defaultColDef="defaultColDef" @cellClicked="comellClicked">
+          </ag-grid-vue>
         </div>
       </div>
+      <div class="col-4">
+        <div class="heading-with-line mb-3">
+          <h5 class="m-0 me-3">업체 상세</h5>
+        </div>
+        <div class="card border-0 col-card" style="height: 500px;">
+          <div class="row">
+            <div class="input-group mb-5 col">
+              <span class="input-group-text" id="basic-addon1">업체코드</span>
+              <input type="text" class="form-control" placeholder="업체코드" aria-label="Username"
+                aria-describedby="basic-addon1" v-model="info.company_code" readonly>
+            </div>
+            <div class="input-group mb-5 col">
+              <span class="input-group-text" id="basic-addon1">업체명</span>
+              <input type="text" class="form-control" placeholder="업체명" aria-label="Username"
+                aria-describedby="basic-addon1" v-model="info.company_name">
+            </div>
+          </div>
+          <div class="row">
+            <div class="input-group mb-5 col">
+              <span class="input-group-text" id="basic-addon1">위치</span>
+              <input type="text" class="form-control" placeholder="위치" aria-label="Username"
+                aria-describedby="basic-addon1" v-model="info.address">
+            </div>
+            <div class="input-group mb-5 col">
+              <span class="input-group-text" id="basic-addon1">연락처</span>
+              <input type="text" class="form-control" placeholder="연락처" aria-label="Username"
+                aria-describedby="basic-addon1" v-model="info.tel">
+            </div>
+          </div>
+          <div class="row">
+            <div class="input-group mb-5 col">
+              <span class="input-group-text" id="basic-addon1">담당자</span>
+              <input type="text" class="form-control" placeholder="담당자" aria-label="Username"
+                aria-describedby="basic-addon1" v-model="info.emp_code">
+            </div>
+            <div class="input-group mb-5 col">
+              <span class="input-group-text" id="basic-addon1">업체타입</span>
+              <select class="form-select col" aria-label="Default select example" v-model="info.company_type">
+                <option disabled selected value="">업체타입</option>
+                <option v-for="dep in companyListAry" :key="dep.sub_code" :value="dep.sub_code">
+                  {{ dep.sub_code_name }}
+                </option>
+              </select>
+            </div>
+          </div>
+        </div>
       </div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -407,7 +410,6 @@ export default{
 }
 .card border-0 col {
  display: inline-block;
- 
 }
 
 .btn-primary {
@@ -428,5 +430,11 @@ export default{
       background-color: #FFCC80;
       border-color: #FFCC80;
   }
+.col-card {
+    background-color: #F5F5F5;
+}
 
+:root[class='app-dark'] .col-card {
+    background-color: #2C3E50;
+}
 </style>

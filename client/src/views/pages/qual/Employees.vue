@@ -1,73 +1,77 @@
 <template>
-  <div class="card border-0 h-100">
-    <h3>사원 관리</h3>
-  
-      <div class="text-end mt-3 mb-3">
-     <Button label="초기화" severity="success" class="me-3" @click="empReset"/>
-     <Button label="등록" severity="info" class="me-3" @click="empSave"/>
-     <Button label="수정" severity="help" class="me-3" @click="empModify"/>
-     <Button label="삭제" severity="danger" class="me-3" @click="empDelete"/>
-   </div>
-   <div class="row">
-   <div class="emp-grid col">
-    <div class="heading-with-line">
-    <h5>사원목록</h5>
-  </div>
-     <ag-grid-vue style="width: 700px; height: 500px;"
-       class="ag-theme-alpine"
-       :columnDefs="columnDefs"
-       :rowData="rowData"
-       :gridOptions="gridOptions"
-       :defaultColDef="defaultColDef"
-
-       @cellClicked="empCellClicked">
-   </ag-grid-vue>
-  </div>
-  <div class="card border-0 col" style="width: 700px; height: 500px; background-color: #F5F5F5;">
-                <h5>사원상세</h5>
-                <div class="row">
-                    <div class="input-group mb-5 col">
-                        <span class="input-group-text" id="basic-addon1">사원번호</span>
-                        <input type="text" class="form-control" placeholder="사원번호" aria-label="Username"
-                            aria-describedby="basic-addon1" v-model="info.emp_code" readonly>
-                    </div>
-                    <div class="input-group mb-5 col">
-                        <span class="input-group-text" id="basic-addon1">이름</span>
-                        <input type="text" class="form-control" placeholder="이름" aria-label="Username"
-                            aria-describedby="basic-addon1" v-model="info.emp_name" >
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="input-group mb-5 col">
-                        <span class="input-group-text" id="basic-addon1">부서</span>
-                        <select class="form-select col" aria-label="Default select example" v-model="info.department">
-                            <option disabled selected value="">부서</option>
-                            <option v-for=" dep in departmentListAry" :key="dep.sub_code" :value="dep.sub_code">
-                                {{ dep.sub_code_name }}
-                            </option>
-                        </select>
-                    </div>
-                    <div class="input-group mb-5 col">
-                        <span class="input-group-text" id="basic-addon1">입사일</span>
-                        <input type="date" class="form-control" placeholder="입사일" aria-label="Username"
-                            aria-describedby="basic-addon1" v-model="info.hire_date" >
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="input-group mb-5 col">
-                        <span class="input-group-text" id="basic-addon1">전화번호</span>
-                        <input type="text" class="form-control" placeholder="전화번호" aria-label="Username"
-                            aria-describedby="basic-addon1" v-model="info.tel" >
-                    </div>
-                    <div class="input-group mb-5 col">
-                        <span class="input-group-text" id="basic-addon1">비밀번호</span>
-                        <input type="password" class="form-control" placeholder="비밀번호" aria-label="Username"
-                            aria-describedby="basic-addon1" v-model="info.pwd">
-                    </div>
-                </div>
+  <div class="card border-0" style="min-height: calc(100vh - 8rem)">
+    <h3>공통 관리</h3>
+    <div class="heading-with-line mb-2">
+      <h5 class="m-0 me-3">사원 관리</h5>
+    </div>
+    <div class="d-flex flex-wrap justify-content-end gap-2 text-end mb-3">
+      <Button label="초기화" severity="success" class="" @click="empReset" />
+      <Button label="등록" severity="info" class="" @click="empSave" />
+      <Button label="수정" severity="help" class="" @click="empModify" />
+      <Button label="삭제" severity="danger" class="" @click="empDelete" />
+    </div>
+    <div class="row">
+      <div class="col">
+        <div class="heading-with-line mb-3">
+          <h5 class="m-0 me-3">사원목록</h5>
+        </div>
+        <div class="container-fluid">
+        <ag-grid-vue style="width: 700px; height: 500px;" class="ag-theme-alpine" :columnDefs="columnDefs"
+          :rowData="rowData" :gridOptions="gridOptions" :defaultColDef="defaultColDef" @cellClicked="empCellClicked">
+        </ag-grid-vue>
+        </div>
+      </div>
+      <div class="col">
+        <div class="heading-with-line mb-2">
+          <h5 class="m-0 me-3">사원 상세</h5>
+        </div>
+        <div class="container-fluid">
+          <div class="card border-0 col mt-3" style="width: 700px; height: 500px; background-color: #F5F5F5;">
+          <div class="row">
+            <div class="input-group mb-5 col">
+              <span class="input-group-text" id="basic-addon1">사원번호</span>
+              <input type="text" class="form-control" placeholder="사원번호" aria-label="Username"
+                aria-describedby="basic-addon1" v-model="info.emp_code" readonly>
+            </div>
+            <div class="input-group mb-5 col">
+              <span class="input-group-text" id="basic-addon1">이름</span>
+              <input type="text" class="form-control" placeholder="이름" aria-label="Username"
+                aria-describedby="basic-addon1" v-model="info.emp_name">
+            </div>
+          </div>
+          <div class="row">
+            <div class="input-group mb-5 col">
+              <span class="input-group-text" id="basic-addon1">부서</span>
+              <select class="form-select col" aria-label="Default select example" v-model="info.department">
+                <option disabled selected value="">부서</option>
+                <option v-for="dep in departmentListAry" :key="dep.sub_code" :value="dep.sub_code">
+                  {{ dep.sub_code_name }}
+                </option>
+              </select>
+            </div>
+            <div class="input-group mb-5 col">
+              <span class="input-group-text" id="basic-addon1">입사일</span>
+              <input type="date" class="form-control" placeholder="입사일" aria-label="Username"
+                aria-describedby="basic-addon1" v-model="info.hire_date">
+            </div>
+          </div>
+          <div class="row">
+            <div class="input-group mb-5 col">
+              <span class="input-group-text" id="basic-addon1">전화번호</span>
+              <input type="text" class="form-control" placeholder="전화번호" aria-label="Username"
+                aria-describedby="basic-addon1" v-model="info.tel">
+            </div>
+            <div class="input-group mb-5 col">
+              <span class="input-group-text" id="basic-addon1">비밀번호</span>
+              <input type="password" class="form-control" placeholder="비밀번호" aria-label="Username"
+                aria-describedby="basic-addon1" v-model="info.pwd">
+            </div>
+          </div>
+        </div>
         </div>
       </div>
     </div>
+  </div>
 </template>
 
 <script>

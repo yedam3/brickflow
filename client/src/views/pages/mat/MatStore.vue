@@ -1,5 +1,5 @@
 <template>
-    <div class="card border-0" style="height: 800px">
+    <div class="card border-0" style="height: calc(100vh - 8rem);">
         <h3>자재 입고 관리</h3>
         <div class="heading-with-line">
             <h5 class="m-0 me-3">등록 | 수정 | 삭제</h5>
@@ -35,7 +35,7 @@
                 <AgGridVue style="width: 100%; height: 100%" class="ag-theme-alpine" :columnDefs="columnDefs"
                     :rowData="rowData" :gridOptions="gridOptions" @rowClicked="clicked" />
             </div>
-            <div class="card border-0 col" style="height: 650px; background-color: #F5F5F5;">
+            <div class="card border-0 col col-card" style="height: 650px;">
                 <h5>입고등록</h5>
                 <div class="row">
                     <div class="input-group mb-5 col">
@@ -430,4 +430,12 @@
       background-color: #FFCC80;
       border-color: #FFCC80;
   }
+
+  .col-card {
+     background-color: #F5F5F5;
+  }
+
+:root[class='app-dark'] .col-card {
+  background-color: #2C3E50;
+}
   </style>

@@ -1,10 +1,10 @@
 <template>
-    <div class="card border-0" style="height: 800px">
+    <div class="card border-0" style="height: calc(100vh - 8rem);">
         <h3>자재 재고 조회</h3>
         <div class="heading-with-line">
             <h5 class="m-0 me-3">조회</h5>
         </div>
-        <div class="text-end mt-5 mb-3">
+        <div class="text-end mt-3 mb-3">
             <div class="row justify-content-between align-items-center">
                 <div class="col-auto">
                     <div class="input-group">
@@ -25,13 +25,17 @@
         </div>
         <div class="row">
             <div class="col-7">
-                <h4>자재 재고</h4>
+                <div class="heading-with-line mb-2">
+                    <h4 class="m-0 me-3">자재 재고</h4>
+                </div>
                 <ag-grid-vue class="ag-theme-alpine custom-grid-theme" style="width: 100%" :columnDefs="columnDefs"
                     :rowData="rowData" :gridOptions="gridOptions1" @cellClicked="matCellclicked">
                 </ag-grid-vue>
             </div>
             <div class="col-5">
-                <h4>LOT별 자재재고</h4>
+                <div class="heading-with-line mb-2">
+                    <h4 class="m-0 me-3">LOT별 자재 재고</h4>
+                </div>
                 <ag-grid-vue ref="secondGrid" class="ag-theme-alpine custom-grid-theme"
                     style="width: 100%; height: 150px" :columnDefs="secondColumnDefs" :rowData="secondRowData"
                     :gridOptions="gridOptions">

@@ -37,7 +37,7 @@ const findAllFac = async (work_lot) => {
     return result;
 };
 
-// 정보 조회
+// 공정 정보 목록 조회
 const findProcessInfo = async (work_lot, emp_code, fac_code) => {
     let processInfoData = [fac_code, emp_code, work_lot]
     let result = await mariaDB.query('findProcessInfoWork_lotAndEmp_codeAndFac_code', processInfoData).catch((err) => console.error(err));
@@ -106,14 +106,7 @@ const findProcessEnd = async () => {
 
 // 실적 목록 조회
 const findAllProcess = async (params) => {
-    const searchKeywords = {};
-
-    Object.keys(params).forEach((key) => {
-        if (key.startsWith("searchKeywords[")) {
-            const fieldName = key.match(/\[([^\]]+)\]/)[1];
-            searchKeywords[fieldName] = params[key];
-        }
-    });
+    const searchKeywords = params;
 
     let convertedCondition = '';
     let searchCondition = [];
