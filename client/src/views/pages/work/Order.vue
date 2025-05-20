@@ -480,7 +480,7 @@ export default {
 
                 // 1. 기본 정보 로드
                 this.updateProgress(10, '기본 정보 조회 중...');
-                const [productOrderResult, workDetailResult] = await Promise.all([
+                const [productOrderResult, workDetailResult] = await axios.all([
                     axios.get(`/api/work/order/productOrder/${planOrder.product_order_code}`),
                     axios.get(`/api/work/order/workDetail/${planOrder.product_order_code}`)
                 ]);
@@ -505,7 +505,7 @@ export default {
 
                 // 2. 자재 요구량 정보 로드
                 this.updateProgress(25, '자재 요구량 조회 중...');
-                const matQtyPromises = work_detail_list.map((detail, index) =>
+                const matQtyAxios = work_detail_list.map((detail, index) =>
                     axios.get(`/api/work/order/loadMatQty/${detail.product_order_detail_code}`)
                         .then(result => {
                             // 개별 요청 완료 시 진행률 업데이트
@@ -520,23 +520,23 @@ export default {
                         })
                 );
 
-                const matQtyResults = await Promise.all(matQtyPromises);
+                const matQtyResults = await axios.all(matQtyAxios);
 
                 // 3. 자재 투입량 정보 로드
                 this.updateProgress(50, '자재 투입량 조회 중...');
-                const matInputPromises = [];
+                const matInputAxios = [];
                 const matQtyMap = new Map();
 
                 matQtyResults.forEach(({ detail, matQtyList }) => {
                     matQtyList.forEach(matQty => {
                         const key = `${detail.product_order_detail_code}_${matQty.mat_code}`;
                         matQtyMap.set(key, { detail, matQty });
-                        matInputPromises.push({ key, detail, matQty });
+                        matInputAxios.push({ key, detail, matQty });
                     });
                 });
 
                 // 자재 투입량 API 호출
-                const matInputCalls = matInputPromises.map((item, index) =>
+                const matInputCalls = matInputAxios.map((item, index) =>
                     axios.get(`/api/work/order/loadMat`, {
                         params: {
                             product_order_detail_code: item.detail.product_order_detail_code,
@@ -545,9 +545,9 @@ export default {
                     })
                         .then(result => {
                             // 개별 요청 완료 시 진행률 업데이트
-                            const progressIncrement = 30 / matInputPromises.length;
+                            const progressIncrement = 30 / matInputAxios.length;
                             this.updateProgress(50 + (progressIncrement * (index + 1)),
-                                `자재 투입량 조회 중... (${index + 1}/${matInputPromises.length})`);
+                                `자재 투입량 조회 중... (${index + 1}/${matInputAxios.length})`);
                             return { key: item.key, matList: result.data };
                         })
                         .catch(err => {
@@ -556,7 +556,7 @@ export default {
                         })
                 );
 
-                const matInputResults = await Promise.all(matInputCalls);
+                const matInputResults = await axios.all(matInputCalls);
 
                 // 4. 데이터 조합
                 this.updateProgress(80, '데이터 조합 중...');
