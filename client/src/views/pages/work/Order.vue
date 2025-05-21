@@ -254,7 +254,7 @@ export default {
             prodListDefs: [
                 { checkboxSelection: true, width: 50 },
                 {
-                    field: "prod_code", headerName: "제품코드", flex: 1.5,
+                    field: "prod_code", headerName: "제품코드", flex: 2,
                     cellStyle: params => {
                         if (!params.data.prod_code) {
                             return { textAlign: "center", backgroundColor: '#d9f2ff !important' };
