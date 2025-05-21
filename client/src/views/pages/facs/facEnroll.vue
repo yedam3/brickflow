@@ -378,7 +378,7 @@ export default {
             const formData = new FormData();
             formData.append("image", this.imageFile);
 
-            const res = await axios.post("http://3.37.89.177/api/fac/uploadImage", formData, {
+            const res = await axios.post("/api/fac/uploadImage", formData, {
                 headers: { "Content-Type": "multipart/form-data" }
             }).catch(err => {
                 console.error("이미지 업로드 실패:", err);
@@ -454,7 +454,7 @@ export default {
         getImageUrl(fileName) {
             if (!fileName) return '';
             if (fileName.startsWith("data:image")) return fileName;
-            return `http://3.37.89.177/api/uploads/facImages/${fileName}`; // 또는 환경 변수 사용
+            return `/api/uploads/facImages/${fileName}`; // 또는 환경 변수 사용
         },
         onImageChange(event) {
             const file = event.target.files[0];
