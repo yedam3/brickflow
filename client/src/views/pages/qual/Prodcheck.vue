@@ -1,5 +1,5 @@
 <template>
-  <div class="card border-0 h-100">
+  <div class="card border-0" style="height: calc(100vh - 8rem);">
     <h3>제품검수</h3>
         <div class="heading-with-line">
             <h5 class="m-0 me-3">초기화 | 저장</h5>
@@ -74,7 +74,7 @@ export default{
      ],
      gridOptions:{
          pagination: true,
-         paginationPageSize: 5,
+         paginationPageSize: 10,
          paginationPageSizeSelector: [5, 10, 20, 50],
          overlayNoRowsTemplate: '표시할 값이 없습니다.',
          defaultColDef: {

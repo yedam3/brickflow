@@ -22,6 +22,7 @@ FROM orders o
 WHERE 1=1
     :searchCondition
 GROUP BY o.orders_code, o.order_name, o.orders_date, o.del_date, o.note, o.finish_status
+ORDER BY o.orders_date DESC
 `;
 
 // 주문 상세 조회
