@@ -91,7 +91,8 @@ export default {
                 pagination: true,
                 paginationPageSize: 7,
                 paginationPageSizeSelector: false,
-
+                suppressRowClickSelection: false,
+                rowSelection:"single",
                 overlayNoRowsTemplate: '표시할 값이 없습니다.',
                 defaultColDef: {
                     suppressMovable: true, //컬럼 드래그로 순서바꾸기 못하게
@@ -409,4 +410,7 @@ h5 {
 .vue-flow__node:hover {
     transform: scale(1.05);
 }
+::v-deep(.ag-row-selected) {
+    background-color: #BADDF9 !important; 
+  }
 </style>
