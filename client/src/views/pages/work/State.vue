@@ -106,8 +106,8 @@
                 </div>
                 <div class="col">
                     <div class="d-flex justify-content-end">
-                        <Button label="Excel 내보내기" severity="info" size="large" class="me-2" @click="searchProcessData" />
-                        <Button label="CSV 내보내기" severity="info" size="large" class="" @click="clearForm" />
+                        <Button label="Excel 내보내기" severity="info" size="large" class="me-2" @click="exportExcel" />
+                        <Button label="CSV 내보내기" severity="info" size="large" class="" @click="exportCSV" />
                     </div>
                 </div>
             </div>
@@ -487,6 +487,93 @@ export default {
             }
 
             this.loadingProgress = Math.min(targetProgress, 100);
+        },
+
+        // Excel Export
+        exportExcel() {
+            let tab_text = '<html xmlns:x="urn:schemas-microsoft-com:office:excel">';
+            tab_text += '<head><meta http-equiv="content-type" content="application/vnd.ms-excel; charset=UTF-8">';
+            tab_text += '<xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>';
+            tab_text += '<x:Name>Sheet1</x:Name>';
+            tab_text += '<x:WorksheetOptions><x:Panes></x:Panes></x:WorksheetOptions></x:ExcelWorksheet>';
+            tab_text += '</x:ExcelWorksheets></x:ExcelWorkbook></xml></head><body>';
+            tab_text += "<table border='1'><thead><tr>";
+
+            // 컬럼명 추출
+            const keys = Object.keys(this.processList[0]);
+            for (let key of keys) {
+                tab_text += `<th>${key}</th>`;
+            }
+            tab_text += "</tr></thead><tbody>";
+
+            // 데이터 삽입
+            for (let row of this.processList) {
+                tab_text += "<tr>";
+                for (let key of keys) {
+                    tab_text += `<td>${row[key]}</td>`;
+                }
+                tab_text += "</tr>";
+            }
+
+            tab_text += "</tbody></table></body></html>";
+
+            // Blob 및 다운로드
+            const blob = new Blob([tab_text], {
+                type: "application/vnd.ms-excel;charset=utf-8;",
+            });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = 'brickflow-work-data' + this.nowDateTime() + ".xls";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        },
+
+        // CSV Export
+        exportCSV() {
+            if (!this.processList || !this.processList.length) {
+                Swal.fire({
+                    title: '실패',
+                    text: '데이터가 존재하지 않습니다.',
+                    icon: 'error',
+                    confirmButtonText: '확인'
+                })
+                return;
+            }
+
+            const keys = Object.keys(this.processList[0]);
+
+            // CSV 헤더
+            let csvContent = keys.join(",") + "\n";
+
+            // CSV 데이터 행
+            this.processList.forEach(row => {
+                const values = keys.map(k => `"${String(row[k]).replace(/"/g, '""')}"`);
+                csvContent += values.join(",") + "\n";
+            });
+
+            // Blob 생성 및 다운로드
+            const BOM = '\uFEFF';
+
+            const blob = new Blob([BOM + csvContent], {
+                type: "text/csv;charset=utf-8;",
+            });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.setAttribute("download", 'brickflow-work-data' + this.nowDateTime());
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        },
+        
+        // 현재 시간 날짜
+        nowDateTime() {
+            const now = new Date();
+            const timestamp = now.toISOString()
+                .replace(/T/, '_')
+                .replace(/:/g, '-')
+                .replace(/\..+/, '');
+            return timestamp;
         }
     },
 };
@@ -623,18 +710,16 @@ export default {
 }
 
 /* 다크모드 지원 */
-@media (prefers-color-scheme: dark) {
-    .loading-content {
-        background-color: #333;
-        color: white;
-    }
+:root[class='app-dark'] .loading-content {
+    background-color: #333;
+    color: white;
+}
 
-    .loading-message {
-        color: #ccc;
-    }
+:root[class='app-dark'] .loading-message {
+    color: #ccc;
+}
 
-    .progress-bar {
-        background-color: #555;
-    }
+:root[class='app-dark'] .progress-bar {
+    background-color: #555;
 }
 </style>
