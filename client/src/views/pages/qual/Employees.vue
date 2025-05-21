@@ -208,6 +208,7 @@ export default{
 
 
 
+
       const res =  await axios.post('/api/admin/empSave', this.info)
        .then(res => {
          if (res.data.affectedRows > 0) {
