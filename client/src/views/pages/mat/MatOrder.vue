@@ -1,5 +1,5 @@
 <template>
-  <div class="card border-0" style="height: 800px">
+  <div class="card border-0" style="min-height: calc(100vh - 8rem)">
     <h3>자재 발주 관리</h3>
     <div class="heading-with-line">
             <h5 class="m-0 me-3">등록 | 수정 | 삭제</h5>

@@ -29,7 +29,7 @@
                         </div>
                     </div>
                     <div class="col-3 p-2">
-                        <CFormCheck class="text-dark" v-model="isOnlyOC1" @change="searchPlan"
+                        <CFormCheck class="text-dark" v-model="isOnlyOC1" size="large" @change="searchPlan"
                             label="계획등록 상태만 보기" />
                     </div>
                 </div>
