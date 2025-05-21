@@ -265,6 +265,14 @@ export default {
       if (!this.rowData2.repaire_finish_date) {
         this.rowData2.repaire_finish_date = moment().format("YYYY-MM-DD");
       }
+      
+      const addDate = moment(this.rowData2.repaire_add_date, "YYYY-MM-DD");
+      const finishDate = moment(this.rowData2.repaire_finish_date, "YYYY-MM-DD");
+
+      if (addDate.isAfter(finishDate)) {
+        Swal.fire("입력오류", "등록일자는 종료일자보다 빠르거나 같아야 합니다.", "warning");
+        return;
+      }
 
       this.rowData2.repaire_finish_date = moment().format("YYYY-MM-DD");
       const fullFinishDateTime = moment().format("YYYY-MM-DD HH:mm");
