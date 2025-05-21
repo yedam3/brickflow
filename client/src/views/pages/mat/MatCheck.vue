@@ -1,5 +1,5 @@
 <template>
-    <div class="card border-0" style="height: 900px">
+    <div class="card border-0" style="min-height: calc(100vh - 8rem)">
         <h3>자재 검수 관리</h3>
         <div class="heading-with-line">
             <h5 class="m-0 me-3">등록 | 수정 | 삭제</h5>
@@ -12,7 +12,7 @@
         </div>
         <div class="row">
 
-            <div class="ag-theme-alpine col me-5" style="height: 400px; width: 50%">
+            <div class="ag-theme-alpine col me-5" style="height: 300px; width: 50%">
                 <!-- 검색창 -->
                 <div class="d-flex justify-content-start">
                     <div class="input-group mb-5" style="width: 65%;">

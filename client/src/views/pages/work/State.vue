@@ -1,12 +1,12 @@
 <template>
-    <div class="card border-0" style="height: calc(50vh - 5rem)">
+    <div class="card border-0" style="height: calc(38vh - 3.8rem)">
         <h3>공정 관리</h3>
         <div class="heading-with-line mb-3">
             <h5 class="m-0 me-3">생산 실적 조회</h5>
         </div>
 
-        <div class="mb-3">
-            <div class="mb-5 row">
+        <div class="container-fluid">
+            <div class="row mb-2">
                 <div class="col-4">
                     <InputGroup>
                         <InputGroupAddon>
@@ -35,7 +35,7 @@
                     </InputGroup>
                 </div>
             </div>
-            <div class="mb-5 row">
+            <div class="row mb-2">
                 <div class="col-4">
                     <InputGroup>
                         <InputGroupAddon>
@@ -64,7 +64,7 @@
                     </InputGroup>
                 </div>
             </div>
-            <div class="mb-2 row">
+            <div class="row mb-2">
                 <div class="col-6">
                     <InputGroup>
                         <InputGroupAddon>
@@ -94,15 +94,26 @@
                     </InputGroup>
                 </div>
             </div>
-            <div class="d-flex justify-content-center">
-                <div class="mt-2">
-                    <Button label="조회" severity="success" size="large" class="me-2" @click="searchProcessData" />
-                    <Button label="초기화" severity="danger" size="large" class="" @click="clearForm" />
+            <div class="row">
+                <div class="col">
+
+                </div>
+                <div class="col">
+                    <div class="d-flex justify-content-center">
+                        <Button label="조회" severity="success" size="large" class="me-2" @click="searchProcessData" />
+                        <Button label="초기화" severity="danger" size="large" class="" @click="clearForm" />
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="d-flex justify-content-end">
+                        <Button label="Excel 내보내기" severity="info" size="large" class="me-2" @click="searchProcessData" />
+                        <Button label="CSV 내보내기" severity="info" size="large" class="" @click="clearForm" />
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="card border-0" style="height: calc(50vh - 5rem)">
+    <div class="card border-0" style="min-height: calc(62vh - 6.2rem)">
         <div class="heading-with-line mb-3">
             <h5 class="m-0 me-3">생산 실적 목록</h5>
         </div>
@@ -176,7 +187,7 @@ export default {
             gridOptions: {
                 domLayout: "autoHeight",            // 행을 보고 자동으로 hight부여
                 pagination: true,                   // 페이지네이션 활성화
-                paginationPageSize: 5,              // 페이지당 갯수
+                paginationPageSize: 7,              // 페이지당 갯수
                 paginationPageSizeSelector: false,  // 
                 defaultColDef: {
                     suppressMovable: true,          // 셀 이동 금지

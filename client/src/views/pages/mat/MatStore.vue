@@ -11,7 +11,7 @@
             <Button label="삭제" severity="danger" class="me-5" @click="deleteStore" />
         </div>
         <div class="row">
-            <div class="ag-theme-alpine col me-5" style="height: 400px; width: 50%">
+            <div class="ag-theme-alpine col me-5" style="height: 300px; width: 50%">
                 <!-- 검색창 -->
                 <div class="d-flex justify-content-start">
                     <div class="input-group" style="width: 65%;">
