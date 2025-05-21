@@ -206,15 +206,6 @@ export default{
         return;
       }
 
-      if(this.info.emp_code != ''){
-      Swal.fire({
-            title: '등록 불가',
-            text: '이미 사원번호가 등록된 건입니다.',
-            icon: 'error',
-            confirmButtonText: '확인'
-          });
-          return;
-    }
 
 
 
