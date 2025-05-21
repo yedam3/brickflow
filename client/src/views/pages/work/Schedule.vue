@@ -1,11 +1,11 @@
 <template>
-    <div class="card border-0" style="height: calc(50vh - 5rem);">
+    <div class="card border-0" style="height: calc(40vh - 4rem);">
         <h3>생산 계획 관리</h3>
         <div class="heading-with-line">
             <h5 class="m-0 me-3">등록 | 수정 | 삭제</h5>
         </div>
 
-        <div class="d-flex flex-wrap justify-content-end gap-2 text-end mt-3 mb-4">
+        <div class="d-flex flex-wrap justify-content-end gap-2 text-end mt-2 mb-3">
             <Button label="주문목록" severity="success" class="" @click="orderList" />
             <Button label="계획목록" severity="info" class="" @click="planList" />
             <Button label="등록" v-if="!editMode" severity="help" class="" @click="addPlan" />
@@ -14,7 +14,7 @@
             <Button label="초기화" severity="danger" class="" @click="clearForm" />
         </div>
 
-        <div class="row mb-4">
+        <div class="row mb-3">
             <div class="col-4">
                 <InputGroup>
                     <InputGroupAddon>
@@ -41,7 +41,7 @@
             </div>
 
         </div>
-        <div class="row mb-4">
+        <div class="row mb-3">
             <div class="col-4">
                 <InputGroup>
                     <InputGroupAddon>
@@ -59,7 +59,7 @@
                 </InputGroup>
             </div>
         </div>
-        <div class="row mb-4">
+        <div class="row mb-3">
             <div class="col-4">
                 <InputGroup>
                     <InputGroupAddon>
@@ -88,7 +88,7 @@
             </div>
         </div>
     </div>
-    <div class="card border-0" style="height: calc(50vh - 5rem);">
+    <div class="card border-0" style="height: calc(60vh - 6rem);">
         <div class="heading-with-line">
             <h5 class="m-0 me-3">제품</h5>
         </div>
@@ -191,7 +191,7 @@ export default {
                 singleClickEdit: true,              // 한번 클릭 했을 때 수정
                 suppressRowClickSelection: true,    // 행 클릭할 때 체크박스 선택 방지
                 pagination: true,
-                paginationPageSize: 3,              // 페이지당 갯수
+                paginationPageSize: 6,              // 페이지당 갯수
                 paginationPageSizeSelector: false,  // 
                 defaultColDef: {
                     suppressMovable: true,          // 셀 이동 금지
@@ -510,8 +510,8 @@ export default {
             }
             const deleteCheck = Swal.mixin({
                 customClass: {
-                    confirmButton: "btn btn-success",
-                    cancelButton: "btn btn-danger"
+                    confirmButton: "btn btn-success text-white me-2",
+                    cancelButton: "btn btn-danger text-white"
                 },
                 buttonsStyling: false
             });
@@ -520,9 +520,9 @@ export default {
                 title: '알림',
                 text: '정말 삭제하겠습니까?',
                 icon: 'question',
-                confirmButtonText: '확인',
-                cancelButtonText: '취소',
-                showCancelButton: true
+                showCancelButton: true,
+                confirmButtonText: "확인",
+                cancelButtonText: "취소"
             });
 
             if(!deleteCheckResult.isConfirmed) {

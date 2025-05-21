@@ -254,7 +254,7 @@ export default {
             prodListDefs: [
                 { checkboxSelection: true, width: 50 },
                 {
-                    field: "prod_code", headerName: "제품코드", flex: 1.5,
+                    field: "prod_code", headerName: "제품코드", flex: 2,
                     cellStyle: params => {
                         if (!params.data.prod_code) {
                             return { textAlign: "center", backgroundColor: '#d9f2ff !important' };
@@ -879,8 +879,8 @@ export default {
             }
             const deleteCheck = Swal.mixin({
                 customClass: {
-                    confirmButton: "btn btn-success",
-                    cancelButton: "btn btn-danger"
+                    confirmButton: "btn btn-success text-white me-2",
+                    cancelButton: "btn btn-danger text-white"
                 },
                 buttonsStyling: false
             });
@@ -889,9 +889,9 @@ export default {
                 title: '알림',
                 text: '정말 삭제하겠습니까?',
                 icon: 'question',
-                confirmButtonText: '확인',
-                cancelButtonText: '취소',
-                showCancelButton: true
+                showCancelButton: true,
+                confirmButtonText: "확인",
+                cancelButtonText: "취소"
             });
 
             if (!deleteCheckResult.isConfirmed) {
