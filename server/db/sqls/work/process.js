@@ -285,6 +285,7 @@ FROM work_process wp
 WHERE 1=1
 :searchCondition
 GROUP BY wp.work_lot, wp.product_order_detail_code, wp.process_code, wp.prod_code, wp.order_quantity
+ORDER BY wp.work_lot DESC
 `;
 
 

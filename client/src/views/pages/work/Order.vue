@@ -1,11 +1,11 @@
 <template>
-    <div class="card border-0" style="height: calc(40vh - 4rem)">
+    <div class="card border-0" style="height: calc(50vh - 5rem)">
         <h3>생산 지시 관리</h3>
         <div class="heading-with-line">
             <h5 class="m-0 me-3">등록 | 수정 | 삭제</h5>
         </div>
 
-        <div class="d-flex flex-wrap justify-content-end gap-2 text-end mt-2 mb-3">
+        <div class="d-flex flex-wrap justify-content-end gap-2 text-end mt-3 mb-4">
             <Button label="계획목록" severity="success" class="" @click="planList" />
             <Button label="지시목록" severity="info" class="" @click="planOrderList" />
             <Button label="등록" v-if="!editMode" severity="help" class="" @click="addPlanOrder" />
@@ -14,8 +14,8 @@
             <Button label="초기화" severity="danger" class="" @click="clearBtn" />
         </div>
         
-        <div class="container-fluid">
-            <div class="row mb-3">
+        <div class="mb-3">
+            <div class="row mb-4">
                 <div class="col-4">
                     <InputGroup>
                         <InputGroupAddon>
@@ -41,7 +41,7 @@
                     </InputGroup>
                 </div>
             </div>
-            <div class="row mb-3">
+            <div class="row mb-4">
                 <div class="col-4">
                     <InputGroup>
                         <InputGroupAddon>
@@ -59,7 +59,7 @@
                     </InputGroup>
                 </div>
             </div>
-            <div class="row mb-3">
+            <div class="row mb-4">
                 <div class="col-4">
                     <InputGroup>
                         <InputGroupAddon>
@@ -91,11 +91,11 @@
     </div>
     <div class="row">
         <div class="col">
-            <div class="card border-0" style="min-height: calc(60vh - 6rem)">
+            <div class="card border-0" style="height: calc(50vh - 5rem)">
                 <div class="heading-with-line mb-3">
                     <h5 class="m-0 me-3">생산 제품 목록</h5>
                 </div>
-                <div class="row justify-content-end">
+                <div class="row justify-content-end mb-3">
                     <div class="col">
                         <!-- <Button label="행추가" severity="success me-2" @click="addRow" />
                         <Button label="행삭제" severity="danger" @click="deleteRow" /> -->
@@ -110,9 +110,9 @@
             </div>
         </div>
         <div class="col">
-            <div class="card border-0" style="min-height: calc(60vh - 6rem)">
+            <div class="card border-0" style="height: calc(50vh - 5rem)">
                 <div class="heading-with-line mb-3">
-                    <h5 class="m-0 me-3">자재 홀드</h5>
+                    <h5 class="me-3">자재 홀드</h5>
                 </div>
                 <div class="ag-wrapper">
                     <ag-grid-vue class="ag-theme-alpine custom-grid-theme" :columnDefs="matHoldListDefs"
@@ -328,7 +328,7 @@ export default {
                 singleClickEdit: true,              //한 번 클릭 했을 때 수정
                 suppressRowClickSelection: true,    // 행 클릭할 때 체크박스 선택 방지
 		        pagination: true,
-                paginationPageSize: 7,              // 페이지당 갯수
+                paginationPageSize: 4,              // 페이지당 갯수
                 paginationPageSizeSelector: false,  // 
                 defaultColDef: {
                     suppressMovable: true,          //셀 이동 금지
@@ -341,7 +341,7 @@ export default {
                 singleClickEdit: true,              //한 번 클릭 했을 때 수정
                 suppressRowClickSelection: true,    // 행 클릭할 때 체크박스 선택 방지
 		        pagination: true,
-                paginationPageSize: 7,              // 페이지당 갯수
+                paginationPageSize: 4,              // 페이지당 갯수
                 paginationPageSizeSelector: false,  // 
                 defaultColDef: {
                     suppressMovable: true,          //셀 이동 금지
