@@ -378,18 +378,16 @@ export default {
             const formData = new FormData();
             formData.append("image", this.imageFile);
 
-            const res = await axios.post("http://223.130.150.38/api/fac/uploadImage", formData, {
+            const res = await axios.post("http://3.37.89.177/api/fac/uploadImage", formData, {
                 headers: { "Content-Type": "multipart/form-data" }
             }).catch(err => {
                 console.error("이미지 업로드 실패:", err);
                 Swal.fire("업로드 실패", "이미지 업로드 중 오류가 발생했습니다.", "error");
                 return null;
             });
-
             if (res && res.data && res.data.fileName) {
                 return res.data.fileName;
             }
-
             return null;
         },
         //수정
@@ -456,15 +454,15 @@ export default {
         getImageUrl(fileName) {
             if (!fileName) return '';
             if (fileName.startsWith("data:image")) return fileName;
-            return `http://223.130.150.38/api/uploads/facImages/${fileName}`; // 또는 환경 변수 사용
+            return `http://3.37.89.177/api/uploads/facImages/${fileName}`; // 또는 환경 변수 사용
         },
         onImageChange(event) {
             const file = event.target.files[0];
             if (!file) return;
-            const allowedTypes = ['image/jpeg', 'image/png', 'image/svg+xml', 'image/jpg'];
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
 
             if (!allowedTypes.includes(file.type)) {
-                Swal.fire("업로드 불가", "이미지 파일만 등록 가능합니다. (jpg, png, svg)", "warning");
+                Swal.fire("업로드 불가", "이미지 파일만 등록 가능합니다. (jpg, png)", "warning");
                 this.$refs.fileInput.value = '';
                 return;
             }
