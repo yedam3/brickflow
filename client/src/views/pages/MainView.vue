@@ -214,48 +214,32 @@ export default {
             
             //자재 소모량 기입
             let groupBar = {};
+
             bar.data.forEach(item => {
-                groupBar[item.matName] = Array(7).fill(0);
+                if (!groupBar[item.matName]) {
+                    groupBar[item.matName] = Array(7).fill(0);
+                }
+
                 const dayIndex = labels.indexOf(item.day);
-                groupBar[item.matName][dayIndex] = item.quantity;
-            })
-            //라인차트 데이터셋 만들기
+                groupBar[item.matName][dayIndex] += item.quantity; // 누적합으로도 가능
+            });
+
             dateSet = Object.keys(groupBar).map((name, idx) => {
                 return {
                     label: name,
                     data: groupBar[name],
                     fill: false,
-                    backgroundColor: colors[idx%10],
+                    backgroundColor: colors[idx % 10],
                     borderColor: colors[idx % 10],
                     tension: 0.4
                 };
             });
+
             this.barData = {
                 labels: labels,
-              datasets: dateSet
+                datasets: dateSet
             };
-            this.barOptions = {
-                plugins: {
-                    legend: {
-                        labels: {
-                            fontColor: textColor
-                        }
-                    }
-                },
-                scales: {
-                    x: {
-                        ticks: {
-                            color: textColorSecondary,
-                            font: { weight: 500 }
-                        },
-                        grid: { display: false, drawBorder: false }
-                    },
-                    y: {
-                        ticks: { color: textColorSecondary },
-                        grid: { color: surfaceBorder, drawBorder: false }
-                    }
-                }
-            };
+
 
             //주간 출고량 기입
             let pieLabel = pie.data.map(item => item.prodName);
