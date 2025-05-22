@@ -188,7 +188,7 @@ export default {
                 domLayout: "autoHeight",            // 행을 보고 자동으로 hight부여
                 pagination: true,                   // 페이지네이션 활성화
                 paginationPageSize: 7,              // 페이지당 갯수
-                paginationPageSizeSelector: false,  // 
+                paginationPageSizeSelector: [7, 14],
                 defaultColDef: {
                     suppressMovable: true,          // 셀 이동 금지
                     resizable: false,               // 열 크기 조정 불가능
@@ -216,7 +216,7 @@ export default {
                 { field: "product_order_code", headerName: "지시코드", flex: 2, cellStyle: { textAlign: "center" } },
                 { field: "product_order_name", headerName: "지시명", flex: 3, cellStyle: { textAlign: "center" } },
                 { field: "process_name", headerName: "공정명", flex: 3, cellStyle: { textAlign: "center" } },
-                { field: "process_start_date", headerName: "공정 시작 일자", flex: 4, cellStyle: { textAlign: "center" } },
+                { field: "process_start_date", headerName: "공정 시작 일자", flex: 4, sort: 'DESC', cellStyle: { textAlign: "center" } },
                 { field: "process_end_date", headerName: "공정 종료 일자", flex: 4, cellStyle: { textAlign: "center" } },
                 { field: "prod_name", headerName: "제품명", flex: 4, cellStyle: { textAlign: "center" } },
                 { field: "order_quantity", headerName: "지시량", flex: 1.5, cellStyle: { textAlign: "center" } },

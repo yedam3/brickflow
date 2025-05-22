@@ -160,6 +160,7 @@ SELECT @result_code AS 'result_code', @result AS 'result';
 const findAllPlanOrderName = `
 SELECT DISTINCT po.product_order_name
 FROM work_process wp
+    LEFT JOIN process p ON wp.process_code = p.process_code
 	JOIN work_detail wd ON wp.product_order_detail_code = wd.product_order_detail_code
 	JOIN product_order po ON wd.product_order_code = po.product_order_code
 WHERE NOT EXISTS (
@@ -185,14 +186,14 @@ WHERE NOT EXISTS (
                ) THEN created_quantity END)
     ) valid_orders
     WHERE valid_orders.product_order_detail_code = wp.product_order_detail_code
-) AND wp.order_quantity > 0
+) AND wp.order_quantity > 0 AND p.process_type = 'PT1'
 `;
 
 // 공정 목록 조회
 const findAllProcessName = `
 SELECT DISTINCT p.process_name
 FROM process p
-JOIN work_process wp ON p.process_code = wp.process_code
+    JOIN work_process wp ON p.process_code = wp.process_code
 WHERE NOT EXISTS (
     SELECT 1
     FROM (
@@ -216,12 +217,13 @@ WHERE NOT EXISTS (
                ) THEN created_quantity END)
     ) valid_orders
     WHERE valid_orders.product_order_detail_code = wp.product_order_detail_code
-) AND wp.order_quantity > 0
+) AND wp.order_quantity > 0 AND p.process_type = 'PT1'
 `;
 // 제품 목록 조회
 const findAllProdName = `
 SELECT DISTINCT pd.prod_name
 FROM work_process wp
+    LEFT JOIN process p ON wp.process_code = p.process_code
     JOIN prod pd ON wp.prod_code = pd.prod_code
 WHERE NOT EXISTS (
     SELECT 1
@@ -246,7 +248,7 @@ WHERE NOT EXISTS (
                ) THEN created_quantity END)
     ) valid_orders
     WHERE valid_orders.product_order_detail_code = wp.product_order_detail_code
-) AND wp.order_quantity > 0
+) AND wp.order_quantity > 0 AND p.process_type = 'PT1'
 `;
 
 // 실적 목록 조회
