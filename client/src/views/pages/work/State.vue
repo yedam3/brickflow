@@ -219,10 +219,10 @@ export default {
                 { field: "process_start_date", headerName: "공정 시작 일자", flex: 4, sort: 'DESC', cellStyle: { textAlign: "center" } },
                 { field: "process_end_date", headerName: "공정 종료 일자", flex: 4, cellStyle: { textAlign: "center" } },
                 { field: "prod_name", headerName: "제품명", flex: 4, cellStyle: { textAlign: "center" } },
-                { field: "order_quantity", headerName: "지시량", flex: 1.5, cellStyle: { textAlign: "center" } },
-                { field: "input_quantity", headerName: "투입량", flex: 1.5, cellStyle: { textAlign: "center" } },
-                { field: "error_quantity", headerName: "불량량", flex: 1.5, cellStyle: { textAlign: "center" } },
-                { field: "created_quantity", headerName: "생산량", flex: 1.5, cellStyle: { textAlign: "center" } },
+                { field: "order_quantity", headerName: "지시량", flex: 2, cellStyle: { textAlign: "center" } },
+                { field: "input_quantity", headerName: "투입량", flex: 2, cellStyle: { textAlign: "center" } },
+                { field: "error_quantity", headerName: "불량량", flex: 2, cellStyle: { textAlign: "center" } },
+                { field: "created_quantity", headerName: "생산량", flex: 2, cellStyle: { textAlign: "center" } },
                 {
                     field: "process_progress", headerName: "공정 진행도", flex: 3, cellRenderer: 'ProgressCell'
                 },
